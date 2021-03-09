@@ -1,0 +1,5 @@
+node_modules
+src/game
+rawSources
+out/melvorTypes.d.ts
+package-lock.json

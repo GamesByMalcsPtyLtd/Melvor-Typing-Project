@@ -152,6 +152,7 @@ function prettifyCode(code) {
  * @prop {string} file
  * @prop {{lineNumber: number; lines: string[]}[]} insert
  * @prop {{lineNumber: number; text: string}[]} replace
+ * @prop {number} version
  */
 
 /**
@@ -221,6 +222,15 @@ function generateModGuide(filePath, fileName) {
 }
 
 /**
+ * 
+ * @param {string} firstLine 
+ * @returns 
+ */
+function getVersion(firstLine) {
+  return parseInt(firstLine.match(/v(?<version>\d+)$/).groups.version);
+}
+
+/**
  * @param {ModificationGuide} modGuide The application guide for the target file
  * @param {string} targetPath The path to the target file to apply jsdoc to
  * @param {string} targetFile The name of the target file to apply jsdoc to
@@ -240,8 +250,15 @@ function applyModGuide(modGuide, targetPath, targetFile, outPath, outName) {
     file: targetFile,
     insert: [],
     replace: [],
+    version: -1,
   };
+  if (targetFile === 'index.html') {
+    fs.writeFileSync(outPath + outName, targetText);
+    console.log(`Applied Modifications and wrote to ${outPath}${outName}`);
+    return applyGuide;
+  }
   targetLines.forEach((line, index) => {
+    if (index === 0) applyGuide.version = getVersion(line);
     const replaceMatches = line.match(classNameRegex);
     if (replaceMatches !== null) {
       const oldClassName = replaceMatches.groups.className;
@@ -323,17 +340,26 @@ function applyGuideToSources(applyGuidePath, targetPath, outPath) {
     if (targetDir.includes(guide.file)) {
       const targetFile = fs.readFileSync(targetPath + guide.file, 'utf8');
       const targetLines = targetFile.split(/\r?\n/);
-      guide.replace.forEach((replacement) => {
-        targetLines[replacement.lineNumber] = replacement.text;
-      });
-      const outLines = [];
-      let curPos = 0;
-      guide.insert.forEach(insertion => {
-        outLines.push(...targetLines.slice(curPos, insertion.lineNumber), ...insertion.lines);
-        curPos = insertion.lineNumber;
-      });
-      outLines.push(...targetLines.slice(curPos));
-      fs.writeFileSync(outPath + guide.file, outLines.join('\n'));
+      if (guide.file === 'index.html') {
+        fs.writeFileSync(outPath + guide.file, targetFile);
+        return;
+      }
+      const targetVersion = getVersion(targetLines[0]);
+      if (targetVersion === guide.version) {
+        guide.replace.forEach((replacement) => {
+          targetLines[replacement.lineNumber] = replacement.text;
+        });
+        const outLines = [];
+        let curPos = 0;
+        guide.insert.forEach(insertion => {
+          outLines.push(...targetLines.slice(curPos, insertion.lineNumber), ...insertion.lines);
+          curPos = insertion.lineNumber;
+        });
+        outLines.push(...targetLines.slice(curPos));
+        fs.writeFileSync(outPath + guide.file, outLines.join('\n'));
+      } else {
+        console.warn(`Cannot apply guide to ${guide.file}, target has version v${targetVersion}, but guide has version v${guide.version}`);
+      }
     } else {
       console.warn(`Could not find file ${guide.file} in ${targetPath}`)
     }
