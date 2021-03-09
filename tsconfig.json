@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    "checkJs": true,
+    "outDir": "dist",
+    "allowJs": true,
+    "target": "es2020",
+    "declaration": true,
+    "emitDeclarationOnly": true,
+    "allowUmdGlobalAccess": true,
+    "moduleResolution": "node",
+    "module": "None",
+    "outFile": "./out/melvorTypes",
+    "noUnusedLocals": true,
+    "strictNullChecks": false
+  },
+  "include": ["./src/customTypes/*","./src/game/*"],
+  "exclude": ["./src/propLibs/**/*","interface/**/*"],
+  "typeAcquisition": {
+    "enable": true
+  },
+}
