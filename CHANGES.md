@@ -1,4 +1,6 @@
 # Changelog
+## v1.1.1
+- Updated to cachebuster version v784
 ## v1.1.0
 - Improved/Updated modifier descriptions
 - Added version update script
