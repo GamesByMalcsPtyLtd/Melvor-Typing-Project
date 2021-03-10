@@ -1,4 +1,4 @@
-/*  Melvor Typing Project v1.0.0: Fetches and Documents Melvor Idle
+/*  Melvor Typing Project v1.1.0: Fetches and Documents Melvor Idle
 
     Copyright (C) <2021>  <Coolrox95>
 
@@ -918,35 +918,47 @@ interface BankSearchOpts {
 }
 
 interface ModifierObject<Skill, Standard> {
-  /** Applies to maximumAttackRoll: Implemented */
+  /** Increases maximumAttackRoll by %: Implemented */
   increasedGlobalAccuracy: Standard,
+  /** Decreases maximumAttackRoll by %: Implemented */
   decreasedGlobalAccuracy: Standard,
-  /** Applies to maximumAttackRoll: Implemented */
+  /** Increases maximumAttackRoll by % when using Melee: Implemented */
   increasedMeleeAccuracyBonus: Standard,
+  /** Decreases maximumAttackRoll by % when using Melee: Implemented */
   decreasedMeleeAccuracyBonus: Standard,
-  /** Applies to baseMaxHit: Implemented */
+  /** Increases baseMaxHit by % when using Melee: Implemented */
   increasedMeleeStrengthBonus: Standard,
+  /** Decreases baseMaxHit by % when using Melee: Implemented */
   decreasedMeleeStrengthBonus: Standard,
-  /** Applies to maximumDefenceRoll: Implemented */
+  /** Increases maximumDefenceRoll by %: Implemented */
   increasedMeleeEvasion: Standard,
+  /** Decreases maximumDefenceRoll by %: Implemented */
   decreasedMeleeEvasion: Standard,
-  /** Applies to maximumAttackRoll: Implemented */
+  /** Increases maximumAttackRoll by % when using Ranged: Implemented */
   increasedRangedAccuracyBonus: Standard,
+  /** Decreases maximumAttackRoll by % when using Ranged: Implemented */
   decreasedRangedAccuracyBonus: Standard,
-  /** Applies to baseMaxHit: Implemented */
+  /** Increases baseMaxHit by % when using Ranged: Implemented */
   increasedRangedStrengthBonus: Standard,
+  /** Decreases baseMaxHit by % when using Ranged: Implemented */
   decreasedRangedStrengthBonus: Standard,
-  /** Not Implemented */
+  /** Increases maximumRangedDefenceRoll by %: Implemented */
   increasedRangedEvasion: Standard,
+  /** Decreases maximumRangedDefenceRoll by %: Implemented */
   decreasedRangedEvasion: Standard,
-  /** Applies to maximumAttackRoll: Implemented */
+  /** Increases maximumAttackRoll by % when using Magic: Implemented */
   increasedMagicAccuracyBonus: Standard,
+  /** Decreases maximumAttackRoll by % when using Magic: Implemented */
   decreasedMagicAccuracyBonus: Standard,
-  /** Applies to baseMaxHit: Implemented */
+  /** Increases baseMaxHit by % when using Magic: Implemented */
   increasedMagicDamageBonus: Standard,
+  /** Decreases baseMaxHit by % when using Magic: Implemented */
   decreasedMagicDamageBonus: Standard,
-  /** Not Implemented */
+  /** Increases maximumMagicDefenceRoll by %: Implemented */
   increasedMagicEvasion: Standard,
+  /** Decreases maximumMagicDefenceRoll by %: Implemented but
+   *  Bugged: Applies twice when debuffed by special attack
+  */
   decreasedMagicEvasion: Standard,
   /** Not Implemented, Not Used */
   increasedMaxHitFlat: Standard,
@@ -956,211 +968,248 @@ interface ModifierObject<Skill, Standard> {
   increasedMaxHitPercent: Standard,
   /** Not Implemented, Not Used */
   decreasedMaxHitPercent: Standard,
-  /** Implemented */
+  /** Increases damageReduction by value: Implemented */
   increasedDamageReduction: Standard,
+  /** Decreases damageReduction by value: Implemented */
   decreasedDamageReduction: Standard,
-  /** Implemented, applies to bones and item drops. 
+  /** Increases chance to double bones and item drops by value: Implemented
    * Appears to be referenced in calculateChanceToDouble but it is never used in the context of combat */
   increasedChanceToDoubleLootCombat: Standard,
+  /** Decreases chance to double bones and item drops by value: Implemented */
   decreasedChanceToDoubleLootCombat: Standard,
-  /** Implemented */
+  /** Increases slayer coin gains by %: Implemented */
   increasedSlayerCoins: Standard,
+  /** Decreases slayer coin gains by %: Implemented */
   decreasedSlayerCoins: Standard,
-  /** Implemented */
+  /** Increases base HP regen by value*numberMultiplier: Implemented */
   increasedHPRegenFlat: Standard,
+  /** Decreases base HP regen by value*numberMultiplier: Implemented */
   decreasedHPRegenFlat: Standard,
-  /** Implemented, Applies to confetti crossbow, coin drops, firemaking, alchemy, agility, thieving (offline+online)  */
+  /** Increases GP gain by % from all sources except selling items: Implemented  */
   increasedGPGlobal: Standard,
+  /** Decreases GP gain by % from all sources except selling items: Implemented  */
   decreasedGPGlobal: Standard,
-  /** Implemented */
+  /** Increases GP gain by % from monster drops and confetti crossbow: Implemented */
   increasedGPFromMonsters: Standard,
+  /** Decreases GP gain by % from monster drops and confetti crossbow: Implemented */
   decreasedGPFromMonsters: Standard,
-  /** Implemented, applies prior to percentage bonus */
+  /** Increases GP gain by value from monster drops before % bonuses: Implemented */
   increasedGPFromMonstersFlat: Standard,
+  /** Decreases GP gain by value from monster drops before % bonuses: Implemented */
   decreasedGPFromMonstersFlat: Standard,
-  /** Implemented */
+  /** Increases GP gain by % from thieving: Implemented */
   increasedGPFromThieving: Standard,
+  /** Decreases GP gain by % from thieving: Implemented */
   decreasedGPFromThieving: Standard,
-  /** Implemented, applies prior to percentage bonus */
+  /** Increases GP gain by value from thieving before % bonuses: Implemented */
   increasedGPFromThievingFlat: Standard,
+  /** Decreases GP gain by value from thieving before % bonuses: Implemented */
   decreasedGPFromThievingFlat: Standard,
-  /** Implemented, applies directly to damage values, only works on attack damage, excludes ancient magicks */
+  /** Increases damage dealt to boss monsters by %: Implemented (only on attack damage, excludes ancient magicks) */
   increasedDamageToBosses: Standard,
+  /** Decreases damage dealt to boss monsters by %: Implemented (only on attack damage, excludes ancient magicks) */
   decreasedDamageToBosses: Standard,
-  /** Implemented, applies directly to damage values, only works on attack damage, excludes ancient magicks */
+  /** Increases damage dealt to slayer task monsters by %: Implemented (only on attack damage, excludes ancient magicks) */
   increasedDamageToSlayerTasks: Standard,
+  /** Decreases damage dealt to slayer task monsters by %: Implemented (only on attack damage, excludes ancient magicks) */
   decreasedDamageToSlayerTasks: Standard,
-  /** Implemented, applies directly to damage values, only works on attack damage, excludes ancient magicks */
+  /** Increases damage dealt to slayer area monsters by %: Implemented (only on attack damage, excludes ancient magicks) */
   increasedDamageToSlayerAreaMonsters: Standard,
+  /** Decreases damage dealt to slayer area monsters by %: Implemented (only on attack damage, excludes ancient magicks) */
   decreasedDamageToSlayerAreaMonsters: Standard,
-  /** Implemented, applies directly to damage values, only works on attack damage, excludes ancient magicks */
+  /** Increases damage dealt to combat area monsters by %: Implemented (only on attack damage, excludes ancient magicks) */
   increasedDamageToCombatAreaMonsters: Standard,
+  /** Decreases damage dealt to combat area monsters by %: Implemented (only on attack damage, excludes ancient magicks) */
   decreasedDamageToCombatAreaMonsters: Standard,
-  /** Implemented, applies directly to damage values, only works on attack damage, excludes ancient magicks */
+  /** Increases damage dealt to dungeon monsters by %: Implemented (only on attack damage, excludes ancient magicks) */
   increasedDamageToDungeonMonsters: Standard,
+  /** Decreases damage dealt to dungeon monsters by %: Implemented (only on attack damage, excludes ancient magicks) */
   decreasedDamageToDungeonMonsters: Standard,
-  /** Implemented, applies directly to damage values, only works on attack damage, excludes ancient magicks */
+  /** Increases damage dealt to monsters by %: Implemented (only on attack damage, excludes ancient magicks) */
   increasedDamageToAllMonsters: Standard,
+  /** Decreases damage dealt to monsters by %: Implemented (only on attack damage, excludes ancient magicks) */
   decreasedDamageToAllMonsters: Standard,
-  /** Implemented, some duplicate code for it but doesn't seem to be a problem */
+  /** Increases the % efficiency of auto-eat by value: Implemented */
   increasedAutoEatEfficiency: Standard,
+  /** Decreases the % efficiency of auto-eat by value: Implemented */
   decreasedAutoEatEfficiency: Standard,
-  /** Implemented */
+  /** Increases the threshold % of maxHitpoints that will trigger auto-eat by value: Implemented */
   increasedAutoEatThreshold: Standard,
+  /** Decreases the threshold % of maxHitpoints that will trigger auto-eat by value: Implemented */
   decreasedAutoEatThreshold: Standard,
-  /** Implemented */
+  /** Increases the % of maxHitpoints that auto-eat heals to by value: Implemented */
   increasedAutoEatHPLimit: Standard,
+  /** Decreases the % of maxHitpoints that auto-eat heals to by value: Implemented */
   decreasedAutoEatHPLimit: Standard,
-  /** Implemented */
+  /** Increases the base healing value of food by %: Implemented */
   increasedFoodHealingValue: Standard,
+  /** Decreases the base healing value of food by %: Implemented */
   decreasedFoodHealingValue: Standard,
-  /** Implemented */
+  /** Increases the % chance to preserve prayerpoints by value: Implemented */
   increasedChanceToPreservePrayerPoints: Standard,
+  /** Decreases the % chance to preserve prayerpoints by value: Implemented */
   decreasedChanceToPreservePrayerPoints: Standard,
-  /** Implemented */
+  /** Decreases the quantity of prayerpoints consumed by a prayer by value: Implemented, but bugged, applies to 0 cost updates to pp */
   increasedFlatPrayerCostReduction: Standard,
+  /** Increases the quantity of prayerpoints consumed by a prayer by value: Implemented, bug bugged, applies to 0 cost updates to pp */
   decreasedFlatPrayerCostReduction: Standard,
-  /** Implemented */
+  /** Increases minHitIncrease by value*numberMultiplier when using Air spells: Implemented */
   increasedMinAirSpellDmg: Standard,
-  /** Implemented */
+  /** Decreases minHitIncrease by value*numberMultiplier when using Air spells: Implemented */
   decreasedMinAirSpellDmg: Standard,
-  /** Implemented */
+  /** Increases minHitIncrease by value*numberMultiplier when using Water spells: Implemented */
   increasedMinWaterSpellDmg: Standard,
-  /** Implemented */
+  /** Decreases minHitIncrease by value*numberMultiplier when using Water spells: Implemented */
   decreasedMinWaterSpellDmg: Standard,
-  /** Implemented */
+  /** Increases minHitIncrease by value*numberMultiplier when using Earth spells: Implemented */
   increasedMinEarthSpellDmg: Standard,
-  /** Implemented */
+  /** Decreases minHitIncrease by value*numberMultiplier when using Earth spells: Implemented */
   decreasedMinEarthSpellDmg: Standard,
-  /** Implemented */
+  /** Increases minHitIncrease by value*numberMultiplier when using Fire spells: Implemented */
   increasedMinFireSpellDmg: Standard,
-  /** Implemented */
+  /** Decreases minHitIncrease by value*numberMultiplier when using Fire spells: Implemented */
   decreasedMinFireSpellDmg: Standard,
-  /** Implemented */
+  /** Increases the % chance to preserve ranged ammo by value: Implemented */
   increasedAmmoPreservation: Standard,
-  /** Implemented */
+  /** Decreases the % chance to preserve ranged ammo by value: Implemented */
   decreasedAmmoPreservation: Standard,
-  /** Implemented, works but implementation is messy */
+  /** Increases the % chance to preserve runes by value: Implemented, but is messy */
   increasedRunePreservation: Standard,
+  /** Decreases the % chance to preserve runes by value: Implemented, but is messy */
   decreasedRunePreservation: Standard,
-  /** Implemented in getSkillHiddenLevels. 
-   * Only Attack and Strength present in game. 
-   * Used For:
-   * Ranged Accuracy
-   * Magic Accuracy
-   * Melee Accuracy
-   * Ranged Max Hit
-   * Melee Max Hit
-   * 
-   * Missing: (Low priority, none of these are actually present)
-   * Melee Evasion: Defence
-   * Ranged Evasion: Defence
-   * Magic Evasion: Defence + Magic
-   * Magic Max Hit: Magic Level */
+  /** Increases the skill level used to compute combat stats by value: Implemented */
   increasedHiddenSkillLevel: Skill,
-  /** Implemented, but bugged. Also has same issues as increasedHiddenSkillLevel if bug fixed */
+  /** Decreases the skill level used to compute combat stats by value: Implemented */
   decreasedHiddenSkillLevel: Skill,
-  /** Implemented */
+  /** Decreases playerAttackSpeed by value [ms] before % bonuses: Implemented */
   decreasedPlayerAttackSpeed: Standard,
+  /** Increases playerAttackSpeed by value [ms] before % bonuses: Implemented */
   increasedPlayerAttackSpeed: Standard,
-  /** Implemented */
+  /** Decreases playerAttackSpeed by %: Implemented */
   decreasedPlayerAttackSpeedPercent: Standard,
+  /** Increases playerAttackSpeed by %: Implemented */
   increasedPlayerAttackSpeedPercent: Standard,
-  /** Implemented: Note area effects work with modifier system now */
+  /** Increases slayer area effect % values by value: Implemented */
   increasedSlayerAreaEffectNegationFlat: Standard,
+  /** Decreases slayer area effect % values by value: Implemented */
   decreasedSlayerAreaEffectNegationFlat: Standard,
-  /** Implemented */
+  /** Decreases enemySpawnTimer by value [ms]: Implemented */
   decreasedMonsterRespawnTimer: Standard,
+  /** Increases enemySpawnTimer by value [ms]: Implemented */
   increasedMonsterRespawnTimer: Standard,
-  /** Implemented, but may be visually bugged. Not actually used though. */
+  /** Increases the GP gained from item sales by %: Implemented, but not used. */
   increasedGPFromSales: Standard,
+  /** Decreases the GP gained from item sales by %: Implemented, but not used. */
   decreasedGPFromSales: Standard,
-  /** Implemented */
+  /** Increases maximum bank space by value: Implemented */
   increasedBankSpace: Standard,
+  /** Decreases maximum bank space by value: Implemented */
   decreasedBankSpace: Standard,
-  /** Implemented Functionally identical to increasedBankSpace*/
+  /** Increases maximum bank space by value, and increases bank upgrade cost via getBankUpgradeCost: Implemented */
   increasedBankSpaceShop: Standard,
+  /** Decreases maximum bank space by value, and decreases bank upgrade cost via getBankUpgradeCost: Implemented */
   decreasedBankSpaceShop: Standard,
-  /** Implemented */
+  /** Increases % chance to preserve potion charges by value: Implemented */
   increasedChanceToPreservePotionCharge: Standard,
+  /** Decreases % chance to preserve potion charges by value: Implemented */
   decreasedChanceToPreservePotionCharge: Standard,
-  /** Implemented via getTotalFromModifierArray in calculateSkillInterval */
+  /** Decreases skill interval by value [ms] before % bonuses: Implemented via getTotalFromModifierArray in calculateSkillInterval */
   decreasedSkillInterval: Skill,
+  /** Increases skill interval by value [ms] before % bonuses: Implemented via getTotalFromModifierArray in calculateSkillInterval */
   increasedSkillInterval: Skill,
-  /** Implemented via getTotalFromModifierArray in calculateSkillInterval  */
+  /** Decreases skill interval by %: Implemented via getTotalFromModifierArray in calculateSkillInterval */
   decreasedSkillIntervalPercent: Skill,
+  /** Increases skill interval by %: Implemented via getTotalFromModifierArray in calculateSkillInterval */
   increasedSkillIntervalPercent: Skill,
-  /** Not implemented, should be replaced with increasedChanceToDoubleItemsSkill*/
-  increasedChanceToDoubleLootThieving: Standard,
-  decreasedChanceToDoubleLootThieving: Standard,
-  /** Implemented via getTotalFromModifierArray in calculateSkillPreservationChance */
-  increasedSkillPreservationChance: Skill,
-  decreasedSkillPreservationChance: Skill,
-  /** Implemented via calculateSkillPreservationChance*/
-  increasedGlobalPreservationChance: Standard,
-  decreasedGlobalPreservationChance: Standard,
-  /** Unimplemented and Used. Holdover from when agility had stamina */
-  increasedStaminaPreservationChance: Standard,
-  decreasedStaminaPreservationChance: Standard,
-  /** Implemented in getMasteryXpToAdd */
-  increasedGlobalMasteryXP: Standard,
-  decreasedGlobalMasteryXP: Standard,
-  /** Implemented in addXPBonuses */
-  increasedGlobalSkillXP: Standard,
-  decreasedGlobalSkillXP: Standard,
-  /** Implemented via getTotalFromModifierArray in getMasteryXpToAdd */
-  increasedMasteryXP: Skill,
-  decreasedMasteryXP: Skill,
-  /** Implemented via getTotalFromModifierArray in addXPBonuses
-   * Currently applies twice for slayer xp
+  /** Not implemented, Not Used
+   * @deprecated Use increasedChanceToDoubleItemsSkill instead
    */
+  increasedChanceToDoubleLootThieving: Standard,
+  /** Not implemented, Not Used.
+   * @deprecated Use decreasedChanceToDoubleItemsSkill instead
+   */
+  decreasedChanceToDoubleLootThieving: Standard,
+  /** Increases % chance to preserve resources in skill by value: Implemented via getTotalFromModifierArray in calculateSkillPreservationChance */
+  increasedSkillPreservationChance: Skill,
+  /** Decreases % chance to preserve resources in skill by value: Implemented via getTotalFromModifierArray in calculateSkillPreservationChance */
+  decreasedSkillPreservationChance: Skill,
+  /** Increases % chance to preserve resources in all skills by value: Implemented via calculateSkillPreservationChance*/
+  increasedGlobalPreservationChance: Standard,
+  /** Decreases % chance to preserve resources in all skills by value: Implemented via calculateSkillPreservationChance*/
+  decreasedGlobalPreservationChance: Standard,
+  /** @deprecated Unimplemented and Used. Holdover from when agility had stamina */
+  increasedStaminaPreservationChance: Standard,
+  /** @deprecated Unimplemented and Used. Holdover from when agility had stamina */
+  decreasedStaminaPreservationChance: Standard,
+  /** Increases mastery xp earned from all skills by %: Implemented in getMasteryXpToAdd */
+  increasedGlobalMasteryXP: Standard,
+  /** Decreases mastery xp earned from all skills by %: Implemented in getMasteryXpToAdd */
+  decreasedGlobalMasteryXP: Standard,
+  /** Increases xp earned from all skills by %: Implemented in addXPBonuses */
+  increasedGlobalSkillXP: Standard,
+  /** Decreases xp earned from all skills by %: Implemented in addXPBonuses */
+  decreasedGlobalSkillXP: Standard,
+  /** Increases mastery xp earned for skill by %: Implemented via getTotalFromModifierArray in getMasteryXpToAdd */
+  increasedMasteryXP: Skill,
+  /** Decreases mastery xp earned for skill by %: Implemented via getTotalFromModifierArray in getMasteryXpToAdd */
+  decreasedMasteryXP: Skill,
+  /** Increases xp earned from skill by %: Implemented via getTotalFromModifierArray in addXPBonuses */
   increasedSkillXP: Skill,
+  /** Decreases xp earned from skill by %: Implemented via getTotalFromModifierArray in addXPBonuses */
   decreasedSkillXP: Skill,
-  /** Unimplemented and Used. Holdover from when agility had stamina */
+  /** @deprecated Unimplemented and Used. Holdover from when agility had stamina */
   increasedMaxStamina: Standard,
+  /** @deprecated Unimplemented and Used. Holdover from when agility had stamina */
   decreasedMaxStamina: Standard,
-  /** Unimplemented, should be in updateRockHP. Also need to remove old usage for pet*/
+  /** Increases maxRockHP by value: Implemented*/
   increasedMiningNodeHP: Standard,
+  /** Decreases maxRockHP by value: Implemented*/
   decreasedMiningNodeHP: Standard,
-  /** Implemented */
+  /** Allows swapping equipment/equipment sets/food in dungeons: Implemented */
   dungeonEquipmentSwapping: Standard,
-  /** Implemented */
+  /** Increases available equipment sets by value: Implemented */
   increasedEquipmentSets: Standard,
-  /** Implemented */
+  /** Allows usage of autoslayer: Implemented */
   autoSlayerUnlocked: Standard,
-  /** Implemented */
+  /** Increases the number of trees that can be cut by value: Implemented */
   increasedTreeCutLimit: Standard,
-  /** Implemented
-   * Does not work on gems from mining though
+  /** Increases the % chance to double items from all skills by value: Implemented
    * Does not work for combat loot
-   * Does not work for alt magic
    */
   increasedChanceToDoubleItemsGlobal: Standard,
+  /** Decreases the % chance to double items from all skills by value: Implemented
+   * Does not work for combat loot
+   */
   decreasedChanceToDoubleItemsGlobal: Standard,
-  /** Implemented */
+  /** Increases the harvest quantity of farming by %: Implemented */
   increasedFarmingYield: Standard,
+  /** Decreases the harvest quantity of farming by %: Implemented */
   decreasedFarmingYield: Standard,
-  /** Implemented */
+  /** Increases maxHitpoints by value*numberMultiplier: Implemented */
   increasedMaxHitpoints: Standard,
+  /** Decreases maxHitpoints by value*numberMultiplier: Implemented */
   decreasedMaxHitpoints: Standard,
-  /** Unused and Unimplented, Holdover from when agility had stamina */
+  /** @deprecated Unused and Unimplented, Holdover from when agility had stamina */
   increasedStaminaPerObstacle: Standard,
-  /** Unused and Unimplented, Holdover from when agility had stamina */
+  /** @deprecated Unused and Unimplented, Holdover from when agility had stamina */
   decreasedStaminaPerObstacle: Standard,
-  /** Implemented */
+  /** Increases slayer task length by %: Implemented */
   increasedSlayerTaskLength: Standard,
+  /** Decreases slayer task length by %: Implemented */
   decreasedSlayerTaskLength: Standard,
-  /** Unused and Unimplented, Holdover from when agility had stamina */
+  /** @deprecated Unused and Unimplented, Holdover from when agility had stamina */
   increasedStaminaCost: Standard,
-  /** Unused and Unimplented, Holdover from when agility had stamina */
+  /** @deprecated Unused and Unimplented, Holdover from when agility had stamina */
   decreasedStaminaCost: Standard,
-  /** Partially implemented.
-   * Doesn't work for: Mining
+  /** Increases the % chance to double items from a skill by value: Partially Implemented.
    * Doesn't work for online Cooking, but the only use is the pet which still works, could do with transitioning to new system
    * Doesn't work for online Crafting (offline uses calculateChanceToDouble), but the global one does. Not used anywhere so it's fine for now.
-   * Does not work for Alt. Magic
    */
   increasedChanceToDoubleItemsSkill: Skill,
+  /** Decreases the % chance to double items from a skill by value: Partially Implemented.
+   * Doesn't work for online Cooking, but the only use is the pet which still works, could do with transitioning to new system
+   * Doesn't work for online Crafting (offline uses calculateChanceToDouble), but the global one does. Not used anywhere so it's fine for now.
+   */
   decreasedChanceToDoubleItemsSkill: Skill,
   /** Unused and Unimplented */
   increasedLifesteal: Standard,
@@ -1170,44 +1219,47 @@ interface ModifierObject<Skill, Standard> {
   increasedReflectDamage: Standard,
   /** Unused and Unimplented */
   decreasedReflectDamage: Standard,
-  /** Implemented in getAgilityGPMultiplier */
+  /** Increases the GP from agility by %: Implemented in getAgilityGPMultiplier */
   increasedGPFromAgility: Standard,
+  /** Decreases the GP from agility by %: Implemented in getAgilityGPMultiplier */
   decreasedGPFromAgility: Standard,
-  /** Implemented, 
-   * but could be replaced with `increasedChanceToDoubleItemsSkill`
-   * and mining could be changed to use calculateChanceToDouble*/
+  /** Increases the % chance to double Ores from mining by value: Implemented */
   increasedChanceToDoubleOres: Standard,
+  /** Decreases the % chance to double Ores from mining by value: Implemented */
   decreasedChanceToDoubleOres: Standard,
-  /** Implemented, percentage bonus to regen */
+  /** Increases HP regeneration by %: Implemented */
   increasedHitpointRegeneration: Standard,
+  /** Decreases HP regeneration by %: Implemented */
   decreasedHitpointRegeneration: Standard,
-  /** Implemented */
+  /** Decreases golbin raid skip cost by %: Implemented */
   golbinRaidWaveSkipCostReduction: Standard,
-  /** Implemented, but also increases the max qty of food */
+  /** Increase the quantity of food from golbin raid by value: Implemented, possibly bugged as it just increases the amount, not just the min */
   golbinRaidIncreasedMinimumFood: Standard,
-  /** Implemented */
+  /** Increases the maximum ammo quantity from goblin raid by %: Implemented */
   golbinRaidIncreasedMaximumAmmo: Standard,
-  /** Implemented */
+  /** Increases the maximum rune quantity from goblin raid by %: Implemented */
   golbinRaidIncreasedMaximumRunes: Standard,
-  /** Implemented */
+  /** Unlocks prayer in golbin raid: Implemented */
   golbinRaidPrayerUnlocked: Standard,
-  /** Implemented? I don't think this one displays anywhere though */
+  /** Increases the prayer level in golbin raid by value: Implemented, I don't think this one displays anywhere though */
   golbinRaidIncreasedPrayerLevel: Standard,
-  /** Implemented */
+  /** Increases the quantity of prayer points started with in golbin raid by value: Implemented */
   golbinRaidIncreasedPrayerPointsStart: Standard,
-  /** Implemented. Golbin raid could have issues with the PP being effected by other modifiers though */
+  /** Increases the quantity of prayer points recieved per wave in golbin raid by value: Implemented. Golbin raid could have issues with the PP being effected by other modifiers though */
   golbinRaidIncreasedPrayerPointsWave: Standard,
-  /** Implemented */
+  /** Unlocks passive slot selection on tenth wave of golbin raid: Implemented */
   golbinRaidPassiveSlotUnlocked: Standard,
-  /** Implemented */
+  /** Increases the quantity of runes started with in golbin raid by value: Implemented */
   golbinRaidIncreasedStartingRuneCount: Standard,
-  /** Implemented */
+  /** Changes the itemID of the starting weapon in golbin raid to value: Implemented */
   golbinRaidStartingWeapon: Standard,
-  /** Implemented */
+  /** Increases minHitIncrease by floor(baseMaxHit*value/100): Implemented */
   increasedMinHitBasedOnMaxHit: Standard,
+  /** Decreases minHitIncrease by floor(baseMaxHit*value/100): Implemented */
   decreasedMinHitBasedOnMaxHit: Standard,
-  /** Implemented */
+  /** Increases the charges of potions by value: Implemented */
   increasedPotionChargesFlat: Standard,
+  /** Decreases the charges of potions by value: Implemented */
   decreasedPotionChargesFlat: Standard,
 }
 type SkillModifierData = [SkillID, number];
@@ -1508,6 +1560,9 @@ interface MasteryLevelCache {
 }
 interface PlayFabEventBody {
   [key: string]: any
+}
+interface StringDictionary<T> {
+  [index: string]: T
 }
 type SweetAlertOptions = import("sweetalert2").SweetAlertOptions<*>;
 type ShopCategory = 'General' | 'SkillUpgrades' | 'Slayer' | 'Gloves' | 'Skillcapes' | 'Materials' | 'GolbinRaid';

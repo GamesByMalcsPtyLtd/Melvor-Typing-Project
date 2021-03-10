@@ -15,14 +15,31 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-import {Tippy, HideAll, Delegate, CreateSingleton, roundArrow} from 'tippy.js';
-export as namespace tippy
-export = tippy;
-interface TippyGlobal extends Tippy {
-  hideAll: HideAll;
-  delegate: Delegate;
-  createSingleton: CreateSingleton;
-  readonly roundArrow: typeof roundArrow;
+// @ts-check
+const fs = require('fs');
+const versionRegex = /\d+\.\d+\.\d+/m;
+const newVersion = '1.1.0';
+const fileDirs = [
+  './.scripts/',
+  './src/customTypes/'
+]
+/**
+ * 
+ * @param {string} fullPath 
+ */
+function updateFileVersion(fullPath) {
+  const newFileText = fs.readFileSync(fullPath,'utf8').replace(versionRegex,newVersion);
+  fs.writeFileSync(fullPath,newFileText);
+  console.log(`Updated version of ${fullPath} to ${newVersion}`);
 }
-
-declare const tippy: TippyGlobal;
+if (versionRegex.test(newVersion)) {
+  fileDirs.forEach((directory)=>{
+    fs.readdirSync(directory).forEach((fileName)=>{
+      const fullPath = directory + fileName;
+      updateFileVersion(fullPath);
+    })
+  });
+  updateFileVersion('./package.json')
+} else {
+  console.warn('New version is not valid');
+}
