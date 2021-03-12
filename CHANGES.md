@@ -1,4 +1,6 @@
 # Changelog
+## v1.2.2
+- Updated to cachebuster verison v790
 ## v1.2.1
 - Updated to cachebuster version v789
 ## v1.2.0
