@@ -1,4 +1,10 @@
 # Changelog
+## v1.2.0
+- Seperated ModifierObject into StandardModifierObject and SkillModifierObject
+- Started adding descriptions to item properties
+- Improved typing of Object.entries of Modifier objects
+- Typed new functions in agility.js
+- Updated to cachebuster version v788
 ## v1.1.1
 - Updated to cachebuster version v784
 ## v1.1.0

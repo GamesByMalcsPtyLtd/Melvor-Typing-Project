@@ -1,4 +1,4 @@
-/*  Melvor Typing Project v1.1.1: Fetches and Documents Melvor Idle
+/*  Melvor Typing Project v1.2.0: Fetches and Documents Melvor Idle
 
     Copyright (C) <2021>  <Coolrox95>
 
@@ -501,7 +501,7 @@ interface FishingItem {
   fishingID: FishingID
 }
 
-type Loot = [number, number];
+type Loot = [ItemID, number];
 type LootTable = Loot[];
 
 interface FletchingItem {
@@ -917,7 +917,7 @@ interface BankSearchOpts {
   keys: ['name', 'category', 'id', 'type'],
 }
 
-interface ModifierObject<Skill, Standard> {
+interface StandardModifierObject<Standard> {
   /** Increases maximumAttackRoll by %: Implemented */
   increasedGlobalAccuracy: Standard,
   /** Decreases maximumAttackRoll by %: Implemented */
@@ -1077,10 +1077,6 @@ interface ModifierObject<Skill, Standard> {
   increasedRunePreservation: Standard,
   /** Decreases the % chance to preserve runes by value: Implemented, but is messy */
   decreasedRunePreservation: Standard,
-  /** Increases the skill level used to compute combat stats by value: Implemented */
-  increasedHiddenSkillLevel: Skill,
-  /** Decreases the skill level used to compute combat stats by value: Implemented */
-  decreasedHiddenSkillLevel: Skill,
   /** Decreases playerAttackSpeed by value [ms] before % bonuses: Implemented */
   decreasedPlayerAttackSpeed: Standard,
   /** Increases playerAttackSpeed by value [ms] before % bonuses: Implemented */
@@ -1113,26 +1109,14 @@ interface ModifierObject<Skill, Standard> {
   increasedChanceToPreservePotionCharge: Standard,
   /** Decreases % chance to preserve potion charges by value: Implemented */
   decreasedChanceToPreservePotionCharge: Standard,
-  /** Decreases skill interval by value [ms] before % bonuses: Implemented via getTotalFromModifierArray in calculateSkillInterval */
-  decreasedSkillInterval: Skill,
-  /** Increases skill interval by value [ms] before % bonuses: Implemented via getTotalFromModifierArray in calculateSkillInterval */
-  increasedSkillInterval: Skill,
-  /** Decreases skill interval by %: Implemented via getTotalFromModifierArray in calculateSkillInterval */
-  decreasedSkillIntervalPercent: Skill,
-  /** Increases skill interval by %: Implemented via getTotalFromModifierArray in calculateSkillInterval */
-  increasedSkillIntervalPercent: Skill,
   /** Not implemented, Not Used
    * @deprecated Use increasedChanceToDoubleItemsSkill instead
    */
-  increasedChanceToDoubleLootThieving: Standard,
-  /** Not implemented, Not Used.
-   * @deprecated Use decreasedChanceToDoubleItemsSkill instead
-   */
-  decreasedChanceToDoubleLootThieving: Standard,
-  /** Increases % chance to preserve resources in skill by value: Implemented via getTotalFromModifierArray in calculateSkillPreservationChance */
-  increasedSkillPreservationChance: Skill,
-  /** Decreases % chance to preserve resources in skill by value: Implemented via getTotalFromModifierArray in calculateSkillPreservationChance */
-  decreasedSkillPreservationChance: Skill,
+   increasedChanceToDoubleLootThieving: Standard,
+   /** Not implemented, Not Used.
+    * @deprecated Use decreasedChanceToDoubleItemsSkill instead
+    */
+   decreasedChanceToDoubleLootThieving: Standard,
   /** Increases % chance to preserve resources in all skills by value: Implemented via calculateSkillPreservationChance*/
   increasedGlobalPreservationChance: Standard,
   /** Decreases % chance to preserve resources in all skills by value: Implemented via calculateSkillPreservationChance*/
@@ -1149,14 +1133,6 @@ interface ModifierObject<Skill, Standard> {
   increasedGlobalSkillXP: Standard,
   /** Decreases xp earned from all skills by %: Implemented in addXPBonuses */
   decreasedGlobalSkillXP: Standard,
-  /** Increases mastery xp earned for skill by %: Implemented via getTotalFromModifierArray in getMasteryXpToAdd */
-  increasedMasteryXP: Skill,
-  /** Decreases mastery xp earned for skill by %: Implemented via getTotalFromModifierArray in getMasteryXpToAdd */
-  decreasedMasteryXP: Skill,
-  /** Increases xp earned from skill by %: Implemented via getTotalFromModifierArray in addXPBonuses */
-  increasedSkillXP: Skill,
-  /** Decreases xp earned from skill by %: Implemented via getTotalFromModifierArray in addXPBonuses */
-  decreasedSkillXP: Skill,
   /** @deprecated Unimplemented and Used. Holdover from when agility had stamina */
   increasedMaxStamina: Standard,
   /** @deprecated Unimplemented and Used. Holdover from when agility had stamina */
@@ -1201,23 +1177,13 @@ interface ModifierObject<Skill, Standard> {
   increasedStaminaCost: Standard,
   /** @deprecated Unused and Unimplented, Holdover from when agility had stamina */
   decreasedStaminaCost: Standard,
-  /** Increases the % chance to double items from a skill by value: Partially Implemented.
-   * Doesn't work for online Cooking, but the only use is the pet which still works, could do with transitioning to new system
-   * Doesn't work for online Crafting (offline uses calculateChanceToDouble), but the global one does. Not used anywhere so it's fine for now.
-   */
-  increasedChanceToDoubleItemsSkill: Skill,
-  /** Decreases the % chance to double items from a skill by value: Partially Implemented.
-   * Doesn't work for online Cooking, but the only use is the pet which still works, could do with transitioning to new system
-   * Doesn't work for online Crafting (offline uses calculateChanceToDouble), but the global one does. Not used anywhere so it's fine for now.
-   */
-  decreasedChanceToDoubleItemsSkill: Skill,
-  /** Unused and Unimplented */
+  /** Unused and Unimplemented */
   increasedLifesteal: Standard,
-  /** Unused and Unimplented */
+  /** Unused and Unimplemented */
   decreasedLifesteal: Standard,
-  /** Unused and Unimplented */
+  /** Unused and Unimplemented */
   increasedReflectDamage: Standard,
-  /** Unused and Unimplented */
+  /** Unused and Unimplemented */
   decreasedReflectDamage: Standard,
   /** Increases the GP from agility by %: Implemented in getAgilityGPMultiplier */
   increasedGPFromAgility: Standard,
@@ -1262,77 +1228,157 @@ interface ModifierObject<Skill, Standard> {
   /** Decreases the charges of potions by value: Implemented */
   decreasedPotionChargesFlat: Standard,
 }
+interface SkillModifierObject<Skill> {
+  /** Increases the skill level used to compute combat stats by value: Implemented */
+  increasedHiddenSkillLevel: Skill,
+  /** Decreases the skill level used to compute combat stats by value: Implemented */
+  decreasedHiddenSkillLevel: Skill,
+  /** Decreases skill interval by value [ms] before % bonuses: Implemented via getTotalFromModifierArray in calculateSkillInterval */
+  decreasedSkillInterval: Skill,
+  /** Increases skill interval by value [ms] before % bonuses: Implemented via getTotalFromModifierArray in calculateSkillInterval */
+  increasedSkillInterval: Skill,
+  /** Decreases skill interval by %: Implemented via getTotalFromModifierArray in calculateSkillInterval */
+  decreasedSkillIntervalPercent: Skill,
+  /** Increases skill interval by %: Implemented via getTotalFromModifierArray in calculateSkillInterval */
+  increasedSkillIntervalPercent: Skill,
+  /** Increases % chance to preserve resources in skill by value: Implemented via getTotalFromModifierArray in calculateSkillPreservationChance */
+  increasedSkillPreservationChance: Skill,
+  /** Decreases % chance to preserve resources in skill by value: Implemented via getTotalFromModifierArray in calculateSkillPreservationChance */
+  decreasedSkillPreservationChance: Skill,
+  /** Increases mastery xp earned for skill by %: Implemented via getTotalFromModifierArray in getMasteryXpToAdd */
+  increasedMasteryXP: Skill,
+  /** Decreases mastery xp earned for skill by %: Implemented via getTotalFromModifierArray in getMasteryXpToAdd */
+  decreasedMasteryXP: Skill,
+  /** Increases xp earned from skill by %: Implemented via getTotalFromModifierArray in addXPBonuses */
+  increasedSkillXP: Skill,
+  /** Decreases xp earned from skill by %: Implemented via getTotalFromModifierArray in addXPBonuses */
+  decreasedSkillXP: Skill,
+  /** Increases the % chance to double items from a skill by value: Partially Implemented.
+   * Doesn't work for online Cooking, but the only use is the pet which still works, could do with transitioning to new system
+   * Doesn't work for online Crafting (offline uses calculateChanceToDouble), but the global one does. Not used anywhere so it's fine for now.
+   */
+   increasedChanceToDoubleItemsSkill: Skill,
+   /** Decreases the % chance to double items from a skill by value: Partially Implemented.
+    * Doesn't work for online Cooking, but the only use is the pet which still works, could do with transitioning to new system
+    * Doesn't work for online Crafting (offline uses calculateChanceToDouble), but the global one does. Not used anywhere so it's fine for now.
+    */
+   decreasedChanceToDoubleItemsSkill: Skill,
+}
+type ModifierObject<Skill, Standard> = StandardModifierObject<Standard> & SkillModifierObject<Skill>;
 type SkillModifierData = [SkillID, number];
 type SkillModifierActive = { id: SkillID, value: number };
 type ModifierData = Partial<ModifierObject<SkillModifierData[], number>>;
 type ModifierActive = Partial<ModifierObject<SkillModifierActive[], number>>;
-type ModifierKeys = keyof ModifierActive;
-type SkillModifierKeys = 'increasedHiddenSkillLevel' | 'decreasedHiddenSkillLevel' | 'decreasedSkillInterval' | 'decreasedSkillIntervalPercent' | 'increasedSkillPreservationChance' | 'increasedMasteryXP' | 'increasedSkillXP' | 'increasedSkillInterval' | 'increasedSkillIntervalPercent' | 'decreasedSkillPreservationChance' | 'decreasedMasteryXP' | 'decreasedSkillXP' | 'increasedChanceToDoubleItemsSkill' | 'decreasedChanceToDoubleItemsSkill';
-type StandardModifierKeys = Exclude<ModifierKeys, SkillModifierKeys>;
-type ModifierEntries<Skill, Standard> = [StandardModifierKeys, Standard] | [SkillModifierKeys, Skill];
-type ModifierDataEntries = ModifierEntries<SkillModifierData[], number>;
-type ModifierActiveEntries = ModifierEntries<SkillModifierActive[], number>;
+type ModifierKeys = keyof ModifierObject<any,any>;
+type SkillModifierKeys = keyof SkillModifierObject<any>;
+type StandardModifierKeys = keyof StandardModifierObject<any>;
+type SkillEntry<T> = [SkillModifierKeys,T];
+type StandardEntry<T> = [StandardModifierKeys,T];
+type ModifierEntry<Skill, Standard> = SkillEntry<Skill> | StandardEntry<Standard>;
+type ModifierDataEntry = ModifierEntry<SkillModifierData[], number>;
+type ModifierActiveEntry = ModifierEntry<SkillModifierActive[], number>;
 
 /** Generic base for all item like arrays */
 interface GenericItem extends BaseItem {
   // Animated Item
+  /** Item has an animated image */
   hasAnimation?: boolean,
+  /** Link to animate image source */
   mediaAnimation?: string,
   // Upgradeable Item
+  /** Item can be upgraded */
   canUpgrade?: boolean,
+  /** Item to upgrade to */
   trimmedItemID?: number,
+  /** Items required to upgrade */
   itemsRequired?: number[][],
+  /** GP cost to upgrades */
   trimmedGPCost?: number,
+  /** Multiple of the item can be upgraded at once */
   canMultiUpgrade?: boolean,
   // Openable Item
+  /** Item can be opened (e.g. is a chest) */
   canOpen?: boolean,
+  /** ItemIDs and weights of drops */
   dropTable?: LootTable,
+  /** Quantities of drops */
   dropQty?: number[],
   // Shop Item
+  /** Used to create SHOP variable, but otherwise do not use */
   buysFor?: number,
+  /** @deprecated Data is stored in SHOP */
   buysForLeather?: number,
+  /** @deprecated Data is now stored in SHOP*/
   slayerCost?: number,
+  /** @deprecated Data is now stored in SHOP*/
   slayerTaskRequirement?: [SlayerTier, number],
+  /** @deprecated Data is now stored in SHOP */
   buysForItems?: [ItemID, number][],
   // Bone Items
+  /** Unused flag for bones, game uses prayerPoints prop instead */
   isBones?: boolean,
+  /** Designates item as bone. Value is base pp given on burying */
   prayerPoints?: number,
   // Food
+  /** Designates item as food */
   canEat?: boolean,
+  /** value*numberMultiplier is base hp of food. */
   healsFor?: number,
   // Readable Item
+  /** Item can be read from bank */
   canRead?: boolean,
   // Alert Item
+  /** When read, sets title of Swal */
   readTitle?: string,
+  /** When read, sets html of Swal */
   readText?: string,
   // Birthday Event Cluescroll
+  /** @deprecated ID for birthday event cluescrolls. No longer in use. */
   clueID?: 0 | 1 | 2 | 3,
   // Bank/Mastery Tokens
+  /** Item can be claimed as token in bank */
   isToken?: boolean,
   // Mastery tokens only
+  /** Flags token as mastery token, and is the Skill to give masteryxp to */
   skill?: SkillID,
   // Bank Token
+  /** Flags token as bank token */
   isBankToken?: boolean,
   // Skill Item
+  /** [SkillID,MasteryID] of producing the item*/
   masteryID?: [SkillID, number],
   // Log
+  /** MasteryID for item for Firemaking */
   firemakingID?: number,
   // Cooking Item
+  /** @deprecated Unused category for cooking */
   cookingCategory?: number,
+  /** Identifies item as able to be cooked. Also MasteryID for cooking */
   cookingID?: number,
+  /** Cooking level required to cook item */
   cookingLevel?: number,
+  /** Cooking xp for cooking item */
   cookingXP?: number,
+  /** ItemID to give when item cooked */
   cookedItemID?: ItemID,
+  /** ItemID to give when item burned */
   burntItemID?: ItemID,
   // Fish
+  /** Identifies item as fish, should also be identical to MasteryID for it */
   fishingID?: number,
+  /** Fishing level required to catch item */
   fishingLevel?: number,
+  /** Fishing XP for catching item */
   fishingXP?: number,
+  /** Min interval [ms] to catch item */
   minFishingInterval?: number,
+  /** Max interval [ms] to catch item */
   maxFishingInterval?: number,
   // Barbarian Fish
+  /** If present fish gives strength xp when caught */
   strengthXP?: number,
   // Special Fishing Item
+  /** Identifies item as specialItems and indicates weight in loot-table */
   fishingCatchWeight?: number,
   // Mining Item
   miningID?: number,
@@ -1507,7 +1553,7 @@ interface BaseItem {
   category: string,
   /** Second Categorization tag */
   type: string,
-  /** Display name of item */
+  /** Display name of item. May contain html portions that must be replaced/filtered*/
   name: string,
   /** Base sale price of item */
   sellsFor: number,

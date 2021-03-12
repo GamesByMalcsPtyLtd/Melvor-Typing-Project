@@ -1,4 +1,4 @@
-/*  Melvor Typing Project v1.1.1: Fetches and Documents Melvor Idle
+/*  Melvor Typing Project v1.2.0: Fetches and Documents Melvor Idle
 
     Copyright (C) <2021>  <Coolrox95>
 
@@ -44,6 +44,6 @@ interface ObjectConstructor {
   keys(obj: ModifierData) : ModifierKeys[]
   keys(obj: ModifierActive) : ModifierKeys[]
   keys(obj: Shop) : ShopCategory[]
-  entries(obj: ModifierActive) : ModifierActiveEntries[]
-  entries(obj: ModifierData) : ModifierDataEntries[]
+  entries(obj: ModifierActive) : ModifierActiveEntry[]
+  entries(obj: ModifierData) : ModifierDataEntry[]
 }
