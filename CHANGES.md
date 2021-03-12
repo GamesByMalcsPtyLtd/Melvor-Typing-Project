@@ -1,4 +1,6 @@
 # Changelog
+## v1.2.1
+- Updated to cachebuster version v789
 ## v1.2.0
 - Seperated ModifierObject into StandardModifierObject and SkillModifierObject
 - Started adding descriptions to item properties
