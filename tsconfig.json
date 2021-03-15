@@ -10,8 +10,8 @@
     "moduleResolution": "node",
     "module": "None",
     "outFile": "./out/melvorTypes",
-    "noUnusedLocals": true,
-    "strictNullChecks": false
+    "noUnusedLocals": false,
+    "strictNullChecks": false,
   },
   "include": ["./src/customTypes/*","./src/game/*"],
   "exclude": ["./src/propLibs/**/*","interface/**/*"],

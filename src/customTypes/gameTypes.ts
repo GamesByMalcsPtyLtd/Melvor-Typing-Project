@@ -1,4 +1,4 @@
-/*  Melvor Typing Project v1.2.2: Fetches and Documents Melvor Idle
+/*  Melvor Typing Project v1.3.0: Fetches and Documents Melvor Idle
 
     Copyright (C) <2021>  <Coolrox95>
 
@@ -296,124 +296,199 @@ interface CombatData {
   player: PlayerCombatData,
   enemy: EnemyCombatData
 }
-interface EnemyCombatData {
+interface EnemyCombatData extends EnemyModifierData {
+  /** Monster ID */
   id: null | MonsterID,
+  /** Current HP of enemy */
   hitpoints: number,
-  effectiveAttackLevel: number,
-  maximumAttackRoll: number,
-  effectiveStrengthLevel: number,
-  maximumStrengthRoll: number,
-  effectiveDefenceLevel: number,
-  maximumDefenceRoll: number,
-  activeBuffs: boolean,
-  buffTurns: number,
-  increasedMeleeEvasion: null | number,
-  increasedRangedEvasion: null | number,
-  increasedMagicEvasion: null | number,
-  reflectMelee: null | number,
-  reflectRanged: null | number,
-  reflectMagic: null | number,
-  attackSpeedDebuff: number,
-  attackSpeedDebuffTurns: number,
-  isCursed: boolean,
-  curseTurnsLeft: number,
-  extraDamageMultiplier: number,
-  decreasedRangedEvasion?: number,
-  decreasedMeleeEvasion?: number,
-  decreasedMagicEvasion?: number,
-  decreasedAccuracy?: number
-  isBleeding?: boolean,
-  sleep?: boolean,
-  sleepTurns?: number,
-  maximumRangedDefenceRoll?: number,
-  maximumMagicDefenceRoll?: number,
-  damageReduction?: number,
-  baseDamageReduction?: number,
-  increasedDamageReduction?: number,
-  hasPassive?: boolean;
-  passiveID?: number[];
-  intoTheMist?: boolean;
-  stunned?: boolean;
-  stunTurns?: number;
-  hasSpecialAttack?: boolean;
-  attackSpeed?: number;
-  specialAttackChances?: number[];
-  specialAttackID?: number[];
-  bleedInterval?: number;
-  bleedCount?: number;
-  totalBleedHP?: number;
+  /** Maximum HP of enemy */
   maxHitpoints?: number;
-  curseID?: CurseID;
-  increasedAttackSpeed?: number;
-  attackType?: number;
+  /** Attack Skill Level */
   attackLevel?: number;
-  attackBonus?: number;
-  rangedLevel?: number;
-  attackBonusRanged?: number;
-  magicLevel?: number;
-  attackBonusMagic?: number;
+  /** Strength Skill Level */
   strengthLevel?: number;
-  strengthBonus?: number;
-  strengthBonusRanged?: number;
-  damageBonusMagic?: number;
+  /** Defence Skill Level */
   defenceLevel?: number;
-  effectiveRangedDefenceLevel?: number;
+  /** Ranged Skill Level */
+  rangedLevel?: number;
+  /** Magic Skill Level */
+  magicLevel?: number;
+  /** Level used to calculate Accuracy Rating */
+  effectiveAttackLevel: number,
+  /** Melee Attack Bonus (used to calculate Accuracy) */
+  attackBonus?: number;
+  /** Ranged Attack Bonus (used to Calculate Accuracy) */
+  attackBonusRanged?: number;
+  /** Magic Attack Bonus (used to Calculate Accuracy) */
+  attackBonusMagic?: number;
+  /** Current Accuracy Rating of enemy */
+  maximumAttackRoll: number,
+  /** Level used to calculate enemy max hit */
+  effectiveStrengthLevel: number,
+  /** Melee Strength Bonus (used to calculate Max Hit for Melee) */
+  strengthBonus?: number;
+  /** Ranged Strength Bonus (used to calcualte Max Hit for Ranged) */
+  strengthBonusRanged?: number;
+  /** Magic % Damage Bonus (used to calculate Max Hit for Magic) */
+  damageBonusMagic?: number;
+  /** Magic Strength Bonus (Golbin Raid Exclusive, used to calculate Max Hit) */
   magicStrengthBonus?: number;
-  defenceBonus?: number;
-  defenceBonusRanged?: number;
+  /** Current Max Hit of enemy */
+  maximumStrengthRoll: number,
+  /** Level used to calculate melee evasion */
+  effectiveDefenceLevel: number,
+  /** Level used to calculate ranged evasion */
+  effectiveRangedDefenceLevel?: number;
+  /** Level used to calculate magic evasion */
   effectiveMagicDefenceLevel?: number;
-  baseAttackSpeed?: number;
+  /** Melee Defence Bonus (used to calculate melee evasion) */
+  defenceBonus?: number;
+  /** Ranged Defence Bonus (used to calculate ranged evasion) */
+  defenceBonusRanged?: number;
+  /** Magic Defence Bonus (used to calculate magic evasion) */
   defenceBonusMagic?: number;
-  // New properties?
-  increasedHitpointRegeneration?: number;
+  /** Current Melee Evasion */
+  maximumDefenceRoll: number,
+  /** Current Ranged Evasion */
+  maximumRangedDefenceRoll?: number,
+  /** Current Magic Evasion */
+  maximumMagicDefenceRoll?: number,
+  /** Base attack speed of enemy before any modifiers [ms] */
+  baseAttackSpeed?: number;
+  /** Current Attack Interval of Enemy [ms] */
+  attackSpeed?: number;
+  /** If enemy has special attack */
+  hasSpecialAttack?: boolean;
+  /** Indices of enemySpecialAttacks */
+  specialAttackID?: number[];
+  /** % Chance for each specialAttackID */
+  specialAttackChances?: number[];
+  /** Base damage reduction of enemy before any modifiers [%]*/
+  baseDamageReduction?: number,
+  /** Current damage reduction of enemy [%] */
+  damageReduction?: number,
+  /** If Enemy has buffs from special attack active */
+  activeBuffs: boolean,
+  /** enemyTimers Left until buffs run out */
+  buffTurns: number,
+  /** Enemy reflects this amount*numberMultiplier damage upon being hit */
+  reflectMelee: null | number,
+  /** @deprecated Unused property (has no effect) */
+  reflectRanged: null | number,
+  /** @deprecated Unused property (has no effect) */
+  reflectMagic: null | number,
+  /** enemyTimers left until slow runs out */
+  attackSpeedDebuffTurns: number,
+  /** Enemy is afflicted by player curse */
+  isCursed: boolean,
+  /** Index of CURSES enemy is afflicted by */
+  curseID?: CurseID;
+  /** enemyTimers left until curse runs out */
+  curseTurnsLeft: number,
+  /** Damage multplier from Anguish Curse (additive with other % damage bonuses) */
+  extraDamageMultiplier: number,
+  /** % decrease to maximumAttackRoll from player special attacks (multiplicative) */
+  decreasedAccuracy?: number
+  /** Enemy is under the effect of a bleed DOT */
+  isBleeding?: boolean,
+  /** Interval between bleed ticks [ms] */
+  bleedInterval?: number;
+  /** Number of bleed ticks before removing DOT*/
+  bleedCount?: number;
+  /** Property used to calculate bleedHPPerProc */
+  totalBleedHP?: number;
+  /** Enemy is under the stun effect */
+  stunned?: boolean;
+  /** enemyTimers left until stun wears off */
+  stunTurns?: number;
+  /** Enemy is under the sleep effect */
+  sleep?: boolean,
+  /** enemyTimers left until sleep wears off */
+  sleepTurns?: number,
+  /** Enemy has one or more passive modifiers active */
+  hasPassive?: boolean;
+  /** Indices of combatPassive to apply to enemy stats */
+  passiveID?: number[];
+  /** Enemy is using the Into the Mist special attack */
+  intoTheMist?: boolean;
+  /** Enemy attack type
+   * 0: Melee
+   * 1: Ranged
+   * 2: Magic
+   */
+  attackType?: number;
+  /** Enemy is dead */
   isDead?: boolean;
-  stunImmunity?: boolean;
-  freezeImmunity?: boolean;
-  increasedReflectDamagePercent?: number;
-  increasedLifesteal?: number;
-  increasedMaxHitPercent?: number;
-  decreasedMaxHitPercent?: number;
-  increasedMaxHitpointsPercent?: number;
-  decreasedMaxHitpointsPercent?: number;
+  /** @deprecated Unused property (has no effect) */
   lifesteal?: number;
 }
 interface PlayerCombatData {
+  /** Current HP of player */
   hitpoints: number,
+  /** Player is stunned and can't attack */
   stunned: boolean,
+  /** Number of playerTimers left till stun wears off*/
   stunTurns: number,
+  /** Base attack speed of player [ms] before attackSpeedDebuff/attackSpeedBuff */
   baseAttackSpeed: number,
+  /** % decrease to baseAttackSpeed (multiplicative with other speed bonuses) */
   attackSpeedDebuff: number,
+  /** Number of playerTimers left until slow wears off */
   attackSpeedDebuffTurns: number,
+  /** @deprecated Unused Property */
   increasedDamageReduction: number,
+  /** Player is sleeping and can't attack */
   sleep?: boolean,
+  /** Number of playerTimers left till sleep wears off */
   sleepTurns?: number,
-  burnDebuff?: number,
-  activeDebuffs?: boolean,
-  debuffTurns?: number,
-  decreasedAccuracy?: number,
-  afflictedStacks?: number
-  hasSpecialAttack?: boolean;
-  specialAttackID?: PlayerSpecialID[];
-  increasedMinHit?: number,
-  markOfDeathStacks?: number;
-  lifesteal?: number,
-  attackSpeedBuff?: number;
-  rangedEvasionBuff?: number;
-  increasedMaxHit?: number;
-  magicEvasionBuff?: number;
-  meleeEvasionBuff?: number;
-  markOfDeathTurns?: number;
-  markOfDeath?: boolean;
+  /** Player has burn debuff active */
   isBurning?: boolean;
+  /** Total % of player maxHitpoints that burn debuff takes */
+  burnDebuff?: number,
+  /** Player is under the effects of an enemy special stat debuff */
+  activeDebuffs?: boolean,
+  /** Number of enemyTimers left till attack debuff wears off */
+  debuffTurns?: number,
+  /** % decrease to player melee evasion from enemy spec (multiplicative with other decreases) */
   meleeEvasionDebuff?: number;
+  /** % decrease to player ranged evasion from enemy spec (multiplicative with other decreases) */
   rangedEvasionDebuff?: number;
+  /** % decrease to player magic evasion from enemy spec (multiplicative with other decreases) */
   magicEvasionDebuff?: number;
-  autoEatThreshold?: number;
-  autoEatEfficiency?: number;
+  /** % decrease to maximumAttackRoll from enemy spec (additive with other decreases) */
+  decreasedAccuracy?: number,
+  /** Number of affliction debuffs stacked on player */
+  afflictedStacks?: number
+  /** Player has special attack */
+  hasSpecialAttack?: boolean;
+  /** Array of special attack IDs the player has */
+  specialAttackID?: PlayerSpecialID[];
+  /** Increased minimum hit from Charged Aurora */
+  increasedMinHit?: number,
+  /** Player has Mark of Death debuff active removePlayerMarkOfDeath, applyMarkOfDeathToPlayer are relevant*/
+  markOfDeath?: boolean;
+  /** Number of Mark of Death debuff stacks player has. */
+  markOfDeathStacks?: number;
+  /** @deprecated This seems to not actually do anything */
+  markOfDeathTurns?: number;
+  /** % Healing from damage from Fervor Aurora (additive with other increases) */
+  lifesteal?: number,
+  /** decrease to playerAttackSpeed in [ms] from Surge Aurora (applies after all other bonuses) */
+  attackSpeedBuff?: number;
+  /** % increase to maximumRangedDefenceRoll from Surge Aurora (multiplicative with other increases) */
+  rangedEvasionBuff?: number;
+  /** Flat increase to baseMaxHit from Fury Aurora (applies before bonuses from modifiers) */
+  increasedMaxHit?: number;
+  /** % increase to Magic Evasion from Fury Aurora (multiplicative with other increases) */
+  magicEvasionBuff?: number;
+  /** % increase to Melee Evasion from Fervor Aurora (multiplicative with other increases) */
+  meleeEvasionBuff?: number;
+  /** @deprecated Unused property, use playerModifiers instead */
   slayerAreaEffectNegationPercent?: number;
+  /** @deprecated Unused property, use playerModifiers instead */
   slayerAreaEffectNegationFlat?: number;
-  // New Properties
   /**
+   * Combat levels used to compute player stats
    * 0: Attack
    * 1: Strength
    * 2: Defence
@@ -423,22 +498,47 @@ interface PlayerCombatData {
    * 6: Prayer
    */
   combatLevels?: number[];
+  /** Stats from players Equipment */
   baseStats?: PlayerBaseStats
+  /**
+   * Bonuses from combat potions
+   * 0: Melee Accuracy
+   * 1: Melee Evasion
+   * 2: Melee Max Hit
+   * 3: Ranged Evasion, Ranged Accuracy
+   * 4: Ranged Max Hit
+   * 5: Magic Evasion, Magic Accuracy
+   * 6: Magic Max Hit
+   * 7: Regeneration (but this value isn't used)
+   * 8: Damage Reduction
+   */
   herbloreBonus?: number[];
+  /** Free skill levels used to compute maximumAttackRoll from combat style */
   attackStyleBonusAccuracy?: number;
+  /** Free skill levels used to compute baseMaxHit from combat style */
   attackStyleBonusStrength?: number;
 }
 
 type PlayerBaseStats = {
+  /** Melee Attack Bonus [stab,slash,defend] */
   attackBonus: [number, number, number],
+  /** Melee Defence Bonus */
   defenceBonus: number,
+  /** Melee Strength Bonus */
   strengthBonus: number,
+  /** % Damage Reduction */
   damageReduction: number,
+  /** Ranged Attack Bonus */
   attackBonusRanged: number,
+  /** Ranged Defence Bonus */
   defenceBonusRanged: number,
+  /** Ranged Strength Bonus */
   strengthBonusRanged: number,
+  /** Magic Attack Bonus */
   attackBonusMagic: number,
+  /** Magic Defence Bonus */
   defenceBonusMagic: number,
+  /** % Bonus to Magic Max Hit */
   damageBonusMagic: number,
 };
 interface EquipmentSet {
@@ -534,9 +634,7 @@ interface HerbloreBonus {
   bonus: [null | PotionBonusID, null | number],
   charges: number
 }
-type HerbloreBonuses = {
-  [index: number]: HerbloreBonus
-}
+type HerbloreBonuses = NumberDictionary<HerbloreBonus>;
 type PotionBonusID = number;
 
 
@@ -680,9 +778,7 @@ type TooltipInstances = {
 type SumFunction = (arr: number[]) => number;
 type OldMasteryArray = { mastery: number, masteryXP: number }[];
 type MasteryCheckPoint = number;
-interface Mastery {
-  [index: number]: MasteryData
-}
+type Mastery = NumberDictionary<MasteryData>;
 interface MasteryData {
   pool: number,
   xp: number[]
@@ -956,17 +1052,15 @@ interface StandardModifierObject<Standard> {
   decreasedMagicDamageBonus: Standard,
   /** Increases maximumMagicDefenceRoll by %: Implemented */
   increasedMagicEvasion: Standard,
-  /** Decreases maximumMagicDefenceRoll by %: Implemented but
-   *  Bugged: Applies twice when debuffed by special attack
-  */
+  /** Decreases maximumMagicDefenceRoll by %: Implemented */
   decreasedMagicEvasion: Standard,
-  /** Not Implemented, Not Used */
+  /** Increases baseMaxHit by value*numberMultiplier after other bonuses: Implemented */
   increasedMaxHitFlat: Standard,
-  /** Not Implemented, Not Used */
+  /** Decreases baseMaxHit by value*numberMultiplier after other bonuses: Implemented */
   decreasedMaxHitFlat: Standard,
-  /** Not Implemented */
+  /** Increases baseMaxHit by %: Implemnted */
   increasedMaxHitPercent: Standard,
-  /** Not Implemented, Not Used */
+  /** Decreases baseMaxHit by %: Implemented */
   decreasedMaxHitPercent: Standard,
   /** Increases damageReduction by value: Implemented */
   increasedDamageReduction: Standard,
@@ -1049,9 +1143,9 @@ interface StandardModifierObject<Standard> {
   increasedChanceToPreservePrayerPoints: Standard,
   /** Decreases the % chance to preserve prayerpoints by value: Implemented */
   decreasedChanceToPreservePrayerPoints: Standard,
-  /** Decreases the quantity of prayerpoints consumed by a prayer by value: Implemented, but bugged, applies to 0 cost updates to pp */
+  /** Decreases the quantity of prayerpoints consumed by a prayer by value: Implemented */
   increasedFlatPrayerCostReduction: Standard,
-  /** Increases the quantity of prayerpoints consumed by a prayer by value: Implemented, bug bugged, applies to 0 cost updates to pp */
+  /** Increases the quantity of prayerpoints consumed by a prayer by value: Implemented */
   decreasedFlatPrayerCostReduction: Standard,
   /** Increases minHitIncrease by value*numberMultiplier when using Air spells: Implemented */
   increasedMinAirSpellDmg: Standard,
@@ -1112,11 +1206,11 @@ interface StandardModifierObject<Standard> {
   /** Not implemented, Not Used
    * @deprecated Use increasedChanceToDoubleItemsSkill instead
    */
-   increasedChanceToDoubleLootThieving: Standard,
-   /** Not implemented, Not Used.
-    * @deprecated Use decreasedChanceToDoubleItemsSkill instead
-    */
-   decreasedChanceToDoubleLootThieving: Standard,
+  increasedChanceToDoubleLootThieving: Standard,
+  /** Not implemented, Not Used.
+   * @deprecated Use decreasedChanceToDoubleItemsSkill instead
+   */
+  decreasedChanceToDoubleLootThieving: Standard,
   /** Increases % chance to preserve resources in all skills by value: Implemented via calculateSkillPreservationChance*/
   increasedGlobalPreservationChance: Standard,
   /** Decreases % chance to preserve resources in all skills by value: Implemented via calculateSkillPreservationChance*/
@@ -1133,9 +1227,9 @@ interface StandardModifierObject<Standard> {
   increasedGlobalSkillXP: Standard,
   /** Decreases xp earned from all skills by %: Implemented in addXPBonuses */
   decreasedGlobalSkillXP: Standard,
-  /** @deprecated Unimplemented and Used. Holdover from when agility had stamina */
+  /** @deprecated Unimplemented and Unused. Holdover from when agility had stamina */
   increasedMaxStamina: Standard,
-  /** @deprecated Unimplemented and Used. Holdover from when agility had stamina */
+  /** @deprecated Unimplemented and Unused. Holdover from when agility had stamina */
   decreasedMaxStamina: Standard,
   /** Increases maxRockHP by value: Implemented*/
   increasedMiningNodeHP: Standard,
@@ -1149,13 +1243,9 @@ interface StandardModifierObject<Standard> {
   autoSlayerUnlocked: Standard,
   /** Increases the number of trees that can be cut by value: Implemented */
   increasedTreeCutLimit: Standard,
-  /** Increases the % chance to double items from all skills by value: Implemented
-   * Does not work for combat loot
-   */
+  /** Increases the % chance to double items from all skills by value: Implemented */
   increasedChanceToDoubleItemsGlobal: Standard,
-  /** Decreases the % chance to double items from all skills by value: Implemented
-   * Does not work for combat loot
-   */
+  /** Decreases the % chance to double items from all skills by value: Implemented */
   decreasedChanceToDoubleItemsGlobal: Standard,
   /** Increases the harvest quantity of farming by %: Implemented */
   increasedFarmingYield: Standard,
@@ -1227,6 +1317,24 @@ interface StandardModifierObject<Standard> {
   increasedPotionChargesFlat: Standard,
   /** Decreases the charges of potions by value: Implemented */
   decreasedPotionChargesFlat: Standard,
+  /** This is a future modifier that is currently Unimplemented */
+  increasedBirdNestDropRate?: Standard,
+  /** This is a future modifier that is currently Unimplemented */
+  decreasedBonfireLogCost?: Standard,
+  /** This is a future modifier that is currently Unimplemented */
+  increasedChanceNoDamageMining?: Standard,
+  /** This is a future modifier that is currently Unimplemented */
+  increasedSeeingGoldChance?: Standard,
+  /** This is a future modifier that is currently Unimplemented */
+  increasedChanceDoubleHarvest?: Standard,
+  /** This is a future modifier that is currently Unimplemented */
+  increasedChanceForElementalRune?: Standard,
+  /** This is a future modifier that is currently Unimplemented */
+  increasedElementalRuneGain?: Standard,
+  /** This is a future modifier that is currently Unimplemented */
+  increasedChanceRandomPotionHerblore?: Standard,
+  /** This is a future modifier that is currently Unimplemented */
+  increasedAttackRolls?: Standard,
 }
 interface SkillModifierObject<Skill> {
   /** Increases the skill level used to compute combat stats by value: Implemented */
@@ -1253,27 +1361,21 @@ interface SkillModifierObject<Skill> {
   increasedSkillXP: Skill,
   /** Decreases xp earned from skill by %: Implemented via getTotalFromModifierArray in addXPBonuses */
   decreasedSkillXP: Skill,
-  /** Increases the % chance to double items from a skill by value: Partially Implemented.
-   * Doesn't work for online Cooking, but the only use is the pet which still works, could do with transitioning to new system
-   * Doesn't work for online Crafting (offline uses calculateChanceToDouble), but the global one does. Not used anywhere so it's fine for now.
-   */
-   increasedChanceToDoubleItemsSkill: Skill,
-   /** Decreases the % chance to double items from a skill by value: Partially Implemented.
-    * Doesn't work for online Cooking, but the only use is the pet which still works, could do with transitioning to new system
-    * Doesn't work for online Crafting (offline uses calculateChanceToDouble), but the global one does. Not used anywhere so it's fine for now.
-    */
-   decreasedChanceToDoubleItemsSkill: Skill,
+  /** Increases the % chance to double items from a skill by value: Partially Implemented. */
+  increasedChanceToDoubleItemsSkill: Skill,
+  /** Decreases the % chance to double items from a skill by value: Partially Implemented. */
+  decreasedChanceToDoubleItemsSkill: Skill,
 }
 type ModifierObject<Skill, Standard> = StandardModifierObject<Standard> & SkillModifierObject<Skill>;
 type SkillModifierData = [SkillID, number];
 type SkillModifierActive = { id: SkillID, value: number };
 type ModifierData = Partial<ModifierObject<SkillModifierData[], number>>;
 type ModifierActive = Partial<ModifierObject<SkillModifierActive[], number>>;
-type ModifierKeys = keyof ModifierObject<any,any>;
+type ModifierKeys = keyof ModifierObject<any, any>;
 type SkillModifierKeys = keyof SkillModifierObject<any>;
 type StandardModifierKeys = keyof StandardModifierObject<any>;
-type SkillEntry<T> = [SkillModifierKeys,T];
-type StandardEntry<T> = [StandardModifierKeys,T];
+type SkillEntry<T> = [SkillModifierKeys, T];
+type StandardEntry<T> = [StandardModifierKeys, T];
 type ModifierEntry<Skill, Standard> = SkillEntry<Skill> | StandardEntry<Standard>;
 type ModifierDataEntry = ModifierEntry<SkillModifierData[], number>;
 type ModifierActiveEntry = ModifierEntry<SkillModifierActive[], number>;
@@ -1381,164 +1483,305 @@ interface GenericItem extends BaseItem {
   /** Identifies item as specialItems and indicates weight in loot-table */
   fishingCatchWeight?: number,
   // Mining Item
+  /** @deprecated Unused property */
   miningID?: number,
+  /** @deprecated Unused property */
   miningLevel?: number,
+  /** Experience earned for Mining item */
   miningXP?: number,
+  /** @deprecated Unused property */
   miningRespawnInterval?: number,
+  /** @deprecated Unused property */
   maxMiningRespawnInterval?: number,
   // Smithing Item
+  /** @deprecated Unused property */
   smithingID?: number,
+  /** Smithing level required to make item */
   smithingLevel?: number,
+  /** Smithing xp for making item */
   smithingXP?: number,
+  /** Items required to smith item */
   smithReq?: ItemQuantity[],
+  /** For seeds, identifies crop type. For smithing identifies metal. */
   tier?: string,
+  /** If present, sets smithed quantity to value, else it is 1 */
   smithingQty?: number,
   // Farming Seed
+  /** Farming level required to grow seed */
   farmingLevel?: number,
+  /** Farming XP given when planting, and xp per harvest qty when harvesting */
   farmingXP?: number,
+  /** Quantity of seeds required to plant */
   seedsRequired?: number,
+  /** Time to grow seed in [s] */
   timeToGrow?: number,
+  /** ItemID given when harvesting seed */
   grownItemID?: ItemID,
+  /** @deprecated Unused property */
   farmingMasteryID?: number,
   // Fletching Item
+  /** @deprecated Unused property */
   fletchingID?: FletchingID,
+  /** Items required to fletch item */
   fletchReq?: ItemQuantity[],
+  /** Base quantity given when fletched */
   fletchQty?: number,
+  /** Fletching level required to fletch */
   fletchingLevel?: number,
+  /** Base Fletching xp given when fletched */
   fletchingXP?: number,
+  /** Tab of fletching page:
+   * 0: Arrows
+   * 1: Shortbows
+   * 2: Longbows
+   * 3: Gem-Tipped Bolts
+   * 4: Crossbows
+   * 5: Javelins
+   */
   fletchingCategory?: FletchingCategory,
   // Crafting Item
+  /** @deprecated Unused property */
   craftingID?: number,
+  /** Items required to craft */
   craftReq?: ItemQuantity[],
+  /** Base quantity made when crafting */
   craftQty?: number,
+  /** Crafting level required to make */
   craftingLevel?: number,
+  /** Base Crafting XP per craft  */
   craftingXP?: number,
   // Runecrafting Item
+  /** Runecrafting level required to make */
   runecraftingLevel?: number,
+  /** Base Runecrafting xp per runecraft */
   runecraftingXP?: number,
+  /** Items required to runecraft */
   runecraftReq?: ItemQuantity[],
+  /** Base quantity made when runecrafting */
   runecraftQty?: number,
+  /** Runecrafting MasteryID of item */
   runecraftingID?: number,
+  /** Tab of Runecrafting page:
+   * 0: Standard Runes
+   * 1: Combination Runes
+   * 2: Staves & Wands
+   * 3: Air Magic Gear
+   * 4: Water Magic Gear
+   * 5: Earth Magic Gear
+   * 6: Fire Magic Gear
+   */
   runecraftingCategory?: RunecraftingCategory,
+  /** Item has stats that are viewable from Runecrafting page */
   hasStats?: boolean,
   // Herblore Item/Potion
+  /** @deprecated Unused property */
   herbloreMasteryID?: HerbloreItemID,
+  /** Items required to brew potion */
   herbloreReq?: ItemQuantity[],
+  /** Flags item as potion */
   isPotion?: boolean,
+  /** Skill that potion applies to, used for herblore display */
   potionSkill?: SkillID,
+  /** Value of potion's effect */
   potionBonus?: number,
+  /** ID used to distinguish the effects of combat potions */
   potionBonusID?: PotionBonusID,
+  /** Base charges of potion */
   potionCharges?: number,
-  potionPage?: number,
+  /** Page potion can be used on */
+  potionPage?: PageID,
+  /** Tier of potion */
   potionTier?: HerbloreTier,
   // Equipment Item
+  /** @deprecated Unused property */
   canEquip?: boolean,
+  /** Flags item as equipment, and determines slot it equips to */
   equipmentSlot?: EquipSlotID,
+  /** Melee attack bonuses [stab,slash,defend]*/
   attackBonus?: [number, number, number],
+  /** Melee strength bonus */
   strengthBonus?: number,
+  /** Melee defence bonus */
   defenceBonus?: number,
+  /** Attack level required to equip item */
   attackLevelRequired?: number,
+  /** Defence level required to equip item */
   defenceLevelRequired?: number,
+  /** Ranged attack bonus */
   rangedAttackBonus?: number,
+  /** Magic attack bonus */
   magicAttackBonus?: number,
+  /** Ranged defence bonus */
   rangedDefenceBonus?: number,
+  /** Magic defence bonus */
   magicDefenceBonus?: number,
+  /** Damage reduction [%] */
   damageReduction?: number,
+  /** Ranged strength bonus */
   rangedStrengthBonus?: number,
+  /** Ranged level required to equip item */
   rangedLevelRequired?: number,
+  /** @deprecated Unused property */
   prayerBonus?: number,
+  /** @deprecated Unused property, used modifiers instead */
   ammoPreservation?: number,
+  /** Magic level required to equip item */
   magicLevelRequired?: number,
+  /** % bonus to magic maxHit */
   magicDamageBonus?: number,
+  /** @deprecated Unused property, use modifiers instead */
   increasedMinAirSpellDmg?: number,
+  /** @deprecated Unused property, use modifiers instead */
   increasedMinWaterSpellDmg?: number,
+  /** @deprecated Unused property, use modifiers instead */
   increasedMinEarthSpellDmg?: number,
+  /** @deprecated Unused property, used modifiers instead */
   increasedMinFireSpellDmg?: number,
+  /** @deprecated Unused property, slayer level requirements are baked into SHOP now */
   slayerLevelRequired?: number,
+  /** @deprecated Will display when viewing item stats, but actual value is in modifiers */
   slayerBonusXP?: number,
+  /** @deprecated Game still calculates this value, but actual value is in modifiers */
   slayerAreaEffectNegationPercent?: number,
+  /** @deprecated Use modifiers instead */
   chanceToDoubleLoot?: number,
+  /** @deprecated Use modifiers instead */
   increasedMaxHitpoints?: number,
-  //  increasedWaterAirSpellDmg?: number,
-  //  increasedEarthFireSpellDmg?: number,
+  /** @deprecated Use modifiers instead */
   decreasedAttackSpeed?: number,
+  /** @deprecated Game still calculates this value, but actual value is in modifiers */
   slayerAreaEffectNegationFlat?: number,
   /** Unused flag for ranged weapons */
   isRanged?: boolean,
   // Skill Glove
+  /** Flags item as skill glove, and identifies index in data arrays */
   gloveID?: GloveID,
   // Quiver Item
+  /** Ammunition type:
+   * 0: Arrows
+   * 1: Bolts
+   * 2: Javelins
+   * 3: Throwing Knives
+   */
   ammoType?: AmmoType,
+  /** Flags item as Javelin or Throwing knife */
   isAmmo?: boolean,
   // Passive Item
+  /** Flags item as equipable in passive slot */
   isPassiveItem?: boolean,
   // Weapon
+  /** Allows non-magic weapons to use curses and auroras */
   canUseMagic?: boolean,
+  /** Attack speed of weapon in [ms] */
   attackSpeed?: number,
+  /** Weapon blocks the use of shield slot */
   isTwoHanded?: boolean,
+  /** Weapon allows the use of spells */
   isMagic?: boolean,
+  /** Ammunition type required to use ranged weapon:
+   * 0: Arrows
+   * 1: Bolts
+   * 2: Javelins
+   * 3: Throwing Knives
+   */
   ammoTypeRequired?: AmmoType,
   // Special Weapon
+  /** Item has special attack */
   hasSpecialAttack?: true,
+  /** Index of playerSpecialAttacks that weapon has */
   specialAttackID?: PlayerSpecialID
   // Rune Provider
+  /** Item provides free runes for spells */
   providesRune?: ItemID[],
+  /** Quantity of runes set by providesRune */
   providesRuneQty?: number,
-  // Thief Gloves
+  // Thief Gloves/Gloves of Silence
+  /** @deprecated Unused property, use modifiers instead */
   increasedGP?: number,
+  /** Increased thieving successrate of Gloves of Silence */
   increasedSuccessRate?: number,
   // Shaman Ring
+  /** @deprecated Unused property, use modifiers instead */
   increasedHPRegen?: number,
   // Elder Crown
+  /** Lifesteal % of Elder crown */
   lifesteal?: number,
   // Recoil Shield
+  /** Reflect damage % of Recoil Shield */
   reflectDamage?: number,
   // Wasteful Ring
+  /** @deprecated Unused property, use modifiers instead */
   increasedAutoEat?: number,
+  /** @deprecated Unused property, use modifiers instead */
   decreasedAutoEatEfficiency?: number,
   // Priest Hat
+  /** @deprecated Unused property, use modifiers instead */
   prayerCostReduction?: number,
   // ARoM
+  /** @deprecated Unused property, use modifiers instead */
   bonusMasteryXP?: number,
   // Myserious_Stone (also present on cake but unused)
+  /** Drop rate of Mysterious Stone */
   dropRate?: number,
   // Big Ron
+  /** Melee strength bonus multiplier of Big Ol Ron */
   bossStrengthMultiplier?: number,
   // Confetti Crossbow
+  /** Maximum GP multiplier of Confetti Crossbow */
   gpMultiplierCap?: number,
+  /** Minimum GP multiplier of Confetti Crossbow */
   gpMultiplierMin?: number,
   // Slayer Crossbow
+  /** Ranged strength bonus multiplier of Slayer Crossbow */
   slayerStrengthMultiplier?: number,
   // Cloudburst
+  /** Max Hit bonus of Cloudburst Staff */
   increasedWaterSpellDamage?: number,
   // Crown of Rhaelyx
+  /** Base drop rate of Crown of Rhaelyx components */
   baseDropRate?: number,
+  /** Max drop rate of Crown of Rhaelyx components */
   maxDropRate?: number,
+  /** Resource preservation chance of Crown of Rhaelyx when charges in bank */
   chanceToPreserve?: number,
+  /** Resource preservation chance of Crown of Rhaelyx when no charges in bank */
   baseChanceToPreserve?: number,
   // ARoS
+  /** @deprecated Unused property, use modifiers instead */
   bonusSkillXP?: number,
   // Clue Chasers
+  /** % increase to Off Items of Clue Chaser's Insignia */
   increasedItemChance?: number,
   // Deadeye Amulet
+  /** % chance to crit with Deadeye amulet */
   chanceToCrit?: number,
+  /** Multiplier to damage on crit with Deadeye amulet */
   critDamage?: number,
   // Warlock Amulet
+  /** % lifesteal for magic provided by Warlock Amulet */
   spellHeal?: number,
   // Gold Ruby Ring
+  /** @deprecated Unused property, use modifiers instead */
   hpRegenBonus?: number,
   // Fishing Amulet
+  /** @deprecated Unused property, use modifiers instead */
   fishingSpeedBonus?: number,
   // Belongs to Gloop and Farming Skillcape
+  /** increasedFarmingYield for Weird Gloop */
   harvestBonus?: number,
   // Chest of Witwix
+  /** @deprecated Unused property */
   isStreamer?: boolean,
   // Signet Ring
+  /** @deprecated Unused property, use modifiers instead */
   gpMultiplier?: number,
+  /** @deprecated Unused propery, use modifiers instead */
   chanceToDoubleResources?: number,
   // Pirates Lost Ring
+  /** XP bonus for pirate's lost ring which for some reason is still multiplicative? */
   fishingBonusXP?: number
   // Modifiers
+  /** Modifiers provided when item is equipped. Also contains modifiers for potions that are WIP */
   modifiers?: ModifierData
 }
 
@@ -1559,7 +1802,7 @@ interface BaseItem {
   sellsFor: number,
   /** Local path to item image */
   media: string,
-  /** Unused variable that references the item index */
+  /** @deprecated Unused variable that references the item index */
   id?: ItemID,
   /** Optional description of item */
   description?: string,
@@ -1595,20 +1838,17 @@ type ObstacleCost = {
   slayerCoins: number,
   items: number[][]
 }
-interface BankCache {
-  [index: number]: number
-}
-interface MasteryCache {
-  [index: number]: number[]
-}
-interface MasteryLevelCache {
-  [index: number]: { levels: number[] }
-}
+type BankCache = NumberDictionary<number>;
+type MasteryCache = NumberDictionary<NumberDictionary<number>>;
+type MasteryLevelCache = NumberDictionary<{levels: number[]}>;
 interface PlayFabEventBody {
   [key: string]: any
 }
 interface StringDictionary<T> {
   [index: string]: T
+}
+interface NumberDictionary<T> {
+  [index: number]: T
 }
 type SweetAlertOptions = import("sweetalert2").SweetAlertOptions<*>;
 type ShopCategory = 'General' | 'SkillUpgrades' | 'Slayer' | 'Gloves' | 'Skillcapes' | 'Materials' | 'GolbinRaid';
@@ -1660,4 +1900,204 @@ type Prayer = {
   modifiers: ModifierData,
   vars?: string[],
   values?: number[]
+}
+/** Base for Dungeons, slayer areas, and combat areas */
+interface BaseArea {
+  /** URL to display image */
+  media: string,
+  /** @deprecated Old property for old area display system */
+  type?: string,
+  /** Monsters contained in area */
+  monsters: MonsterID[],
+  /**
+   * 0: Very Easy
+   * 1: Easy
+   * 2: Medium
+   * 3: Hard:
+   * 4: Very Hard
+   */
+  difficulty: number[],
+  /** If not 0, Item required to do damage to monsters in area */
+  slayerItem: ItemID
+}
+
+interface CombatArea extends BaseArea {
+  /** Display name HTML */
+  areaName: string
+}
+
+interface SlayerArea extends BaseArea {
+  /** Display name HTML */
+  areaName: string
+  /** Slayer level required to enter area */
+  slayerLevel: number
+  /** Dungeon required to complete to enter area */
+  dungeonCompleted: DungeonID
+  /** Area has modifiers to apply to player */
+  areaEffect?: true
+  /** Description of modifiers */
+  areaEffectDescription?: string
+  /** Value of modifier to apply to player */
+  areaEffectValue?: number
+}
+
+interface Dungeon extends BaseArea {
+  /** Display name HTML */
+  name: string,
+  /** @deprecated Old property for old dungeon display system */
+  recommendedStats?: [number, number, number]
+  /** @deprecated Unused property */
+  rewardCount: number
+  /** @deprecated Old property for old dungeon display system */
+  rewards: ItemID[]
+  /** ID of boss pet rolled on completion of dungeon */
+  petID: PetID
+  /** Dungeon required to enter dungeon */
+  requiresCompletion?: DungeonID
+  /** Number of times requiresCompletion must be finished to enter (if not present once) */
+  requiresCompletionCount?: number
+  /** Slayer level required to enter dungeon */
+  slayerLevel?: number
+}
+
+type SlayerTaskData = {
+  /** Display name of task difficulty */
+  display: string,
+  /** Cost to reroll/change to task */
+  cost: number,
+  /** Minimum combat level of monster for task */
+  minLevel: number,
+  /** Maximum combat level of monster for task (-1 is uncapped (6969 lol)) */
+  maxLevel: number,
+  /** Slayer level required to recieve task */
+  slayerLevel: number
+}
+
+type Slayer = {
+  task: {
+    Easy: SlayerTaskData,
+    Normal: SlayerTaskData,
+    Hard: SlayerTaskData,
+    Elite: SlayerTaskData,
+    Master: SlayerTaskData
+  }
+}
+/** These are applied to combatData.enemy as properties */
+interface EnemyModifierObject<T> {
+  /** % Increase to Melee Evasion */
+  increasedMeleeEvasion: T,
+  /** % Decrease to Melee Evasion */
+  decreasedMeleeEvasion: T,
+  /** % Increase to Ranged Evasion */
+  increasedRangedEvasion: T,
+  /** % Decrease to Ranged Evasion */
+  decreasedRangedEvasion: T,
+  /** % Increase to Magic Evasion */
+  increasedMagicEvasion: T,
+  /** % Decrease to Magic Evasion */
+  decreasedMagicEvasion: T,
+  /** % Increase to Max Hit */
+  increasedMaxHitPercent: T,
+  /** % Decrease to Max Hit */
+  decreasedMaxHitPercent: T,
+  /** % Increase to Max HP */
+  increasedMaxHitpointsPercent: T,
+  /** % Decrease to Max HP */
+  decreasedMaxHitpointsPercent: T,
+  /** % Increase to Accuracy Rating */
+  increasedGlobalAccuracy: T,
+  /** % Decrease to Accuracy Rating */
+  decreasedGlobalAccuracy: T,
+  /** % Decrease to attack interval */
+  increasedAttackSpeed: T,
+  /** % Increase to attack interval */
+  attackSpeedDebuff: T,
+  /** % of damage taken to reflect to player */
+  increasedReflectDamagePercent: T,
+  /** Flat increase to damageReduction */
+  increasedDamageReduction: T,
+  /** % of HP to heal every 10 seconds */
+  increasedHitpointRegeneration: T,
+  /** % of all damage to player to heal from */
+  increasedLifesteal: T,
+  /** Cannot be stunned */
+  stunImmunity: T,
+  /** Cannot be stunned */
+  freezeImmunity: T
+}
+type EnemyModifierData = Partial<EnemyModifierObject<number>>;
+type EnemyModiferKey = keyof EnemyModifierObject<any>;
+
+type CombatPassive = {
+  /** Index of passive in combatPassive */
+  id: number,
+  /** Display name of passive */
+  name: string,
+  /** Description of passive */
+  description: string,
+  /** Chance for passive to occur */
+  chance: number,
+  /** Modifiers to apply to monster */
+  modifiers?: EnemyModifierData
+}
+
+type SkillData = {
+  /** Display name of skill */
+  name: string,
+  /** Image URL of skill icon */
+  media: string,
+  /** Skill has mastery levels */
+  hasMastery: boolean,
+  /** Unused: Maximum level of skill */
+  maxLevel: number
+}
+type MasteryMedia = {
+  /** Image URL of mastery item */
+  media: string
+}
+type MasteryUnlock = {
+  /** Mastery level for unlock */
+  level: number,
+  /** Description of unlock */
+  unlock: string
+}
+type MasteryPoolBonus = {
+  /** Description of pool bonus */
+  bonuses: string[]
+}
+interface SkillObject<T> {
+  Woodcutting: T,
+  Fishing: T,
+  Firemaking: T,
+  Cooking: T,
+  Mining: T,
+  Smithing: T,
+  Attack: T,
+  Strength: T,
+  Defence: T,
+  Hitpoints: T,
+  Thieving: T,
+  Farming: T,
+  Ranged: T,
+  Fletching: T,
+  Crafting: T,
+  Runecrafting: T,
+  Magic: T,
+  Prayer: T,
+  Slayer: T,
+  Herblore: T,
+  Agility: T
+}
+
+type SkillName = keyof SkillObject<any>;
+
+type Milestone = {
+  /** Unlock level of milestone */
+  level: number,
+  /** Display name of milestone */
+  name: string,
+  /** URL of milestone image */
+  media: string,
+  /** @deprecated Unused property */
+  alwaysShow?: boolean
 }

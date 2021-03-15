@@ -1,4 +1,16 @@
 # Changelog
+## v1.3.0
+- Updated to cachebuster version v791
+- Added descriptions to PlayerCombatData and EnemyCombatData properties
+- Added @types/simplebar to dependencies. You will either need to run `npm install` or `npm install @types/simplebar --save` for this change to take place.
+- Typed some untyped functions
+- Added typdef and described properties of global data objects combatAreas, slayerAreas, DUNGEONS, SLAYER, combatPassive, masteryMedia, masteryUnlocks,masteryCheckpointBonuses, MILESTONES, SKILLS
+- Added typedef for enemy modifiers and extended combatData.enemy by them
+- Added EnemyModifierObject for modifiers that apply to monsters
+- Finished item property descriptions
+- Added descriptions marking functions as callbacks if it appears unused but is actually used in HTML
+- Deprecated a number of unused functions and global variables
+- Updated modifier descriptions to reflect bug fixes
 ## v1.2.2
 - Updated to cachebuster verison v790
 ## v1.2.1
