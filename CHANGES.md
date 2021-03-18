@@ -1,4 +1,6 @@
 # Changelog
+## v1.4.1
+- Updated to cachebuster version v809
 ## v1.4.0
 - Fixed fetching the index.html of the splash page and not the game
 - Annotated some new combat variables
