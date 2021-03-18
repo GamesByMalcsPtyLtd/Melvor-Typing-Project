@@ -1,4 +1,4 @@
-/*  Melvor Typing Project v1.3.0: Fetches and Documents Melvor Idle
+/*  Melvor Typing Project v1.4.0: Fetches and Documents Melvor Idle
 
     Copyright (C) <2021>  <Coolrox95>
 
@@ -212,7 +212,8 @@ interface EnemySpecialAttack {
   /** Maximum % attack can decrease player accuracy by */
   decreasePlayerAccuracyLimit?: number,
   /** Attack temporarily increases enemy damage reduction by 10% per attack, while attacking */
-  intoTheMist?: boolean
+  intoTheMist?: boolean,
+  modifiers?: ModifierData
 }
 interface PlayerSpecialAttack {
   /** Index of playerSpecialAttacks */
@@ -251,12 +252,18 @@ interface PlayerSpecialAttack {
   canBleed?: boolean,
   /** Chance to apply bleed on hit in %, if not present defaults to 100% */
   bleedChance?: number,
+  /** Interval between bleed procs in [ms] */
   bleedInterval?: number,
-  totalBleedHP?: number,
-  totalBleedHPPercent?: number,
-  totalBleedHPCustom?: number,
-  extraBleedDmg?: number,
+  /** Total number of bleed procs */
   bleedCount?: number,
+  /** Total bleed damage is totalBleedHP*attackDamage */
+  totalBleedHP?: number,
+  /** Total bleed damage is this % of enemy max HP */
+  totalBleedHPPercent?: number,
+  /** Total bleed damage is instead random between [0,totalBleedHP*attackDamage) */
+  totalBleedHPCustom?: 1,
+  /** Adds value*numberMultiplier to total bleed damage */
+  extraBleedDmg?: number,
   /** Enemy sleeps on hit */
   canSleep?: boolean,
   /** Number of turns enemy sleeps for */
@@ -291,10 +298,17 @@ interface PlayerSpecialAttack {
   activeBuffs?: boolean,
   /** Unused */
   burnDebuff?: number,
+  modifiers?: ModifierData
 }
-interface CombatData {
-  player: PlayerCombatData,
-  enemy: EnemyCombatData
+
+interface PlayerEnemyObject<Player,Enemy> {
+  player: Player,
+  enemy: Enemy
+}
+type CombatData = PlayerEnemyObject<PlayerCombatData,EnemyCombatData>;
+type SpecialAttackData = {
+  isActive?: boolean,
+  turnsLeft?: number
 }
 interface EnemyCombatData extends EnemyModifierData {
   /** Monster ID */
@@ -861,7 +875,6 @@ interface SaveGame {
   username: typeof username,
   nameChanges: typeof nameChanges,
   gp: typeof gp,
-  currentBank: typeof currentBank,
   currentBankUpgrade: typeof currentBankUpgrade,
   skillXP: typeof skillXP,
   skillLevel: typeof skillLevel,
@@ -919,7 +932,6 @@ interface SaveGame {
   darkMode: typeof darkMode,
   buyQty: typeof buyQty,
   itemLog: typeof itemLog,
-  itemLogBuilt: typeof itemLogBuilt,
   dungeonCompleteCount: typeof dungeonCompleteCount,
   sellQty: typeof sellQty,
   statsRunecrafting: typeof statsRunecrafting,
@@ -939,7 +951,6 @@ interface SaveGame {
   newFarmingAreas: typeof newFarmingAreas,
   equipmentSets: typeof equipmentSets,
   selectedEquipmentSet: typeof selectedEquipmentSet,
-  equipmentSetCount: typeof equipmentSetCount,
   currentAutoEat: typeof currentAutoEat,
   equipmentSetsPurchased: typeof equipmentSetsPurchased,
   herbloreBonuses: typeof herbloreBonuses,
@@ -1317,24 +1328,44 @@ interface StandardModifierObject<Standard> {
   increasedPotionChargesFlat: Standard,
   /** Decreases the charges of potions by value: Implemented */
   decreasedPotionChargesFlat: Standard,
-  /** This is a future modifier that is currently Unimplemented */
-  increasedBirdNestDropRate?: Standard,
-  /** This is a future modifier that is currently Unimplemented */
-  decreasedBonfireLogCost?: Standard,
-  /** This is a future modifier that is currently Unimplemented */
-  increasedChanceNoDamageMining?: Standard,
-  /** This is a future modifier that is currently Unimplemented */
-  increasedSeeingGoldChance?: Standard,
-  /** This is a future modifier that is currently Unimplemented */
-  increasedChanceDoubleHarvest?: Standard,
-  /** This is a future modifier that is currently Unimplemented */
-  increasedChanceForElementalRune?: Standard,
-  /** This is a future modifier that is currently Unimplemented */
-  increasedElementalRuneGain?: Standard,
-  /** This is a future modifier that is currently Unimplemented */
-  increasedChanceRandomPotionHerblore?: Standard,
-  /** This is a future modifier that is currently Unimplemented */
-  increasedAttackRolls?: Standard,
+  /** Increases the % chance to recieve bird's nests from Woodcutting by value: Implemented*/
+  increasedBirdNestDropRate: Standard,
+  /** Decreases the % chance to recieve bird's nests from Woodcutting by value: Implemented*/
+  decreasedBirdNestDropRate: Standard
+  /** Increases the % chance to not use rockHP when mining by value: Implemented */
+  increasedChanceNoDamageMining: Standard,
+  /** Decreases the % chance to not use rockHP when mining by value: Implemented */
+  decreasedChanceNoDamageMining: Standard
+  /** Increases the % chance to recieve a gold bar when smelting silver bars by value: Implemented */
+  increasedSeeingGoldChance: Standard,
+  /** Decreases the % chance to recieve a gold bar when smelting silver bars by value: Implemented */
+  decreasedSeeingGoldChance: Standard
+  /** Increases the % chance to double crops from farming by value: Implemented via calculateChanceToDouble*/
+  increasedChanceDoubleHarvest: Standard,
+  /** Decreases the % chance to double crops from farming by value: Implemented via calculateChanceToDouble*/
+  decreasedChanceDoubleHarvest: Standard,
+  /** Increases the % chance to recieve bonus elemental runes from runecrafting by value: Implemented */
+  increasedChanceForElementalRune: Standard,
+  /** Decreases the % chance to recieve bonus elemental runes from runecrafting by value: Implemented */
+  decreasedChanceForElementalRune: Standard,
+  /** Increases the quantity of bonus elemental runes from runecrafting by value: Implemented */
+  increasedElementalRuneGain: Standard,
+  /** Decreases the quantity of bonus elemental runes from runecrafting by value: Implemented */
+  decreasedElementalRuneGain: Standard,
+  /** Increases the % chance that a random tier of potion is recieved from herblore by value: Implemented */
+  increasedChanceRandomPotionHerblore: Standard,
+  /** Decreases the % chance that a random tier of potion is recieved from herblore by value: Implemented */
+  decreasedChanceRandomPotionHerblore: Standard,
+  /** Increases the number of times the player rolls to hit an enemy by value: Implemented */
+  increasedAttackRolls: Standard,
+  /** Decreases the number of times the player rolls to hit an enemy by value: Implemented */
+  decreasedAttackRolls: Standard,
+  /** Effect of Bonfire Potions: Implemented */
+  freeBonfires: Standard,
+  /** Increases the Magic XP gained from alt magic by %: Implemented */
+  increasedAltMagicSkillXP: Standard
+  /** Decreases the Magic XP gained from alt magic by %: Implemented */
+  decreasedAltMagicSkillXP: Standard
 }
 interface SkillModifierObject<Skill> {
   /** Increases the skill level used to compute combat stats by value: Implemented */

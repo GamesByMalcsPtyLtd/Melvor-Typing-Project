@@ -1,4 +1,4 @@
-/*  Melvor Typing Project v1.3.0: Fetches and Documents Melvor Idle
+/*  Melvor Typing Project v1.4.0: Fetches and Documents Melvor Idle
 
     Copyright (C) <2021>  <Coolrox95>
 
@@ -20,6 +20,7 @@ const https = require('https');
 const fs = require('fs');
 const prettier = require('prettier');
 const gameURL = "https://www.melvoridle.com/";
+const htmlQuery = "?l=1";
 const sourceRegexp = /^<script type="(text|application)\/javascript" src="(?<path>assets\/js\/(game\/)?(?<name>\w*.js))\?(?<fileVersion>\d+)"><\/script>/;
 
 /**
@@ -80,7 +81,7 @@ function getURLasString(webURL, desiredType) {
  */
 async function getAllSources(outDir) {
   if (!fs.existsSync(outDir)) fs.mkdirSync(outDir, { recursive: true });
-  const indexHtml = await getURLasString(gameURL, 'text/html');
+  const indexHtml = await getURLasString(gameURL+htmlQuery, 'text/html');
   fs.writeFileSync(outDir + 'index.html',indexHtml);
   console.log(`Wrote file ${outDir + 'index.html'}`);
   const sources = getSourcePathsFromIndex(indexHtml);

@@ -1,4 +1,10 @@
 # Changelog
+## v1.4.0
+- Fixed fetching the index.html of the splash page and not the game
+- Annotated some new combat variables
+- Type annotated someCoolFunctions.js (formerly pushNotifications.js)
+- Updated to cachebuster version v807
+- Added descriptions to the bleed properties of Player special attacks
 ## v1.3.0
 - Updated to cachebuster version v791
 - Added descriptions to PlayerCombatData and EnemyCombatData properties
