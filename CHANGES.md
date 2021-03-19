@@ -1,4 +1,8 @@
 # Changelog
+## v1.5.0
+- Updated to cachebuster version v813
+- Improved SaveGame type, and added some notes on variables that could be reduced in size or eliminated
+- Deprecated unused functions and variables
 ## v1.4.1
 - Updated to cachebuster version v809
 ## v1.4.0

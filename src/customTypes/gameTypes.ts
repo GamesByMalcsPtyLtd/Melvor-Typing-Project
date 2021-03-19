@@ -1,4 +1,4 @@
-/*  Melvor Typing Project v1.4.1: Fetches and Documents Melvor Idle
+/*  Melvor Typing Project v1.5.0: Fetches and Documents Melvor Idle
 
     Copyright (C) <2021>  <Coolrox95>
 
@@ -877,53 +877,73 @@ interface SaveGame {
   gp: typeof gp,
   currentBankUpgrade: typeof currentBankUpgrade,
   skillXP: typeof skillXP,
+  /** Redundant, can be reproduced on load */
   skillLevel: typeof skillLevel,
+  /** Redundant, can be reproduced on load */
   nextLevelProgress: typeof nextLevelProgress,
   treeMasteryData: typeof treeMasteryData,
   currentAxe: typeof currentAxe,
   treeCutLimit: typeof treeCutLimit,
+  /** Contains redundant data, can be reduced in size */
   bank: typeof bank,
   bankMax: typeof bankMax,
   ignoreBankFull: typeof ignoreBankFull,
+  /** Contains redundant data, can be reduced in size */
   statsGeneral: typeof statsGeneral,
+  /** Contains redundant data, can be reduced in size */
   statsWoodcutting: typeof statsWoodcutting,
   logsMastery: typeof logsMastery,
+  /** Contains redundant data, can be reduced in size */
   statsFiremaking: typeof statsFiremaking,
   fishMastery: typeof fishMastery,
-  fishingArea: { level: number, maxFish: number, currentFish: number[] }[],
   currentRod: typeof currentRod,
+  /** Contains redundant data, can be reduced in size */
   statsFishing: typeof statsFishing,
   cookingMastery: typeof cookingMastery,
   upgradedToRange: typeof upgradedToRange,
+  /** Contains redundant data, can be reduced in size */
   statsCooking: typeof statsCooking,
   defaultPageOnLoad: typeof defaultPageOnLoad,
   miningOreMastery: typeof miningOreMastery,
+  /** Contains redundant data, can be reduced in size */
   statsMining: typeof statsMining,
   currentPickaxe: typeof currentPickaxe,
+  /** Contains redundant data, can be reduced in size */
   statsSmithing: typeof statsSmithing,
   levelUpScreen: typeof levelUpScreen,
   gameUpdateNotification: typeof gameUpdateNotification,
+  /** Redundant, can be reproduced on load */
   equippedItems: typeof equippedItems,
   attackStyle: typeof attackStyle,
+  /** Contains redundant data, can be reduced in size */
   combatData: typeof combatData,
   currentCombatFood: typeof currentCombatFood,
+  /** Can be reduced in size by changing to array */
   equippedFood: typeof equippedFood,
   smithingMastery: typeof smithingMastery,
+  /** Contains redundant data, can be reduced in size */
   statsCombat: typeof statsCombat,
   continueThievingOnStun: typeof continueThievingOnStun,
   thievingMastery: typeof thievingMastery,
   farmingMastery: typeof farmingMastery,
   showItemNotify: typeof showItemNotify,
+  /** Contains redundant data, can be reduced in size */
   glovesTracker: typeof glovesTracker,
   currentCookingFire: typeof currentCookingFire,
+  /** Contains redundant data, can be reduced in size */
   rockData: typeof rockData,
   fletchingMastery: typeof fletchingMastery,
   craftingMastery: typeof craftingMastery,
+  /** Redundant, can be reproduced on load*/
   ammo: typeof ammo,
   myBankVersion: typeof myBankVersion,
+  /** Contains redundant data, can be reduced in size */
   statsThieving: typeof statsThieving,
+  /** Contains redundant data, can be reduced in size */
   statsFarming: typeof statsFarming,
+  /** Contains redundant data, can be reduced in size */
   statsFletching: typeof statsFletching,
+  /** Contains redundant data, can be reduced in size */
   statsCrafting: typeof statsCrafting,
   autoRestartDungeon: typeof autoRestartDungeon,
   autoSaveCloud: typeof autoSaveCloud,
@@ -934,9 +954,11 @@ interface SaveGame {
   itemLog: typeof itemLog,
   dungeonCompleteCount: typeof dungeonCompleteCount,
   sellQty: typeof sellQty,
+  /** Contains redundant data, can be reduced in size */
   statsRunecrafting: typeof statsRunecrafting,
   showGPNotify: typeof showGPNotify,
   enableAccessibility: typeof enableAccessibility,
+  /** Old save variable that can be deleted */
   showSkillNav: boolean,
   accountGameVersion: typeof accountGameVersion,
   prayerPoints: typeof prayerPoints,
@@ -948,21 +970,25 @@ interface SaveGame {
   confirmationOnClose: typeof confirmationOnClose,
   listView: typeof listView,
   herbloreMastery: typeof herbloreMastery,
+  /** Contains redundant data, can be reduced in size */
   newFarmingAreas: typeof newFarmingAreas,
   equipmentSets: typeof equipmentSets,
   selectedEquipmentSet: typeof selectedEquipmentSet,
   currentAutoEat: typeof currentAutoEat,
   equipmentSetsPurchased: typeof equipmentSetsPurchased,
+  /** Contains redundant data, can be reduced in size */
   herbloreBonuses: typeof herbloreBonuses,
   autoPotion: typeof autoPotion,
   autoUseSpecialAttack: typeof autoUseSpecialAttack,
   showHPNotify: typeof showHPNotify,
+  /** Contains redundant data, can be reduced in size */
   statsHerblore: typeof statsHerblore,
   offline: typeof offline,
   selectedAttackStyle: typeof selectedAttackStyle,
   showCommas: typeof showCommas,
   showVirtualLevels: typeof showVirtualLevels,
   formatNumberSetting: typeof formatNumberSetting,
+  /** Can be converted to array to reduce size */
   tutorialTips: typeof tutorialTips,
   saveTimestamp: typeof saveTimestamp,
   secretAreaUnlocked: typeof secretAreaUnlocked,
@@ -990,7 +1016,17 @@ interface SaveGame {
   slayerTaskCompletion: typeof slayerTaskCompletion,
   autoSlayerUnlocked: typeof autoSlayerUnlocked,
   autoSlayer: typeof autoSlayer,
-  itemsAlreadyFound: typeof itemsAlreadyFound
+  /** Redundant, can be reproduced on load */
+  itemsAlreadyFound: typeof itemsAlreadyFound,
+  xmasPresents: typeof xmasPresents,
+  /** Can be massively reduced in size */
+  shopItemsPurchased: typeof shopItemsPurchased,
+  titleNewsID: typeof titleNewsID,
+  chosenAgilityObstacles: typeof chosenAgilityObstacles,
+  skillsUnlocked: typeof skillsUnlocked,
+  agilityObstacleBuildCount: typeof agilityObstacleBuildCount,
+  agilityPassivePillarActive: typeof agilityPassivePillarActive,
+  scheduledPushNotifications: typeof scheduledPushNotifications,
 }
 
 interface SmithingItem {
