@@ -1,4 +1,4 @@
-/*  Melvor Typing Project v1.5.0: Fetches and Documents Melvor Idle
+/*  Melvor Typing Project v1.5.1: Fetches and Documents Melvor Idle
 
     Copyright (C) <2021>  <Coolrox95>
 
@@ -301,11 +301,11 @@ interface PlayerSpecialAttack {
   modifiers?: ModifierData
 }
 
-interface PlayerEnemyObject<Player,Enemy> {
+interface PlayerEnemyObject<Player, Enemy> {
   player: Player,
   enemy: Enemy
 }
-type CombatData = PlayerEnemyObject<PlayerCombatData,EnemyCombatData>;
+type CombatData = PlayerEnemyObject<PlayerCombatData, EnemyCombatData>;
 type SpecialAttackData = {
   isActive?: boolean,
   turnsLeft?: number
@@ -963,6 +963,7 @@ interface SaveGame {
   accountGameVersion: typeof accountGameVersion,
   prayerPoints: typeof prayerPoints,
   slayerCoins: typeof slayerCoins,
+  /** Can be serialized to reduce size */
   slayerTask: typeof slayerTask,
   showEnemySkillLevels: typeof showEnemySkillLevels,
   monsterStats: typeof monsterStats,
@@ -1009,7 +1010,9 @@ interface SaveGame {
   golbinRaidStats: typeof golbinRaidStats,
   raidCoins: typeof raidCoins,
   disableAds: typeof disableAds,
+  /** Can be serialized to reduce size */
   SETTINGS: typeof SETTINGS,
+  /** Can be serialized to reduce size */
   MASTERY: typeof MASTERY,
   useCombinationRunes: typeof useCombinationRunes,
   firstTimeLoad: typeof firstTimeLoad,
@@ -1028,7 +1031,7 @@ interface SaveGame {
   agilityPassivePillarActive: typeof agilityPassivePillarActive,
   scheduledPushNotifications: typeof scheduledPushNotifications,
 }
-
+type SaveKey = keyof SaveGame;
 interface SmithingItem {
   itemID: ItemID,
   smithingLevel: number,
@@ -1844,9 +1847,6 @@ interface GenericItem extends BaseItem {
   gpMultiplier?: number,
   /** @deprecated Unused propery, use modifiers instead */
   chanceToDoubleResources?: number,
-  // Pirates Lost Ring
-  /** XP bonus for pirate's lost ring which for some reason is still multiplicative? */
-  fishingBonusXP?: number
   // Modifiers
   /** Modifiers provided when item is equipped. Also contains modifiers for potions that are WIP */
   modifiers?: ModifierData
@@ -1907,7 +1907,7 @@ type ObstacleCost = {
 }
 type BankCache = NumberDictionary<number>;
 type MasteryCache = NumberDictionary<NumberDictionary<number>>;
-type MasteryLevelCache = NumberDictionary<{levels: number[]}>;
+type MasteryLevelCache = NumberDictionary<{ levels: number[] }>;
 interface PlayFabEventBody {
   [key: string]: any
 }

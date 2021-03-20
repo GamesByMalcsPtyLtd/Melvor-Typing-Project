@@ -1,4 +1,4 @@
-/*  Melvor Typing Project v1.5.0: Fetches and Documents Melvor Idle
+/*  Melvor Typing Project v1.5.1: Fetches and Documents Melvor Idle
 
     Copyright (C) <2021>  <Coolrox95>
 
@@ -18,7 +18,7 @@
 // @ts-check
 const fs = require('fs');
 const versionRegex = /\d+\.\d+\.\d+/m;
-const newVersion = '1.5.0';
+const newVersion = '1.5.1';
 const fileDirs = [
   './.scripts/',
   './src/customTypes/'
