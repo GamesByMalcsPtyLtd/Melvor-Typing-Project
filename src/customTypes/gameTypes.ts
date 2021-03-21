@@ -1,4 +1,4 @@
-/*  Melvor Typing Project v1.5.1: Fetches and Documents Melvor Idle
+/*  Melvor Typing Project v1.5.2: Fetches and Documents Melvor Idle
 
     Copyright (C) <2021>  <Coolrox95>
 
@@ -712,8 +712,8 @@ interface ItemStat {
    * 2: gpFromSale
    * 3: deathCount
    * 4: damageTaken
-   * 5: missedAttacks
-   * 6: damageDealt
+   * 5: damageDealt
+   * 6: missedAttacks
    * 7: timesEaten
    * 8: healedFor
    * 9: totalAttacks
@@ -1367,6 +1367,7 @@ interface StandardModifierObject<Standard> {
   increasedPotionChargesFlat: Standard,
   /** Decreases the charges of potions by value: Implemented */
   decreasedPotionChargesFlat: Standard,
+  // Start of New Modifiers for potions
   /** Increases the % chance to recieve bird's nests from Woodcutting by value: Implemented*/
   increasedBirdNestDropRate: Standard,
   /** Decreases the % chance to recieve bird's nests from Woodcutting by value: Implemented*/
