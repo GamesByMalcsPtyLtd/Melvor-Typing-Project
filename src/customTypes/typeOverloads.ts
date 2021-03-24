@@ -1,4 +1,4 @@
-/*  Melvor Typing Project v1.5.3: Fetches and Documents Melvor Idle
+/*  Melvor Typing Project v1.5.4: Fetches and Documents Melvor Idle
 
     Copyright (C) <2021>  <Coolrox95>
 
@@ -41,6 +41,7 @@ interface Document {
 }
 
 interface ObjectConstructor {
+  keys(obj: Partial<StandardModifierObject<number>>): StandardModifierKeys[]
   keys(obj: ModifierData) : ModifierKeys[]
   keys(obj: ModifierActive) : ModifierKeys[]
   keys(obj: Shop) : ShopCategory[]

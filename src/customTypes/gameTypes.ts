@@ -1,4 +1,4 @@
-/*  Melvor Typing Project v1.5.3: Fetches and Documents Melvor Idle
+/*  Melvor Typing Project v1.5.4: Fetches and Documents Melvor Idle
 
     Copyright (C) <2021>  <Coolrox95>
 
@@ -1021,7 +1021,7 @@ interface SaveGame {
   autoSlayer: typeof autoSlayer,
   /** Redundant, can be reproduced on load */
   itemsAlreadyFound: typeof itemsAlreadyFound,
-  xmasPresents: typeof xmasPresents,
+  xmasPresents: number,
   /** Can be massively reduced in size */
   shopItemsPurchased: typeof shopItemsPurchased,
   titleNewsID: typeof titleNewsID,
@@ -1965,7 +1965,7 @@ type Prayer = {
   pointsPerPlayer: number,
   pointsPerEnemy: number,
   pointsPerRegen: number,
-  modifiers: ModifierData,
+  modifiers: Partial<StandardModifierObject<number>>,
   vars?: string[],
   values?: number[]
 }

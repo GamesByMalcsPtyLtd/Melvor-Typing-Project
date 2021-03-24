@@ -1,4 +1,6 @@
 # Changelog
+## v1.5.4
+- Fixed a bug where tsc wasn't working
 ## v1.5.3
 - Updated to cachebuster version v819
 ## v1.5.2
