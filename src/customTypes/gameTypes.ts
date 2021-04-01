@@ -1,4 +1,4 @@
-/*  Melvor Typing Project v1.5.4: Fetches and Documents Melvor Idle
+/*  Melvor Typing Project v1.6.0: Fetches and Documents Melvor Idle
 
     Copyright (C) <2021>  <Coolrox95>
 
@@ -44,7 +44,7 @@ type LootID = number;
 type PrayerID = number;
 /** An index of playerSpecialAttacks */
 type PlayerSpecialID = number;
-type SlayerTier = 0 | 1 | 2 | 3 | 4;
+type SlayerTier = number;
 type SaveString = string;
 type TimeoutID = number;
 type BankTabID = number;
@@ -80,8 +80,8 @@ type ObstacleID = number;
 type PillarID = number;
 /** Categories of agility obstacles */
 type ObstacleCategories = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9;
-/** Current gamemode, 0 is normal, 1 is hardcore, 2 is adventure */
-type GameMode = 0 | 1 | 2;
+/** Current gamemode, 0 is normal, 1 is hardcore, 2 is adventure, 3 is CHAOS */
+type GameMode = 0 | 1 | 2 | 3;
 /** Index of rockData,oreTypes */
 type MiningID = number;
 interface ReqCheck {
@@ -147,8 +147,6 @@ interface EnemySpecialAttack {
   canStun: boolean,
   /** Number of turns attack stuns player for */
   stunTurns: null | number,
-  /** Attack damage is multiplied by this if the player is stunnned */
-  stunDamageMultiplier: number,
   /** Attack can apply active buffs to enemy */
   activeBuffs?: boolean,
   /** Number of enemy turns active buffs last */
@@ -278,10 +276,6 @@ interface PlayerSpecialAttack {
   decreasedAccuracy?: number,
   /** Damage is always multiplied by this */
   damageMultiplier: number,
-  /** Damage is multiplied by this if enemy is stunned */
-  stunDamageMultiplier: number,
-  /** Damage is multiplied by this if enemy is sleeping */
-  sleepDamageMultiplier?: number,
   /** Fraction of damage dealt this attack heals player for */
   healsFor?: number,
   /** On hit, decreased enemy attack speed by this % */
@@ -311,6 +305,8 @@ type SpecialAttackData = {
   turnsLeft?: number
 }
 interface EnemyCombatData extends EnemyModifierData {
+  /** 1: LEMONG GANG 2: Some carrot people or whatever */
+  gang?: number;
   /** Monster ID */
   id: null | MonsterID,
   /** Current HP of enemy */
@@ -969,7 +965,6 @@ interface SaveGame {
   monsterStats: typeof monsterStats,
   itemStats: typeof itemStats,
   confirmationOnClose: typeof confirmationOnClose,
-  listView: typeof listView,
   herbloreMastery: typeof herbloreMastery,
   /** Contains redundant data, can be reduced in size */
   newFarmingAreas: typeof newFarmingAreas,
@@ -1030,6 +1025,7 @@ interface SaveGame {
   agilityObstacleBuildCount: typeof agilityObstacleBuildCount,
   agilityPassivePillarActive: typeof agilityPassivePillarActive,
   scheduledPushNotifications: typeof scheduledPushNotifications,
+  randomModifiers: typeof randomModifiers
 }
 type SaveKey = keyof SaveGame;
 interface SmithingItem {
@@ -1317,9 +1313,9 @@ interface StandardModifierObject<Standard> {
   increasedStaminaCost: Standard,
   /** @deprecated Unused and Unimplented, Holdover from when agility had stamina */
   decreasedStaminaCost: Standard,
-  /** Unused and Unimplemented */
+  /** Increases the % of attack damage the player is healed for by value: Implemented */
   increasedLifesteal: Standard,
-  /** Unused and Unimplemented */
+  /** Decreases the % of attack damage the player is healed for by value: Implemented */
   decreasedLifesteal: Standard,
   /** Unused and Unimplemented */
   increasedReflectDamage: Standard,
@@ -1406,6 +1402,26 @@ interface StandardModifierObject<Standard> {
   increasedAltMagicSkillXP: Standard
   /** Decreases the Magic XP gained from alt magic by %: Implemented */
   decreasedAltMagicSkillXP: Standard
+  /** ??? It's a Mystery ??? */
+  aprilFoolsIncreasedMovementSpeed: Standard
+  /** ??? It's a Mystery ??? */
+  aprilFoolsDecreasedMovementSpeed: Standard
+  /** ??? It's a Mystery ??? */
+  aprilFoolsIncreasedTeleportCost: Standard
+  /** ??? It's a Mystery ??? */
+  aprilFoolsDecreasedTeleportCost: Standard
+  /** ??? It's a Mystery ??? */
+  aprilFoolsIncreasedUpdateDelay: Standard
+  /** ??? It's a Mystery ??? */
+  aprilFoolsDecreasedUpdateDelay: Standard
+  /** ??? It's a Mystery ??? */
+  aprilFoolsIncreasedLemonGang: Standard
+  /** ??? It's a Mystery ??? */
+  aprilFoolsDecreasedLemonGang: Standard
+  /** ??? It's a Mystery ??? */
+  aprilFoolsIncreasedCarrotGang: Standard
+  /** ??? It's a Mystery ??? */
+  aprilFoolsDecreasedCarrotGang: Standard
 }
 interface SkillModifierObject<Skill> {
   /** Increases the skill level used to compute combat stats by value: Implemented */
@@ -1939,7 +1955,7 @@ type ShopCategoryData = {
   hasQty?: boolean,
   charges?: number,
   unlockRequirements: UnlockRequirement,
-  buyLimit: [number, number, number],
+  buyLimit: [number, number, number, number],
   showBuyLimit?: boolean
 }
 type UnlockRequirement = {
@@ -1948,6 +1964,7 @@ type UnlockRequirement = {
   skillLevel?: [SkillID, number][],
   slayerTaskCompletion?: [SlayerTier, number][]
   dungeonCompletion?: [DungeonID, number][]
+  completionPercentage?: number
 }
 
 type SpellCost = {
@@ -2168,4 +2185,173 @@ type Milestone = {
   media: string,
   /** @deprecated Unused property */
   alwaysShow?: boolean
+}
+// Typedefs imported from serializeSave.ts
+interface NumberSaveGame {
+  firstTime: number,
+  nameChanges: number,
+  gp: number,
+  defaultPageOnLoad: number,
+  levelUpScreen: number,
+  attackStyle: number,
+  currentCombatFood: number,
+  showItemNotify: number,
+  myBankVersion: number,
+  selectedSpell: number,
+  buyQty: number,
+  sellQty: number,
+  accountGameVersion: number,
+  prayerPoints: number,
+  slayerCoins: number,
+  selectedEquipmentSet: number,
+  formatNumberSetting: number,
+  saveTimestamp: number,
+  activeAurora: number,
+  currentGamemode: number,
+  raidCoins: number,
+  agilityPassivePillarActive: number
+}
+type NumberKey = keyof NumberSaveGame;
+
+interface BoolSaveGame {
+  ignoreBankFull: boolean,
+  continueThievingOnStun: boolean,
+  autoRestartDungeon: boolean,
+  autoSaveCloud: boolean,
+  darkMode: boolean,
+  showGPNotify: boolean,
+  enableAccessibility: boolean,
+  showEnemySkillLevels: boolean,
+  confirmationOnClose: boolean,
+  autoPotion: boolean,
+  showCommas: boolean,
+  showVirtualLevels: boolean,
+  secretAreaUnlocked: boolean,
+  showSaleNotifications: boolean,
+  showShopNotifications: boolean,
+  pauseOfflineActions: boolean,
+  showCombatMinibar: boolean,
+  showCombatMinibarCombat: boolean,
+  showSkillMinibar: boolean,
+  disableAds: boolean,
+  useCombinationRunes: boolean,
+  firstTimeLoad: boolean,
+  autoSlayer: boolean,
+}
+type BoolKey = keyof BoolSaveGame;
+
+interface SerializableSaveGame {
+  bank: BankItem[]
+  statsGeneral: GameStat[]
+  statsWoodcutting: GameStat[]
+  statsFiremaking: GameStat[]
+  statsFishing: GameStat[]
+  statsCooking: GameStat[]
+  statsMining: GameStat[]
+  statsSmithing: GameStat[]
+  statsCombat: GameStat[]
+  statsThieving: GameStat[]
+  statsFarming: GameStat[]
+  statsFletching: GameStat[]
+  statsCrafting: GameStat[]
+  statsRunecrafting: GameStat[]
+  statsHerblore: GameStat[]
+  glovesTracker: typeof glovesTracker
+  rockData: RockData[]
+  herbloreBonuses: HerbloreBonus[]
+  tutorialTips: typeof tutorialTips
+  shopItemsPurchased: [ShopCategory, number][]
+  combatData: MinCombatData
+  equippedFood: ItemQuantity2[]
+  SETTINGS: typeof SETTINGS
+  monsterStats: MonsterStat[]
+  petUnlocked: boolean[]
+  skillsUnlocked: boolean[]
+  equipmentSets: EquipmentSet[]
+  skillXP: number[]
+  dungeonCompleteCount: number[]
+  selectedAttackStyle: number[]
+  lockedItems: number[]
+  golbinRaidStats: number[]
+  slayerTask: SlayerTask[]
+  slayerTaskCompletion: number[]
+  chosenAgilityObstacles: number[]
+  agilityObstacleBuildCount: number[]
+  itemsAlreadyFound: number[]
+  saveStateBeforeRaid: number[]
+}
+type SerialKey = keyof SerializableSaveGame;
+interface NestedSerializeableSaveGame {
+  newFarmingAreas: FarmingArea[],
+  MASTERY: Mastery,
+  golbinRaidHistory: RaidHistory[],
+  itemStats: ItemStat[]
+}
+type NestedKey = keyof NestedSerializeableSaveGame;
+interface OtherSaveGame {
+  offline: Offline,
+  titleNewsID: string[],
+  scheduledPushNotifications: StringDictionary<string>
+  username: string,
+  gameUpdateNotification: string,
+  randomModifiers: typeof randomModifiers
+}
+type OtherKey = keyof OtherSaveGame;
+interface ReconstructedSaveGame {
+  skillLevel: number[],
+  nextLevelProgress: number[],
+  equippedItems: number[],
+  ammo: number
+}
+type ReconKey = keyof ReconstructedSaveGame;
+type NewSaveGame = NumberSaveGame & BoolSaveGame & SerializableSaveGame & NestedSerializeableSaveGame & OtherSaveGame & ReconstructedSaveGame;
+interface Serializer<T> {
+  (saveVar: T): number[]
+}
+
+interface NestedSerializer<T> {
+  (saveVar: T): number[][]
+}
+interface Deserializer<T> {
+  (sData: number[], version: number): T
+}
+interface NestedDeserializer<T> {
+  (sData: number[][], version: number): T
+}
+type StatsData = {
+  stats: number[],
+  items: number[]
+}
+type MinCombatData = {
+  player: {
+    hitpoints: number
+  },
+  enemy: {
+
+  }
+}
+type SerializerVar<T, U> = {
+  saveKey: U,
+  serialize: Serializer<T>,
+  deserialize: Deserializer<T>
+}
+type NestedSerializerVar<T, U> = {
+  saveKey: U,
+  serialize: NestedSerializer<T>,
+  deserialize: NestedDeserializer<T>
+}
+type MapToSerializer<Type> = {
+  [Property in keyof Type]: SerializerVar<Type[Property], Property>
+}
+
+type MapToNested<Type> = {
+  [Property in keyof Type]: NestedSerializerVar<Type[Property], Property>
+}
+type PackagedSave = {
+  v: number
+  n: number[],
+  b: number[],
+  s: number[][],
+  ns: number[][][]
+  o: string[]
 }

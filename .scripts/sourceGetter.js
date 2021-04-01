@@ -1,4 +1,4 @@
-/*  Melvor Typing Project v1.5.4: Fetches and Documents Melvor Idle
+/*  Melvor Typing Project v1.6.0: Fetches and Documents Melvor Idle
 
     Copyright (C) <2021>  <Coolrox95>
 
@@ -22,7 +22,8 @@ const prettier = require('prettier');
 const gameURL = "https://www.melvoridle.com/";
 const htmlQuery = "?l=1";
 const sourceRegexp = /^<script type="(text|application)\/javascript" src="(?<path>assets\/js\/(game\/)?(?<name>\w*.js))\?(?<fileVersion>\d+)"><\/script>/;
-
+const jsdocStart = /^\s*\/\*{2}/;
+const jsdocEnd = /\*\/\s*$/;
 /**
  * Reads the https web url and returns a promise that resolves as a string
  * @param {string} webURL 
@@ -81,8 +82,8 @@ function getURLasString(webURL, desiredType) {
  */
 async function getAllSources(outDir) {
   if (!fs.existsSync(outDir)) fs.mkdirSync(outDir, { recursive: true });
-  const indexHtml = await getURLasString(gameURL+htmlQuery, 'text/html');
-  fs.writeFileSync(outDir + 'index.html',indexHtml);
+  const indexHtml = await getURLasString(gameURL + htmlQuery, 'text/html');
+  fs.writeFileSync(outDir + 'index.html', indexHtml);
   console.log(`Wrote file ${outDir + 'index.html'}`);
   const sources = getSourcePathsFromIndex(indexHtml);
   return Promise.all(sources.map(async source => {
@@ -177,8 +178,6 @@ function prettifyCode(code) {
  * @returns {ModificationGuide}
  */
 function generateModGuide(filePath, fileName) {
-  const jsdocStart = /^\s*\/\*{2}/;
-  const jsdocEnd = /\*\/\s*$/;
   const typeCast = /^\s*(\w+) = \/\*\* @type {\w+} \*\/ \(\1\);/;
   const ignoreError = /^\s*\/\/ @ts-ignore$/;
   const tripleSlash = /\/\/\/ \<reference path = \"\w*\.js\"\/\>/;
@@ -280,29 +279,72 @@ function applyModGuide(modGuide, targetPath, targetFile, outPath, outName) {
     })
   }
   let lastDocPos = 0;
+  // Need to modify this to replace JSdocs that share the same target
+  const existingModGuide = generateModGuide(targetPath, targetFile);
   modGuide.comments.forEach(jsdoc => {
-    let nextLinesFound = -1;
-    let commentPositionFound = false;
-    for (let i = lastDocPos + 1; i < targetLines.length; i++) {
-      if (targetLines[i].replace(commentRegex, '') === jsdoc.nextLine.replace(commentRegex, '')) nextLinesFound++;
-      if (nextLinesFound === jsdoc.prevOccurences) {
-        outLines.push(...targetLines.slice(lastDocPos, i));
-        outLines.push(...jsdoc.commentLines);
-        applyGuide.insert.push({
-          lineNumber: i,
-          lines: jsdoc.commentLines
-        })
-        lastDocPos = i;
-        commentPositionFound = true;
-        break;
+    if (!checkForExistingComment(existingModGuide, jsdoc)) {
+      const replaceComment = findSamePlaceComment(existingModGuide, jsdoc);
+      let nextLinesFound = -1;
+      let commentPositionFound = false;
+      for (let i = lastDocPos + 1; i < targetLines.length; i++) {
+        if (targetLines[i].replace(commentRegex, '') === jsdoc.nextLine.replace(commentRegex, '')) nextLinesFound++;
+        if (nextLinesFound === jsdoc.prevOccurences) {
+          if (replaceComment !== undefined) {
+            outLines.push(...targetLines.slice(lastDocPos, i - replaceComment.length));
+            outLines.push(...jsdoc.commentLines);
+            replaceComment.commentLines.forEach((line,j)=>{
+              applyGuide.replace.push({
+                lineNumber: i - replaceComment.length + j,
+                text: jsdoc.commentLines[j]
+              })
+            })
+            applyGuide.insert.push({
+              lineNumber: i,
+              lines: jsdoc.commentLines.slice(replaceComment.length)
+            })
+            lastDocPos = i;
+            commentPositionFound = true;
+          } else {
+            outLines.push(...targetLines.slice(lastDocPos, i));
+            outLines.push(...jsdoc.commentLines);
+            applyGuide.insert.push({
+              lineNumber: i,
+              lines: jsdoc.commentLines
+            })
+            lastDocPos = i;
+            commentPositionFound = true;
+          }
+          break;
+        }
       }
+      if (!commentPositionFound) console.warn(`Could not find line: ${jsdoc.nextLine}\n in: ${targetFile}\n with comment:\n ${jsdoc.commentLines.join('\n')}`)
     }
-    if (!commentPositionFound) console.warn(`Could not find line: ${jsdoc.nextLine}\n in: ${targetFile}\n with comment:\n ${jsdoc.commentLines.join('\n')}`)
   });
   outLines.push(...targetLines.slice(lastDocPos));
   fs.writeFileSync(outPath + outName, outLines.join('\n'));
   console.log(`Applied Modifications and wrote to ${outPath}${outName}`);
   return applyGuide;
+}
+
+/**
+ * 
+ * @param {ModificationGuide} existingModGuide 
+ * @param {CommentGuide} jsdoccomment 
+ */
+function checkForExistingComment(existingModGuide, jsdoccomment) {
+  return existingModGuide.comments.some((comment) => {
+    return JSON.stringify(comment) === JSON.stringify(jsdoccomment);
+  })
+}
+
+/**
+ * 
+ * @param {ModificationGuide} existingModGuide 
+ * @param {CommentGuide} jsdoc 
+ * @returns {CommentGuide|undefined}
+ */
+function findSamePlaceComment(existingModGuide, jsdoc) {
+  return existingModGuide.comments.find((comment) => { return comment.nextLine === jsdoc.nextLine });
 }
 
 /**
@@ -336,7 +378,7 @@ function applyGuideToSources(applyGuidePath, targetPath, outPath) {
   /** @type {ApplyGuide[]} */
   const applyGuides = JSON.parse(fs.readFileSync(applyGuidePath, 'utf8'));
   const targetDir = fs.readdirSync(targetPath);
-  if (!fs.existsSync(outPath)) fs.mkdirSync(outPath,{recursive: true});
+  if (!fs.existsSync(outPath)) fs.mkdirSync(outPath, { recursive: true });
   applyGuides.forEach((guide) => {
     if (targetDir.includes(guide.file)) {
       const targetFile = fs.readFileSync(targetPath + guide.file, 'utf8');

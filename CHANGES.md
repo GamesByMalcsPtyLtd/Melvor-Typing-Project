@@ -1,4 +1,11 @@
 # Changelog
+## 1.6.0
+- Updated to cachebuster version v825
+- Removed some old properties from special attack interfaces
+- Added description to now implemented lifesteal modifier
+- Changed source documentation code to skip existing JSdoc comments in the source code
+- Changed source documentation code to support changing existing JSdoc comments to something else
+- Documented serializeSave.js
 ## v1.5.4
 - Fixed a bug where tsc wasn't working
 ## v1.5.3
