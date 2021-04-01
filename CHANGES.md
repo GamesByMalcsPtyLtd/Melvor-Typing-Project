@@ -1,5 +1,7 @@
 # Changelog
-## 1.6.0
+## v1.6.1
+- Updated to cachebuster version v826
+## v1.6.0
 - Updated to cachebuster version v825
 - Removed some old properties from special attack interfaces
 - Added description to now implemented lifesteal modifier
