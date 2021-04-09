@@ -1,4 +1,9 @@
 # Changelog
+## v1.7.0
+- Updated to cachebuster version v832
+- Added type def for gamemode data
+- Added type def for random modifier for chaos mode
+- Added types to new chaos mode functions
 ## v1.6.2
 - Updated to cachebuster version v831
 ## v1.6.1

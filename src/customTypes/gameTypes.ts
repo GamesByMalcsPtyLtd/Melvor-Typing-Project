@@ -1,4 +1,4 @@
-/*  Melvor Typing Project v1.6.2: Fetches and Documents Melvor Idle
+/*  Melvor Typing Project v1.7.0: Fetches and Documents Melvor Idle
 
     Copyright (C) <2021>  <Coolrox95>
 
@@ -44,6 +44,7 @@ type LootID = number;
 type PrayerID = number;
 /** An index of playerSpecialAttacks */
 type PlayerSpecialID = number;
+type EnemySpecialID = number;
 type SlayerTier = number;
 type SaveString = string;
 type TimeoutID = number;
@@ -2354,4 +2355,22 @@ type PackagedSave = {
   s: number[][],
   ns: number[][][]
   o: string[]
+}
+type GamemodeData = {
+  name: string,
+  media: string,
+  description: string,
+  rules: string[],
+  textClass: string,
+  btnClass: string,
+  isPermaDeath: boolean,
+  isEvent: boolean,
+  endDate: number,
+  combatTriangle: number,
+  numberMultiplier: number
+}
+
+type RandomModifier = {
+  modifier: ModifierKeys,
+  value: number | number[][]
 }
