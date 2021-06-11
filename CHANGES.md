@@ -1,4 +1,6 @@
 # Changelog
+## v1.8.1
+- Updated to cachebuster version v908
 ## v1.8.0
 - Updated to cachebuster version v906
 ## v1.7.0
