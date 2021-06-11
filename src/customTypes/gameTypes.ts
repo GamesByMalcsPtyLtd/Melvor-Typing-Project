@@ -1,4 +1,4 @@
-/*  Melvor Typing Project v1.7.0: Fetches and Documents Melvor Idle
+/*  Melvor Typing Project v1.8.0: Fetches and Documents Melvor Idle
 
     Copyright (C) <2021>  <Coolrox95>
 
@@ -237,6 +237,7 @@ interface PlayerSpecialAttack {
   customDamageModifier?: number
   /** Attack deals this amount of damage * numberMultiplier */
   setDamage?: number | null,
+  extraDamage?: number
   /** Attack deals fixed damage based on magic level */
   stormsnap?: boolean,
   /** Attack has this % chance to stun enemy on hit */
@@ -432,6 +433,8 @@ interface EnemyCombatData extends EnemyModifierData {
   isDead?: boolean;
   /** @deprecated Unused property (has no effect) */
   lifesteal?: number;
+  burnDebuff?: number;
+  isBurning?: boolean;
 }
 interface PlayerCombatData {
   /** Current HP of player */
@@ -528,6 +531,9 @@ interface PlayerCombatData {
   attackStyleBonusAccuracy?: number;
   /** Free skill levels used to compute baseMaxHit from combat style */
   attackStyleBonusStrength?: number;
+  maximumDefenceRoll?: number,
+  maximumRangedDefenceRoll?: number,
+  maximumMagicDefenceRoll?: number
 }
 
 type PlayerBaseStats = {
@@ -554,7 +560,8 @@ type PlayerBaseStats = {
 };
 interface EquipmentSet {
   equipment: number[],
-  ammo: number
+  ammo: number,
+  summonAmmo: [number,number]
 }
 interface ItemQuantity2 {
   itemID: ItemID,
@@ -784,7 +791,10 @@ type TooltipInstances = {
   itemLog?: TippyTooltip[],
   monsterLog?: TippyTooltip[],
   petLog?: TippyTooltip[],
-  agilityItemCosts?: TippyTooltip[]
+  agilityItemCosts?: TippyTooltip[],
+  summoningSynergy?: TippyTooltip[],
+  summoningRecipe?: TippyTooltip[],
+  summoning?: TippyTooltip[],
 }
 type SumFunction = (arr: number[]) => number;
 type OldMasteryArray = { mastery: number, masteryXP: number }[];
@@ -1027,6 +1037,7 @@ interface SaveGame {
   agilityPassivePillarActive: typeof agilityPassivePillarActive,
   scheduledPushNotifications: typeof scheduledPushNotifications,
   randomModifiers: typeof randomModifiers
+  summoningData: typeof summoningData
 }
 type SaveKey = keyof SaveGame;
 interface SmithingItem {
@@ -1423,6 +1434,110 @@ interface StandardModifierObject<Standard> {
   aprilFoolsIncreasedCarrotGang: Standard
   /** ??? It's a Mystery ??? */
   aprilFoolsDecreasedCarrotGang: Standard
+  increasedGPOnEnemyHit: Standard;
+  decreasedGPOnEnemyHit: Standard;
+  decreasedEnemyMeleeEvasion: Standard;
+  increasedEnemyMeleeEvasion: Standard;
+  decreasedEnemyRangedEvasion: Standard;
+  increasedEnemyRangedEvasion: Standard;
+  decreasedEnemyMagicEvasion: Standard;
+  increasedEnemyMagicEvasion: Standard;
+  decreasedEnemyAccuracy: Standard;
+  increasedEnemyAccuracy: Standard;
+  increasedAdditionalRunecraftCountRunes: Standard;
+  decreasedAdditionalRunecraftCountRunes: Standard;
+  summoningSynergy_0_1: Standard;
+  summoningSynergy_0_6: Standard;
+  summoningSynergy_0_7: Standard;
+  summoningSynergy_0_8: Standard;
+  summoningSynergy_0_12: Standard;
+  summoningSynergy_0_13: Standard;
+  summoningSynergy_0_14: Standard;
+  summoningSynergy_0_15: Standard;
+  summoningSynergy_1_2: Standard;
+  summoningSynergy_1_8: Standard;
+  summoningSynergy_1_12: Standard;
+  summoningSynergy_1_13: Standard;
+  summoningSynergy_1_14: Standard;
+  summoningSynergy_1_15: Standard;
+  summoningSynergy_2_6: Standard;
+  summoningSynergy_2_7: Standard;
+  summoningSynergy_2_8: Standard;
+  summoningSynergy_2_12: Standard;
+  summoningSynergy_2_13: Standard;
+  summoningSynergy_2_14: Standard;
+  summoningSynergy_2_15: Standard;
+  summoningSynergy_3_4: Standard;
+  summoningSynergy_3_5: Standard;
+  summoningSynergy_3_9: Standard;
+  summoningSynergy_3_10: Standard;
+  summoningSynergy_3_11: Standard;
+  summoningSynergy_3_16: Standard;
+  summoningSynergy_3_17: Standard;
+  summoningSynergy_3_18: Standard;
+  summoningSynergy_3_19: Standard;
+  summoningSynergy_4_5: Standard;
+  summoningSynergy_4_9: Standard;
+  summoningSynergy_4_10: Standard;
+  summoningSynergy_4_11: Standard;
+  summoningSynergy_4_16: Standard;
+  summoningSynergy_4_17: Standard;
+  summoningSynergy_4_18: Standard;
+  summoningSynergy_4_19: Standard;
+  summoningSynergy_5_9: Standard;
+  summoningSynergy_5_10: Standard;
+  summoningSynergy_5_11: Standard;
+  summoningSynergy_5_16: Standard;
+  summoningSynergy_5_17: Standard;
+  summoningSynergy_5_18: Standard;
+  summoningSynergy_6_7: Standard;
+  summoningSynergy_6_8: Standard;
+  summoningSynergy_6_12: Standard;
+  summoningSynergy_6_13: Standard;
+  summoningSynergy_6_14: Standard;
+  summoningSynergy_6_15: Standard;
+  summoningSynergy_7_8: Standard;
+  summoningSynergy_7_12: Standard;
+  summoningSynergy_7_13: Standard;
+  summoningSynergy_7_14: Standard;
+  summoningSynergy_7_15: Standard;
+  summoningSynergy_8_12: Standard;
+  summoningSynergy_8_13: Standard;
+  summoningSynergy_8_14: Standard;
+  summoningSynergy_9_10: Standard;
+  summoningSynergy_9_11: Standard;
+  summoningSynergy_9_16: Standard;
+  summoningSynergy_9_17: Standard;
+  summoningSynergy_9_18: Standard;
+  summoningSynergy_9_19: Standard;
+  summoningSynergy_10_11: Standard;
+  summoningSynergy_10_16: Standard;
+  summoningSynergy_10_18: Standard;
+  summoningSynergy_10_19: Standard;
+  summoningSynergy_11_16: Standard;
+  summoningSynergy_11_17: Standard;
+  summoningSynergy_11_18: Standard;
+  summoningSynergy_11_19: Standard;
+  summoningSynergy_12_13: Standard;
+  summoningSynergy_12_14: Standard;
+  summoningSynergy_12_15: Standard;
+  summoningSynergy_13_14: Standard;
+  summoningSynergy_13_15: Standard;
+  summoningSynergy_14_15: Standard;
+  summoningSynergy_16_17: Standard;
+  summoningSynergy_16_18: Standard;
+  summoningSynergy_16_19: Standard;
+  summoningSynergy_17_18: Standard;
+  summoningSynergy_17_19: Standard;
+  summoningSynergy_18_19: Standard;
+  increasedSummoningChargePreservation: Standard;
+  decreasedSummoningChargePreservation: Standard;
+  increasedSummoningCreationCharges: Standard;
+  decreasedSummoningCreationCharges: Standard;
+  increasedChanceToApplyBurn: Standard;
+  decreasedChanceToApplyBurn: Standard;
+  decreasedSummoningShardCost: Standard;
+  increasedSummoningShardCost: Standard;
 }
 interface SkillModifierObject<Skill> {
   /** Increases the skill level used to compute combat stats by value: Implemented */
@@ -1453,6 +1568,8 @@ interface SkillModifierObject<Skill> {
   increasedChanceToDoubleItemsSkill: Skill,
   /** Decreases the % chance to double items from a skill by value: Partially Implemented. */
   decreasedChanceToDoubleItemsSkill: Skill,
+  increasedChanceAdditionalSkillResource: Skill;
+  decreasedChanceAdditionalSkillResource: Skill;
 }
 type ModifierObject<Skill, Standard> = StandardModifierObject<Standard> & SkillModifierObject<Skill>;
 type SkillModifierData = [SkillID, number];
@@ -1867,7 +1984,18 @@ interface GenericItem extends BaseItem {
   chanceToDoubleResources?: number,
   // Modifiers
   /** Modifiers provided when item is equipped. Also contains modifiers for potions that are WIP */
-  modifiers?: ModifierData
+  modifiers?: ModifierData,
+  smithingBar?: ItemID,
+  summoningDescription?: string,
+  summoningID?: number,
+  summoningReq?: ItemQuantity[][],
+  summoningQty?: number,
+  summoningLevel?: number,
+  summoningXP?: number,
+  summoningTier?: number,
+  summoningSkills?: SkillID[],
+  summoningMaxHit?: number,
+  summoningCategory?: number
 }
 
 interface FindEnemyAreaFcn {
@@ -2126,7 +2254,6 @@ type CombatPassive = {
   /** Modifiers to apply to monster */
   modifiers?: EnemyModifierData
 }
-
 type SkillData = {
   /** Display name of skill */
   name: string,
@@ -2135,7 +2262,8 @@ type SkillData = {
   /** Skill has mastery levels */
   hasMastery: boolean,
   /** Unused: Maximum level of skill */
-  maxLevel: number
+  maxLevel: number,
+  masteryTokenID?: ItemID
 }
 type MasteryMedia = {
   /** Image URL of mastery item */
@@ -2172,7 +2300,8 @@ interface SkillObject<T> {
   Prayer: T,
   Slayer: T,
   Herblore: T,
-  Agility: T
+  Agility: T,
+  Summoning: T
 }
 
 type SkillName = keyof SkillObject<any>;
@@ -2296,6 +2425,7 @@ interface OtherSaveGame {
   username: string,
   gameUpdateNotification: string,
   randomModifiers: typeof randomModifiers
+  summoningData: typeof summoningData
 }
 type OtherKey = keyof OtherSaveGame;
 interface ReconstructedSaveGame {
@@ -2373,4 +2503,37 @@ type GamemodeData = {
 type RandomModifier = {
   modifier: ModifierKeys,
   value: number | number[][]
+}
+type SummoningData = {
+  Settings: SummoningSettings,
+  Marks: SummoningMarks,
+  Synergies: SummoningSynergies
+}
+type SummoningSettings = {
+  recipeGPCost: number,
+}
+type SummoningMarks = {
+  Levels: number[]
+}
+type SummoningSynergies = NumberDictionary<NumberDictionary<SynergyData>>
+type SynergyData = {
+  description: string,
+  modifiers: ModifierData
+}
+type PlayerSummoningData = {
+  MarksDiscovered?: NumberDictionary<number>,
+  defaultRecipe?: number[]
+}
+type SummoningItem = {
+  itemID: ItemID,
+  summoningLevel: number
+  summoningID: number
+  summoningCategory: number
+}
+type SummoningSearch = {
+  description: string,
+  name1: string,
+  name2: string,
+  summon1: number,
+  summon2: number
 }
