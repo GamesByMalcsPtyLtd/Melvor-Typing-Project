@@ -1,4 +1,4 @@
-/*  Melvor Typing Project v1.8.2: Fetches and Documents Melvor Idle
+/*  Melvor Typing Project v1.8.3: Fetches and Documents Melvor Idle
 
     Copyright (C) <2021>  <Coolrox95>
 
@@ -18,7 +18,7 @@
 // @ts-check
 const fs = require('fs');
 const versionRegex = /\d+\.\d+\.\d+/m;
-const newVersion = '1.8.2';
+const newVersion = '1.8.3';
 const fileDirs = [
   './.scripts/',
   './src/customTypes/'
