@@ -13,7 +13,7 @@
     "noUnusedLocals": false,
     "strictNullChecks": false,
   },
-  "include": ["./src/customTypes/*","./src/game/*"],
+  "include": ["./src/customTypes/*","./src/game/*","./src/gameTypes/*"],
   "exclude": ["./src/propLibs/**/*","interface/**/*"],
   "typeAcquisition": {
     "enable": true

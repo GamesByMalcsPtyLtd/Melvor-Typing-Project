@@ -1,4 +1,4 @@
-/*  Melvor Typing Project v1.8.3: Fetches and Documents Melvor Idle
+/*  Melvor Typing Project v1.9.0: Fetches and Documents Melvor Idle
 
     Copyright (C) <2021>  <Coolrox95>
 
@@ -236,9 +236,10 @@ function getVersion(firstLine) {
  * @param {string} targetFile The name of the target file to apply jsdoc to
  * @param {string} outPath The path to output the modified file to
  * @param {string} outName The name to output the modified file to
+ * @param {FileLogger} transferLog
  * @returns {ApplyGuide} 
  */
-function applyModGuide(modGuide, targetPath, targetFile, outPath, outName) {
+function applyModGuide(modGuide, targetPath, targetFile, outPath, outName, transferLog) {
   const targetText = fs.readFileSync(targetPath + targetFile, 'utf8');
   const targetLines = targetText.split(/\r?\n/);
   const commentRegex = /\s*\/\/.*$/;
@@ -254,7 +255,7 @@ function applyModGuide(modGuide, targetPath, targetFile, outPath, outName) {
   };
   if (targetFile === 'index.html') {
     fs.writeFileSync(outPath + outName, targetText);
-    console.log(`Applied Modifications and wrote to ${outPath}${outName}`);
+    transferLog.log(`Applied Modifications and wrote to ${outPath}${outName}`);
     return applyGuide;
   }
   targetLines.forEach((line, index) => {
@@ -317,12 +318,12 @@ function applyModGuide(modGuide, targetPath, targetFile, outPath, outName) {
           break;
         }
       }
-      if (!commentPositionFound) console.warn(`Could not find line: ${jsdoc.nextLine}\n in: ${targetFile}\n with comment:\n ${jsdoc.commentLines.join('\n')}`)
+      if (!commentPositionFound) transferLog.warn(`Could not find line: ${jsdoc.nextLine}\n in: ${targetFile}\n with comment:\n ${jsdoc.commentLines.join('\n')}`)
     }
   });
   outLines.push(...targetLines.slice(lastDocPos));
   fs.writeFileSync(outPath + outName, outLines.join('\n'));
-  console.log(`Applied Modifications and wrote to ${outPath}${outName}`);
+  transferLog.log(`Applied Modifications and wrote to ${outPath}${outName}`);
   return applyGuide;
 }
 
@@ -347,6 +348,65 @@ function findSamePlaceComment(existingModGuide, jsdoc) {
   return existingModGuide.comments.find((comment) => { return comment.nextLine === jsdoc.nextLine });
 }
 
+class FileLogger {
+  constructor(name) {
+    const timeStamp = new Date();
+    const fileName = `${name}-${timeStamp.getFullYear()}-${timeStamp.getMonth()}-${timeStamp.getDay()}_${timeStamp.getHours()}.${timeStamp.getMinutes()}.${timeStamp.getSeconds()}.${timeStamp.getMilliseconds()}.txt`;
+    fs.writeFileSync(fileName,'',{
+      encoding: 'utf8'
+    });
+    /** @type {fs.WriteStream} */
+    this.logFile = fs.createWriteStream(fileName);
+  }
+  /**
+   * 
+   * @param {'Log'|'Warn'|'Error'} type 
+   * @param {string} message 
+   */
+  writeToLog(type, message) {
+    const timeStamp = new Date();
+    let typeText;
+    switch (type) {
+      case 'Log':
+        typeText = '[Info]'
+        break;
+      case 'Warn':
+        typeText = '[Warning]'
+        break;
+      case 'Error':
+        typeText = '[Error]'
+        break;
+      default:
+        throw new Error('Unknown message type.')
+    }
+    this.logFile.write(`${timeStamp.getHours()}:${timeStamp.getMinutes()}:${timeStamp.getSeconds()}.${timeStamp.getMilliseconds()} ${typeText} ${message}\n`,'utf8')
+  }
+  /**
+   * 
+   * @param {string} message 
+   */
+  log(message) {
+    this.writeToLog('Log',message)
+  }
+  /**
+   * 
+   * @param {string} message 
+   */
+  warn(message) {
+    this.writeToLog('Warn',message)
+  }
+  /**
+   * 
+   * @param {string} message 
+   */
+  error(message) {
+    this.writeToLog('Error',message)
+  }
+  closeFile() {
+    this.logFile.close();
+  }
+}
+
 /**
  * Transfers JSDoc comments from files in fromPath to the files in targetPath, and writes the modified files to outPath
  * @param {string} fromPath Folder to get JSDoc from
@@ -358,16 +418,18 @@ function transferJSDoc(fromPath, targetPath, outPath) {
   const toFiles = fs.readdirSync(targetPath);
   if (!fs.existsSync(outPath)) fs.mkdirSync(outPath, { recursive: true });
   const applyGuides = [];
+  const transferLog = new FileLogger('transferLog');
   fromFiles.forEach((fromName) => {
     if (toFiles.includes(fromName)) {
       const jsdocs = generateModGuide(fromPath, fromName);
-      applyGuides.push(applyModGuide(jsdocs, targetPath, fromName, outPath, fromName));
+      applyGuides.push(applyModGuide(jsdocs, targetPath, fromName, outPath, fromName, transferLog));
     } else {
-      console.warn(`Could not find file: ${fromName} in target directory.`)
+      transferLog.warn(`Could not find file: ${fromName} in target directory.`)
     }
   });
   fs.writeFileSync('./out/applyGuide.json', JSON.stringify(applyGuides));
-  console.log(`Wrote application guide to ./out/applyGuide.json`)
+  transferLog.log(`Wrote application guide to ./out/applyGuide.json`);
+  transferLog.closeFile();
 }
 /**
  * @param {string} applyGuidePath The path to the json apply file

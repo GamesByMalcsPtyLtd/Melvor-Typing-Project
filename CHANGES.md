@@ -1,4 +1,9 @@
 # Changelog
+## v1.9.0
+- Updated to support v0.21, cachebuster version v1106
+- Added Official Typedefs from game sources to src/gameTypes
+- Removed files that are covered by official typdefs (If you are updating this project, I recommend removing everything from the `src/game` folder and running `npm run init` before building)
+- Changed update script to output logs to a file instead of console
 ## v1.8.4
 - Updated to cachebuster version v960
 ## v1.8.3

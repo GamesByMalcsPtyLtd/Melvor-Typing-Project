@@ -1,4 +1,4 @@
-/*  Melvor Typing Project v1.8.3: Fetches and Documents Melvor Idle
+/*  Melvor Typing Project v1.9.0: Fetches and Documents Melvor Idle
 
     Copyright (C) <2021>  <Coolrox95>
 
@@ -45,7 +45,10 @@ interface ObjectConstructor {
   keys(obj: ModifierData) : ModifierKeys[]
   keys(obj: ModifierActive) : ModifierKeys[]
   keys(obj: Shop) : ShopCategory[]
-  keys(obj: EnemyModifierData): EnemyModiferKey[]
   entries(obj: ModifierActive) : ModifierActiveEntry[]
   entries(obj: ModifierData) : ModifierDataEntry[]
+  entries(obj: ModifierObject<SkillModifierTemplate, StandardModifierTemplate>): ModifierEntry<SkillModifierTemplate, StandardModifierTemplate>[]
+  entries(obj: CombatModifierData): [keyof CombatModifierObject<number>, number][];
+  entries<T>(obj: EquipmentObject<T>): [keyof EquipmentObject<T>, T][];
+  entries<T>(obj: NumberDictionary<T>): [string, T][]
 }

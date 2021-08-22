@@ -11,6 +11,9 @@
 1. Simply run `tsc` to generate ./out/melvorTypes.d.ts
 2. If you are using Vscode, this project includes a `build` task which can be run with `CTRL+SHIFT+B` that will automatically put type-errors in the Problems panel.
 
+## Game Type Definitions
+This project also includes official type definitions generated from the game's sources (with permission).
+These files can be found in `src/gameTypes`
 ## Building the Distributable Version
 1. Run `npm run buildRelease`. This will copy the minimal files required to build this project to the folder ../MTP/
 
