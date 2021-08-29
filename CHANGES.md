@@ -1,4 +1,7 @@
 # Changelog
+## v1.9.1
+- Update to cachebuster version v1113
+- Updated shop.js JSDOC
 ## v1.9.0
 - Updated to support v0.21, cachebuster version v1106
 - Added Official Typedefs from game sources to src/gameTypes
