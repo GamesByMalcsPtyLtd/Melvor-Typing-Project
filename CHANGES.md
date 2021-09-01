@@ -1,4 +1,6 @@
 # Changelog
+## v1.9.2
+ - Update to cachebuster version v1115
 ## v1.9.1
 - Update to cachebuster version v1113
 - Updated shop.js JSDOC
