@@ -1,4 +1,4 @@
-/*  Melvor Typing Project v1.9.2: Fetches and Documents Melvor Idle
+/*  Melvor Typing Project v1.9.3: Fetches and Documents Melvor Idle
 
     Copyright (C) <2021>  <Coolrox95>
 
