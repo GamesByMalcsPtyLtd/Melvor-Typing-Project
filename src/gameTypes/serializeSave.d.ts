@@ -1,31 +1,52 @@
+interface Window {
+    selectedSpell: undefined;
+    attackStyle: number;
+    currentCombatFood: undefined;
+    prayerPoints: undefined;
+    slayerCoins: undefined;
+    selectedEquipmentSet: undefined;
+    activeAurora: undefined;
+    combatData: undefined;
+    equippedFood: undefined;
+    equipmentSets: undefined;
+    selectedAttackStyle: undefined;
+    slayerTask: undefined;
+    slayerTaskCompletion: undefined;
+    saveStateBeforeRaid: undefined;
+    equippedItems: undefined;
+    ammo: undefined;
+    randomModifiers: undefined;
+    continueThievingOnStun: undefined;
+    autoPotion: undefined;
+}
 interface NumberSaveGame {
     firstTime: number;
     nameChanges: number;
     gp: number;
     defaultPageOnLoad: number;
     levelUpScreen: number;
-    attackStyle?: number;
-    currentCombatFood?: number;
     showItemNotify: number;
     myBankVersion: number;
-    selectedSpell?: number;
     buyQty: number;
     sellQty: number;
     accountGameVersion: number;
-    prayerPoints?: number;
-    slayerCoins?: number;
-    selectedEquipmentSet?: number;
     formatNumberSetting: number;
     saveTimestamp: number;
-    activeAurora?: number;
     currentGamemode: number;
     raidCoins: number;
     agilityPassivePillarActive: number;
+    selectedSpell?: number;
+    attackStyle?: number;
+    currentCombatFood?: number;
+    prayerPoints?: number;
+    slayerCoins?: number;
+    selectedEquipmentSet?: number;
+    activeAurora?: number;
 }
 declare type NumberKey = keyof NumberSaveGame;
 interface BoolSaveGame {
     ignoreBankFull: boolean;
-    continueThievingOnStun: boolean;
+    continueThievingOnStun?: boolean;
     autoRestartDungeon: boolean;
     autoSaveCloud: boolean;
     darkMode: boolean;
@@ -33,7 +54,7 @@ interface BoolSaveGame {
     enableAccessibility: boolean;
     showEnemySkillLevels: boolean;
     confirmationOnClose: boolean;
-    autoPotion: boolean;
+    autoPotion?: boolean;
     showCommas: boolean;
     showVirtualLevels: boolean;
     secretAreaUnlocked: boolean;
@@ -70,23 +91,23 @@ interface SerializableSaveGame {
     herbloreBonuses: HerbloreBonuses;
     tutorialTips: typeof tutorialTips;
     shopItemsPurchased: Map<string, ShopPurchase>;
-    combatData?: MinCombatData;
-    equippedFood?: ItemQuantity2[];
-    SETTINGS: typeof SETTINGS;
+    SETTINGS: Settings;
     monsterStats: MonsterStat[];
     petUnlocked: boolean[];
     skillsUnlocked: boolean[];
-    equipmentSets?: OldEquipmentSet[];
     skillXP: number[];
     dungeonCompleteCount: number[];
-    selectedAttackStyle?: number[];
     lockedItems: number[];
     golbinRaidStats: number[];
-    slayerTask?: OldSlayerTask[];
-    slayerTaskCompletion?: number[];
     chosenAgilityObstacles: number[];
     agilityObstacleBuildCount: number[];
     itemsAlreadyFound: number[];
+    combatData?: MinCombatData;
+    equippedFood?: ItemQuantity2[];
+    equipmentSets?: OldEquipmentSet[];
+    selectedAttackStyle?: number[];
+    slayerTask?: OldSlayerTask[];
+    slayerTaskCompletion?: number[];
     saveStateBeforeRaid?: number[];
 }
 declare type SerialKey = keyof SerializableSaveGame;
@@ -103,8 +124,9 @@ interface OtherSaveGame {
     scheduledPushNotifications: StringDictionary<string>;
     username: string;
     gameUpdateNotification: string;
-    randomModifiers: any;
+    randomModifiers?: any;
     summoningData: typeof summoningData;
+    cookingStockpiles: ItemQuantity2[];
 }
 declare type OtherKey = keyof OtherSaveGame;
 interface ReconstructedSaveGame {
@@ -134,12 +156,12 @@ interface NestedDeserializer<T> {
 declare type StatsData = {
     stats: Stats[];
     items: number[];
+    removed: NumberDictionary<number[]>;
 };
 declare type MinCombatData = {
     player: {
         hitpoints: number;
     };
-    enemy: {};
 };
 declare type SerializerVar<Key extends NewSaveKey> = {
     saveKey: Key;
@@ -161,11 +183,25 @@ declare type PackagedSave = {
     cd: number[];
 };
 declare const reconstructedVars: ReconKey[];
-declare const currentSaveVersion = 3;
+declare const currentSaveVersion = 5;
+interface AddRemove<T> {
+    add: T[];
+    remove: T[];
+}
+declare type SaveKeyDiff<T> = NumberDictionary<AddRemove<T>>;
+declare const numberVarDiff: SaveKeyDiff<NumberKey>;
+declare const boolVarDiff: SaveKeyDiff<BoolKey>;
+declare const otherVarDiff: SaveKeyDiff<OtherKey>;
+declare const serialVarDiff: SaveKeyDiff<SerialKey>;
+declare const nestedVarDiff: SaveKeyDiff<NestedKey>;
+declare function getSaveKeysFromDiff<T>(diff: SaveKeyDiff<T>): T[][];
+declare function testDiffs(): void;
+declare function testDiff<T>(diff: SaveKeyDiff<T>, vars: NumberDictionary<T[]>, version: number): void;
+declare function createSaveDiff<T>(vars: NumberDictionary<T[]>): SaveKeyDiff<T>;
 /** Variables that store a number */
-declare const numberVars: NumberDictionary<NumberKey[]>;
+declare const numberVars: (keyof NumberSaveGame)[][];
 /** Variables that store a boolean */
-declare const boolVars: NumberDictionary<BoolKey[]>;
+declare const boolVars: (keyof BoolSaveGame)[][];
 /**  Old variables that should not be stored */
 declare const oldVars: SaveKey[];
 /** Old Savegame variables that may or may not exist */
@@ -202,10 +238,11 @@ interface OldSaveGame {
     killCount: number[];
 }
 /** Variables with other types that are too mishapen or not fit for serialization */
-declare const otherVars: NumberDictionary<OtherKey[]>;
-/** Varialbes that are serializable */
-declare const serialVars: NumberDictionary<SerialKey[]>;
-declare const nestedVars: NumberDictionary<NestedKey[]>;
+declare const otherVars: (keyof OtherSaveGame)[][];
+/** Variables that are serializable */
+declare const serialVars: (keyof SerializableSaveGame)[][];
+/** Variables that are nested serializable */
+declare const nestedVars: (keyof NestedSerializeableSaveGame)[][];
 declare function isEmptyObject(obj: Record<string, unknown>): obj is Record<string, never>;
 declare const serializeItemsFound: Serializer<number[]>;
 declare const serializeNumberArray: Serializer<number[]>;
@@ -262,47 +299,60 @@ declare const itemStatsData: {
     all: {
         stats: Stats[];
         items: number[];
+        removed: {};
     };
     weapon: {
         stats: Stats[];
         items: number[];
+        removed: {};
     };
     quiver: {
         stats: Stats[];
         items: number[];
+        removed: {};
     };
     armour: {
         stats: Stats[];
         items: number[];
+        removed: {};
     };
     chests: {
         stats: Stats[];
         items: number[];
+        removed: {};
     };
     seeds: {
         stats: Stats[];
         items: number[];
+        removed: {};
     };
     harvest: {
         stats: Stats[];
         items: number[];
+        removed: {};
     };
     food: {
         stats: Stats[];
         items: number[];
+        removed: {
+            0: number[];
+        };
     };
     rune: {
         stats: Stats[];
         items: number[];
+        removed: {};
     };
 };
 declare const itemStatTypes: (keyof typeof itemStatsData)[];
 declare function serializeStatPortion(portion: StatsData, stats: ItemStat[]): number[];
-declare function deserializeItemStatsPortion(portion: StatsData, subData: number[], stats: ItemStat[]): void;
+declare function deserializeItemStatsPortion(portion: StatsData, subData: number[], stats: ItemStat[], itemStatVer: number): void;
+declare const curItemStatVer = 1;
 declare const serializeItemStats: NestedSerializer<ItemStat[]>;
 declare const deserializeItemStats: NestedDeserializer<ItemStat[]>;
 declare const serializeSettings: Serializer<typeof SETTINGS>;
 declare const deserializeSettings: Deserializer<typeof SETTINGS>;
+declare const deserializeSettingsOld: Deserializer<typeof SETTINGS>;
 declare const serializeDefaultItemTabs: Serializer<BankDefaultItem[]>;
 declare const deserializeDefaultItemTabs: Deserializer<BankDefaultItem[]>;
 declare const serializeNumbers: Serializer<NumberKey[]>;
@@ -363,6 +413,7 @@ declare function getSaveFromString(saveString: string): {
     saveGame: NewSaveGame;
     oldFormat: boolean;
 };
+declare function setSaveKeyToDefault<T extends keyof NewSaveGame>(saveGame: NewSaveGame, key: T): void;
 /** Converts herblore bonuses from array */
 declare function convertHerbloreBonusesFromArray(herbloreBonuses: HerbloreBonus[]): HerbloreBonuses;
 /** Reconstructs variables that did not need to be saved (and performs some post processing for others) */
@@ -386,6 +437,7 @@ declare class DataReader {
     private nextValue;
     getChunk(length: number): number[];
     getVariableLengthChunk(): DataReader;
+    getBoolArray(): boolean[];
     getStunFlavour(): StunFlavour;
     getActionType(): ActionType;
     getAttack(): Attack;
@@ -397,6 +449,7 @@ declare class DataReader {
     getLocationType(): LocationType;
     getLocation(): CombatAreaData | SlayerAreaData | DungeonData;
     getEnemyState(): EnemyState;
+    getRawData(): number[];
 }
 declare class DataWriter {
     data: number[];
@@ -404,6 +457,7 @@ declare class DataWriter {
     addBool(value: boolean): void;
     addChunk(data: number[]): void;
     addVariableLengthChunk(data: number[]): void;
+    addBoolArray(data: boolean[]): void;
     addStunFlavour(flavour: StunFlavour): void;
     addActionType(action: ActionType): void;
     addAttack(attack: Attack): void;

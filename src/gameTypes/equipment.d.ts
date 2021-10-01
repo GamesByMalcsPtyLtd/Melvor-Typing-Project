@@ -7,7 +7,7 @@ declare class Equipment {
     /** Class to manage the equiped items of players */
     constructor();
     /** Returns the items that will be removed on equipping */
-    getItemsAddedOnEquip(item: EquipmentItem, slot: SlotTypes | "Default"): ItemQuantity2[];
+    getItemsAddedOnEquip(item: EquipmentItem, slot: SlotTypes | 'Default'): ItemQuantity2[];
     /** Returns the items that will be removed on unequipping */
     getItemsAddedOnUnequip(slot: SlotTypes): ItemQuantity2;
     /** Gets the actually equipped slots to unequip when equipping an item */
@@ -20,7 +20,7 @@ declare class Equipment {
     unequipItem(slot: SlotTypes): void;
     /** Determines if an itemID is equipped */
     checkForItemID(itemID: number): boolean;
-    getSlotOfItemID(itemID: number): SlotTypes | "None";
+    getSlotOfItemID(itemID: number): SlotTypes | 'None';
     getQuantityOfItemID(itemID: number): number;
     addQuantityToSlot(slot: SlotTypes, quantity: number): void;
     /** Removes quantity from a slot. Returns true if slot is now empty and stats need updating */
@@ -41,6 +41,7 @@ declare class Equipment {
 }
 declare type EquipmentItem = EquipmentWithSpecial | EquipmentWithoutSpecial;
 declare type WeaponItem = WeaponWithSpecial | WeaponWithoutSpecial;
+declare type QuiverConsumption = 'Fishing' | 'PrayerPointCost' | 'MeleeAttack' | 'RuneUse' | 'Thieving' | 'PlantingAllotment' | 'CraftingRunes' | 'PotionUsage';
 interface BaseEquipmentItem extends BaseItem {
     /** Valids slots the equipment can go in. First element is the default slot to use. */
     validSlots: SlotTypes[];
@@ -59,6 +60,8 @@ interface BaseEquipmentItem extends BaseItem {
     providesRune?: number[];
     ammoType?: AmmoType;
     ammoTypeRequired?: AmmoType;
+    consumesOn?: QuiverConsumption;
+    fightEffects?: FightEffects[];
 }
 interface WeaponWithSpecial extends EquipmentWithSpecial {
     attackType: AttackType;
@@ -129,7 +132,7 @@ declare class EquipSlot {
     /** Item that is in the slot */
     item: EquipmentItem;
     /** If the item simply occopies the slot and does not contribute to stats */
-    occupiedBy: SlotTypes | "None";
+    occupiedBy: SlotTypes | 'None';
     /** Quantity of the item equipped */
     quantity: number;
     /** Other slots occupied by this item */

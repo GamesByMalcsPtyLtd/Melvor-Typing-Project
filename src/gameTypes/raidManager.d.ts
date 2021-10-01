@@ -6,6 +6,7 @@ declare class RaidManager extends BaseManager {
     private itemSelection;
     private itemSelectionCount;
     private itemLevelBrackets;
+    private selectingItem;
     wave: number;
     private get waveLength();
     private get fightingBoss();
@@ -23,6 +24,7 @@ declare class RaidManager extends BaseManager {
     private startTimestamp;
     private endTimestamp;
     constructor();
+    tick(): void;
     startRaid(): void;
     private toggleOffSelectors;
     private toggleOnSelectors;
@@ -53,6 +55,7 @@ declare class RaidManager extends BaseManager {
     addMonsterStat(statID: MonsterStats, amount?: number): void;
     addCombatStat(statID: CombatStats, amount?: number): void;
     private setDefaultEquipment;
+    static getGolbinRaidHistory(historyID: number): string;
 }
 declare type RaidItemSelection = {
     weapons: ItemID[][];

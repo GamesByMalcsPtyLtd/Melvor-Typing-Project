@@ -1,3 +1,4 @@
+declare let game: Game;
 declare let agilityPassiveBonuses: AgilityModifiers;
 declare let combatManager: CombatManager;
 declare let raidManager: RaidManager;
@@ -13,6 +14,7 @@ declare let skillProgressDisplay: SkillProgressDisplay;
 declare let enemyHTMLElements: EnemyRenderHTMLElements;
 /** Cache of elements required to render the player */
 declare let playerHTMLElements: PlayerHTMLElements;
+declare let thievingMenu: ThievingMenu;
 declare const combatSkills: (keyof CombatLevels)[];
 declare const synergyElements: SynergyElements;
 declare var monsterStats: MonsterStat[];

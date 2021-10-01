@@ -4,10 +4,6 @@ declare abstract class BaseManager {
     abstract enemy: Enemy;
     areaType: LocationType;
     fightInProgress: boolean;
-    private loopInterval;
-    private loopStarted;
-    protected renderCombat: boolean;
-    protected previousTickTime: number;
     protected spawnTimer: Timer;
     abstract bank: BankHelper;
     notifications: NotificationQueue;
@@ -30,26 +26,15 @@ declare abstract class BaseManager {
     abstract readonly canInteruptAttacks: boolean;
     abstract readonly areaRequirements: Requirement[];
     abstract readonly areaModifiers: ModifierData;
-    get tickRatio(): string;
     abstract readonly onSlayerTask: boolean;
-    private maxOfflineTicks;
     constructor();
     initialize(): void;
     protected setCallbacks(): void;
     private minibarEatCallback;
     private minibarRunCallback;
-    /** Starts the main combat loop */
-    startCombatLoop(): void;
-    /** Stops the main combat loop */
-    stopCombatLoop(): void;
-    /** Execute combat */
-    protected runCombat(): void;
-    /** Evaluates ticks of combat */
-    protected processTime(): void;
-    protected runTicks(ticksToRun: number): void;
-    protected tick(): void;
+    tick(): void;
     /** Renders combat in current state */
-    protected render(): void;
+    render(): void;
     protected abstract renderLocation(): void;
     /** Checks for player or enemy death */
     protected checkDeath(): void;
@@ -66,6 +51,7 @@ declare abstract class BaseManager {
     protected loadNextEnemy(): void;
     /** Spawns a new enemy when the spawn timer fires */
     protected spawnEnemy(): void;
+    private statUpdateOnEnemySpawn;
     protected startFight(): void;
     /** Ends the fight the player is currently in */
     protected endFight(): void;
@@ -80,4 +66,5 @@ interface ManagerRenderQueue {
     location: boolean;
     dungeonCompletion: boolean;
     completionLog: boolean;
+    pause: boolean;
 }

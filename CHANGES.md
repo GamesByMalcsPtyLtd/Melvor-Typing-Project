@@ -1,4 +1,10 @@
 # Changelog
+## v1.10.0
+ - Update to support v0.22, cachebuster version v1180
+ - Updated Official typedefs
+ - Changed src/customTypes/gameTypes.ts to gameTypes/gameTypes.d.ts
+ - If you are updating this project, I recommend removing everything from the `src/game` folder and running `npm run init` before building the typedefs
+ - Update script now outputs logs to logs/*.txt
 ## v1.9.3
  - Update to cachebuster version v1120
 ## v1.9.2

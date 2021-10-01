@@ -18,7 +18,7 @@ declare class RaidPlayer extends Player {
     equipItem(itemID: number, set: number, slot?: SlotTypes | 'Default', quantity?: number, altAttacks?: Attack[]): boolean;
     updateForEquipmentChange(): void;
     /** Equips the selected food, replacing it if it is different */
-    equipFood(itemID: number, quantity: number): void;
+    equipFood(itemID: number, quantity: number): boolean;
     /** Sets default starting equipment for golbin raid */
     setEquipmentToDefault(): void;
     protected addMiscModifiers(): void;

@@ -1,26 +1,104 @@
 interface BaseSpell {
     name: string;
     media: string;
-    magicLevelRequired: number;
+    level: number;
     runesRequired: ItemQuantity[];
     runesRequiredAlt?: ItemQuantity[];
 }
 interface Spell extends BaseSpell {
+    id: Spells;
     maxHit: number;
     spellType: number;
 }
 interface Curse extends BaseSpell {
-    id: number;
+    id: Curses;
     description: string;
     enemyModifiers: Partial<CombatModifierObject<number>>;
 }
 interface BaseAurora extends BaseSpell {
+    id: Auroras;
     requiredItem: ItemID | -1;
     modifiers: ModifierData;
 }
 interface Ancient extends BaseSpell {
+    id: Ancients;
     requiredDungeonCompletion: [DungeonID, number];
     specialAttack: Attack;
+}
+declare enum Spells {
+    WindStrike = 0,
+    WaterStrike = 1,
+    EarthStrike = 2,
+    FireStrike = 3,
+    WindBolt = 4,
+    WaterBolt = 5,
+    EarthBolt = 6,
+    FireBolt = 7,
+    WindBlast = 8,
+    WaterBlast = 9,
+    EarthBlast = 10,
+    FireBlast = 11,
+    WindWave = 12,
+    WaterWave = 13,
+    EarthWave = 14,
+    FireWave = 15,
+    WindSurge = 16,
+    WaterSurge = 17,
+    EarthSurge = 18,
+    FireSurge = 19
+}
+declare enum Curses {
+    BlindingI = 0,
+    SoulSplitI = 1,
+    WeakeningI = 2,
+    AnguishI = 3,
+    BlindingII = 4,
+    SoulSplitII = 5,
+    WeakeningII = 6,
+    Confusion = 7,
+    AnguishII = 8,
+    BlindingIII = 9,
+    SoulSplitIII = 10,
+    WeakeningIII = 11,
+    AnguishIII = 12,
+    Decay = 13
+}
+declare enum Auroras {
+    SurgeI = 0,
+    FuryI = 1,
+    FervorI = 2,
+    SurgeII = 3,
+    ChargedI = 4,
+    FuryII = 5,
+    FervorII = 6,
+    SurgeIII = 7,
+    ChargedII = 8,
+    FuryIII = 9,
+    FervorIII = 10,
+    ChargedIII = 11
+}
+declare enum Ancients {
+    SlicingWinds = 0,
+    IcicleVolley = 1,
+    Ignite = 2,
+    Gust = 3,
+    Frostbite = 4,
+    Quake = 5,
+    Incinerate = 6
+}
+declare enum AltMagics {
+    JustLearning = 0,
+    SuperheatI = 1,
+    ItemAlchemyI = 2,
+    BoneOffering = 3,
+    SuperheatII = 4,
+    ItemAlchemyII = 5,
+    RagstoRichesI = 6,
+    BlessedOffering = 7,
+    SuperheatIII = 8,
+    RagstoRichesII = 9,
+    ItemAlchemyIII = 10,
+    SuperheatIV = 11
 }
 declare const SPELLS: Spell[];
 declare const CURSES: Curse[];
@@ -31,6 +109,7 @@ interface BaseAltMagic extends BaseSpell {
     magicXP: number;
     /** Items produced/Alchemy value multiplier */
     convertToQty: number;
+    id: AltMagics;
 }
 interface CreationSpell extends BaseAltMagic {
     selectItem: -1;
@@ -77,6 +156,8 @@ declare let currentMagicSpell: number;
 declare const selectedMagicItem: [number, number, number];
 declare const magicInterval = 2000;
 declare let magicTimeout: number;
+declare let altMagicSelection: AltMagicSelectionTab;
+declare function loadAltMagic(): void;
 declare function castMagic(clicked?: boolean, offlineIsPaused?: boolean): void;
 declare function selectMagic(altMagicID: number, update?: boolean): void;
 declare function openMagicItemSelection(): void;
@@ -181,6 +262,5 @@ declare type BookData = {
     name: string;
     description: string;
 };
-declare type SpellBookType = "standard" | "curse" | "aurora" | "ancient" | "altMagic";
-declare function updateSpellbook(book: SpellBookType | "all"): void;
-declare function updateAltMagicSpells(): void;
+declare type SpellBookType = 'standard' | 'curse' | 'aurora' | 'ancient' | 'altMagic';
+declare function updateSpellbook(book: SpellBookType | 'all'): void;

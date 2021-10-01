@@ -1,4 +1,4 @@
-/*  Melvor Typing Project v1.9.3: Fetches and Documents Melvor Idle
+/*  Melvor Typing Project v1.10.0: Fetches and Documents Melvor Idle
 
     Copyright (C) <2021>  <Coolrox95>
 
@@ -21,7 +21,7 @@ const fs = require('fs');
 const prettier = require('prettier');
 const gameURL = "https://www.melvoridle.com/";
 const htmlQuery = "?l=1";
-const sourceRegexp = /^<script type="(text|application)\/javascript" src="(?<path>assets\/js\/(game\/)?(?<name>\w*.js))\?(?<fileVersion>\d+)"><\/script>/;
+const sourceRegexp = /<script type="(text|application)\/javascript" src="(?<path>assets\/js\/(game\/)?(?<name>\w*.js))\?(?<fileVersion>\d+)"><\/script>/;
 const jsdocStart = /^\s*\/\*{2}/;
 const jsdocEnd = /\*\/\s*$/;
 /**
@@ -351,7 +351,7 @@ function findSamePlaceComment(existingModGuide, jsdoc) {
 class FileLogger {
   constructor(name) {
     const timeStamp = new Date();
-    const fileName = `${name}-${timeStamp.getFullYear()}-${timeStamp.getMonth()}-${timeStamp.getDay()}_${timeStamp.getHours()}.${timeStamp.getMinutes()}.${timeStamp.getSeconds()}.${timeStamp.getMilliseconds()}.txt`;
+    const fileName = `logs/${name}-${timeStamp.getFullYear()}-${timeStamp.getMonth()}-${timeStamp.getDay()}_${timeStamp.getHours()}.${timeStamp.getMinutes()}.${timeStamp.getSeconds()}.${timeStamp.getMilliseconds()}.txt`;
     fs.writeFileSync(fileName,'',{
       encoding: 'utf8'
     });

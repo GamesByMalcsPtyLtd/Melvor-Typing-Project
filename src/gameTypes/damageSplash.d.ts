@@ -12,5 +12,6 @@ declare class SplashManager {
 declare type DamageSplash = {
     source: SplashType;
     text: string;
+    xOffset: number;
 };
-declare type SplashType = DOTType | "Attack" | "Crit" | "Heal";
+declare type SplashType = DOTType | 'Attack' | 'Crit' | 'Heal';

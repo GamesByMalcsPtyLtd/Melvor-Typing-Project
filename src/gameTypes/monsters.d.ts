@@ -13,7 +13,6 @@ interface Monster {
     media: string;
     bones: number;
     canSlayer?: boolean;
-    slayerXP?: number;
     selectedSpell?: SpellID;
     description?: string;
     isBoss: boolean;
@@ -75,8 +74,8 @@ declare enum Monsters {
     ResurrectedEye = 47,
     PratTheProtectorOfSecrets = 48,
     MalcsTheGuardianOfMelvor = 49,
-    Spider0 = 50,
-    Spider1 = 51,
+    Spider = 50,
+    BrownSpider = 51,
     EvilSpider = 52,
     SpiderKing = 53,
     IceMonster = 54,

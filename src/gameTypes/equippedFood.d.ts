@@ -22,6 +22,7 @@ interface FoodItem extends BaseItem {
     canEat: true;
     healsFor: number;
     masteryID?: [SkillID, number];
+    cookingID?: number;
 }
 declare function isFood(item: GenericItem): item is FoodItem;
 declare const emptyFood: FoodItem;

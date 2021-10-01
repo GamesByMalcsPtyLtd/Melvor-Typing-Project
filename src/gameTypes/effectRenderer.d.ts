@@ -6,7 +6,7 @@ declare class EffectRenderer {
     /** Renders an effect */
     removeEffects(): void;
     /** Clears the removal queue */
-    flushRemovalQueue(): void;
+    private flushRemovalQueue;
     private createEffect;
     private createTooltip;
     private addEffect;
@@ -15,7 +15,7 @@ declare class EffectRenderer {
     addSleep(activeSleep: ActiveSleep): void;
     addStun(activeStun: ActiveStun): void;
     addCurse(activeCurse: ActiveCurse): void;
-    addReflexive(activeReflexive: ActiveStackingEffect, effect: ReflexiveEffect, attack: Attack): void;
+    addReflexive(activeReflexive: ActiveReflexiveEffect, effect: ReflexiveEffect, attack: Attack): void;
     addStacking(activeStacking: ActiveStackingEffect, effect: StackingEffect): void;
     /** Queues the removal of an effect */
     queueRemoval(data: RenderData): void;

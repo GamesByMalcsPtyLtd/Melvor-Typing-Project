@@ -7,7 +7,7 @@ declare type SlayerTaskData = {
     minLevel: number;
     /** Maximum combat level of monster for task (-1 is uncapped (6969 lol)) */
     maxLevel: number;
-    /** Slayer level required to recieve task */
+    /** Slayer level required to receive task */
     slayerLevel: number;
 };
 declare class SlayerTask {

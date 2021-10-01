@@ -4,6 +4,7 @@ declare class ProgressBar {
     private isStriped;
     private static stripeClasses;
     constructor(barElem: HTMLElement);
+    animateProgressFromTimer(timer: Timer): void;
     /** Animates the progress bar from start to end over the alloted interval */
     animateProgress(elapsedTime: number, totalTime: number): void;
     animateStriped(): void;

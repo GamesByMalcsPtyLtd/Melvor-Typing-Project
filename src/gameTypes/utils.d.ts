@@ -1,11 +1,15 @@
 /** Rolls an interger value between [minValue,maxValue] */
 declare function rollInteger(minValue: number, maxValue: number): number;
+declare function rollForOffItem(baseChance: number): boolean;
 /** Gets a random element from an array */
 declare function getRandomArrayElement<T>(array: T[]): T;
 /** Clamps a value between min and max */
 declare function clampValue(value: number, min: number, max: number): number;
 /** Checks if the player meets the level requirements, and returns the failed ones */
 declare function checkLevelRequirements(requirements: SkillReq[]): SkillReq[];
+/** Returns -1 if no skill is associated with the page */
+declare function getSkillIDFromPageID(pageID: number): number;
+declare function roundToTickInterval(interval: number): number;
 declare const joinList: (seperator: string) => (list: string[]) => string;
 declare const joinAsList: (list: string[]) => string;
 declare const joinAsSuperList: (list: string[]) => string;
@@ -57,13 +61,14 @@ interface SeedItem extends BaseItem {
 declare class BankHelper {
     protected manager: BaseManager;
     protected updatesRequired: Set<ItemID>;
+    lostItems: Map<ItemID, number>;
     constructor(manager: BaseManager);
     /** Renders the bank as per the updates required */
     render(): void;
     /** Adds a quantity of an item to the bank */
-    addItem(itemID: number, quantity: number): boolean;
+    addItem(itemID: number, quantity: number, logLost: boolean): boolean;
     /** Adds a quantity of an item to the bank */
-    addQuantity(itemID: number, quantity: number): void;
+    addQuantity(itemID: number, quantity: number, deactivateGloves?: boolean): void;
     /** Gets the quantity of an item from the bank */
     getQty(itemID: number): number;
     /** Checks for item costs */
@@ -139,3 +144,29 @@ declare function showStunnedNotification(): void;
 declare function showSleepNotification(): void;
 declare function cdnMedia(media: string): string;
 declare function getMonsterMedia(monster: Monster): string;
+declare function compareNameValuePairs(currentPairs: NameValuePair[], oldPairs: NameValuePair[]): void;
+declare function convertNameValuePairToMap(pairs: NameValuePair[]): Map<string, number>;
+/**
+ * Replaces templates in a string with data
+ * @example templateString("Level ${value}",{value: "1"})
+ * @param string A string with template replacements in it e.g. ${example}. Replacements may only contain alpha-numeric characters
+ * @param templateData An object containing replacements strings e.g. {example: "true text"}
+ */
+declare function templateString(string: string, templateData: StringDictionary<string>): string;
+/**
+ * Shortcut for templating language strings
+ * @example templateLangString("MENU_TEXT","PERCEPTION",{value: "100"})
+ * @param category The category for the language string to template
+ * @param identifier The identifier for the language string to template
+ * @param templateData An object containing replacements strings e.g. {example: "true text"}
+ */
+declare function templateLangString(category: LanguageCategory, identifier: string, templateData: StringDictionary<string>): string;
+declare function milliToSeconds(ms: number): number;
+declare function multiplyByNumberMultiplier(value: number): number;
+declare function divideByNumberMultiplier(value: number): number;
+/** Gets the dom nodes for `Unlocked at ${image} level ${level}' */
+declare function getUnlockedAtNodes(skill: SkillID, level: number): (HTMLImageElement | Text)[];
+declare function getOfflineTimeDiff(): {
+    timeDiff: number;
+    originalTimeDiff: number;
+};

@@ -1,12 +1,13 @@
 declare type BaseModifierTemplate = {
     isNegative: boolean;
+    description: string;
+    modifyValue?: (value: number) => number | string;
+    langDescription?: string;
 };
 interface StandardModifierTemplate extends BaseModifierTemplate {
-    format: (value: number) => string;
     isSkill: false;
 }
 interface SkillModifierTemplate extends BaseModifierTemplate {
-    format: (value: SkillModifierData) => string;
     isSkill: true;
 }
 declare type ModifierTag = SkillName | 'Combat';
@@ -126,8 +127,10 @@ declare class CombatModifiers implements CombatModifierObject<number> {
     decreasedChanceToApplyBurn: number;
     decreasedDragonBreathDamage: number;
     increasedMeleeStunThreshold: number;
+    increasedFrostburn: number;
     constructor();
     reset(): void;
+    getActiveModifiers(): NameValuePair[];
     addModifiers(modData: CombatModifierData, negMult?: number, posMult?: number): void;
     subModifiers(modData: CombatModifierData, negMult?: number, posMult?: number): void;
     getDOTLifesteal(type: DOTType): number;
@@ -338,7 +341,7 @@ declare class PlayerModifiers extends CombatModifiers implements StandardModifie
     summoningSynergy_8_12: number;
     summoningSynergy_8_13: number;
     summoningSynergy_8_14: number;
-    summoningSynergy_9_10: number;
+    increasedRunecraftingEssencePreservation: number;
     summoningSynergy_9_11: number;
     summoningSynergy_9_16: number;
     summoningSynergy_9_17: number;
@@ -371,7 +374,6 @@ declare class PlayerModifiers extends CombatModifiers implements StandardModifie
     decreasedMagicDamageBonus: number;
     increasedAgilityObstacleCost: number;
     decreasedAgilityObstacleCost: number;
-    decreasedFoodBurnChance: number;
     decreasedSecondaryFoodBurnChance: number;
     freeCompost: number;
     increasedCompostPreservationChance: number;
@@ -405,6 +407,31 @@ declare class PlayerModifiers extends CombatModifiers implements StandardModifie
     increasedGPMultiplierCap: number;
     increasedGPMultiplierMin: number;
     allowAttackAugmentingMagic: number;
+    autoEquipFoodUnlocked: number;
+    autoSwapFoodUnlocked: number;
+    increasedChanceSuccessfulCook: number;
+    decreasedChanceSuccessfulCook: number;
+    increasedChancePerfectCookGlobal: number;
+    decreasedChancePerfectCookGlobal: number;
+    increasedChancePerfectCookFire: number;
+    decreasedChancePerfectCookFire: number;
+    increasedChancePerfectCookFurnace: number;
+    decreasedChancePerfectCookFurnace: number;
+    increasedChancePerfectCookPot: number;
+    decreasedChancePerfectCookPot: number;
+    increasedThievingStealth: number;
+    decreasedThievingStealth: number;
+    increasedAltMagicRunePreservation: number;
+    decreasedAltMagicRunePreservation: number;
+    increasedMinThievingGP: number;
+    decreasedMinThievingGP: number;
+    increasedFishingSpecialChance: number;
+    decreasedFishingSpecialChance: number;
+    increasedAllotmentSeedCost: number;
+    decreasedAllotmentSeedCost: number;
+    increasedSummoningMaxHit: number;
+    decreasedSummoningMaxHit: number;
+    masteryToken: number;
     private skillModifiers;
     constructor();
     get combatLootDoubleChance(): number;
@@ -412,6 +439,7 @@ declare class PlayerModifiers extends CombatModifiers implements StandardModifie
     get runePreservationChance(): number;
     get ammoPreservationChance(): number;
     addModifiers(modifiers: ModifierData, negMult?: number, posMult?: number): void;
+    getActiveModifiers(): NameValuePair[];
     reset(): void;
     getSkillModifierValue(key: SkillModifierKeys, skill: SkillID): number;
     getGPForDamageMultiplier(attackType: AttackType): number;
@@ -421,6 +449,10 @@ declare class PlayerModifiers extends CombatModifiers implements StandardModifie
     getHiddenSkillLevels(skill: SkillID): number;
     getActiveModifierDescriptions(): [string, string][];
 }
+declare type NameValuePair = {
+    name: string;
+    value: number;
+};
 declare class AgilityModifiers {
     private skillModifiers;
     private standardModifiers;
@@ -463,6 +495,8 @@ interface BankItemCondition extends BaseConditionalModifier {
 }
 declare function checkGloveCondition(condition: GlovesCondition): boolean;
 declare const conditionalModifiers: Map<ItemID, ConditionalModifier>;
+/** Describes modifiers and joins them as a list with no HTML formatting */
+declare function describeModifierDataPlain(modifiers: ModifierData): string;
 /** Describes modifiers and joins them as a list */
 declare function describeModifierData(modifiers: ModifierData): string;
 /** Gets span HTML that describes modifiers */
@@ -699,6 +733,8 @@ interface CombatModifierObject<Standard> {
     decreasedDragonBreathDamage: Standard;
     /** Increases the max hit threshold to stun a target for 1 turn with a melee attack: Implemented */
     increasedMeleeStunThreshold: Standard;
+    /** Take extra damage per hit equal to value% current HP (of entity being hit) */
+    increasedFrostburn: Standard;
 }
 /** Modifiers that are only common to the player */
 interface StandardModifierObject<Standard> extends CombatModifierObject<Standard> {
@@ -868,7 +904,7 @@ interface StandardModifierObject<Standard> extends CombatModifierObject<Standard
     golbinRaidIncreasedPrayerLevel: Standard;
     /** Increases the quantity of prayer points started with in golbin raid by value: Implemented */
     golbinRaidIncreasedPrayerPointsStart: Standard;
-    /** Increases the quantity of prayer points recieved per wave in golbin raid by value: Implemented */
+    /** Increases the quantity of prayer points received per wave in golbin raid by value: Implemented */
     golbinRaidIncreasedPrayerPointsWave: Standard;
     /** Unlocks passive slot selection on tenth wave of golbin raid: Implemented */
     golbinRaidPassiveSlotUnlocked: Standard;
@@ -880,33 +916,33 @@ interface StandardModifierObject<Standard> extends CombatModifierObject<Standard
     increasedPotionChargesFlat: Standard;
     /** Decreases the charges of potions by value: Implemented */
     decreasedPotionChargesFlat: Standard;
-    /** Increases the % chance to recieve bird's nests from Woodcutting by value: Implemented*/
+    /** Increases the % chance to receive bird's nests from Woodcutting by value: Implemented*/
     increasedBirdNestDropRate: Standard;
-    /** Decreases the % chance to recieve bird's nests from Woodcutting by value: Implemented*/
+    /** Decreases the % chance to receive bird's nests from Woodcutting by value: Implemented*/
     decreasedBirdNestDropRate: Standard;
     /** Increases the % chance to not use rockHP when mining by value: Implemented */
     increasedChanceNoDamageMining: Standard;
     /** Decreases the % chance to not use rockHP when mining by value: Implemented */
     decreasedChanceNoDamageMining: Standard;
-    /** Increases the % chance to recieve a gold bar when smelting silver bars by value: Implemented */
+    /** Increases the % chance to receive a gold bar when smelting silver bars by value: Implemented */
     increasedSeeingGoldChance: Standard;
-    /** Decreases the % chance to recieve a gold bar when smelting silver bars by value: Implemented */
+    /** Decreases the % chance to receive a gold bar when smelting silver bars by value: Implemented */
     decreasedSeeingGoldChance: Standard;
     /** Increases the % chance to double crops from farming by value: Implemented via calculateChanceToDouble*/
     increasedChanceDoubleHarvest: Standard;
     /** Decreases the % chance to double crops from farming by value: Implemented via calculateChanceToDouble*/
     decreasedChanceDoubleHarvest: Standard;
-    /** Increases the % chance to recieve bonus elemental runes from runecrafting by value: Implemented */
+    /** Increases the % chance to receive bonus elemental runes from runecrafting by value: Implemented */
     increasedChanceForElementalRune: Standard;
-    /** Decreases the % chance to recieve bonus elemental runes from runecrafting by value: Implemented */
+    /** Decreases the % chance to receive bonus elemental runes from runecrafting by value: Implemented */
     decreasedChanceForElementalRune: Standard;
     /** Increases the quantity of bonus elemental runes from runecrafting by value: Implemented */
     increasedElementalRuneGain: Standard;
     /** Decreases the quantity of bonus elemental runes from runecrafting by value: Implemented */
     decreasedElementalRuneGain: Standard;
-    /** Increases the % chance that a random tier of potion is recieved from herblore by value: Implemented */
+    /** Increases the % chance that a random tier of potion is received from herblore by value: Implemented */
     increasedChanceRandomPotionHerblore: Standard;
-    /** Decreases the % chance that a random tier of potion is recieved from herblore by value: Implemented */
+    /** Decreases the % chance that a random tier of potion is received from herblore by value: Implemented */
     decreasedChanceRandomPotionHerblore: Standard;
     /** Effect of Bonfire Potions: Implemented */
     freeBonfires: Standard;
@@ -992,7 +1028,7 @@ interface StandardModifierObject<Standard> extends CombatModifierObject<Standard
     summoningSynergy_8_12: Standard;
     summoningSynergy_8_13: Standard;
     summoningSynergy_8_14: Standard;
-    summoningSynergy_9_10: Standard;
+    increasedRunecraftingEssencePreservation: Standard;
     summoningSynergy_9_11: Standard;
     summoningSynergy_9_16: Standard;
     summoningSynergy_9_17: Standard;
@@ -1033,7 +1069,6 @@ interface StandardModifierObject<Standard> extends CombatModifierObject<Standard
     increasedAgilityObstacleCost: Standard;
     /** Decreases all costs of agility obstacles by % */
     decreasedAgilityObstacleCost: Standard;
-    decreasedFoodBurnChance: Standard;
     decreasedSecondaryFoodBurnChance: Standard;
     freeCompost: Standard;
     increasedCompostPreservationChance: Standard;
@@ -1043,8 +1078,6 @@ interface StandardModifierObject<Standard> extends CombatModifierObject<Standard
     doubleOresMining: Standard;
     increasedBonusCoalMining: Standard;
     decreasedSmithingCoalCost: Standard;
-    increasedThievingSuccessRate: Standard;
-    increasedThievingSuccessCap: Standard;
     allowSignetDrops: Standard;
     bonusCoalOnDungeonCompletion: Standard;
     increasedMasteryPoolProgress: Standard;
@@ -1072,6 +1105,42 @@ interface StandardModifierObject<Standard> extends CombatModifierObject<Standard
     increasedGPMultiplierCap: Standard;
     increasedGPMultiplierMin: Standard;
     allowAttackAugmentingMagic: Standard;
+    /** Enables the Auto Equip Food from Active Cook */
+    autoEquipFoodUnlocked: Standard;
+    /** Enables auto swapping of food in combat */
+    autoSwapFoodUnlocked: Standard;
+    /** Chance to successfully cook food (replaced burning) */
+    increasedChanceSuccessfulCook: Standard;
+    decreasedChanceSuccessfulCook: Standard;
+    increasedChancePerfectCookGlobal: Standard;
+    decreasedChancePerfectCookGlobal: Standard;
+    increasedChancePerfectCookFire: Standard;
+    decreasedChancePerfectCookFire: Standard;
+    increasedChancePerfectCookFurnace: Standard;
+    decreasedChancePerfectCookFurnace: Standard;
+    increasedChancePerfectCookPot: Standard;
+    decreasedChancePerfectCookPot: Standard;
+    increasedThievingStealth: Standard;
+    decreasedThievingStealth: Standard;
+    /** Increases rune preservation but only for alt. magic */
+    increasedAltMagicRunePreservation: Standard;
+    /** Decreases rune preservation but only for alt. magic */
+    decreasedAltMagicRunePreservation: Standard;
+    /** Increases the minimum gp from thieving (e.g. +20% changes roll from 1-100 to 20-100) */
+    increasedMinThievingGP: Standard;
+    /** Decreases the minimum gp from thieving (e.g. -10% changes roll from 20-100 to 10-100) */
+    decreasedMinThievingGP: Standard;
+    /** Increases the chance for a special item from fishing (shifted from fish chance) */
+    increasedFishingSpecialChance: Standard;
+    /** Decreases the chance for a special item from fishing (shifted into fish chance) */
+    decreasedFishingSpecialChance: Standard;
+    /** Increases the quantity of seeds required to plant allotments by amount */
+    increasedAllotmentSeedCost: Standard;
+    /** Decreases the quantity of seeds required to plant allotments by amount */
+    decreasedAllotmentSeedCost: Standard;
+    increasedSummoningMaxHit: Standard;
+    decreasedSummoningMaxHit: Standard;
+    masteryToken: Standard;
 }
 interface SkillModifierObject<Skill> {
     /** Increases the skill level used to compute combat stats by value: Implemented */
@@ -1104,7 +1173,7 @@ interface SkillModifierObject<Skill> {
     decreasedChanceToDoubleItemsSkill: Skill;
     increasedChanceAdditionalSkillResource: Skill;
     decreasedChanceAdditionalSkillResource: Skill;
-    /** Doubles the items recieved from a skill: Implemented for skills that have this modifier */
+    /** Doubles the items received from a skill: Implemented for skills that have this modifier */
     doubleItemsSkill: Skill;
 }
 declare type ModifierObject<Skill, Standard> = StandardModifierObject<Standard> & SkillModifierObject<Skill>;

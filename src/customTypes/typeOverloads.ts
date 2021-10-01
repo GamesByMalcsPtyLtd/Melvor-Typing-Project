@@ -1,4 +1,4 @@
-/*  Melvor Typing Project v1.9.3: Fetches and Documents Melvor Idle
+/*  Melvor Typing Project v1.10.0: Fetches and Documents Melvor Idle
 
     Copyright (C) <2021>  <Coolrox95>
 
@@ -23,7 +23,11 @@ interface JQueryStatic {
   (selector: '#searchTextbox') : JQueryInputElement
   (selector: '#dropdown-content-custom-amount') : JQueryInputElement
   (selector: '#dropdown-content-custom-amount-1'): JQueryInputElement
+  (selector: '#dropdown-content-custom-amount-2'): JQueryInputElement
   (selector: '#import-save-character-selection'): JQueryInputElement
+  (selector: '#summoning-synergy-search'): JQueryInputElement
+  (selector: '#cloud-login-form-username'): JQueryInputElement
+  (selector: '#cloud-login-form-password'): JQueryInputElement
 }
 interface JQueryInputElement extends Omit<JQuery<HTMLElement>, 'val'> {
   val: ValFcnForInput
@@ -50,5 +54,5 @@ interface ObjectConstructor {
   entries(obj: ModifierObject<SkillModifierTemplate, StandardModifierTemplate>): ModifierEntry<SkillModifierTemplate, StandardModifierTemplate>[]
   entries(obj: CombatModifierData): [keyof CombatModifierObject<number>, number][];
   entries<T>(obj: EquipmentObject<T>): [keyof EquipmentObject<T>, T][];
-  entries<T>(obj: NumberDictionary<T>): [string, T][]
+  entries<T>(obj: NumberDictionary<T>): [string, T][];
 }

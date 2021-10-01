@@ -6,7 +6,6 @@ declare class CombatManager extends BaseManager {
     areaData: CombatAreaData | SlayerAreaData | DungeonData;
     dungeonProgress: number;
     selectedMonster: MonsterID;
-    private dropWeightCache;
     bank: BankHelper;
     loot: CombatLoot;
     slayerTask: SlayerTask;
@@ -22,10 +21,10 @@ declare class CombatManager extends BaseManager {
     /** Management class for combat */
     constructor();
     initialize(): void;
-    protected tick(): void;
-    protected runCombat(): void;
+    tick(): void;
     /** Renders combat in current state */
-    protected render(): void;
+    render(): void;
+    private renderPause;
     protected renderLocation(): void;
     /** Renders things that can be unlocked by completing dungeons */
     private renderDungeonCompletion;
@@ -41,7 +40,7 @@ declare class CombatManager extends BaseManager {
     selectMonster(monsterID: number, areaData: CombatAreaData | SlayerAreaData): void;
     /** Callback function for selecting a dungeon */
     selectDungeon(dungeonID: number): void;
-    protected preSelection(): void;
+    protected preSelection(): boolean;
     /** Callback function for running from combat */
     stopCombat(fled?: boolean, areaChange?: boolean): void;
     protected loadNextEnemy(): void;
@@ -55,31 +54,24 @@ declare class CombatManager extends BaseManager {
     protected closeAreaMenu(): void;
     serialize(): number[];
     deserialize(reader: DataReader, version: number): void;
-    private snapShotOffline;
-    private createOfflineModal;
-    processOffline(): void;
+    resetOfflineTracking(): void;
     /** Sets properties based on the old save file variables */
     convertFromOldSaveFormat(saveGame: NewSaveGame): void;
-    /** Puts the manager in a state where offline will progress the amount specified */
-    testForOffline(timeToGoBack: number): void;
+    private getStatsLog;
+    /** Logs player and enemy combat stats to console */
+    saveStats(): void;
+    compareStatsWithSavedStats(): void;
 }
-interface OfflineSnapshot {
-    gp: number;
-    slayercoins: number;
-    prayerPoints: number;
-    experience: number[];
-    levels: number[];
-    food: ItemQuantity2;
-    quiverItem: ItemQuantity2;
-    summon1ID: ItemID;
-    summon2ID: ItemID;
-    bank: Map<ItemID, number>;
-    loot: Map<ItemID, number>;
-    monsterKills: number[];
-    dungeonCompletion: number[];
-    taskCompletions: number[];
-    summoningMarks: number[];
-}
+declare type StatsLog = {
+    player: {
+        stats: NameValuePair[];
+        modifiers: NameValuePair[];
+    };
+    enemy: {
+        stats: NameValuePair[];
+        modifiers: NameValuePair[];
+    };
+};
 declare class Timer {
     type: TimerTypes;
     private action;

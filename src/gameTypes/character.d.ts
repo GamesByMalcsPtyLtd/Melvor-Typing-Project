@@ -1,4 +1,4 @@
-declare abstract class Character {
+declare abstract class Character implements Tickable {
     protected manager: BaseManager;
     hitpoints: number;
     stun: ActiveStun;
@@ -112,6 +112,7 @@ declare abstract class Character {
     protected setHitpoints(value: number): void;
     /** Perform an attack against a target */
     protected attack(target: Character, attack: Attack): number;
+    protected modifyAttackDamage(target: Character, attack: Attack, damage: number): number;
     getAttackMaxDamage(attack: Attack): number;
     /** Performs lifesteal from attack damage. Returns the true amount healed. */
     protected lifesteal(attack: Attack, damage: number): number;
@@ -145,7 +146,7 @@ declare abstract class Character {
     protected addPassives(passiveIDs: number[]): void;
     protected removePassives(passiveIDs: number[]): void;
     protected removeAllPassives(): void;
-    protected applyEffect(effect: Effect, target: Character, damage?: number): void;
+    protected applyEffect(effect: Effect, target: Character, damage?: number, attack?: Attack): void;
     /** Applies a stacking effect to the target */
     protected applyStackingEffect(effect: StackingEffect, target: Character): void;
     /** Applies a reflexive effect to self */
@@ -183,7 +184,7 @@ declare abstract class Character {
     /** Renders the character's current stats */
     protected renderStats(): void;
     protected renderDamageValues(): void;
-    protected formatAttackDamage(damage: number): string;
+    protected formatNormalAttackDamage(damage: number): string;
     /** Updates the hitchance display */
     protected renderHitchance(): void;
     /** Updates all hitpoint numbers and bars */
@@ -261,6 +262,10 @@ declare class CharacterStats {
     damageReduction: number;
     get averageEvasion(): number;
     get maxEvasion(): number;
+    getValueTable(): {
+        name: string;
+        value: number;
+    }[];
 }
 declare type AttackSelection = {
     attack: Attack;
@@ -294,7 +299,7 @@ declare type ModifierEffects = {
     fromTarget: CountedModifier;
 };
 declare type AttackType = 'melee' | 'ranged' | 'magic';
-declare type TimerTypes = 'Act' | 'Spawn' | 'Regen' | 'DOT' | 'SlayerTask' | 'Summon';
+declare type TimerTypes = 'Act' | 'Spawn' | 'Regen' | 'DOT' | 'SlayerTask' | 'Summon' | 'Skill';
 declare type AttackStyle = 'Stab' | 'Slash' | 'Block' | 'Magic' | 'Defensive' | 'Accurate' | 'Rapid' | 'Longrange';
 declare type CharacterTimers = {
     act: Timer;
@@ -327,6 +332,7 @@ declare type ActiveStackingEffect = {
 };
 interface ActiveReflexiveEffect extends ActiveStackingEffect {
     sourceAttack: Attack;
+    turnsLeft: number;
 }
 declare type RenderQueue = {
     stats: boolean;

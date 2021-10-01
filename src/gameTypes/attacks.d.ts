@@ -2,13 +2,16 @@
 declare const normalDamage: Damage[];
 /** Burning: Deal 15% of current HP as dmg over 5 seconds */
 declare const burnEffect: DOTEffect;
-/** Poison: Deal 10% of max HP as dmg over 10 seconds */
+/** Poison: Deal 10% of max HP as dmg over 10 seconds, 4 procs */
 declare const poisonEffect: DOTEffect;
 declare const stackingEffects: StackingEffect[];
 declare const markOfDeathEffect: StackingEffect;
 declare const afflictionEffect: ModifierEffect;
 /** Stores all player and enemy attack types */
 declare const attacks: StringDictionary<Attack>;
+declare enum FightEffects {
+    Absorbing_Shield = 0
+}
 /** Map of attack ID to attack Object */
 declare const attacksIDMap: Map<number, Attack>;
 declare function getAttackFromID(id: number): Attack;
@@ -93,13 +96,13 @@ interface RolledDamage extends BaseDamage {
 interface FixedDamage extends BaseDamage {
     roll: false;
 }
-declare type CharacterType = "Target" | "Attacker";
+declare type CharacterType = 'Target' | 'Attacker';
 /** Effects of an attack */
 declare type Effect = ModifierEffect | SleepEffect | StunEffect | DOTEffect | StackingEffect | ReflexiveEffect;
-declare type RollType = "MaxHit" | "MinHit" | "CurrentHP" | "MaxHP" | "DamageDealt" | "MagicScaling" | "Fixed" | "One" | "Rend";
-declare type EffectType = "Modifier" | "Sleep" | "Stun" | "DOT" | "IntoTheMist" | "MarkOfDeath";
+declare type RollType = 'MaxHit' | 'MinHit' | 'CurrentHP' | 'MaxHP' | 'DamageDealt' | 'MagicScaling' | 'Fixed' | 'One' | 'Rend';
+declare type EffectType = 'Modifier' | 'Sleep' | 'Stun' | 'DOT' | 'IntoTheMist' | 'MarkOfDeath';
 interface ModifierEffect {
-    type: "Modifier";
+    type: 'Modifier';
     /** Modifiers the attack applies */
     modifiers: CombatModifierData;
     /** Maximum stacks the effect can have */
@@ -114,24 +117,24 @@ interface ModifierEffect {
     media: string;
 }
 interface SleepEffect {
-    type: "Sleep";
+    type: 'Sleep';
     /** Number of turns the effect applies for */
     turns: number;
     /** Chance that the effect applies */
     chance: number;
 }
 interface StunEffect {
-    type: "Stun";
+    type: 'Stun';
     /** Number of turns the effect applies for */
     turns: number;
     /** Chance that the effect applies */
     chance: number;
     flavour: StunFlavour;
 }
-declare type StunFlavour = "Stun" | "Freeze";
-declare type DOTType = "Burn" | "Bleed" | "Poison" | "Regen";
+declare type StunFlavour = 'Stun' | 'Freeze';
+declare type DOTType = 'Burn' | 'Bleed' | 'Poison' | 'Regen';
 interface DOTEffect {
-    type: "DOT";
+    type: 'DOT';
     subtype: DOTType;
     /** Number of times the DOT applies */
     procs: number;
@@ -143,13 +146,16 @@ interface DOTEffect {
     chance: number;
 }
 interface ReflexiveEffect {
-    type: "Reflexive";
+    type: 'Reflexive';
     modifiers: CombatModifierData;
     maxStacks: number;
     media: string;
+    /** Number of turns the effect lasts */
+    turns: number;
+    name: string;
 }
 interface StackingEffect {
-    type: "Stacking";
+    type: 'Stacking';
     stacksToAdd: number;
     modifiers: CombatModifierData;
     maxStacks: number;
