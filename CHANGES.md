@@ -1,4 +1,7 @@
 # Changelog
+## v1.10.1
+ - Update to support cachebuster version v1181
+ - Minor fixes to some type defs
 ## v1.10.0
  - Update to support v0.22, cachebuster version v1180
  - Updated Official typedefs

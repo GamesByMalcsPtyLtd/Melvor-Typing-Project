@@ -804,6 +804,7 @@ interface GenericItem extends BaseItem {
     cookingQty?: number;
     cookingCategory?: CookingCategory;
     ignoreLangGeneration?: true;
+    craftGPCost?: number;
 }
 interface FindEnemyAreaFcn {
     (enemy: MonsterID, name?: true): string;
@@ -1076,6 +1077,7 @@ declare type TooltipInstances = {
     summoningSynergy?: TippyTooltip[];
     summoningRecipe?: TippyTooltip[];
     summoning?: TippyTooltip[];
+    cooking?: TippyTooltip[];
 };
 declare type ShopPurchase = {
     category: ShopCategory;
@@ -1092,6 +1094,7 @@ declare type SkillProcessed = {
     otherItemsGained: ItemQuantity2[];
     itemsUsed: ItemQuantity2[];
     xp: number;
+    successfulCook: boolean;
 };
 declare type BankSettings = {
     bankBorder: number;
@@ -1201,7 +1204,7 @@ interface OfflineTuple extends OfflineBase {
     action: [number, number];
 }
 declare type Offline = OfflineWoodcut | OfflineTuple | OfflineUnset | OfflineSkill | OfflineMagic | OfflineCooking | OfflineNoAction;
-declare type LanguageCategory = 'SPECIAL_ATTACK'|'SKILL_NAME'|'ITEM_NAME'|'MONSTER_NAME'|'ITEM_DESCRIPTION'|'MODIFIER_DATA'|'PET_NAME'|'LORE'|'GAME_GUIDE'|'SHOP_NAME'|'SHOP_DESCRIPTION'|'PRIVACY_POLICY'|'MENU_TEXT'|'MAGIC'|'THIEVING';
+declare type LanguageCategory = 'SPECIAL_ATTACK'|'SKILL_NAME'|'ITEM_NAME'|'MONSTER_NAME'|'ITEM_DESCRIPTION'|'MODIFIER_DATA'|'PET_NAME'|'LORE'|'GAME_GUIDE'|'SHOP_NAME'|'SHOP_DESCRIPTION'|'PRIVACY_POLICY'|'MENU_TEXT'|'MAGIC'|'THIEVING'|'MISC_STRING'|'PAGE_NAME_MISC'|'PRAYER';
 interface ToggleSettingData {
   value: boolean,
   shouldChange: boolean,
