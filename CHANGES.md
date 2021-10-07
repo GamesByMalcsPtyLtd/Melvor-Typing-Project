@@ -1,4 +1,7 @@
 # Changelog
+
+## v1.10.2
+  - Update to Alpha v0.22.1 (?1183)
 ## v1.10.1
  - Update to support cachebuster version v1181
  - Minor fixes to some type defs
