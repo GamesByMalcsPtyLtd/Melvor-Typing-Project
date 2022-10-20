@@ -1,180 +1,76 @@
-interface Monster {
-    id: MonsterID;
+interface DropTableData {
+    itemID: string;
+    minQuantity: number;
+    maxQuantity: number;
+    weight: number;
+}
+interface MonsterData extends IDData {
     name: string;
+    description?: string;
+    media: string;
+    mediaAnimation?: string;
     levels: Omit<CombatLevels, 'Prayer'>;
     equipmentStats: EquipStatPair[];
     ignoreCompletion: boolean;
-    attackType: AttackType;
-    specialAttacks: Attack[];
+    attackType: AttackType | 'random';
+    specialAttacks: string[];
     overrideSpecialChances?: number[];
-    dropCoins: [number, number];
-    lootTable: [ItemID, number, number][];
+    passives: string[];
     lootChance: number;
-    media: string;
-    bones: number;
-    canSlayer?: boolean;
-    selectedSpell?: SpellID;
-    description?: string;
+    lootTable: DropTableData[];
+    gpDrops: {
+        min: number;
+        max: number;
+    };
+    bones?: {
+        itemID: string;
+        quantity: number;
+    };
+    canSlayer: boolean;
     isBoss: boolean;
-    boneQty?: number;
-    hasPassive?: boolean;
-    passiveID?: number[];
-    hasAnimation?: boolean;
-    mediaAnimation?: string;
-    defaultArea?: CombatAreaData | SlayerAreaData;
+    selectedSpell: string;
+    pet?: IDQuantity;
 }
-declare enum Monsters {
-    BlackKnight = 0,
-    HillGiant = 1,
-    MossGiant = 2,
-    GiantCrab = 3,
-    Tentacle = 4,
-    Seagull = 5,
-    ConfusedPirate = 6,
-    FrozenMammoth = 7,
-    FrozenArcher = 8,
-    Mummy = 9,
-    Statue = 10,
-    StoneSnake = 11,
-    WetMonster = 12,
-    MoistMonster = 13,
-    SweatyMonster = 14,
-    UndeadWerewolf = 15,
-    Vampire = 16,
-    FierceDevil = 17,
-    ManyEyedMonster = 18,
-    StrangeEyedMonster = 19,
-    LotsofEyes = 20,
-    Eyes = 21,
-    Griffin = 22,
-    Pegasus = 23,
-    Fairy = 24,
-    Valkyrie = 25,
-    Angel = 26,
-    HolyArcher = 27,
-    GooMonster = 28,
-    GreenGooMonster = 29,
-    PurpleGooMonster = 30,
-    ScatteredGooMonster = 31,
-    RagingHornedElite = 32,
-    SeethingHornedElite = 33,
-    DarkHornedElite = 34,
-    Golbin = 35,
-    RangedGolbin = 36,
-    Chicken = 37,
-    Cow = 38,
-    Chick = 39,
-    MummaChicken = 40,
-    Pirate = 41,
-    PirateCaptain = 42,
-    TheKraken = 43,
-    Bat = 44,
-    BigBat = 45,
-    TheEye = 46,
-    ResurrectedEye = 47,
-    PratTheProtectorOfSecrets = 48,
-    MalcsTheGuardianOfMelvor = 49,
-    Spider = 50,
-    BrownSpider = 51,
-    EvilSpider = 52,
-    SpiderKing = 53,
-    IceMonster = 54,
-    IceTroll = 55,
-    Ice = 56,
-    ProtectorofIce = 57,
-    FirstMate = 58,
-    ZombieHand = 59,
-    Zombie = 60,
-    ZombieLeader = 61,
-    Ghost = 62,
-    GreenDragon = 63,
-    BlueDragon = 64,
-    RedDragon = 65,
-    BlackDragon = 66,
-    JuniorFarmer = 67,
-    AdultFarmer = 68,
-    MasterFarmer = 69,
-    Wizard = 70,
-    SteelKnight = 71,
-    MithrilKnight = 72,
-    AdamantKnight = 73,
-    RuneKnight = 74,
-    BanditTrainee = 75,
-    Bandit = 76,
-    BanditLeader = 77,
-    DarkWizard = 78,
-    MasterWizard = 79,
-    ElderWizard = 80,
-    Skeleton = 81,
-    Leech = 82,
-    ViciousSerpent = 83,
-    FireSpirit = 84,
-    AirGuard = 85,
-    AirMonster = 86,
-    AirGolem = 87,
-    Aleron = 88,
-    Voltaire = 89,
-    Aeris = 90,
-    WaterGuard = 91,
-    WaterMonster = 92,
-    WaterGolem = 93,
-    Lissia = 94,
-    Murtia = 95,
-    Glacia = 96,
-    EarthGuard = 97,
-    EarthMonster = 98,
-    EarthGolem = 99,
-    Mistral = 100,
-    Ophidia = 101,
-    Terran = 102,
-    FireGuard = 103,
-    FireMonster = 104,
-    FireGolem = 105,
-    Pyra = 106,
-    Ignis = 107,
-    Ragnar = 108,
-    ElderDragon = 109,
-    FuriousHornedElite = 110,
-    Plant = 111,
-    MioliteSprig = 112,
-    MioliteTrio = 113,
-    MioliteWarden = 114,
-    MioliteMonarch = 115,
-    Druid = 116,
-    Thief = 117,
-    Shaman = 118,
-    Necromancer = 119,
-    Elementalist = 120,
-    TurkulRiders = 121,
-    TurkulArchers = 122,
-    TurkulThrowers = 123,
-    TurkulGiant = 124,
-    TurkulGeneral = 125,
-    SandBeast = 126,
-    RancoraSpider = 127,
-    ElderVampire = 128,
-    CursedMaiden = 129,
-    BountyHunter = 130,
-    ChaoticGreaterDragon = 131,
-    HuntingGreaterDragon = 132,
-    WickedGreaterDragon = 133,
-    Umbora = 134,
-    Rokken = 135,
-    Kutul = 136,
-    Paladin = 137,
-    Priest = 138,
-    WanderingBard = 139,
-    Cerberus = 140,
-    FearfulEye = 141,
-    RedDevil = 142,
-    Phoenix = 143,
-    Incendius = 144,
-    PratTheGuardianOfSecrets = 145,
-    MalcsTheLeaderOfDragons = 146,
-    MysteriousFigurePhase1 = 147,
-    MysteriousFigurePhase2 = 148,
-    Ahrenia = 149,
-    SuperiorEyedMonster = 150,
-    EyeOfFear = 151
+declare class Monster extends NamespacedObject {
+    get media(): string;
+    get name(): string;
+    get description(): string;
+    get combatLevel(): number;
+    levels: Omit<CombatLevels, 'Prayer'>;
+    equipmentStats: EquipStatPair[];
+    ignoreCompletion: boolean;
+    attackType: AttackType | 'random';
+    specialAttacks: AttackSelection[];
+    passives: CombatPassive[];
+    lootChance: number;
+    lootTable: DropTable;
+    gpDrops: {
+        min: number;
+        max: number;
+    };
+    /** Bones that the monster drops. If undefined, monster does not drop bones. */
+    bones?: {
+        item: AnyItem;
+        quantity: number;
+    };
+    canSlayer: boolean;
+    isBoss: boolean;
+    selectedSpell: StandardSpell;
+    protected _name: string;
+    private _description?;
+    private _media;
+    private _mediaAnimation?;
+    hasDescription: boolean;
+    /** Pet that is unlocked if the monster is killed kills times */
+    pet?: {
+        pet: Pet;
+        kills: number;
+    };
+    constructor(namespace: DataNamespace, data: MonsterData, game: Game);
 }
-declare const MONSTERS: Monster[];
+declare class DummyMonster extends Monster {
+    constructor(namespace: DataNamespace, id: string, game: Game);
+}
+declare class GolbinMonster extends Monster {
+    get name(): string;
+}

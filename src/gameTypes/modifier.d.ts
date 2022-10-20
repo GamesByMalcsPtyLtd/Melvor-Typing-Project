@@ -3,6 +3,7 @@ declare type BaseModifierTemplate = {
     description: string;
     modifyValue?: (value: number) => number | string;
     langDescription?: string;
+    tags: string[];
 };
 interface StandardModifierTemplate extends BaseModifierTemplate {
     isSkill: false;
@@ -69,17 +70,11 @@ declare class CombatModifiers implements CombatModifierObject<number> {
     decreasedBurnLifesteal: number;
     decreasedPoisonLifesteal: number;
     increasedMeleeCritChance: number;
-    increasedMeleeCritMult: number;
     decreasedMeleeCritChance: number;
-    decreasedMeleeCritMult: number;
     increasedRangedCritChance: number;
-    increasedRangedCritMult: number;
     decreasedRangedCritChance: number;
-    decreasedRangedCritMult: number;
     increasedMagicCritChance: number;
-    increasedMagicCritMult: number;
     decreasedMagicCritChance: number;
-    decreasedMagicCritMult: number;
     increasedHitpointRegeneration: number;
     decreasedHitpointRegeneration: number;
     increasedMinHitBasedOnMaxHit: number;
@@ -122,28 +117,194 @@ declare class CombatModifiers implements CombatModifierObject<number> {
     poisonImmunity: number;
     bleedImmunity: number;
     debuffImmunity: number;
+    freezeImmunity: number;
     increasedRebirthChance: number;
     increasedChanceToApplyBurn: number;
     decreasedChanceToApplyBurn: number;
     decreasedDragonBreathDamage: number;
     increasedMeleeStunThreshold: number;
     increasedFrostburn: number;
+    increasedAfflictionChance: number;
+    otherStyleImmunity: number;
+    meleeImmunity: number;
+    rangedImmunity: number;
+    magicImmunity: number;
+    slowImmunity: number;
+    increasedEndOfTurnHealing2: number;
+    increasedEndOfTurnHealing3: number;
+    increasedEndOfTurnHealing5: number;
+    increasedChanceToApplyPoison: number;
+    increasedChanceToApplyFrostburn: number;
+    increasedMeleeStunChance: number;
+    increasedElementalEffectChance: number;
+    frostBurnImmunity: number;
+    increasedPoisonReflectChance: number;
+    increasedBleedReflectChance: number;
+    increasedMinNatureSpellDamageBasedOnMaxHit: number;
+    increasedTotalBleedDamage: number;
+    increasedChanceToIncreaseStunDuration: number;
+    increasedSurgeSpellAccuracy: number;
+    increasedSurgeSpellMaxHit: number;
+    decreasedRegenerationInterval: number;
+    increasedOnHitSlowMagnitude: number;
+    globalEvasionHPScaling: number;
+    doubleBoneDrops: number;
+    increasedPrayerPointsWhenHit: number;
+    increasedFlatMeleeAccuracyBonusPerAttackInterval: number;
+    decreasedFlatMeleeAccuracyBonusPerAttackInterval: number;
+    increasedFlatMeleeStrengthBonusPerAttackInterval: number;
+    decreasedFlatMeleeStrengthBonusPerAttackInterval: number;
+    increasedFlatRangedAccuracyBonusPerAttackInterval: number;
+    decreasedFlatRangedAccuracyBonusPerAttackInterval: number;
+    increasedFlatRangedStrengthBonusPerAttackInterval: number;
+    decreasedFlatRangedStrengthBonusPerAttackInterval: number;
+    increasedFlatMagicAccuracyBonusPerAttackInterval: number;
+    decreasedFlatMagicAccuracyBonusPerAttackInterval: number;
+    increasedDamageReductionAgainstMelee: number;
+    decreasedDamageReductionAgainstMelee: number;
+    increasedDamageReductionAgainstRanged: number;
+    decreasedDamageReductionAgainstRanged: number;
+    increasedDamageReductionAgainstMagic: number;
+    decreasedDamageReductionAgainstMagic: number;
+    increasedDamageReductionWithMagic2HWeapon: number;
+    decreasedDamageReductionWithMagic2HWeapon: number;
+    increasedMaxHitPercentBasedOnEnemyDamageReduction: number;
+    decreasedMaxHitPercentBasedOnEnemyDamageReduction: number;
+    increasedMeleeMaxHitBonusAgainstRanged: number;
+    decreasedMeleeMaxHitBonusAgainstRanged: number;
+    increasedRangedMaxHitBonusAgainstMagic: number;
+    decreasedRangedMaxHitBonusAgainstMagic: number;
+    increasedMagicMaxHitBonusAgainstMelee: number;
+    decreasedMagicMaxHitBonusAgainstMelee: number;
+    gainSlayerCoinsBasedOnEnemyCombatLevelMelee: number;
+    gainSlayerCoinsBasedOnEnemyCombatLevelRanged: number;
+    gainSlayerCoinsBasedOnEnemyCombatLevelMagic: number;
+    increasedDamageReductionAgainstBosses: number;
+    decreasedDamageReductionAgainstBosses: number;
+    increasedChanceDoubleSlayerTaskKill: number;
+    decreasedChanceDoubleSlayerTaskKill: number;
+    increasedDamageTakenAddedAsPrayerPoints: number;
+    decreasedDamageTakenAddedAsPrayerPoints: number;
+    globalAccuracyHPScaling: number;
+    decreasedEnemyDamageReduction: number;
+    increasedEnemyDamageReduction: number;
+    increasedGlobalStunChance: number;
+    decreasedGlobalStunChance: number;
+    increasedGlobalSleepChance: number;
+    decreasedGlobalSleepChance: number;
+    increased15SlowStunChance2Turns: number;
+    decreased15SlowStunChance2Turns: number;
+    increasedGPPerDamage: number;
+    decreasedGPPerDamage: number;
+    increasedGPBasedOnEnemyCombatLevel: number;
+    increasedGPBasedOnSummonDamage: number;
+    decreasedGPBasedOnSummonDamage: number;
+    increasedSlayerCoinsPerDamage: number;
+    decreasedSlayerCoinsPerDamage: number;
+    increasedChanceToIncreaseSleepDuration: number;
+    decreasedChanceToIncreaseSleepDuration: number;
+    increasedChanceToAvoidStun: number;
+    decreasedChanceToAvoidStun: number;
+    increasedChanceToAvoidSleep: number;
+    decreasedChanceToAvoidSleep: number;
+    increasedHealWhenStunned: number;
+    decreasedHealWhenStunned: number;
+    increasedHealWhenSleep: number;
+    decreasedHealWhenSleep: number;
+    increasedChanceToApplyDeadlyPoisonWhenPoisoned: number;
+    decreasedChanceToApplyDeadlyPoisonWhenPoisoned: number;
+    increasedDamageTakenPerAttack: number;
+    decreasedDamageTakenPerAttack: number;
+    increasedDamageTakenWhenAsleep: number;
+    decreasedDamageTakenWhenAsleep: number;
+    increasedDamageTakenWhenStunned: number;
+    decreasedDamageTakenWhenStunned: number;
+    decreasedPlayerDamageReduction: number;
+    increasedDamageDealtIfPoisoned: number;
+    decreasedDamageDealtIfPoisoned: number;
+    increasedMeleeMaxHitFlat: number;
+    decreasedMeleeMaxHitFlat: number;
+    increasedRangedMaxHitFlat: number;
+    decreasedRangedMaxHitFlat: number;
+    increasedMagicMaxHitFlat: number;
+    decreasedMagicMaxHitFlat: number;
+    increasedChanceToApplyShock: number;
+    increasedAbsorbingSkin: number;
+    increasedDuality: number;
+    increasedChanceToApplyDecayCurse: number;
+    increasedRage: number;
+    increasedCurseLifesteal: number;
+    applyRandomCurseOnSpawn: number;
+    increasedChanceDarkBlade: number;
+    increasedMaxHitPercentBasedOnDamageReduction: number;
+    decreasedMaxHitPercentBasedOnDamageReduction: number;
+    halveDamageReduction: number;
+    increasedLifestealBasedOnHPRegenEffectiveness: number;
+    disableHPRegeneration: number;
+    increasedMinMeteorShowerSpellDamage: number;
+    increasedEndOfTurnEvasion2: number;
+    decreaseEnemyEvasionOnStun: number;
+    decreaseEnemyEvasionOnSleep: number;
+    decreasedEvasionBasedOnDR: number;
+    healOnHitBasedOnTargetDR: number;
+    doubleLifesteal: number;
+    increasedMaxHPBurnDamage: number;
+    increasedChanceToApplyDeadlyPoison: number;
+    disableLifesteal: number;
+    increasedSlayerCoinsBasedOnTargetDR: number;
+    increasedSlayerCoinsPerPoisonDamage: number;
+    increasedChanceToAvoidCurses: number;
+    applyMadnessCurseOnSpawn: number;
+    applyTormentCurseOnSpawn: number;
+    applyDespairCurseOnSpawn: number;
+    increasedMinPoisonArchaicDmg: number;
+    increasedMinInfernalArchaicDmg: number;
+    increasedMinLightningArchaicDmg: number;
+    reducedTargetDamageRedcutionIfBleeding: number;
+    increasedAssassin: number;
+    summoningSynergy_Devil_Eagle: number;
+    growingMadnessPassive: number;
+    momentInTimePassive: number;
+    reignOverTimePassive: number;
+    increasedChanceToApplySleepToTargetWhenHit: number;
+    increasedPlayerRage: number;
+    increasedLeviathan: number;
+    shadowCloak: number;
+    increasedPoisonSpellAccuracy: number;
+    increasedInfernalSpellAccuracy: number;
+    increasedLightningSpellAccuracy: number;
+    decreasedBurnDOTDamage: number;
+    increasedBurnDOTDamage: number;
+    decreasedBleedDOTDamage: number;
+    increasedBleedDOTDamage: number;
+    increasedPoisonDOTDamage: number;
+    decreasedPoisonDOTDamage: number;
+    increasedDeadlyPoisonDOTDamage: number;
+    decreasedDeadlyPoisonDOTDamage: number;
+    increased30Slow5TurnsChance: number;
+    increasedEndOfTurnMaxHealing2: number;
+    increasedEvasionAgainstMelee: number;
+    increasedEvasionAgainstRanged: number;
+    increasedEvasionAgainstMagic: number;
     constructor();
     reset(): void;
     getActiveModifiers(): NameValuePair[];
     addModifiers(modData: CombatModifierData, negMult?: number, posMult?: number): void;
+    addArrayModifiers(modArray: CombatModifierArray): void;
+    subArrayModifiers(modArray: CombatModifierArray): void;
     subModifiers(modData: CombatModifierData, negMult?: number, posMult?: number): void;
     getDOTLifesteal(type: DOTType): number;
+    getDOTDamageModifier(type: DOTType): number;
     getAccuracyModifier(type: AttackType): number;
     getEvasionModifier(type: AttackType): number;
     getMaxHitModifier(type: AttackType): number;
     getCritChance(type: AttackType): number;
-    getCritMult(type: AttackType): number;
     getLifesteal(type: AttackType): number;
-    getMaxHitFlatModifier(): number;
+    getMaxHitFlatModifier(type: AttackType): number;
     getMinHitFromMaxHitModifier(): number;
     getFlatMinHitModifier(): number;
     getSpellMinHitModifier(spellType: number): number;
+    getArchaicMinHitModifier(archaicSpell: ArchaicSpell): number;
     getSpellMaxHitModifier(spellType: number): number;
     getMaxHPPercentModifier(): number;
     getMaxHPFlatModifier(): number;
@@ -151,6 +312,7 @@ declare class CombatModifiers implements CombatModifierObject<number> {
     getFlatAttackIntervalModifier(): number;
     getFlatDamageReductionModifier(): number;
     getProtectionValue(type: AttackType): number;
+    getImmunity(type: AttackType): boolean;
     getFlatReflectDamage(): number;
     getRolledReflectDamage(): number;
     getReflectPercent(): number;
@@ -287,84 +449,84 @@ declare class PlayerModifiers extends CombatModifiers implements StandardModifie
     decreasedGPOnEnemyHit: number;
     increasedAdditionalRunecraftCountRunes: number;
     decreasedAdditionalRunecraftCountRunes: number;
-    summoningSynergy_0_1: number;
-    summoningSynergy_0_6: number;
-    summoningSynergy_0_7: number;
-    summoningSynergy_0_8: number;
-    summoningSynergy_0_12: number;
-    summoningSynergy_0_13: number;
-    summoningSynergy_0_14: number;
-    summoningSynergy_0_15: number;
+    increasedGPFromMonstersFlatBasedOnEvasion: number;
+    increasedGPPerMeleeDamage: number;
+    increasedGPPerRangedDamage: number;
+    increasedGPPerMagicDamage: number;
+    increasedGPFromSlayerTaskMonsters: number;
+    increasedGPWhenHitBasedOnDR: number;
+    increasedGPOnRegenBasedOnHPGain: number;
+    increasedGPFromBurningMonsters: number;
     summoningSynergy_1_2: number;
-    summoningSynergy_1_8: number;
-    summoningSynergy_1_12: number;
-    summoningSynergy_1_13: number;
-    summoningSynergy_1_14: number;
+    increasedFlatMagicDefenceBonus: number;
+    decreasedSlayerTaskMonsterAccuracy: number;
+    increasedMeleeRangedDefenceBonusBasedOnDR: number;
+    increasedHPRegenWhenEnemyHasMoreEvasion: number;
     summoningSynergy_1_15: number;
-    summoningSynergy_2_12: number;
-    summoningSynergy_2_13: number;
-    summoningSynergy_2_15: number;
-    summoningSynergy_3_4: number;
-    summoningSynergy_3_5: number;
+    increasedSCfromLifesteal: number;
+    increasedHealingOnAttackBasedOnDR: number;
+    increasedSummoningAttackLifesteal: number;
+    increasedWoodcuttingGemChance: number;
+    increasedBonusFishingSpecialChance: number;
     summoningSynergy_3_9: number;
-    summoningSynergy_3_10: number;
-    summoningSynergy_3_11: number;
-    summoningSynergy_3_16: number;
+    increasedRunecraftingStavePreservation: number;
+    summoningSynergy_Ent_Leprechaun: number;
+    increasedWoodcuttingJewelryChance: number;
     summoningSynergy_3_17: number;
-    summoningSynergy_3_18: number;
+    increasedMinimumBirdNestsWhenPotionActive: number;
     summoningSynergy_3_19: number;
     summoningSynergy_4_5: number;
-    summoningSynergy_4_9: number;
-    summoningSynergy_4_10: number;
-    summoningSynergy_4_11: number;
-    summoningSynergy_4_16: number;
-    summoningSynergy_4_17: number;
-    summoningSynergy_4_18: number;
+    decreasedCookingSuccessCap: number;
+    doubleRuneEssenceMining: number;
+    summoningSynergy_Mole_Leprechaun: number;
+    doubleSilverGoldMining: number;
+    increasedMiningBarChance: number;
+    increasedMiningNodeHPWithPerfectSwing: number;
     summoningSynergy_4_19: number;
-    summoningSynergy_5_9: number;
-    summoningSynergy_5_10: number;
-    summoningSynergy_5_11: number;
-    summoningSynergy_5_16: number;
-    summoningSynergy_5_17: number;
-    summoningSynergy_5_18: number;
+    increasedFishingCookedChance: number;
+    increasedRunecraftingWaterComboRunes: number;
+    summoningSynergy_Octopus_Leprechaun: number;
+    increasedCraftingJewelryRandomGemChance: number;
+    increasedSmithingDragonGearPreservation: number;
+    increasedFishermansPotionCharges: number;
     summoningSynergy_6_7: number;
-    summoningSynergy_6_8: number;
-    summoningSynergy_6_12: number;
+    increasedMagicMinHitBasedOnMaxHitSlayerTask: number;
+    increasedMeleeMaxHitBasedOnMaxHitSlayerTask: number;
     summoningSynergy_6_13: number;
-    summoningSynergy_6_14: number;
+    increasedFlatHPRegenBasedOnMeleeMaxHit: number;
     summoningSynergy_6_15: number;
     summoningSynergy_7_8: number;
-    summoningSynergy_7_12: number;
+    increasedRangedMaxHitBasedOnMaxHitSlayerTask: number;
     summoningSynergy_7_13: number;
-    summoningSynergy_7_14: number;
-    summoningSynergy_7_15: number;
-    summoningSynergy_8_12: number;
+    increasedFlatHPRegenBasedOnRangedMaxHit: number;
+    increasedChanceToApplyBurnWithRanged: number;
+    increasedSlayerCoinsPerMagicDamageSlayerTask: number;
     summoningSynergy_8_13: number;
-    summoningSynergy_8_14: number;
+    increasedFlatHPRegenBasedOnMagicMaxHit: number;
     increasedRunecraftingEssencePreservation: number;
-    summoningSynergy_9_11: number;
-    summoningSynergy_9_16: number;
+    thievingChefNoDamage: number;
+    decreasedFlatCraftingDragonhideCost: number;
     summoningSynergy_9_17: number;
-    summoningSynergy_9_18: number;
+    increasedGenerousCookPotionCharges: number;
     summoningSynergy_9_19: number;
-    summoningSynergy_10_11: number;
-    summoningSynergy_10_16: number;
+    increasedRuneEssenceThievingMiner: number;
+    increasedChanceToDoubleLeatherDragonhideCrafting: number;
     summoningSynergy_10_17: number;
-    summoningSynergy_10_18: number;
-    summoningSynergy_10_19: number;
-    summoningSynergy_11_16: number;
-    summoningSynergy_11_17: number;
-    summoningSynergy_11_18: number;
-    summoningSynergy_11_19: number;
-    summoningSynergy_12_13: number;
-    summoningSynergy_12_14: number;
+    giveRandomComboRunesRunecrafting: number;
+    increasedFireRunesWhenMakingElementalRunes: number;
+    increasedThievingAutoSellPrice: number;
+    increasedRandomBarChanceThievingMiner: number;
+    increasedHerbSackChanceThievingFarmer: number;
+    summoningSynergy_Leprechaun_Devil: number;
+    increasedDamageReductionAgainstSlayerTasks: number;
+    increasedHitpointRegenerationAgainstSlayerTasks: number;
     summoningSynergy_13_14: number;
-    summoningSynergy_16_17: number;
-    summoningSynergy_16_18: number;
-    summoningSynergy_16_19: number;
-    summoningSynergy_17_18: number;
-    summoningSynergy_17_19: number;
-    summoningSynergy_18_19: number;
+    increasedCraftingJewelryPreservation: number;
+    increasedCraftingPotionCharges: number;
+    increasedFiremakingLogGP: number;
+    doubleSilverGoldSmithingWithSeeingGold: number;
+    decreasedFlatSmithingCoalCost: number;
+    summoningSynergy_Bear_Devil: number;
     increasedChanceToConvertSeedDrops: number;
     increasedMeleeStrengthBonus: number;
     decreasedMeleeStrengthBonus: number;
@@ -394,7 +556,7 @@ declare class PlayerModifiers extends CombatModifiers implements StandardModifie
     increasedRedemptionThreshold: number;
     autoLooting: number;
     autoBurying: number;
-    increasedCombatStoppingThreshold: number;
+    freeProtectItem: number;
     decreasedSummoningShardCost: number;
     increasedSummoningShardCost: number;
     increasedSummoningCreationCharges: number;
@@ -431,76 +593,277 @@ declare class PlayerModifiers extends CombatModifiers implements StandardModifie
     decreasedAllotmentSeedCost: number;
     increasedSummoningMaxHit: number;
     decreasedSummoningMaxHit: number;
-    masteryToken: number;
+    increasedChanceForDiamondFiremaking: number;
+    decreasedChanceForDiamondFiremaking: number;
+    increasedNonMagicPoisonChance: number;
+    increasedChanceToPreserveFood: number;
+    allowLootContainerStacking: number;
+    infiniteLootContainer: number;
+    increasedBaseStardustDropQty: number;
+    increasedGPFromFiremaking: number;
+    decreasedGPFromFiremaking: number;
+    increasedWoodcuttingXPAddedAsFiremakingXP: number;
+    decreasedWoodcuttingXPAddedAsFiremakingXP: number;
+    increasedChanceForOneExtraOre: number;
+    decreasedChanceForOneExtraOre: number;
+    increasedChanceForQualitySuperiorGem: number;
+    decreasedChanceForQualitySuperiorGem: number;
+    increasedMeteoriteOre: number;
+    increasedChanceForAshInWoodcutting: number;
+    decreasedChanceForAshInWoodcutting: number;
+    increasedChanceForAshInFiremaking: number;
+    decreasedChanceForAshInFiremaking: number;
+    increasedChanceForStardustInFiremaking: number;
+    decreasedChanceForStardustInFiremaking: number;
+    increasedChanceForOneExtraFish: number;
+    decreasedChanceForOneExtraFish: number;
+    doubleLogProduction: number;
+    increasedGPFromNegativeObstacles: number;
+    decreasedGPFromNegativeObstacles: number;
+    increasedXPFromNegativeObstacles: number;
+    decreasedXPFromNegativeObstacles: number;
+    increasedMasteryXPFromNegativeObstacles: number;
+    decreasedMasteryXPFromNegativeObstacles: number;
+    increasedChanceGoldenStardust: number;
+    decreasedChanceGoldenStardust: number;
+    increasedChanceStardust: number;
+    decreasedChanceStardust: number;
+    decreasedThievingStunIntervalPercent: number;
+    increasedThievingStunIntervalPercent: number;
+    decreasedGlobalSkillIntervalPercent: number;
+    increasedGlobalSkillIntervalPercent: number;
+    increasedChanceForArrowShaftsWoodcutting: number;
+    decreasedChanceForArrowShaftsWoodcutting: number;
+    decreasedNonShardCostForEquippedTablets: number;
+    increasedNonShardCostForEquippedTablets: number;
+    decreasedPassiveCookInterval: number;
+    increasedPassiveCookInterval: number;
+    increasedSalamanderCreationCharges: number;
+    decreasedSalamanderCreationCharges: number;
+    decreasedJavelinResourceCost: number;
+    increasedJavelinResourceCost: number;
+    increasedJavelinProduction: number;
+    decreasedJavelinProduction: number;
+    increasedChanceExtraJavelins: number;
+    decreasedChanceExtraJavelins: number;
+    increasedChanceExtraMeteoriteOre: number;
+    decreasedChanceExtraMeteoriteOre: number;
+    increasedChanceExtraArrows: number;
+    decreasedChanceExtraArrows: number;
+    increasedChanceExtraUnstrungBows: number;
+    decreasedChanceExtraUnstrungBows: number;
+    increasedChanceItemToGoldFletching: number;
+    decreasedChanceItemToGoldFletching: number;
+    increasedLeprechaunCreationCharges: number;
+    decreasedLeprechaunCreationCharges: number;
+    increasedGPFromAgilityPerActiveObstacle: number;
+    decreasedGPFromAgilityPerActiveObstacle: number;
+    increasedChanceExtraCrossbows: number;
+    decreasedChanceExtraCrossbows: number;
+    disableGoldenStardustDrops: number;
+    increasedBoltProduction: number;
+    decreasedBoltProduction: number;
+    decreasedFletchingIntervalWithArrows: number;
+    increasedFletchingIntervalWithArrows: number;
+    increasedCyclopsCreationCharges: number;
+    decreasedCyclopsCreationCharges: number;
+    increasedGPFromItemAlchemy: number;
+    increasedChanceForCharcoalInFiremaking: number;
+    decreasedChanceForCharcoalInFiremaking: number;
+    increasedThievingAreaUniqueChance: number;
+    decreasedThievingAreaUniqueChance: number;
+    increasedChanceToFindMeteorite: number;
+    increasedChanceToFindMushroomWoodcutting: number;
+    increasedChanceToAvoidThievingStuns: number;
+    increasedChanceAdditionalPerfectItem: number;
+    increasedChanceStardustCuttingMagicLogs: number;
+    increasedTownshipPopulationCap: number;
+    decreasedTownshipPopulationCap: number;
+    increasedTownshipHappiness: number;
+    decreasedTownshipHappiness: number;
+    increasedTownshipEducation: number;
+    decreasedTownshipEducation: number;
+    increasedTownshipHealth: number;
+    decreasedTownshipHealth: number;
+    increasedTownshipGPProduction: number;
+    decreasedTownshipGPProduction: number;
+    increasedTownshipMaxStorage: number;
+    decreasedTownshipMaxStorage: number;
+    increasedTownshipFoodProduction: number;
+    decreasedTownshipFoodProduction: number;
+    increasedTownshipWoodProduction: number;
+    decreasedTownshipWoodProduction: number;
+    increasedTownshipOreProduction: number;
+    decreasedTownshipOreProduction: number;
+    increasedTownshipStoneProduction: number;
+    decreasedTownshipStoneProduction: number;
+    increasedTownshipCoalProduction: number;
+    decreasedTownshipCoalProduction: number;
+    increasedTownshipBarProduction: number;
+    decreasedTownshipBarProduction: number;
+    increasedTownshipHerbProduction: number;
+    decreasedTownshipHerbProduction: number;
+    increasedTownshipRuneEssenceProduction: number;
+    decreasedTownshipRuneEssenceProduction: number;
+    increasedTownshipLeatherProduction: number;
+    decreasedTownshipLeatherProduction: number;
+    increasedTownshipPotionProduction: number;
+    decreasedTownshipPotionProduction: number;
+    increasedTownshipPlankProduction: number;
+    decreasedTownshipPlankProduction: number;
+    increasedTownshipClothingProduction: number;
+    decreasedTownshipClothingProduction: number;
+    increasedTownshipBuildingCost: number;
+    decreasedTownshipBuildingCost: number;
+    increasedTownshipGrasslandsProduction: number;
+    decreasedTownshipGrasslandsProduction: number;
+    increasedTownshipForestProduction: number;
+    decreasedTownshipForestProduction: number;
+    increasedTownshipDesertProduction: number;
+    decreasedTownshipDesertProduction: number;
+    increasedTownshipWaterProduction: number;
+    decreasedTownshipWaterProduction: number;
+    increasedTownshipSwampProduction: number;
+    decreasedTownshipSwampProduction: number;
+    increasedTownshipAridPlainsProduction: number;
+    decreasedTownshipAridPlainsProduction: number;
+    increasedTownshipMountainsProduction: number;
+    decreasedTownshipMountainsProduction: number;
+    increasedTownshipValleyProduction: number;
+    decreasedTownshipValleyProduction: number;
+    increasedTownshipJungleProduction: number;
+    decreasedTownshipJungleProduction: number;
+    increasedTownshipSnowlandsProduction: number;
+    decreasedTownshipSnowlandsProduction: number;
+    increasedTownshipFishingDockProduction: number;
+    decreasedTownshipFishingDockProduction: number;
+    increasedTownshipMagicEmporiumProduction: number;
+    decreasedTownshipMagicEmporiumProduction: number;
+    increasedTownshipOrchardProduction: number;
+    decreasedTownshipOrchardProduction: number;
+    increasedTownshipFarmProduction: number;
+    decreasedTownshipFarmProduction: number;
+    increasedTownshipWoodcuttingProduction: number;
+    decreasedTownshipWoodcuttingProduction: number;
+    increasedTownshipBlacksmithProduction: number;
+    decreasedTownshipBlacksmithProduction: number;
+    increasedTownshipTaxPerCitizen: number;
+    decreasedTownshipTaxPerCitizen: number;
+    townshipDisableHunting: number;
+    increasedTownshipResourceProduction: number;
+    decreasedTownshipResourceProduction: number;
+    increasedTownshipCoalUsage: number;
+    decreasedTownshipCoalUsage: number;
+    increasedTownshipBuildingHappinessPenalties: number;
+    decreasedTownshipBuildingHappinessPenalties: number;
+    increasedAdditionalAshInFiremaking: number;
+    decreasedAdditionalAshInFiremaking: number;
+    increasedTownshipFoodUsage: number;
+    decreasedTownshipFoodUsage: number;
+    increasedChanceToFindLostChest: number;
+    increasedChanceToPreserveConsumable: number;
+    increasedTownshipDeadStorage: number;
+    decreasedTownshipDeadStorage: number;
+    bigRon: number;
+    coalGainedOnCookingFailure: number;
+    halvedWoodcuttingDoubleChance: number;
+    increasedFlatFarmingYield: number;
+    decreasedFlatFarmingYield: number;
+    increasedDeadlyToxinsFromHerblore: number;
+    increasedSummoningCreationChargesForEquippedTablets: number;
+    decreasedSummoningIntervalPercentForEquippedTablets: number;
+    increasedMinBirdNestQuantity: number;
+    increasedGemVeinChance: number;
+    decreasedGemVeinChance: number;
+    increasedChanceAdditionalBarSmithing: number;
+    increasedFletchingBoltQuantity: number;
+    increasedAgilityPillarCost: number;
+    decreasedAgilityPillarCost: number;
+    increasedNonCombatSkillXP: number;
+    decreasedNonCombatSkillXP: number;
+    increasedFlatMeleeDefenceBonus: number;
+    increasedFlatRangedDefenceBonus: number;
+    increasedFlatStabAttackBonus: number;
+    increasedFlatSlashAttackBonus: number;
+    increasedFlatBlockAttackBonus: number;
+    increasedFlatRangedAttackBonus: number;
+    increasedFlatMagicAttackBonus: number;
+    increasedFlatMeleeStrengthBonus: number;
+    increasedFlatRangedStrengthBonus: number;
+    disableSalamanderItemReduction: number;
+    decreasedSummoningIntervalForOctopus: number;
+    increasedMasteryPoolCap: number;
+    bypassAllSlayerItems: number;
+    increased5DROnBeingHit: number;
+    allowNonMagicCurses: number;
     private skillModifiers;
     constructor();
     get combatLootDoubleChance(): number;
     get increasedCombatGP(): number;
     get runePreservationChance(): number;
     get ammoPreservationChance(): number;
-    addModifiers(modifiers: ModifierData, negMult?: number, posMult?: number): void;
+    addModifiers(modifiers: PlayerModifierObject, negMult?: number, posMult?: number): void;
+    /** Adds the modifiers from a MappedModifiers object to this */
+    addMappedModifiers(modifiers: MappedModifiers): void;
     getActiveModifiers(): NameValuePair[];
     reset(): void;
-    getSkillModifierValue(key: SkillModifierKeys, skill: SkillID): number;
+    getSkillModifierValue(key: SkillModifierKeys, skill: AnySkill): number;
     getGPForDamageMultiplier(attackType: AttackType): number;
     get meleeStrengthBonusModifier(): number;
     get rangedStrengthBonusModifier(): number;
     get magicDamageModifier(): number;
-    getHiddenSkillLevels(skill: SkillID): number;
+    getHiddenSkillLevels(skill: AnySkill): number;
     getActiveModifierDescriptions(): [string, string][];
 }
 declare type NameValuePair = {
     name: string;
     value: number;
 };
-declare class AgilityModifiers {
-    private skillModifiers;
-    private standardModifiers;
+declare class MappedModifiers {
+    skillModifiers: Map<SkillModifierKeys, Map<AnySkill, number>>;
+    standardModifiers: Map<StandardModifierKeys, number>;
     constructor();
-    addModifiers(modifiers: ModifierData, negMult?: number, posMult?: number): void;
+    private addStandardModifier;
+    private addSkillModifiers;
+    /** Adds a modifier data object */
+    addModifiers(modifiers: PlayerModifierObject, negMult?: number, posMult?: number): void;
+    /** Adds a modifier array */
+    addArrayModifiers(modArray: ModifierArray): void;
+    /** Adds the modifiers from another mapped modifiers object to this one */
+    addMappedModifiers(modifiers: MappedModifiers): void;
     reset(): void;
     getActiveModifierDescriptions(): [string, string][];
+    getActiveModifierDescriptionsToPrecision(precision: number): [string, string][];
+    getModifierDescriptionsAsNodes<T extends keyof HTMLElementTagNameMap>(tagName: T, additionalClasses?: string[]): HTMLElementTagNameMap[T][];
 }
 declare class TargetModifiers {
     private modifiers;
+    addTargetModifiers(modifiers: TargetModifiers): void;
     addModifiers(modifiers: CombatModifierData, negMult?: number, posMult?: number): void;
     addToCombatModifiers(combatModifiers: CombatModifiers): void;
+    subFromCombatModifiers(combatModifiers: CombatModifiers): void;
     reset(): void;
 }
-declare function printPlayerModifier(key: SkillModifierKeys, value: [SkillID, number]): [string, string];
-declare function printPlayerModifier(key: StandardModifierKeys, value: number): [string, string];
+declare function shouldRoundModifier(key: ModifierKeys, value: number): boolean;
+declare function printPlayerModifier(key: SkillModifierKeys, value: SkillModifier, precision?: number): [string, string];
+declare function printPlayerModifier(key: StandardModifierKeys, value: number, precision?: number): [string, string];
 declare function isSkillEntry<Skill, Standard>(entry: ModifierEntry<Skill, Standard>): entry is SkillEntry<Skill>;
-interface BaseConditionalModifier {
-    itemID: ItemID;
-    modifiers: ModifierData;
-    active: boolean;
-}
-declare type ConditionalModifier = HitpointsCondition | GlovesCondition | BankItemCondition;
-declare const conditionalModifierData: ConditionalModifier[];
-declare type ConditionalTypes = 'Hitpoints' | 'GloveCharges' | 'BankItem';
-/** Hitpoints are above a certain percent */
-interface HitpointsCondition extends BaseConditionalModifier {
-    type: 'Hitpoints';
-    percent: number;
-}
-/** Gloves have charges */
-interface GlovesCondition extends BaseConditionalModifier {
-    type: 'GloveCharges';
-    gloveID: number;
-}
-/** Item is present in the bank */
-interface BankItemCondition extends BaseConditionalModifier {
-    type: 'BankItem';
-    bankItemID: ItemID;
-}
-declare function checkGloveCondition(condition: GlovesCondition): boolean;
-declare const conditionalModifiers: Map<ItemID, ConditionalModifier>;
+declare function isSkillKey(key: SkillModifierKeys | StandardModifierKeys): key is SkillModifierKeys;
+declare function addModifierTemplateData(formatData: StringDictionary<string>, modifiers: PlayerModifierObject, key: string): void;
+declare function generateModifierDataDescription(modifiers: PlayerModifierObject, key: string): string;
+/** Gets an array of plain modifier descriptions from data*/
+declare function getPlainModifierDescriptions(modifiers: PlayerModifierObject): string[];
 /** Describes modifiers and joins them as a list with no HTML formatting */
-declare function describeModifierDataPlain(modifiers: ModifierData): string;
-/** Describes modifiers and joins them as a list */
-declare function describeModifierData(modifiers: ModifierData): string;
+declare function describeModifierDataPlain(modifiers: PlayerModifierObject): string;
+/** Describes modifiers and joins them as a list separated by HTML line breaks with no HTML formatting for the modifier itself */
+declare function describeModifierDataPlainLineBreak(modifiers: PlayerModifierObject): string;
+/** Describes modifiers and joins them as a list using Intl.ListFormat */
+declare function describeModifierData(modifiers: PlayerModifierObject): string;
+/** Describes modifiers and joins them as a list separated by HTML line breaks */
+declare function describeModifierDataLineBreak(modifiers: PlayerModifierObject): string;
 /** Gets span HTML that describes modifiers */
-declare function getModifierDataSpans(modifiers: ModifierData, negMult?: number, posMult?: number): string[];
+declare function getModifierDataSpans(modifiers: PlayerModifierObject, negMult?: number, posMult?: number): string[];
+declare function getSpansFromModifierObject(modifiers: PlayerModifierObject, negMult?: number, posMult?: number): HTMLSpanElement[];
 /** Modifiers that are common to characters in combat */
 interface CombatModifierObject<Standard> {
     /** Increases accuracy rating by %: Implemented */
@@ -677,28 +1040,16 @@ interface CombatModifierObject<Standard> {
     decreasedPoisonLifesteal: Standard;
     /** Increases chance to perform a critical hit for melee attacks: Implemented */
     increasedMeleeCritChance: Standard;
-    /** Increases critical hit multiplier for melee attacks: Implemented */
-    increasedMeleeCritMult: Standard;
     /** Decreases chance to perform a critical hit for melee attacks: Implemented */
     decreasedMeleeCritChance: Standard;
-    /** Decreases critical hit multiplier for melee attacks: Implemented */
-    decreasedMeleeCritMult: Standard;
     /** Increases chance to perform a critical hit for ranged attacks: Implemented */
     increasedRangedCritChance: Standard;
-    /** Decreases critical hit multiplier for ranged attacks: Implemented */
-    increasedRangedCritMult: Standard;
     /** Decreases chance to perform a critical hit for ranged attacks: Implemented */
     decreasedRangedCritChance: Standard;
-    /** Decreases critical hit multiplier for ranged attacks: Implemented */
-    decreasedRangedCritMult: Standard;
     /** Increases chance to perform a critical hit for magic attacks: Implemented */
     increasedMagicCritChance: Standard;
-    /** Increases critical hit multiplier for magic attacks: Implemented */
-    increasedMagicCritMult: Standard;
     /** Decreases chance to perform a critical hit for magic attacks: Implemented */
     decreasedMagicCritChance: Standard;
-    /** Decreases critical hit multiplier for magic attacks: Implemented */
-    decreasedMagicCritMult: Standard;
     /** Sets chance to hit for melee attacks to value%. 100% provided immunity: Implemented*/
     meleeProtection: Standard;
     /** Sets chance to hit for ranged attacks to value%. 100% provided immunity: Implemented*/
@@ -713,6 +1064,8 @@ interface CombatModifierObject<Standard> {
     decreasedDamageReductionPercent: Standard;
     /** Provides immunity to stuns: Implemented */
     stunImmunity: Standard;
+    /** Provides immunity to freezes: Implemented */
+    freezeImmunity: Standard;
     /** Provides immunity to sleep: Implemented */
     sleepImmunity: Standard;
     /** Provides immunity to modifier effects that apply to targets, and stacking effects: Implemented */
@@ -735,6 +1088,238 @@ interface CombatModifierObject<Standard> {
     increasedMeleeStunThreshold: Standard;
     /** Take extra damage per hit equal to value% current HP (of entity being hit) */
     increasedFrostburn: Standard;
+    /** Increases the chance that affliction is applied by {value}% */
+    increasedAfflictionChance: Standard;
+    /** Provides character with immunity to damage from other attack styles */
+    otherStyleImmunity: Standard;
+    /** Provides character with immunity to damage from Melee */
+    meleeImmunity: Standard;
+    /** Provides character with immunity to damage from Ranged */
+    rangedImmunity: Standard;
+    /** Provides character with immunity to damage from Magic */
+    magicImmunity: Standard;
+    /** Provides character with immunity to Slows */
+    slowImmunity: Standard;
+    /** Heal % of current hitpoints every 2 turns */
+    increasedEndOfTurnHealing2: Standard;
+    /** Heal % of current hitpoints every 3 turns */
+    increasedEndOfTurnHealing3: Standard;
+    /** Heal % of current hitpoints every 5 turns */
+    increasedEndOfTurnHealing5: Standard;
+    /** Chance to apply poison when hitting with an attack */
+    increasedChanceToApplyPoison: Standard;
+    /** Chance to apply frostburn when hitting with an attack */
+    increasedChanceToApplyFrostburn: Standard;
+    /** Chance to stun when hitting with a Melee attack (once per turn) */
+    increasedMeleeStunChance: Standard;
+    /** Chance to apply Burn, Frostburn or Freeze when hitting with a Magic attack (once per turn) */
+    increasedElementalEffectChance: Standard;
+    /** Provides character with immunity to Frostburn */
+    frostBurnImmunity: Standard;
+    /** Chance to poison attackers when hit */
+    increasedPoisonReflectChance: Standard;
+    /** Chance to inflict a bleed that does 100% of the attack's damage to attackers when hit */
+    increasedBleedReflectChance: Standard;
+    /** % of Maximum Hit added to Minimum Hit when using Nature spells */
+    increasedMinNatureSpellDamageBasedOnMaxHit: Standard;
+    /** Increases total damage to bleeds inflicted by flat amount */
+    increasedTotalBleedDamage: Standard;
+    /** % chance to increase the length of stuns inflicted by 1 turn */
+    increasedChanceToIncreaseStunDuration: Standard;
+    /** Increases Accuracy Rating when using Surge spells */
+    increasedSurgeSpellAccuracy: Standard;
+    /** Increases Max Hit when using Surge spells */
+    increasedSurgeSpellMaxHit: Standard;
+    /** Decreases Hitpoint Regeneration interval (s) */
+    decreasedRegenerationInterval: Standard;
+    /** Inflict a slow that increases the target's attack interval by % when hitting with an attack */
+    increasedOnHitSlowMagnitude: Standard;
+    /** Modifier for the pegasus passive, only works for enemies */
+    globalEvasionHPScaling: Standard;
+    /** Increases Flat Melee Accuracy Bonus per 0.1s Attack Interval */
+    increasedFlatMeleeAccuracyBonusPerAttackInterval: Standard;
+    /** Decreases Flat Melee Accuracy Bonus per 0.1s Attack Interval */
+    decreasedFlatMeleeAccuracyBonusPerAttackInterval: Standard;
+    /** Increases Flat Melee Strength Bonus per 0.1s Attack Interval */
+    increasedFlatMeleeStrengthBonusPerAttackInterval: Standard;
+    /** Decreases Flat Melee Strength Bonus per 0.1s Attack Interval */
+    decreasedFlatMeleeStrengthBonusPerAttackInterval: Standard;
+    /** Increases Flat Ranged Accuracy Bonus per 0.1s Attack Interval */
+    increasedFlatRangedAccuracyBonusPerAttackInterval: Standard;
+    /** Decreases Flat Ranged Accuracy Bonus per 0.1s Attack Interval */
+    decreasedFlatRangedAccuracyBonusPerAttackInterval: Standard;
+    /** Increases Flat Ranged Strength Bonus per 0.1s Attack Interval */
+    increasedFlatRangedStrengthBonusPerAttackInterval: Standard;
+    /** Decreases Flat Ranged Strength Bonus per 0.1s Attack Interval */
+    decreasedFlatRangedStrengthBonusPerAttackInterval: Standard;
+    /** Increases Flat Magic Accuracy Bonus per 0.1s Attack Interval */
+    increasedFlatMagicAccuracyBonusPerAttackInterval: Standard;
+    /** Decreases Flat Magic Accuracy Bonus per 0.1s Attack Interval */
+    decreasedFlatMagicAccuracyBonusPerAttackInterval: Standard;
+    /** Increases Damage Reduction against Melee Enemy */
+    increasedDamageReductionAgainstMelee: Standard;
+    /** Decreases Damage Reduction against Melee Enemy */
+    decreasedDamageReductionAgainstMelee: Standard;
+    /** Increases Damage Reduction against Ranged Enemy */
+    increasedDamageReductionAgainstRanged: Standard;
+    /** Decreases Damage Reduction against Ranged Enemy */
+    decreasedDamageReductionAgainstRanged: Standard;
+    /** Increases Damage Reduction against Magic Enemy */
+    increasedDamageReductionAgainstMagic: Standard;
+    /** Decreases Damage Reduction against Magic Enemy */
+    decreasedDamageReductionAgainstMagic: Standard;
+    /** Increases Damage Reduction when using a 2H Magic Weapon */
+    increasedDamageReductionWithMagic2HWeapon: Standard;
+    /** Decreases Damage Reduction when using a 2H Magic Weapon */
+    decreasedDamageReductionWithMagic2HWeapon: Standard;
+    /** Increases Max Hit for each 1% of Damage Reduction the Enemy has */
+    increasedMaxHitPercentBasedOnEnemyDamageReduction: Standard;
+    /** Decreases Max Hit for each 1% of Damage Reduction the Enemy has */
+    decreasedMaxHitPercentBasedOnEnemyDamageReduction: Standard;
+    /** Increases Melee Max Hit. This value is tripled if fighting a Ranged Enemy. */
+    increasedMeleeMaxHitBonusAgainstRanged: Standard;
+    /** Decreases Melee Max Hit. This value is tripled if fighting a Ranged Enemy. */
+    decreasedMeleeMaxHitBonusAgainstRanged: Standard;
+    /** Increases Ranged Max Hit. This value is tripled if fighting a Magic Enemy. */
+    increasedRangedMaxHitBonusAgainstMagic: Standard;
+    /** Decreases Ranged Max Hit. This value is tripled if fighting a Magic Enemy. */
+    decreasedRangedMaxHitBonusAgainstMagic: Standard;
+    /** Increases Magic Max Hit. This value is tripled if fighting a Melee Enemy. */
+    increasedMagicMaxHitBonusAgainstMelee: Standard;
+    /** Decreases Magic Max Hit. This value is tripled if fighting a Melee Enemy. */
+    decreasedMagicMaxHitBonusAgainstMelee: Standard;
+    /** Killing a Melee Slayer Task Enemy grants Slayer Coins equal to Enemy Combat Level */
+    gainSlayerCoinsBasedOnEnemyCombatLevelMelee: Standard;
+    /** Killing a Ranged Slayer Task Enemy grants Slayer Coins equal to Enemy Combat Level */
+    gainSlayerCoinsBasedOnEnemyCombatLevelRanged: Standard;
+    /** Killing a Magic Slayer Task Enemy grants Slayer Coins equal to Enemy Combat Level */
+    gainSlayerCoinsBasedOnEnemyCombatLevelMagic: Standard;
+    /** Increases Damage Reduction when fighting a Dungeon Boss */
+    increasedDamageReductionAgainstBosses: Standard;
+    /** Decreases Damage Reduction when fighting a Dungeon Boss */
+    decreasedDamageReductionAgainstBosses: Standard;
+    /** Increases chance for a Slayer Task kill to count as 2 kills */
+    increasedChanceDoubleSlayerTaskKill: Standard;
+    /** Decreases chance for a Slayer Task kill to count as 2 kills */
+    decreasedChanceDoubleSlayerTaskKill: Standard;
+    /** Increases % of damage taken is added as Prayer Points (% damage rounded down) [% is divided by number multiplier] */
+    increasedDamageTakenAddedAsPrayerPoints: Standard;
+    /** Decreases % of damage taken is added as Prayer Points (% damage rounded down) [% is divided by number multiplier] */
+    decreasedDamageTakenAddedAsPrayerPoints: Standard;
+    /** Accuracy Ratings are multiplied by ${value} times current Hitpoints percent */
+    globalAccuracyHPScaling: Standard;
+    /** Do not use in the context of Conditional Modifiers. Use appropriate enemyModifiers instead */
+    decreasedEnemyDamageReduction: Standard;
+    /** Do not use in the context of Conditional Modifiers. Use appropriate enemyModifiers instead */
+    increasedEnemyDamageReduction: Standard;
+    increasedGlobalStunChance: Standard;
+    decreasedGlobalStunChance: Standard;
+    increasedGlobalSleepChance: Standard;
+    decreasedGlobalSleepChance: Standard;
+    increased15SlowStunChance2Turns: Standard;
+    decreased15SlowStunChance2Turns: Standard;
+    increasedPrayerPointsWhenHit: Standard;
+    increasedGPPerDamage: Standard;
+    decreasedGPPerDamage: Standard;
+    increasedGPBasedOnEnemyCombatLevel: Standard;
+    increasedGPBasedOnSummonDamage: Standard;
+    decreasedGPBasedOnSummonDamage: Standard;
+    increasedSlayerCoinsPerDamage: Standard;
+    decreasedSlayerCoinsPerDamage: Standard;
+    increasedChanceToIncreaseSleepDuration: Standard;
+    decreasedChanceToIncreaseSleepDuration: Standard;
+    increasedChanceToAvoidStun: Standard;
+    decreasedChanceToAvoidStun: Standard;
+    increasedChanceToAvoidSleep: Standard;
+    decreasedChanceToAvoidSleep: Standard;
+    increasedHealWhenStunned: Standard;
+    decreasedHealWhenStunned: Standard;
+    increasedHealWhenSleep: Standard;
+    decreasedHealWhenSleep: Standard;
+    increasedChanceToApplyDeadlyPoisonWhenPoisoned: Standard;
+    decreasedChanceToApplyDeadlyPoisonWhenPoisoned: Standard;
+    increasedDamageTakenPerAttack: Standard;
+    decreasedDamageTakenPerAttack: Standard;
+    increasedDamageTakenWhenAsleep: Standard;
+    decreasedDamageTakenWhenAsleep: Standard;
+    increasedDamageTakenWhenStunned: Standard;
+    decreasedDamageTakenWhenStunned: Standard;
+    decreasedPlayerDamageReduction: Standard;
+    increasedDamageDealtIfPoisoned: Standard;
+    decreasedDamageDealtIfPoisoned: Standard;
+    increasedMeleeMaxHitFlat: Standard;
+    decreasedMeleeMaxHitFlat: Standard;
+    increasedRangedMaxHitFlat: Standard;
+    decreasedRangedMaxHitFlat: Standard;
+    increasedMagicMaxHitFlat: Standard;
+    decreasedMagicMaxHitFlat: Standard;
+    increasedChanceToApplyShock: Standard;
+    increasedAbsorbingSkin: Standard;
+    increasedDuality: Standard;
+    increasedChanceToApplyDecayCurse: Standard;
+    increasedRage: Standard;
+    increasedCurseLifesteal: Standard;
+    applyRandomCurseOnSpawn: Standard;
+    increasedChanceDarkBlade: Standard;
+    /** Increases Max Hit for each 1% of Damage Reduction the Player has */
+    increasedMaxHitPercentBasedOnDamageReduction: Standard;
+    /** Decreases Max Hit for each 1% of Damage Reduction the Player has */
+    decreasedMaxHitPercentBasedOnDamageReduction: Standard;
+    halveDamageReduction: Standard;
+    increasedLifestealBasedOnHPRegenEffectiveness: Standard;
+    disableHPRegeneration: Standard;
+    increasedMinMeteorShowerSpellDamage: Standard;
+    increasedEndOfTurnEvasion2: Standard;
+    decreaseEnemyEvasionOnStun: Standard;
+    decreaseEnemyEvasionOnSleep: Standard;
+    decreasedEvasionBasedOnDR: Standard;
+    healOnHitBasedOnTargetDR: Standard;
+    doubleLifesteal: Standard;
+    increasedMaxHPBurnDamage: Standard;
+    increasedChanceToApplyDeadlyPoison: Standard;
+    disableLifesteal: Standard;
+    increasedSlayerCoinsBasedOnTargetDR: Standard;
+    increasedSlayerCoinsPerPoisonDamage: Standard;
+    increasedChanceToAvoidCurses: Standard;
+    applyMadnessCurseOnSpawn: Standard;
+    applyTormentCurseOnSpawn: Standard;
+    applyDespairCurseOnSpawn: Standard;
+    /** Increases min hit by value*numberMultiplier when using Archaic spells that use Poison Runes */
+    increasedMinPoisonArchaicDmg: Standard;
+    /** Increases min hit by value*numberMultiplier when using Archaic spells that use Infernal Runes */
+    increasedMinInfernalArchaicDmg: Standard;
+    /** Increases min hit by value*numberMultiplier when using Archaic spells that use Lightning Runes */
+    increasedMinLightningArchaicDmg: Standard;
+    reducedTargetDamageRedcutionIfBleeding: Standard;
+    increasedAssassin: Standard;
+    growingMadnessPassive: Standard;
+    momentInTimePassive: Standard;
+    reignOverTimePassive: Standard;
+    increasedChanceToApplySleepToTargetWhenHit: Standard;
+    /** @deprecated Has no effect. Replaced by Item Effect system */
+    increasedPlayerRage: Standard;
+    /** @deprecated Has no effect. Replaced by Item Effect system */
+    increasedLeviathan: Standard;
+    shadowCloak: Standard;
+    /** Increased accuracy when using Archaic spells that use Poison Runes */
+    increasedPoisonSpellAccuracy: Standard;
+    /** Increased accuracy when using Archaic spells that use Infernal Runes */
+    increasedInfernalSpellAccuracy: Standard;
+    /** Increased accuracy when using Archaic spells that use Lightning Runes */
+    increasedLightningSpellAccuracy: Standard;
+    decreasedBurnDOTDamage: Standard;
+    increasedBurnDOTDamage: Standard;
+    decreasedBleedDOTDamage: Standard;
+    increasedBleedDOTDamage: Standard;
+    increasedPoisonDOTDamage: Standard;
+    decreasedPoisonDOTDamage: Standard;
+    increasedDeadlyPoisonDOTDamage: Standard;
+    decreasedDeadlyPoisonDOTDamage: Standard;
+    increased30Slow5TurnsChance: Standard;
+    increasedEndOfTurnMaxHealing2: Standard;
+    increasedEvasionAgainstMelee: Standard;
+    increasedEvasionAgainstRanged: Standard;
+    increasedEvasionAgainstMagic: Standard;
 }
 /** Modifiers that are only common to the player */
 interface StandardModifierObject<Standard> extends CombatModifierObject<Standard> {
@@ -974,84 +1559,99 @@ interface StandardModifierObject<Standard> extends CombatModifierObject<Standard
     decreasedGPOnEnemyHit: Standard;
     increasedAdditionalRunecraftCountRunes: Standard;
     decreasedAdditionalRunecraftCountRunes: Standard;
-    summoningSynergy_0_1: Standard;
-    summoningSynergy_0_6: Standard;
-    summoningSynergy_0_7: Standard;
-    summoningSynergy_0_8: Standard;
-    summoningSynergy_0_12: Standard;
-    summoningSynergy_0_13: Standard;
-    summoningSynergy_0_14: Standard;
-    summoningSynergy_0_15: Standard;
+    increasedGPFromMonstersFlatBasedOnEvasion: Standard;
+    increasedGPPerMeleeDamage: Standard;
+    increasedGPPerRangedDamage: Standard;
+    increasedGPPerMagicDamage: Standard;
+    increasedGPFromSlayerTaskMonsters: Standard;
+    increasedGPWhenHitBasedOnDR: Standard;
+    increasedGPOnRegenBasedOnHPGain: Standard;
+    increasedGPFromBurningMonsters: Standard;
+    /** @deprecated Unused Modifier */
     summoningSynergy_1_2: Standard;
-    summoningSynergy_1_8: Standard;
-    summoningSynergy_1_12: Standard;
-    summoningSynergy_1_13: Standard;
-    summoningSynergy_1_14: Standard;
+    increasedFlatMagicDefenceBonus: Standard;
+    decreasedSlayerTaskMonsterAccuracy: Standard;
+    increasedMeleeRangedDefenceBonusBasedOnDR: Standard;
+    increasedHPRegenWhenEnemyHasMoreEvasion: Standard;
+    /** @deprecated Unused Modifier */
     summoningSynergy_1_15: Standard;
-    summoningSynergy_2_12: Standard;
-    summoningSynergy_2_13: Standard;
-    summoningSynergy_2_15: Standard;
-    summoningSynergy_3_4: Standard;
-    summoningSynergy_3_5: Standard;
+    increasedSCfromLifesteal: Standard;
+    increasedHealingOnAttackBasedOnDR: Standard;
+    increasedSummoningAttackLifesteal: Standard;
+    increasedWoodcuttingGemChance: Standard;
+    increasedBonusFishingSpecialChance: Standard;
+    /** @deprecated Unused Modifier */
     summoningSynergy_3_9: Standard;
-    summoningSynergy_3_10: Standard;
-    summoningSynergy_3_11: Standard;
-    summoningSynergy_3_16: Standard;
+    increasedRunecraftingStavePreservation: Standard;
+    summoningSynergy_Ent_Leprechaun: Standard;
+    increasedWoodcuttingJewelryChance: Standard;
     summoningSynergy_3_17: Standard;
-    summoningSynergy_3_18: Standard;
+    increasedMinimumBirdNestsWhenPotionActive: Standard;
+    /** @deprecated Unused Modifier */
     summoningSynergy_3_19: Standard;
     summoningSynergy_4_5: Standard;
-    summoningSynergy_4_9: Standard;
-    summoningSynergy_4_10: Standard;
-    summoningSynergy_4_11: Standard;
-    summoningSynergy_4_16: Standard;
-    summoningSynergy_4_17: Standard;
-    summoningSynergy_4_18: Standard;
+    decreasedCookingSuccessCap: Standard;
+    doubleRuneEssenceMining: Standard;
+    summoningSynergy_Mole_Leprechaun: Standard;
+    doubleSilverGoldMining: Standard;
+    increasedMiningBarChance: Standard;
+    increasedMiningNodeHPWithPerfectSwing: Standard;
+    /** @deprecated Unused Modifier */
     summoningSynergy_4_19: Standard;
-    summoningSynergy_5_9: Standard;
-    summoningSynergy_5_10: Standard;
-    summoningSynergy_5_11: Standard;
-    summoningSynergy_5_16: Standard;
-    summoningSynergy_5_17: Standard;
-    summoningSynergy_5_18: Standard;
+    increasedFishingCookedChance: Standard;
+    increasedRunecraftingWaterComboRunes: Standard;
+    summoningSynergy_Octopus_Leprechaun: Standard;
+    increasedCraftingJewelryRandomGemChance: Standard;
+    increasedSmithingDragonGearPreservation: Standard;
+    increasedFishermansPotionCharges: Standard;
+    /** @deprecated Unused Modifier */
     summoningSynergy_6_7: Standard;
-    summoningSynergy_6_8: Standard;
-    summoningSynergy_6_12: Standard;
+    increasedMagicMinHitBasedOnMaxHitSlayerTask: Standard;
+    increasedMeleeMaxHitBasedOnMaxHitSlayerTask: Standard;
+    /** @deprecated Unused Modifier */
     summoningSynergy_6_13: Standard;
-    summoningSynergy_6_14: Standard;
+    increasedFlatHPRegenBasedOnMeleeMaxHit: Standard;
+    /** @deprecated Unused Modifier */
     summoningSynergy_6_15: Standard;
+    /** @deprecated Unused Modifier */
     summoningSynergy_7_8: Standard;
-    summoningSynergy_7_12: Standard;
+    increasedRangedMaxHitBasedOnMaxHitSlayerTask: Standard;
+    /** @deprecated Unused Modifier */
     summoningSynergy_7_13: Standard;
-    summoningSynergy_7_14: Standard;
-    summoningSynergy_7_15: Standard;
-    summoningSynergy_8_12: Standard;
+    increasedFlatHPRegenBasedOnRangedMaxHit: Standard;
+    increasedChanceToApplyBurnWithRanged: Standard;
+    increasedSlayerCoinsPerMagicDamageSlayerTask: Standard;
+    /** @deprecated Unused Modifier */
     summoningSynergy_8_13: Standard;
-    summoningSynergy_8_14: Standard;
+    increasedFlatHPRegenBasedOnMagicMaxHit: Standard;
     increasedRunecraftingEssencePreservation: Standard;
-    summoningSynergy_9_11: Standard;
-    summoningSynergy_9_16: Standard;
+    thievingChefNoDamage: Standard;
+    decreasedFlatCraftingDragonhideCost: Standard;
+    /** @deprecated Unused Modifier */
     summoningSynergy_9_17: Standard;
-    summoningSynergy_9_18: Standard;
+    increasedGenerousCookPotionCharges: Standard;
+    /** @deprecated Unused Modifier */
     summoningSynergy_9_19: Standard;
-    summoningSynergy_10_11: Standard;
-    summoningSynergy_10_16: Standard;
+    increasedRuneEssenceThievingMiner: Standard;
+    increasedChanceToDoubleLeatherDragonhideCrafting: Standard;
+    /** @deprecated Unused Modifier */
     summoningSynergy_10_17: Standard;
-    summoningSynergy_10_18: Standard;
-    summoningSynergy_10_19: Standard;
-    summoningSynergy_11_16: Standard;
-    summoningSynergy_11_17: Standard;
-    summoningSynergy_11_18: Standard;
-    summoningSynergy_11_19: Standard;
-    summoningSynergy_12_13: Standard;
-    summoningSynergy_12_14: Standard;
+    giveRandomComboRunesRunecrafting: Standard;
+    increasedFireRunesWhenMakingElementalRunes: Standard;
+    increasedThievingAutoSellPrice: Standard;
+    increasedRandomBarChanceThievingMiner: Standard;
+    increasedHerbSackChanceThievingFarmer: Standard;
+    summoningSynergy_Leprechaun_Devil: Standard;
+    increasedDamageReductionAgainstSlayerTasks: Standard;
+    increasedHitpointRegenerationAgainstSlayerTasks: Standard;
+    /** @deprecated Unused Modifier */
     summoningSynergy_13_14: Standard;
-    summoningSynergy_16_17: Standard;
-    summoningSynergy_16_18: Standard;
-    summoningSynergy_16_19: Standard;
-    summoningSynergy_17_18: Standard;
-    summoningSynergy_17_19: Standard;
-    summoningSynergy_18_19: Standard;
+    increasedCraftingJewelryPreservation: Standard;
+    increasedCraftingPotionCharges: Standard;
+    increasedFiremakingLogGP: Standard;
+    doubleSilverGoldSmithingWithSeeingGold: Standard;
+    decreasedFlatSmithingCoalCost: Standard;
+    summoningSynergy_Bear_Devil: Standard;
     increasedChanceToConvertSeedDrops: Standard;
     /** Increases melee strength bonus of equipment by %*/
     increasedMeleeStrengthBonus: Standard;
@@ -1069,6 +1669,7 @@ interface StandardModifierObject<Standard> extends CombatModifierObject<Standard
     increasedAgilityObstacleCost: Standard;
     /** Decreases all costs of agility obstacles by % */
     decreasedAgilityObstacleCost: Standard;
+    /** @deprecated Unused Modifier */
     decreasedSecondaryFoodBurnChance: Standard;
     freeCompost: Standard;
     increasedCompostPreservationChance: Standard;
@@ -1092,7 +1693,7 @@ interface StandardModifierObject<Standard> extends CombatModifierObject<Standard
     increasedRedemptionPercent: Standard;
     autoLooting: Standard;
     autoBurying: Standard;
-    increasedCombatStoppingThreshold: Standard;
+    freeProtectItem: Standard;
     increasedSummoningChargePreservation: Standard;
     decreasedSummoningChargePreservation: Standard;
     increasedSummoningCreationCharges: Standard;
@@ -1140,7 +1741,223 @@ interface StandardModifierObject<Standard> extends CombatModifierObject<Standard
     decreasedAllotmentSeedCost: Standard;
     increasedSummoningMaxHit: Standard;
     decreasedSummoningMaxHit: Standard;
-    masteryToken: Standard;
+    increasedChanceForDiamondFiremaking: Standard;
+    decreasedChanceForDiamondFiremaking: Standard;
+    increasedNonMagicPoisonChance: Standard;
+    /** % Chance to preserve food when eaten */
+    increasedChanceToPreserveFood: Standard;
+    allowLootContainerStacking: Standard;
+    infiniteLootContainer: Standard;
+    increasedBaseStardustDropQty: Standard;
+    increasedGPFromFiremaking: Standard;
+    decreasedGPFromFiremaking: Standard;
+    increasedWoodcuttingXPAddedAsFiremakingXP: Standard;
+    decreasedWoodcuttingXPAddedAsFiremakingXP: Standard;
+    increasedChanceForOneExtraOre: Standard;
+    decreasedChanceForOneExtraOre: Standard;
+    increasedChanceForQualitySuperiorGem: Standard;
+    decreasedChanceForQualitySuperiorGem: Standard;
+    increasedMeteoriteOre: Standard;
+    increasedChanceForAshInWoodcutting: Standard;
+    decreasedChanceForAshInWoodcutting: Standard;
+    increasedChanceForAshInFiremaking: Standard;
+    decreasedChanceForAshInFiremaking: Standard;
+    increasedChanceForStardustInFiremaking: Standard;
+    decreasedChanceForStardustInFiremaking: Standard;
+    increasedChanceForOneExtraFish: Standard;
+    decreasedChanceForOneExtraFish: Standard;
+    doubleBoneDrops: Standard;
+    /** Increases % GP gained from Agility Obstacles that contain a negative Modifier */
+    increasedGPFromNegativeObstacles: Standard;
+    /** Decreases % GP gained from Agility Obstacles that contain a negative Modifier */
+    decreasedGPFromNegativeObstacles: Standard;
+    /** Increases % Skill XP gained from Agility Obstacles that contain a negative Modifier */
+    increasedXPFromNegativeObstacles: Standard;
+    /** Decreases % Skill XP gained from Agility Obstacles that contain a negative Modifier */
+    decreasedXPFromNegativeObstacles: Standard;
+    /** Increases % Mastery XP gained from Agility Obstacles that contain a negative Modifier */
+    increasedMasteryXPFromNegativeObstacles: Standard;
+    /** Decreases % Mastery XP gained from Agility Obstacles that contain a negative Modifier */
+    decreasedMasteryXPFromNegativeObstacles: Standard;
+    /** Increases % chance to locate Golden Stardust in Astrology */
+    increasedChanceGoldenStardust: Standard;
+    /** Decreases % chance to locate Golden Stardust in Astrology */
+    decreasedChanceGoldenStardust: Standard;
+    increasedChanceStardust: Standard;
+    decreasedChanceStardust: Standard;
+    decreasedThievingStunIntervalPercent: Standard;
+    increasedThievingStunIntervalPercent: Standard;
+    decreasedGlobalSkillIntervalPercent: Standard;
+    increasedGlobalSkillIntervalPercent: Standard;
+    doubleLogProduction: Standard;
+    increasedChanceForArrowShaftsWoodcutting: Standard;
+    decreasedChanceForArrowShaftsWoodcutting: Standard;
+    decreasedNonShardCostForEquippedTablets: Standard;
+    increasedNonShardCostForEquippedTablets: Standard;
+    decreasedPassiveCookInterval: Standard;
+    increasedPassiveCookInterval: Standard;
+    increasedSalamanderCreationCharges: Standard;
+    decreasedSalamanderCreationCharges: Standard;
+    decreasedJavelinResourceCost: Standard;
+    increasedJavelinResourceCost: Standard;
+    increasedJavelinProduction: Standard;
+    decreasedJavelinProduction: Standard;
+    increasedChanceExtraJavelins: Standard;
+    decreasedChanceExtraJavelins: Standard;
+    increasedChanceExtraMeteoriteOre: Standard;
+    decreasedChanceExtraMeteoriteOre: Standard;
+    increasedChanceExtraArrows: Standard;
+    decreasedChanceExtraArrows: Standard;
+    increasedChanceExtraUnstrungBows: Standard;
+    decreasedChanceExtraUnstrungBows: Standard;
+    increasedChanceItemToGoldFletching: Standard;
+    decreasedChanceItemToGoldFletching: Standard;
+    increasedLeprechaunCreationCharges: Standard;
+    decreasedLeprechaunCreationCharges: Standard;
+    increasedGPFromAgilityPerActiveObstacle: Standard;
+    decreasedGPFromAgilityPerActiveObstacle: Standard;
+    increasedChanceExtraCrossbows: Standard;
+    decreasedChanceExtraCrossbows: Standard;
+    disableGoldenStardustDrops: Standard;
+    increasedBoltProduction: Standard;
+    decreasedBoltProduction: Standard;
+    decreasedFletchingIntervalWithArrows: Standard;
+    increasedFletchingIntervalWithArrows: Standard;
+    increasedCyclopsCreationCharges: Standard;
+    decreasedCyclopsCreationCharges: Standard;
+    increasedGPFromItemAlchemy: Standard;
+    increasedChanceForCharcoalInFiremaking: Standard;
+    decreasedChanceForCharcoalInFiremaking: Standard;
+    increasedThievingAreaUniqueChance: Standard;
+    decreasedThievingAreaUniqueChance: Standard;
+    increasedChanceToFindMeteorite: Standard;
+    increasedChanceToFindMushroomWoodcutting: Standard;
+    increasedChanceToAvoidThievingStuns: Standard;
+    increasedChanceAdditionalPerfectItem: Standard;
+    increasedChanceStardustCuttingMagicLogs: Standard;
+    increasedTownshipPopulationCap: Standard;
+    decreasedTownshipPopulationCap: Standard;
+    increasedTownshipHappiness: Standard;
+    decreasedTownshipHappiness: Standard;
+    increasedTownshipEducation: Standard;
+    decreasedTownshipEducation: Standard;
+    increasedTownshipHealth: Standard;
+    decreasedTownshipHealth: Standard;
+    increasedTownshipGPProduction: Standard;
+    decreasedTownshipGPProduction: Standard;
+    increasedTownshipMaxStorage: Standard;
+    decreasedTownshipMaxStorage: Standard;
+    increasedTownshipFoodProduction: Standard;
+    decreasedTownshipFoodProduction: Standard;
+    increasedTownshipWoodProduction: Standard;
+    decreasedTownshipWoodProduction: Standard;
+    increasedTownshipOreProduction: Standard;
+    decreasedTownshipOreProduction: Standard;
+    increasedTownshipStoneProduction: Standard;
+    decreasedTownshipStoneProduction: Standard;
+    increasedTownshipCoalProduction: Standard;
+    decreasedTownshipCoalProduction: Standard;
+    increasedTownshipBarProduction: Standard;
+    decreasedTownshipBarProduction: Standard;
+    increasedTownshipHerbProduction: Standard;
+    decreasedTownshipHerbProduction: Standard;
+    increasedTownshipRuneEssenceProduction: Standard;
+    decreasedTownshipRuneEssenceProduction: Standard;
+    increasedTownshipLeatherProduction: Standard;
+    decreasedTownshipLeatherProduction: Standard;
+    increasedTownshipPotionProduction: Standard;
+    decreasedTownshipPotionProduction: Standard;
+    increasedTownshipPlankProduction: Standard;
+    decreasedTownshipPlankProduction: Standard;
+    increasedTownshipClothingProduction: Standard;
+    decreasedTownshipClothingProduction: Standard;
+    increasedTownshipBuildingCost: Standard;
+    decreasedTownshipBuildingCost: Standard;
+    increasedTownshipGrasslandsProduction: Standard;
+    decreasedTownshipGrasslandsProduction: Standard;
+    increasedTownshipForestProduction: Standard;
+    decreasedTownshipForestProduction: Standard;
+    increasedTownshipDesertProduction: Standard;
+    decreasedTownshipDesertProduction: Standard;
+    increasedTownshipWaterProduction: Standard;
+    decreasedTownshipWaterProduction: Standard;
+    increasedTownshipSwampProduction: Standard;
+    decreasedTownshipSwampProduction: Standard;
+    increasedTownshipAridPlainsProduction: Standard;
+    decreasedTownshipAridPlainsProduction: Standard;
+    increasedTownshipMountainsProduction: Standard;
+    decreasedTownshipMountainsProduction: Standard;
+    increasedTownshipValleyProduction: Standard;
+    decreasedTownshipValleyProduction: Standard;
+    increasedTownshipJungleProduction: Standard;
+    decreasedTownshipJungleProduction: Standard;
+    increasedTownshipSnowlandsProduction: Standard;
+    decreasedTownshipSnowlandsProduction: Standard;
+    increasedTownshipFishingDockProduction: Standard;
+    decreasedTownshipFishingDockProduction: Standard;
+    increasedTownshipMagicEmporiumProduction: Standard;
+    decreasedTownshipMagicEmporiumProduction: Standard;
+    increasedTownshipOrchardProduction: Standard;
+    decreasedTownshipOrchardProduction: Standard;
+    increasedTownshipFarmProduction: Standard;
+    decreasedTownshipFarmProduction: Standard;
+    increasedTownshipWoodcuttingProduction: Standard;
+    decreasedTownshipWoodcuttingProduction: Standard;
+    increasedTownshipBlacksmithProduction: Standard;
+    decreasedTownshipBlacksmithProduction: Standard;
+    increasedTownshipTaxPerCitizen: Standard;
+    decreasedTownshipTaxPerCitizen: Standard;
+    townshipDisableHunting: Standard;
+    increasedTownshipResourceProduction: Standard;
+    decreasedTownshipResourceProduction: Standard;
+    increasedTownshipCoalUsage: Standard;
+    decreasedTownshipCoalUsage: Standard;
+    increasedTownshipBuildingHappinessPenalties: Standard;
+    decreasedTownshipBuildingHappinessPenalties: Standard;
+    increasedAdditionalAshInFiremaking: Standard;
+    decreasedAdditionalAshInFiremaking: Standard;
+    increasedTownshipFoodUsage: Standard;
+    decreasedTownshipFoodUsage: Standard;
+    increasedChanceToFindLostChest: Standard;
+    increasedChanceToPreserveConsumable: Standard;
+    increasedTownshipDeadStorage: Standard;
+    decreasedTownshipDeadStorage: Standard;
+    /** Big old ron modifiers */
+    bigRon: Standard;
+    /** Gives coal amount when failing to cook */
+    coalGainedOnCookingFailure: Standard;
+    /** Chance to double logs while Woodcutting is halved */
+    halvedWoodcuttingDoubleChance: Standard;
+    increasedFlatFarmingYield: Standard;
+    decreasedFlatFarmingYield: Standard;
+    summoningSynergy_Devil_Eagle: Standard;
+    increasedDeadlyToxinsFromHerblore: Standard;
+    increasedSummoningCreationChargesForEquippedTablets: Standard;
+    decreasedSummoningIntervalPercentForEquippedTablets: Standard;
+    increasedMinBirdNestQuantity: Standard;
+    increasedGemVeinChance: Standard;
+    decreasedGemVeinChance: Standard;
+    increasedChanceAdditionalBarSmithing: Standard;
+    increasedFletchingBoltQuantity: Standard;
+    increasedAgilityPillarCost: Standard;
+    decreasedAgilityPillarCost: Standard;
+    increasedNonCombatSkillXP: Standard;
+    decreasedNonCombatSkillXP: Standard;
+    increasedFlatMeleeDefenceBonus: Standard;
+    increasedFlatRangedDefenceBonus: Standard;
+    increasedFlatStabAttackBonus: Standard;
+    increasedFlatSlashAttackBonus: Standard;
+    increasedFlatBlockAttackBonus: Standard;
+    increasedFlatRangedAttackBonus: Standard;
+    increasedFlatMagicAttackBonus: Standard;
+    increasedFlatMeleeStrengthBonus: Standard;
+    increasedFlatRangedStrengthBonus: Standard;
+    disableSalamanderItemReduction: Standard;
+    decreasedSummoningIntervalForOctopus: Standard;
+    increasedMasteryPoolCap: Standard;
+    bypassAllSlayerItems: Standard;
+    increased5DROnBeingHit: Standard;
+    allowNonMagicCurses: Standard;
 }
 interface SkillModifierObject<Skill> {
     /** Increases the skill level used to compute combat stats by value: Implemented */
@@ -1171,20 +1988,42 @@ interface SkillModifierObject<Skill> {
     increasedChanceToDoubleItemsSkill: Skill;
     /** Decreases the % chance to double items from a skill by value: Partially Implemented. */
     decreasedChanceToDoubleItemsSkill: Skill;
+    /** Increased % chance to received +1 item in a skill (Cannot be doubled) */
     increasedChanceAdditionalSkillResource: Skill;
+    /** Decreased % chance to received +1 item in a skill (Cannot be doubled) */
     decreasedChanceAdditionalSkillResource: Skill;
     /** Doubles the items received from a skill: Implemented for skills that have this modifier */
     doubleItemsSkill: Skill;
+    /** Increases resource preservation cap in a skill */
+    increasedSkillPreservationCap: Skill;
+    /** Decreases resource preservation cap in a skill */
+    decreasedSkillPreservationCap: Skill;
+    increasedSkillMasteryXPPerDeedree: Skill;
+    increasedSkillMasteryXPPerAmeria: Skill;
+    increasedSkillMasteryXPPerVale: Skill;
+    increasedSkillMasteryXPPerQimican: Skill;
+    increasedSkillMasteryXPPerKo: Skill;
+    increasedSkillMasteryXPPerArachi: Skill;
+    increasedSkillMasteryXPPerIridan: Skill;
+    increasedSkillMasteryXPPerHyden: Skill;
+    increasedSkillMasteryXPPerSyllia: Skill;
+    /** Dummy modifier for adding mastery pool xp */
+    masteryToken: Skill;
+}
+interface SkillModifierData {
+    skillID: string;
+    value: number;
+}
+interface SkillModifier {
+    skill: AnySkill;
+    value: number;
 }
 declare type ModifierObject<Skill, Standard> = StandardModifierObject<Standard> & SkillModifierObject<Skill>;
-declare type SkillModifierData = [SkillID, number];
-declare type SkillModifierActive = {
-    id: SkillID;
-    value: number;
-};
+declare type PlayerModifierData = Partial<ModifierObject<SkillModifierData[], number>>;
+declare type PlayerModifierObject = Partial<ModifierObject<SkillModifier[], number>>;
+declare type OldSkillModifierData = [number, number];
 declare type CombatModifierData = Partial<CombatModifierObject<number>>;
-declare type ModifierData = Partial<ModifierObject<SkillModifierData[], number>>;
-declare type ModifierActive = Partial<ModifierObject<SkillModifierActive[], number>>;
+declare type OldPlayerModifierData = Partial<ModifierObject<OldSkillModifierData[], number>>;
 declare type CombatModifierKey = keyof CombatModifierObject<any>;
 declare type ModifierKeys = keyof ModifierObject<any, any>;
 declare type SkillModifierKeys = keyof SkillModifierObject<any>;
@@ -1192,5 +2031,14 @@ declare type StandardModifierKeys = keyof StandardModifierObject<any>;
 declare type SkillEntry<T> = [SkillModifierKeys, T];
 declare type StandardEntry<T> = [StandardModifierKeys, T];
 declare type ModifierEntry<Skill, Standard> = SkillEntry<Skill> | StandardEntry<Standard>;
-declare type ModifierDataEntry = ModifierEntry<SkillModifierData[], number>;
-declare type ModifierActiveEntry = ModifierEntry<SkillModifierActive[], number>;
+declare type ModifierDataEntry = ModifierEntry<OldSkillModifierData[], number>;
+declare type SkillModifierArrayElement = {
+    key: SkillModifierKeys;
+    values: SkillModifier[];
+};
+declare type StandardModifierArrayElement = {
+    key: StandardModifierKeys;
+    value: number;
+};
+declare type ModifierArrayElement = SkillModifierArrayElement | StandardModifierArrayElement;
+declare type ModifierArray = ModifierArrayElement[];

@@ -6,7 +6,7 @@ declare class EnemyAttackPassiveMenu {
     private attackDescCont;
     private maxhitSpans;
     constructor(isCombat: boolean);
-    render(passives: Set<CombatPassive>, attackSelection: AttackSelection[], character: Character): void;
+    render(passives: Map<CombatPassive, ActivePassive>, attackSelection: AttackSelection[], character: Character): void;
     renderMaxhits(attackSelection: AttackSelection[], character: Character): void;
     private renderPassives;
     private hidePassives;

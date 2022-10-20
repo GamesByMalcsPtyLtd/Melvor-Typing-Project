@@ -1,43 +1,48 @@
 /** Base Class for Combat Managers */
-declare abstract class BaseManager {
+declare abstract class BaseManager extends NamespacedObject implements Serializable, EncodableObject, ActiveAction {
+    protected game: Game;
+    abstract media: string;
+    abstract activeSkills: AnySkill[];
+    abstract name: string;
     abstract player: Player;
     abstract enemy: Enemy;
-    areaType: LocationType;
+    /** The Type of combat area the player is currently in */
+    abstract areaType: CombatAreaType;
     fightInProgress: boolean;
     protected spawnTimer: Timer;
-    abstract bank: BankHelper;
+    abstract bank: Bank;
     notifications: NotificationQueue;
-    tickCount: number;
-    ticksMissed: number;
     allowDuplicateDOTS: boolean;
-    isInCombat: boolean;
-    private runButton;
-    private miniBar;
-    private viewDropsButton;
+    isActive: boolean;
+    giveFreeDeath: boolean;
     rendersRequired: ManagerRenderQueue;
-    protected locationElements: {
-        image: HTMLImageElement;
-        name: HTMLSpanElement;
-        floorCount: HTMLSpanElement;
-        count: HTMLSpanElement;
-        areaEffect: HTMLSpanElement;
-    };
+    shouldResetAction: boolean;
+    private _dotID;
+    get dotID(): number;
     abstract readonly isFightingITMBoss: boolean;
     abstract readonly canInteruptAttacks: boolean;
-    abstract readonly areaRequirements: Requirement[];
-    abstract readonly areaModifiers: ModifierData;
+    abstract readonly areaRequirements: AnyRequirement[];
+    abstract readonly slayerAreaLevelReq: number;
+    abstract readonly playerAreaModifiers: PlayerModifierObject;
+    abstract readonly enemyAreaModifiers: CombatModifierData;
     abstract readonly onSlayerTask: boolean;
-    constructor();
+    /** If the level and requirements of spells should be ignored */
+    abstract readonly ignoreSpellRequirements: boolean;
+    constructor(game: Game, namespace: DataNamespace, id: string);
     initialize(): void;
     protected setCallbacks(): void;
     private minibarEatCallback;
     private minibarRunCallback;
-    tick(): void;
+    minibarShowHoldToEat(): void;
+    minibarHideHoldToEat(): void;
+    abstract activeTick(): void;
     /** Renders combat in current state */
     render(): void;
+    getErrorLog(): string;
     protected abstract renderLocation(): void;
+    private renderSpellBook;
     /** Checks for player or enemy death */
-    protected checkDeath(): void;
+    checkDeath(): void;
     protected onPlayerDeath(): void;
     /** Called on enemy death, returns if combat should be stopped as a result */
     protected onEnemyDeath(): boolean;
@@ -45,26 +50,30 @@ declare abstract class BaseManager {
     addCombatStat(statID: CombatStats, amount?: number): void;
     protected onSelection(): void;
     /** Callback function for running from combat */
-    stopCombat(fled?: boolean): void;
-    protected showMinibar(): void;
-    protected hideMinibar(): void;
+    stop(fled?: boolean): boolean;
     protected loadNextEnemy(): void;
     /** Spawns a new enemy when the spawn timer fires */
     protected spawnEnemy(): void;
+    private uniqueUpdatesOnEnemySpawn;
     private statUpdateOnEnemySpawn;
-    protected startFight(): void;
+    protected startFight(tickOffset?: boolean): void;
     /** Ends the fight the player is currently in */
     protected endFight(): void;
     protected abstract createNewEnemy(): void;
     /** Function to execute on changing to the combat page */
     onPageChange(): void;
-    serialize(): number[];
-    deserialize(reader: DataReader, version: number): void;
+    protected resetActionState(): void;
+    encode(writer: SaveWriter): SaveWriter;
+    decode(reader: SaveWriter, version: number): void;
+    deserialize(reader: DataReader, version: number, idMap: NumericIDMap): void;
 }
 interface ManagerRenderQueue {
-    combatStats: boolean;
     location: boolean;
-    dungeonCompletion: boolean;
-    completionLog: boolean;
     pause: boolean;
+    slayerAreaEffects: boolean;
+    eventMenu: boolean;
+    /** Updates all combat/slayer/dungeons requirements */
+    areaRequirements: boolean;
+    /** Updates the currently open spellbook */
+    spellBook: boolean;
 }

@@ -8,39 +8,43 @@ declare class PlayerStats extends CharacterStats {
 }
 declare class Player extends Character {
     protected manager: BaseManager;
-    equipmentSets: Equipment[];
+    equipmentSets: EquipmentSet[];
     selectedEquipmentSet: number;
-    activePrayers: Set<number>;
+    get activePrayers(): Set<ActivePrayer>;
     food: EquippedFood;
     protected timers: PlayerTimers;
     private attackStyles;
-    private _slayercoins;
     equipToSet: number;
-    equipQuantity: number;
     modifiers: PlayerModifiers;
     noun: Noun;
-    runesProvided: Map<number, number>;
+    runesProvided: Map<AnyItem, number>;
     prayerPoints: number;
     target: Character;
     stats: PlayerStats;
+    private eatTimeout;
+    allowToEatFromTimeout: boolean;
+    quickEquipMenu: CombatQuickEquipMenu;
     rendersRequired: PlayerRenderQueue;
     protected get activeTriangle(): TriangleData;
-    protected statElements: PlayerHTMLElements;
-    protected splashManager: SplashManager;
-    protected effectRenderer: EffectRenderer;
-    protected attackBar: ProgressBar;
-    protected summonBar: ProgressBar;
+    protected get statElements(): PlayerHTMLElements;
+    protected get splashManager(): SplashManager;
+    protected get effectRenderer(): EffectRenderer;
+    protected get attackBar(): ProgressBar;
+    protected get attackBarMinibar(): ProgressBar;
     protected activeSummonSlots: ('Summon1' | 'Summon2')[];
+    protected statProviders: Set<StatProvider>;
+    activeItemSynergies: Set<ItemSynergy>;
+    /** Currently active summoning synergy. Undefined if none active. */
+    protected activeSummoningSynergy?: SummoningSynergy;
     chargesUsed: {
         Summon1: number;
         Summon2: number;
     };
     private summonAttackInterval;
-    private synergy_1_2_isActive;
-    private itemReflexives;
-    get slayercoins(): number;
+    private itemEffects;
     get equipment(): Equipment;
-    protected get attackStyle(): AttackStyleData;
+    get spellSelection(): SpellSelection;
+    protected get attackStyle(): AttackStyle | undefined;
     /** Player automatically eats below this HP */
     protected get autoEatThreshold(): number;
     /** Player automatically eats to this HP */
@@ -48,6 +52,7 @@ declare class Player extends Character {
     /** Player automatically eats food at this efficiency */
     protected get autoEatEfficiency(): number;
     protected get minHitFromMaxHitPercent(): number;
+    /** Returns a description of the current synergy */
     get synergyDescription(): string;
     get numEquipSets(): number;
     /** Modified max cost of all active prayers */
@@ -55,78 +60,104 @@ declare class Player extends Character {
     private _pets;
     get pets(): number;
     set pets(value: number);
-    constructor(manager: BaseManager);
+    get bigOlRonModifiers(): PlayerModifierObject;
+    /** If the player should use combination runes for spellcasting */
+    protected get useCombinationRunes(): boolean;
+    protected get allowRegen(): boolean;
+    protected get addItemsToBankOnLoadFail(): boolean;
+    constructor(manager: BaseManager, game: Game);
+    setDefaultAttackStyles(): void;
     setCallbacks(): void;
     initialize(): void;
+    registerStatProvider(provider: StatProvider): void;
     setRenderAll(): void;
-    tick(): void;
+    activeTick(): void;
+    protected baseSpawnInterval: number;
+    getErrorLog(): string;
     getMonsterSpawnTime(): number;
-    checkEquipmentSetsForItem(itemID: ItemID): boolean;
+    isEquipmentSlotUnlocked(slot: SlotTypes): boolean;
+    /** Returns true if the given item is equipped in any equipment set */
+    checkEquipmentSetsForItem(item: EquipmentItem): boolean;
     /** Checks and unequips items that the player does not meet the requirements for */
     checkEquipmentRequirements(): void;
     protected modifyDamageReduction(reduction: number): number;
     computeAllStats(): void;
     computeCombatStats(): void;
-    private computeItemReflexiveList;
-    /** Checks equipped items with fight effects and removes/adds them if need be */
-    private checkItemReflexiveEffects;
-    /** Checks the usage of auroras/curses and disables them if they are not usable */
+    private computeItemEffectList;
+    /** Applies all item effects to the player */
+    private applyItemEffects;
+    /** Checks all item effects, removing or adding them as needed */
+    private checkItemEffects;
+    /** Resets the primary spell selection to Wind Strike */
+    private resetPrimarySpell;
+    /** Checks the usage of combat spells and disables them if they are not usable */
     protected checkMagicUsage(): void;
     protected computeLevels(): void;
-    protected getSkillLevel(skillID: number): number;
     protected getAccuracyValues(): BaseStatValues;
     protected computeAttackSelection(): void;
-    protected getSlotAttacks(slot: EquipSlot): Attack[];
+    protected getSlotAttacks(slot: EquipSlot): SpecialAttack[];
     protected computeRuneProvision(): void;
-    protected rollToHit(target: Character, attack: Attack): boolean;
+    protected rollToHit(target: Character, attack: SpecialAttack): boolean;
     damage(amount: number, source: SplashType, thieving?: boolean): void;
+    protected addPrayerPointsBasedOnDamage(amount: number): void;
     protected addHitpoints(amount: number): void;
-    protected setHitpoints(value: number): void;
+    setHitpoints(value: number): void;
     protected updateHPConditionals(computeStats?: boolean): void;
     protected autoEat(foodSwapped?: boolean): void;
-    getRuneCosts(spell: BaseSpell): ItemQuantity2[];
-    protected applyCurse(target: Character): void;
+    getRuneCosts(spell: BaseSpell): AnyItemQuantity[];
+    protected castCurseSpell(target: Character, curse: CurseSpell): void;
     protected onMagicAttackFailure(): void;
     protected onRangedAttackFailure(quiver: EquipmentItem): void;
     protected rewardForDamage(damage: number): void;
-    protected attack(target: Character, attack: Attack): number;
-    protected lifesteal(attack: Attack, damage: number): number;
+    protected attack(target: Character, attack: SpecialAttack): number;
+    protected lifesteal(attack: SpecialAttack, damage: number): number;
+    protected rewardForSummonDamage(damage: number): void;
     protected summonAttack(): void;
-    startSummonAttack(): void;
-    protected postAttack(): void;
+    startSummonAttack(tickOffset?: boolean): void;
+    protected postAttack(attack: SpecialAttack, attackType: AttackType): void;
     protected onHit(): void;
     protected onBeingHit(): void;
+    protected applyOnBeingHitEffects(): void;
     protected onMiss(): void;
-    trackWeaponStat(stat: Stats, amount?: number): void;
-    protected trackArmourStat(stat: Stats, amount?: number): void;
-    protected addItemStat(itemID: number, stat: Stats, amount: number): void;
-    protected consumeRunes(costs: ItemQuantity2[]): void;
-    consumeQuiver(type: QuiverConsumption): void;
+    trackWeaponStat(stat: ItemStats, amount?: number): void;
+    protected trackArmourStat(stat: ItemStats, amount?: number): void;
+    protected addItemStat(item: AnyItem, stat: ItemStats, amount: number): void;
+    protected consumeRunes(costs: AnyItemQuantity[]): void;
+    consumeEquipmentCharges(event: GameEvent, interval: number): void;
     private removeFromQuiver;
+    private removeFromConsumable;
     protected consumeAmmo(): void;
-    protected trackItemUsage(costs: ItemQuantity2[]): void;
+    protected trackItemUsage(costs: AnyItemQuantity[]): void;
     protected applyDOT(effect: DOTEffect, target: Character, damageDealt: number): boolean;
     protected getFlatReflectDamage(): number;
     protected applyDamageModifiers(target: Character, damage: number): number;
     protected applyTriangleToDamage(target: Character, damage: number): number;
     protected getDamageModifiers(target: Character): number;
-    equipCallback(itemID: number, slot: SlotTypes): void;
+    quickEquipItem(item: EquipmentItem, skill: AnySkill): void;
+    equipCallback(item: EquipmentItem, slot: SlotTypes, quantity?: number): void;
+    /** Attempts to quick equip the summons in a summoning synergy */
+    quickEquipSynergy(synergy: SummoningSynergy): void;
     /** Callback function for changing equipment set */
     changeEquipmentSet(setID: number): void;
+    changeEquipToSet(setID: number): void;
     /** Adds equipment sets based on the modifier value */
-    protected addEquipmentSets(): void;
+    protected updateEquipmentSets(): void;
     /** Perform stat recalculation and ui update, interrupt current player action */
     updateForEquipmentChange(): void;
     /** Updates and renders the equipment sets */
     updateForEquipSetChange(): void;
     /** Function for equipping an item */
-    equipItem(itemID: number, set: number, slot?: SlotTypes | 'Default', quantity?: number): boolean;
+    equipItem(item: EquipmentItem, set: number, slot?: SlotTypes | 'Default', quantity?: number): boolean;
     /** Returns a callback function for unequipping an item from a slot*/
     unequipCallback(slot: SlotTypes): () => void;
     /** Function for unequipping an item from a slot */
     protected unequipItem(set: number, slot: SlotTypes): boolean;
-    /** Equips the selected food from bank */
-    equipFood(itemID: number, quantity: number, autoEquipped?: boolean): boolean | undefined;
+    /** Automatically equips the selected food, without taking it from the bank
+     *  Will update the completion log and item statistics
+     */
+    autoEquipFood(item: FoodItem, quantity: number): boolean;
+    /** Callback function for equipping the selected food from bank */
+    equipFood(item: FoodItem, quantity: number): boolean | undefined;
     /** Unequips the player's currently selected food */
     unequipFood(): void;
     /** Changes the player's currently selected food */
@@ -135,20 +166,24 @@ declare class Player extends Character {
     eatFood(quantity?: number, interrupt?: boolean, efficiency?: number): void;
     getFoodHealing(item: FoodItem): number;
     protected getFoodHealingBonus(item: FoodItem): number;
+    startHoldToEat(): void;
+    stopHoldToEat(): void;
     protected interruptAttack(): void;
     /** Callback Function for clicking on a prayer */
-    togglePrayer(prayerID: number, render?: boolean): void;
-    toggleSpell(spellID: number, render?: boolean): void;
-    toggleCurse(spellID: number, render?: boolean): void;
-    toggleAurora(spellID: number, render?: boolean): void;
-    toggleAncient(spellID: number, render?: boolean): void;
+    togglePrayer(prayer: ActivePrayer, render?: boolean): void;
+    toggleSpell(spell: StandardSpell, render?: boolean): void;
+    toggleCurse(spell: CurseSpell, render?: boolean): void;
+    toggleAurora(spell: AuroraSpell, render?: boolean): void;
+    toggleAncient(spell: AncientSpell, render?: boolean): void;
+    toggleArchaic(spell: ArchaicSpell, render?: boolean): void;
     protected consumePrayerPoints(amount: number): void;
     protected disableActivePrayers(): void;
     addPrayerPoints(amount: number): void;
+    protected trackPrayerStats(stat: PrayerStats, amount: number): void;
     protected applyCostModifiersToPrayerCost(amount: number): number;
     protected applyPreservationToPrayerCost(amount: number): number;
     protected applyModifiersToPrayerCost(amount: number): number;
-    protected computePrayerMaxCost(prayer: Prayer): number;
+    protected computePrayerMaxCost(prayer: ActivePrayer): number;
     protected renderPrayerPoints(): void;
     protected renderPrayerSelection(): void;
     /** Determines in the player can (un)equip an item currently */
@@ -162,35 +197,48 @@ declare class Player extends Character {
     protected computeAttackType(): void;
     private setAttackStyle;
     computeModifiers(): void;
+    protected addProviderModifiers(): void;
     protected addAttackStyleModifiers(): void;
     protected addEquippedItemModifiers(): void;
-    private computeTargetModifiers;
-    protected bankConditionWatchLists: Map<ItemID, BankItemCondition[]>;
-    protected gloveConditionWatchLists: Map<GloveID, GlovesCondition[]>;
-    protected hitpointConditionWatchLists: Set<HitpointsCondition>;
-    private computeConditionalWatchLists;
+    protected computeTargetModifiers(): void;
+    private computeItemSynergies;
+    private computeSummoningSynergy;
+    protected conditionalListeners: Record<ConditionHooks | 'All', Set<ConditionalModifier>>;
+    private checkStatCompareCondition;
+    private checkCondition;
+    /** Updates all registered conditional modifiers with the given hook */
+    updateConditionals(hook: ConditionHooks | 'All', computeStats: boolean, computeTargetStats: boolean): void;
+    private registerConditionalListeners;
+    private computeConditionalListeners;
+    /** Adds all conditional modifiers except for HP hooked ones */
     protected addConditionalModifiers(): void;
-    updateGloveConditionals(gloveID: GloveID): void;
-    updateBankConditionals(itemID: ItemID): void;
-    protected addPetModifiers(): void;
+    /** Adds all enemy conditional modifiers except for HP hooked ones */
+    protected addConditionalTargetModifiers(): void;
     protected addPrayerModifiers(): void;
-    private addAgilityModifiers;
-    private addPotionModifiers;
-    protected addShopModifiers(): void;
     protected addMiscModifiers(): void;
+    protected addGamemodeModifiers(): void;
     private addSummonSynergyModifiers;
-    getSummoningIDs(): [number, number];
-    /** Checks if a summoning synergy is active */
-    isSynergyActive(summonID1: number, summonID2: number): boolean;
-    consumeSummonCharge(summonID: number, charges?: number): boolean;
-    protected removeSummonCharge(slot: 'Summon1' | 'Summon2', charges?: number): void;
+    get equippedSummoningSynergy(): SummoningSynergy | undefined;
+    /** Removes a quantity from the summoning familiar equipped in the slot, and rewards XP for it */
+    protected removeSummonCharge(slot: 'Summon1' | 'Summon2', interval: number): void;
     addCombatAreaEffectModifiers(): void;
     calculateAreaEffectValue(value: number): number;
     private addMiscSummoningModifiers;
-    addTargetDotModifiers(): void;
-    protected onTargetDOTRemoval(type: DOTType, statUpdate?: boolean): void;
-    protected onDOTRemoval(type: DOTType, statUpdate?: boolean): void;
     protected onDOTApplication(type: DOTType): void;
+    protected onDOTRemoval(type: DOTType, statUpdate?: boolean): void;
+    protected onTargetDOTRemoval(type: DOTType, statUpdate?: boolean): void;
+    protected onModifierEffectApplication(): void;
+    protected onModifierEffectRemoval(): void;
+    protected onTargetModifierEffectRemoval(): void;
+    protected onTargetModifierEffectApplication(): void;
+    protected onApplyingStun(target: Character): void;
+    protected onBeingStunned(): void;
+    protected onStunRemoval(): void;
+    protected onTargetStunRemoval(): void;
+    protected onApplyingSleep(target: Character): void;
+    protected onBeingSlept(): void;
+    protected onSleepRemoval(): void;
+    protected onTargetSleepRemoval(): void;
     protected getMeleeDefenceBonus(): number;
     protected getRangedDefenceBonus(): number;
     protected getMagicDefenceBonus(): number;
@@ -202,49 +250,39 @@ declare class Player extends Character {
     protected renderAttackStyle(): void;
     protected setAttackStyleButtonCallbacks(): void;
     protected renderHitpoints(): void;
-    protected renderSlayercoins(): void;
     protected renderSummonMaxHit(): void;
     protected renderStats(): void;
-    protected renderGP(): void;
     protected renderFood(): void;
     render(): void;
     protected renderAutoEat(): void;
     protected renderCombatTriangle(): void;
-    protected renderSummonMarks(): void;
-    /** Sets the sidebar to green when skills are active */
-    protected renderActiveSkills(): void;
-    protected renderActiveSkillPage(): void;
+    getExperienceGainSkills(): AnySkill[];
+    /** Updates for when the modifiers of a skill are changed based on the current page */
+    protected renderActiveSkillModifiers(): void;
     protected renderEquipmentSets(): void;
     protected renderAttackIcon(): void;
-    protected renderPotions(): void;
     protected renderSummonBar(): void;
     /** Rewards slayer coins for current target */
     rewardSlayerCoins(): void;
-    addSlayerCoins(amount: number): void;
-    removeSlayerCoins(amount: number, render?: boolean): void;
-    addGP(amount: number): void;
-    removeGP(amount: number): void;
-    addXP(skill: number, amount: number): void;
     /** Rewards XP and rolls for pets */
     protected rewardXPAndPetsForDamage(damage: number): void;
-    rollForSummoningMarks(skill: SkillID, interval: number): void;
+    rollForSummoningMarks(skill: AnySkill, interval: number): void;
+    protected rewardCurrencyForSummonDamage(damage: number): void;
     protected rewardCurrencyForDamage(damage: number): void;
     rewardGPForKill(): void;
-    protected renderXP(): void;
-    /** Consumes a potion charge */
-    consumePotionCharge(type: PotionConsumption, page?: PageID): void;
-    /** Non-rendering potion re-use */
-    protected reusePotion(page: PageID): void;
+    /** Processes game events relating to combat. Exists for golbin raid override */
+    protected processCombatEvent(event: GameEvent, interval?: number): void;
+    /** For specific player only spawn effects */
+    applyUniqueSpawnEffects(): void;
     initializeForCombat(): void;
     stopFighting(): void;
-    protected renderLevelUp(): void;
     renderCombatLevel(): void;
-    /** Serializes the player object */
-    serialize(): number[];
-    /** Deserializes the player object */
-    deserialize(reader: DataReader, version: number): void;
+    resetActionState(): void;
+    encode(writer: SaveWriter): SaveWriter;
+    decode(reader: SaveWriter, version: number): void;
+    deserialize(reader: DataReader, version: number, idMap: NumericIDMap): void;
     /** Sets properties based on the old save file variables */
-    convertFromOldSaveFormat(saveGame: NewSaveGame): void;
+    convertFromOldSaveFormat(saveGame: NewSaveGame, idMap: NumericIDMap): void;
 }
 interface PlayerHTMLElements extends RenderHTMLElements {
     navHitpoints: HTMLElement[];
@@ -263,9 +301,9 @@ interface PlayerHTMLElements extends RenderHTMLElements {
     golbinLevels: MapToElement<CombatLevels>;
 }
 declare type AttackStyleSelection = {
-    melee: AttackStyle;
-    ranged: AttackStyle;
-    magic: AttackStyle;
+    melee?: AttackStyle;
+    ranged?: AttackStyle;
+    magic?: AttackStyle;
 };
 interface PlayerRenderQueue extends RenderQueue {
     prayerPoints: boolean;
@@ -274,27 +312,20 @@ interface PlayerRenderQueue extends RenderQueue {
     curseSelection: boolean;
     auroraSelection: boolean;
     ancientSelection: boolean;
+    archaicSelection: boolean;
     attackStyle: boolean;
     equipment: boolean;
-    slayercoins: boolean;
     food: boolean;
-    gp: boolean;
-    xp: Set<SkillID>;
-    level: Set<SkillID>;
     combatLevel: boolean;
     summonBar: boolean;
-    potion: Set<PageID>;
     attacks: boolean;
     equipmentSets: boolean;
-    activeSkills: boolean;
-    summoningMarks: Set<number>;
     runesUsed: boolean;
     autoEat: boolean;
     combatTriangle: boolean;
     levels: boolean;
-    activeSkillPage: boolean;
+    activeSkillModifierChange: boolean;
 }
 interface PlayerTimers extends CharacterTimers {
     summon: Timer;
 }
-declare type PotionConsumption = 'Regen' | 'Attack' | 'EnemyAttack' | 'HerbSeedDrop' | 'PrayerPointCost' | 'Skill';

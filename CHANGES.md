@@ -1,5 +1,9 @@
 # Changelog
-
+## v1.11.0
+  - Update to V1.1.0
+  - Removed the old source getting and documentation code as this is no longer required to use the type defs
+  - Updated the official type definitions
+  - Changed Read Me to reflect the changes to this project
 ## v1.10.2
   - Update to Alpha v0.22.1 (?1183)
 ## v1.10.1

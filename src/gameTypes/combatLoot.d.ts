@@ -1,22 +1,23 @@
-declare class CombatLoot {
+declare class CombatLoot implements Serializable, EncodableObject {
     private maxLoot;
-    private container;
-    private name;
-    private dropElements;
-    drops: LootDrop[];
+    private game;
+    drops: AnyItemQuantity[];
     private renderRequired;
-    lostLoot: Map<ItemID, number>;
-    constructor(maxLoot: number);
-    add(itemID: number, quantity: number, stack?: boolean): void;
+    lostLoot: Map<AnyItem, number>;
+    constructor(maxLoot: number, game: Game);
+    initializeMenus(): void;
+    add(item: AnyItem, quantity: number, stack?: boolean): void;
     removeAll(): void;
     private makeDropRoom;
-    private createDrop;
     lootAll(): void;
-    private lootItem;
-    private createTooltip;
+    destroyAllLoot(): void;
+    actuallyDestroyAllLootNow(): void;
+    getSnapshot(): Map<AnyItem, number>;
+    lootItem(id: number): void;
     render(): void;
-    serialize(): number[];
-    deserialize(reader: DataReader, version: number): void;
+    encode(writer: SaveWriter): SaveWriter;
+    decode(reader: SaveWriter, version: number): void;
+    deserialize(reader: DataReader, version: number, idMap: NumericIDMap): void;
 }
 declare type LootElements = {
     container: HTMLDivElement;
@@ -24,7 +25,18 @@ declare type LootElements = {
     qty: HTMLDivElement;
     tooltip: TippyTooltip;
 };
-declare type LootDrop = {
-    item: GenericItem;
-    qty: number;
-};
+declare class CombatLootMenuElement extends HTMLElement {
+    private _content;
+    private lootQuantity;
+    private lootAllButton;
+    private lootContainer;
+    private lootingAmuletText;
+    private dropElements;
+    constructor();
+    connectedCallback(): void;
+    /** Set callbacks and translations */
+    initialize(loot: CombatLoot): void;
+    renderDrops(drops: AnyItemQuantity[], maxDrops: number, loot: CombatLoot): void;
+    private createDropElement;
+    private createTooltip;
+}

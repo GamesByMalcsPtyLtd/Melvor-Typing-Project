@@ -1,31 +1,25 @@
-declare class EquippedFood {
+declare class EquippedFood implements EncodableObject, Serializable {
     private maxSlots;
+    private game;
     slots: FoodData[];
     private selectedSlot;
     get currentSlot(): FoodData;
-    constructor(maxSlots: number);
+    constructor(maxSlots: number, game: Game);
     private addSlot;
     equip(item: FoodItem, quantity: number): boolean;
     unequipSelected(): void;
     consume(quantity?: number): void;
     setSlot(slotID: number): void;
     private checkSlotid;
-    serialize(): number[];
-    deserialize(reader: DataReader, version: number): void;
-    convertFromOldSaveFormat(oldData: ItemQuantity2[]): void;
+    encode(writer: SaveWriter): SaveWriter;
+    decode(reader: SaveWriter, version: number, addOnFail?: boolean): void;
+    deserialize(reader: DataReader, version: number, idMap: NumericIDMap, addOnFail?: boolean): void;
+    convertFromOldSaveFormat(oldData: OldItemQuantity2[], idMap: NumericIDMap): void;
 }
 declare type FoodData = {
     item: FoodItem;
     quantity: number;
 };
-interface FoodItem extends BaseItem {
-    canEat: true;
-    healsFor: number;
-    masteryID?: [SkillID, number];
-    cookingID?: number;
-}
-declare function isFood(item: GenericItem): item is FoodItem;
-declare const emptyFood: FoodItem;
 declare class FoodMenu {
     private container;
     private selected;
@@ -35,6 +29,8 @@ declare class FoodMenu {
     private unequipButton;
     constructor(containerID: string);
     private addDropdownOption;
+    showHoldToEat(): void;
+    hideHoldToEat(): void;
     private removeDropOption;
     private renderOption;
     private renderSelected;

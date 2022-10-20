@@ -1,99 +1,146 @@
-declare enum ThievingNPCs {
-    MAN = 0,
-    GOLBIN = 1,
-    LUMBERJACK = 2,
-    BOB_THE_FARMER = 3,
-    FISHERMAN = 4,
-    CHEF = 5,
-    MINER = 6,
-    KNIGHT = 7,
-    WOMAN = 8,
-    GOLBIN_CHIEF = 9,
-    BANDIT_THUG = 10,
-    MARAUDER = 11,
-    MERCHANT = 12,
-    ASSISTANT_COOK = 13,
-    DOCK_HAND = 14,
-    TROLL = 15,
-    CYCLOPS = 16,
-    SQUIRE = 17,
-    WIZARD = 18,
-    ACOLYTE = 19,
-    COURT_JESTER = 20,
-    KING = 21,
-    PRINCESS = 22
+interface ThievingNPCData extends BasicSkillRecipeData {
+    name: string;
+    media: string;
+    perception: number;
+    maxHit: number;
+    maxGP: number;
+    uniqueDrop?: IDQuantity;
+    lootTable: DropTableData[];
 }
-declare enum ThievingAreas {
-    LOW_TOWN = 0,
-    GOLBIN_VILLAGE = 1,
-    BANDIT_HIDEOUT = 2,
-    FARMERS_MARKET = 3,
-    BANQUET = 4,
-    PORT_OF_LEMVOR = 5,
-    CAVE_OF_GIANTS = 6,
-    OUTSKIRTS = 7,
-    FORT = 8,
-    WIZARD_TOWER = 9,
-    ROYAL_CASTLE = 10
+declare class ThievingNPC extends BasicSkillRecipe {
+    get name(): string;
+    get media(): string;
+    private _name;
+    private _media;
+    perception: number;
+    maxHit: number;
+    maxGP: number;
+    uniqueDrop?: AnyItemQuantity;
+    lootTable: DropTable;
+    constructor(namespace: DataNamespace, data: ThievingNPCData, game: Game);
+}
+interface ThievingAreaData extends IDData {
+    name: string;
+    npcIDs: string[];
+    uniqueDrops: IDQuantity[];
+}
+declare class ThievingArea extends NamespacedObject {
+    get name(): string;
+    npcs: ThievingNPC[];
+    uniqueDrops: AnyItemQuantity[];
+    private _name;
+    constructor(namespace: DataNamespace, data: ThievingAreaData, game: Game, thieving: Thieving);
 }
 declare const enum DevilResult {
     DOUBLE_GP = 0,
     QUAD_ITEMS = 1,
     NOTHING = 2
 }
-interface ThievingRenderQueue extends SkillRenderQueue {
+declare const enum OtherDevilResult {
+    SKILL_XP = 0,
+    MORE_GOLD = 1,
+    NOTHING = 2
+}
+declare class ThievingRenderQueue extends GatheringSkillRenderQueue<ThievingNPC> {
     menu: boolean;
     stopButton: boolean;
-    stats: boolean;
+    /** Updates the NPC buttons based on skill level */
+    npcUnlock: boolean;
 }
-declare class Thieving extends CraftingSkill {
+interface GeneralThievingRareData {
+    itemID: string;
+    chance: number;
+    npcs?: string[];
+}
+interface GeneralThievingRare {
+    item: AnyItem;
+    chance: number;
+    npcs?: Set<ThievingNPC>;
+}
+interface ThievingSkillData extends MasterySkillData {
+    npcs?: ThievingNPCData[];
+    areas?: ThievingAreaData[];
+    generalRareItems?: GeneralThievingRareData[];
+    entLeprechaunItem?: string;
+    crowLeprechaunItem?: string;
+    bearLeprechaunItem?: string;
+    easterEgg?: {
+        equippedID: string;
+        positionedID: string;
+        rewardID: string;
+    };
+}
+declare const enum ThievingStunState {
+    None = 0,
+    Stunned = 1,
+    AvoidedStun = 2
+}
+declare class Thieving extends GatheringSkill<ThievingNPC, ThievingSkillData> {
     private stunTimer;
-    protected readonly id: 10;
-    protected readonly activeID = ActiveSkills.THIEVING;
-    protected readonly pageID: number;
-    protected readonly skillPetID = 6;
-    protected readonly failureMessage = "to pickpocket this.";
+    protected readonly _media = "assets/media/skills/thieving/thieving.svg";
+    protected getTotalUnlockedMasteryActions(): number;
     readonly baseInterval = 3000;
-    private readonly stunInterval;
+    readonly baseStunInterval = 3000;
     private readonly itemChance;
-    private readonly areaUniqueChance;
-    protected renderQueue: ThievingRenderQueue;
-    private currentArea;
-    private currentNPC;
-    /** Pickpocket against current Target */
-    private get pickpocket();
-    /** Success Rate against current Target */
-    protected get successRate(): number;
-    /** Mastery level for current NPC */
-    protected get masteryLevel(): number;
-    protected get masteryID(): number;
-    /** Chance to double items for current NPC */
-    protected get doublingChance(): number;
+    private readonly baseAreaUniqueChance;
+    renderQueue: ThievingRenderQueue;
+    areas: NamespaceRegistry<ThievingArea>;
+    generalRareItems: GeneralThievingRare[];
+    private entLeprechaunItem?;
+    private crowLeprechaunItem?;
+    private bearLeprechaunItem?;
+    private barItems;
+    private easterEgg?;
+    private currentArea?;
+    currentNPC?: ThievingNPC;
+    private hiddenAreas;
+    /** Last area that was active. Used for rendering progressbars */
+    private lastActiveAreaProgressBar?;
+    /** Get the chance of a unique area drop with modifiers */
+    private get areaUniqueChance();
+    protected get masteryAction(): ThievingNPC;
     protected get actionLevel(): number;
-    constructor();
-    tick(): void;
+    protected get canStop(): boolean;
+    protected get avoidStunChance(): number;
+    protected get stunInterval(): number;
+    constructor(namespace: DataNamespace, game: Game);
+    registerData(namespace: DataNamespace, data: ThievingSkillData): void;
+    postDataRegistration(): void;
+    activeTick(): void;
+    getErrorLog(): string;
     render(): void;
-    serialize(): number[];
-    deserialize(reader: DataReader, version: number): void;
-    onPageChange(): void;
+    private renderNPCUnlock;
+    protected resetActionState(): void;
+    encode(writer: SaveWriter): SaveWriter;
+    decode(reader: SaveWriter, version: number): void;
+    deserialize(reader: DataReader, version: number, idMap: NumericIDMap): void;
+    protected getActionIDFromOldID(oldActionID: number, idMap: NumericIDMap): string;
+    onModifierChange(): void;
+    onEquipmentChange(): void;
+    protected onLevelUp(oldLevel: number, newLevel: number): void;
     onLoad(): void;
-    stop(): boolean;
+    protected onStop(): void;
     stopOnDeath(): void;
     private notifyStunBlockingAction;
     private renderMenu;
     private renderStopButton;
-    private renderStats;
     renderProgressBar(): void;
+    /** Updates the visibility of areas */
+    private renderVisibleAreas;
+    /** Callback function for when thieving area menu panel is clicked */
+    onAreaHeaderClick(area: ThievingArea): void;
     /** Determines what should be done when an npc is selected in an area
      * Returns true if the panel should update
      */
     onNPCPanelSelection(npc: ThievingNPC, area: ThievingArea): boolean;
     startThieving(area: ThievingArea, npc: ThievingNPC): void;
+    getStunInterval(): number;
     getNPCSuccessRate(npc: ThievingNPC): number;
     getNPCSleightOfHand(npc: ThievingNPC): number;
     getNPCPickpocket(npc: ThievingNPC): number;
-    private getNPCMastery;
     getStealthAgainstNPC(npc: ThievingNPC): number;
+    protected getFlatIntervalModifier(action: ThievingNPC): number;
+    protected getPercentageIntervalModifier(action: ThievingNPC): number;
     /** Returns the interval an npc in ms */
     getNPCInterval(npc: ThievingNPC): number;
     getNPCDoublingChance(npc: ThievingNPC): number;
@@ -103,51 +150,21 @@ declare class Thieving extends CraftingSkill {
     };
     private getNPCMinGPRoll;
     private getNPCGPMultiplier;
+    getXPModifier(masteryAction?: ThievingNPC): number;
+    getMasteryXPModifier(action: ThievingNPC): number;
     /** Method for processing a stunned thieving turn */
     private stunned;
-    isStunned: boolean;
-    protected itemCosts: never[];
-    protected gpCost: number;
-    protected slayercoinCost: number;
+    private stunState;
+    private get isStunned();
     protected get actionRewards(): Rewards;
     private addJesterHatGP;
     protected get actionInterval(): number;
+    protected get masteryModifiedInterval(): number;
     protected startActionTimer(): void;
     protected preAction(): void;
-    protected subtractActionCosts(): void;
     protected postAction(): void;
     private addStat;
-    static readonly areas: ThievingArea[];
-    static readonly npcs: ThievingNPC[];
-    static readonly generalRareItems: {
-        itemID: number;
-        chance: number;
-    }[];
+    testTranslations(): void;
     static readonly DevilTable: [number, number, number][];
+    static readonly OtherDevilTable: [number, number, number][];
 }
-declare enum ThievingStats {
-    SuccessfulPickpockets = 0,
-    FailedPickpockets = 1,
-    DamageTakenFromNPCs = 2,
-    SecondsSpentStunned = 3
-}
-declare type ThievingNPC = {
-    readonly id: ThievingNPCs;
-    readonly name: string;
-    readonly media: string;
-    readonly level: number;
-    readonly perception: number;
-    readonly maxHit: number;
-    readonly xp: number;
-    readonly maxGP: number;
-    /** Unique drop of NPC, -1 if they don't have one */
-    readonly uniqueDrop: ItemQuantity2;
-    /** Standard loot table of [ItemID, Weight, MaxQty] */
-    readonly lootTable: [number, number, number][];
-};
-declare type ThievingArea = {
-    readonly id: ThievingAreas;
-    readonly name: string;
-    readonly npcs: readonly ThievingNPCs[];
-    readonly uniqueDrops: readonly ItemQuantity2[];
-};

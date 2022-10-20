@@ -1,27 +1,42 @@
-declare class Equipment {
+declare const MAX_QUICK_EQUIP_ITEMS = 3;
+declare class Equipment implements EncodableObject, Serializable {
+    private game;
     slots: EquipmentObject<EquipSlot>;
     slotArray: EquipSlot[];
-    private menuIcons;
-    private synergyIcons;
-    private synergyTooltips;
+    /** Maps item to slot types */
+    private slotMap;
+    /** Slots that provide stats and use charges */
+    itemChargeUsers: Set<EquipSlot>;
+    /** Slots that provide stats and use quantities */
+    itemQuantityUsers: Set<EquipSlot>;
+    /** Slots that provide stats and use items in the bank */
+    bankItemUsers: Set<EquipSlot>;
     /** Class to manage the equiped items of players */
-    constructor();
+    constructor(game: Game);
+    /** Determines if the equipped Weapon is 2-Handed */
+    get isWeapon2H(): boolean;
     /** Returns the items that will be removed on equipping */
-    getItemsAddedOnEquip(item: EquipmentItem, slot: SlotTypes | 'Default'): ItemQuantity2[];
+    getItemsAddedOnEquip(item: EquipmentItem, slot: SlotTypes | 'Default'): {
+        item: EquipmentItem;
+        quantity: number;
+    }[];
     /** Returns the items that will be removed on unequipping */
-    getItemsAddedOnUnequip(slot: SlotTypes): ItemQuantity2;
+    getItemsAddedOnUnequip(slot: SlotTypes): AnyItemQuantity;
     /** Gets the actually equipped slots to unequip when equipping an item */
-    private getSlotsToUnequip;
+    getSlotsToUnequip(itemToEquip: EquipmentItem, slot: SlotTypes): SlotTypes[];
     /** Gets the root slot of an occupied slot */
     private getRootSlot;
     /** Performs the equipment process, removing equipped items */
     equipItem(itemToEquip: EquipmentItem, slot: SlotTypes, quantity: number): void;
     /** Performs the unequipment process, removing the item */
     unequipItem(slot: SlotTypes): void;
+    forceAddAllToBank(): void;
     /** Determines if an itemID is equipped */
-    checkForItemID(itemID: number): boolean;
-    getSlotOfItemID(itemID: number): SlotTypes | 'None';
-    getQuantityOfItemID(itemID: number): number;
+    checkForItem(item: EquipmentItem): boolean;
+    checkForItemID(itemID: string): boolean;
+    checkForItemIDs(itemIDs: (EquipmentItem | SynergyGroup)[]): boolean;
+    getSlotOfItem(item: EquipmentItem): SlotTypes | 'None';
+    getQuantityOfItem(item: EquipmentItem): number;
     addQuantityToSlot(slot: SlotTypes, quantity: number): void;
     /** Removes quantity from a slot. Returns true if slot is now empty and stats need updating */
     removeQuantityFromSlot(slot: SlotTypes, quantity: number): boolean;
@@ -32,49 +47,23 @@ declare class Equipment {
     renderQuantity(): void;
     private updateTooltips;
     private getSynergyTooltipContent;
-    private getEquipStatDescription;
-    serialize(): number[];
-    deserialize(reader: DataReader, version: number): void;
-    convertFromOldFormat(oldData: OldEquipmentSet): void;
+    static getEquipStatDescription(type: EquipStatKey, value: number): string;
+    encode(writer: SaveWriter): SaveWriter;
+    decode(reader: SaveWriter, version: number, addOnFail?: boolean): void;
+    deserialize(reader: DataReader, version: number, idMap: NumericIDMap, addOnFail?: boolean): void;
+    convertFromOldFormat(oldData: OldEquipmentSet, idMap: NumericIDMap): void;
     /** Removes all equipment */
     unequipAll(): void;
 }
-declare type EquipmentItem = EquipmentWithSpecial | EquipmentWithoutSpecial;
-declare type WeaponItem = WeaponWithSpecial | WeaponWithoutSpecial;
-declare type QuiverConsumption = 'Fishing' | 'PrayerPointCost' | 'MeleeAttack' | 'RuneUse' | 'Thieving' | 'PlantingAllotment' | 'CraftingRunes' | 'PotionUsage';
-interface BaseEquipmentItem extends BaseItem {
-    /** Valids slots the equipment can go in. First element is the default slot to use. */
-    validSlots: SlotTypes[];
-    /** Additional equipment slots that are also taken up */
-    occupiesSlots: SlotTypes[];
-    /** Requirements for equipping the item */
-    equipRequirements: Requirement[];
-    /** Equipment stats provided by item */
-    equipmentStats: EquipStatPair[];
-    gloveID?: number;
-    attackType?: AttackType;
-    modifiers?: ModifierData;
-    enemyModifiers?: CombatModifierData;
-    summoningID?: number;
-    providesRuneQty?: number;
-    providesRune?: number[];
-    ammoType?: AmmoType;
-    ammoTypeRequired?: AmmoType;
-    consumesOn?: QuiverConsumption;
-    fightEffects?: FightEffects[];
-}
-interface WeaponWithSpecial extends EquipmentWithSpecial {
-    attackType: AttackType;
-}
-interface WeaponWithoutSpecial extends EquipmentWithoutSpecial {
-    attackType: AttackType;
-}
-interface EquipmentWithSpecial extends BaseEquipmentItem {
-    hasSpecialAttack: true;
-    specialAttacks: Attack[];
-}
-interface EquipmentWithoutSpecial extends BaseEquipmentItem {
-    hasSpecialAttack: false;
+/** Class for storing all data for a players equipment set */
+declare class EquipmentSet implements EncodableObject {
+    private game;
+    equipment: Equipment;
+    spellSelection: SpellSelection;
+    prayerSelection: Set<ActivePrayer>;
+    constructor(game: Game);
+    encode(writer: SaveWriter): SaveWriter;
+    decode(reader: SaveWriter, version: number, addOnFail?: boolean): void;
 }
 declare class EquipmentSetMenu {
     private buttonClasses;
@@ -82,10 +71,11 @@ declare class EquipmentSetMenu {
     private buttons;
     private highlightedButton;
     constructor(containerID: string, buttonClasses: string[]);
-    render(sets: Equipment[], selected: number, player: Player): void;
+    render(sets: EquipmentSet[], selected: number, player: Player): void;
     private renderSets;
     private renderSelected;
     private setCallbacks;
+    private getTooltipRow;
     private getTooltipContent;
     private addButton;
     private createTooltip;
@@ -110,6 +100,7 @@ interface EquipmentObject<T> {
     Passive: T;
     Summon1: T;
     Summon2: T;
+    Consumable: T;
 }
 declare function getEquipmentImageElements(slotID: number): HTMLImageElement[];
 declare function getEquipmentQtyElements(slot: SlotTypes): HTMLSpanElement[];
@@ -121,15 +112,14 @@ declare type SlotData = {
     imageElements: HTMLImageElement[];
     qtyElements: HTMLSpanElement[];
     tooltips: TippyTooltip[];
-    unlocked: boolean;
+    quickEquipTooltip: TippyTooltip[];
     /** If items equipped in this slot provide equipment stats */
     providesStats: boolean;
 };
-/** An invalid item for the use of defaults */
-declare const emptyItem: EquipmentItem;
 declare class EquipSlot {
     type: SlotTypes;
-    /** Item that is in the slot */
+    private emptyItem;
+    /** Item that is in the slot. If Undefined no item is equipped. */
     item: EquipmentItem;
     /** If the item simply occopies the slot and does not contribute to stats */
     occupiedBy: SlotTypes | 'None';
@@ -137,10 +127,27 @@ declare class EquipSlot {
     quantity: number;
     /** Other slots occupied by this item */
     occupies: SlotTypes[];
+    /** Stores the items which can be quick equipped to this slot */
+    quickEquipItems: EquipmentItem[];
     get isEmpty(): boolean;
     get providesStats(): boolean;
-    constructor(type: SlotTypes);
+    constructor(type: SlotTypes, emptyItem: EquipmentItem);
+    isItem(item: EquipmentItem | SynergyGroup): boolean;
     setOccupied(item: EquipmentItem, slot: SlotTypes): void;
     setEquipped(item: EquipmentItem, quantity: number, occupies: SlotTypes[]): void;
     setEmpty(): void;
+    /** Ensures the quickEquipItems array is the appropriate length */
+    trimQuickEquipItems(): void;
+}
+declare class CombatQuickEquipMenu {
+    private player;
+    private game;
+    constructor(player: Player, game: Game);
+    /** Migrates the old quick equip data to the appropriate equipment sets */
+    deserialize(reader: DataReader, version: number, idMap: NumericIDMap, player: Player): void;
+    getTooltipContent(slotID: number): HTMLElement;
+    /** Sets quick equip slot to use item that is currently equipped */
+    private setItem;
+    /** Updates the image of the quick equip image with the one you set */
+    private setImage;
 }

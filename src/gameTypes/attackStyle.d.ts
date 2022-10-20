@@ -1,15 +1,22 @@
-/** Contains data on the different attackstyles present */
-declare const attackStyles: StringDictionary<AttackStyleData>;
-declare type AttackStyleData = {
-    id: number;
-    name: AttackStyle;
-    modifiers: ModifierData;
+interface AttackStyleData extends IDData {
+    modifiers: PlayerModifierData;
     experienceGain: {
-        skill: SkillID;
+        skillID: string;
         ratio: number;
     }[];
-    buttonID: string;
     attackType: AttackType;
-    pets: PetID[];
-    tooltipContent: string;
-};
+    name: string;
+}
+declare class AttackStyle extends NamespacedObject {
+    modifiers: PlayerModifierObject;
+    experienceGain: {
+        skill: AnySkill;
+        ratio: number;
+    }[];
+    attackType: AttackType;
+    get name(): string;
+    get toolTipContent(): string;
+    get buttonID(): string;
+    private _name;
+    constructor(namespace: DataNamespace, data: AttackStyleData, game: Game);
+}

@@ -6,6 +6,8 @@ declare class ThievingMenu {
     private activePanel;
     constructor(containerID: string);
     private createInfoBox;
+    hideAreaPanel(area: ThievingArea): void;
+    showAreaPanel(area: ThievingArea): void;
     updateNPCsForLevel(level: number): void;
     updateNPCButtons(): void;
     selectNPC(npc: ThievingNPC, area: ThievingArea): void;
@@ -17,7 +19,7 @@ declare class ThievingMenu {
     private updateInfoContainerForNPC;
     private showNPCDrops;
     private formatSpecialDrop;
-    getProgressBar(area: ThievingArea): ProgressBar;
+    getProgressBar(area: ThievingArea): ProgressBar | undefined;
     localize(): void;
 }
 declare type ThievingAreaPanel = {
@@ -53,4 +55,5 @@ declare type ThievingNPCNav = {
     success: HTMLElement;
     maxHit: HTMLElement;
     unlock: HTMLDivElement;
+    masteryDisplay: CompactMasteryDisplay;
 };

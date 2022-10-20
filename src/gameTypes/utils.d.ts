@@ -1,32 +1,75 @@
+/** Rolls a percentage chance in the range [0,100] */
+declare function rollPercentage(chance: number): boolean;
 /** Rolls an interger value between [minValue,maxValue] */
 declare function rollInteger(minValue: number, maxValue: number): number;
 declare function rollForOffItem(baseChance: number): boolean;
+declare function generateGaussianNumber($mean: number, $stdDev: number): number;
+declare function getMean(numActions: number, probability: number): number;
+declare function getStdDev(numActions: number, probability: number): number;
+/** Modifies baseStat by modifier
+ *   @param type 0 applies a percentage bonus, 1 applies an additive bonus, 2: applies a negative additive bonus, 3: multiplies base number by percentage
+ */
+declare function applyModifier(baseStat: number, modifier: number, type?: 0 | 1 | 2 | 3): number;
+declare function binomial_distribution(n: number, p: number, epsilon?: number): number[];
+declare function sample_from_binomial(numberTrials: number, chance: number): number;
+/**
+ * Returns the linear funciton m*x+b
+ * @param m The slope of the function
+ * @param b The y-intercept of the function
+ * @param x The x-value to evaluate the function at
+ * @returns m*x+b
+ */
+declare function linearFunction(m: number, b: number, x: number): number;
+/**
+ * Returns the linear function m*x+b, capped by cap
+ * @param m The slope of the function
+ * @param b The y-intercept of the function
+ * @param cap The value to cap y at
+ * @param x The x-value to evaluate the function at
+ * @returns m*x+b, capped by cap
+ */
+declare function cappedLinearFunction(m: number, b: number, cap: number, x: number): number;
+declare function deleteKeysFromObject(object: any): void;
 /** Gets a random element from an array */
 declare function getRandomArrayElement<T>(array: T[]): T;
+/** Gets a random number of elements from an array (exclusive) */
+declare function getExclusiveRandomArrayElements<T>(array: T[], numElements: number): Set<T>;
+declare const arrSum: (arr: number[]) => number;
+declare function getAverage(elements?: number[]): number;
 /** Clamps a value between min and max */
 declare function clampValue(value: number, min: number, max: number): number;
-/** Checks if the player meets the level requirements, and returns the failed ones */
-declare function checkLevelRequirements(requirements: SkillReq[]): SkillReq[];
-/** Returns -1 if no skill is associated with the page */
-declare function getSkillIDFromPageID(pageID: number): number;
+/** Sets the first character of a string to uppercase */
+declare function setToUppercase(string: string): string;
+/** Sets the first character of a string to lowercase */
+declare function setToLowercase(string: string): string;
+/** Uses Regex to replace all in a string. find is regex string. */
+declare function replaceAll(str: string, find: string, replace: string): string;
+/** Returns true if any member of setA is present in setB */
+declare function isAnySetMemberInSet<T>(setA: Set<T>, setB: Set<T>): boolean;
+declare let updateTooltipsTimer: number;
+/** Updates all tooltips enabled by [data-toggle="tooltip"] and [data-toggle="popover"] */
+declare function updateTooltips(): void;
+declare function getSortableDelayOnTouch(): boolean;
 declare function roundToTickInterval(interval: number): number;
 declare const joinList: (seperator: string) => (list: string[]) => string;
-declare const joinAsList: (list: string[]) => string;
+declare function joinAsList(list: string[]): string;
+declare function joinAsLineBreakList(list: string[]): string;
 declare const joinAsSuperList: (list: string[]) => string;
-/** Compute the combat level of a monster */
-declare function getMonsterCombatLevel(mID: number): number;
-declare function pluralS(number: number): "s" | "";
+declare function pluralS(number: number): "" | "s";
+declare function checkMediaQuery(mediaQuery: string): boolean;
 declare function createElement<T extends keyof HTMLElementTagNameMap>(tagName: T, options?: ElemCreationOptions): HTMLElementTagNameMap[T];
 declare function hideElement(elem: HTMLElement): void;
 declare function showElement(elem: HTMLElement): void;
-declare function isSkillLocked(skillID: number): boolean;
+declare function removeElementID(elem: HTMLElement): void;
 declare type ElemCreationOptions = {
-    /** Sets the element classlist */
+    /** Sets the elements className */
+    className?: string;
+    /** Sets the element classlist, will be added in addition to className if also provided */
     classList?: string[];
     /** Appends the child to a parent node */
     parent?: HTMLElement;
     /** Appends the children to the element */
-    children?: Node[];
+    children?: (string | Node)[];
     /** Sets the element's text */
     text?: string;
     /** List of attributes to set on the element */
@@ -34,61 +77,45 @@ declare type ElemCreationOptions = {
     /** Element ID */
     id?: string;
 };
-declare function isSeedItem(item: GenericItem): item is SeedItem;
-declare function isEquipment(item: GenericItem): item is EquipmentItem;
-declare function isWeapon(item: EquipmentItem): item is WeaponItem;
-declare function getPlayerCombatLevel(): number;
-declare type SeedTier = 'Allotment' | 'Herb' | 'Tree';
-interface SeedItem extends BaseItem {
-    /** [SkillID,MasteryID] */
-    masteryID: [SkillID, number];
-    /** Type of plot item can be planted in, flags type */
-    tier: SeedTier;
-    /** Minimum Farming level required to plant */
-    farmingLevel: number;
-    /** Base farming xp per item harvested */
-    farmingXP: number;
-    /** Number of seeds required to plant */
-    seedsRequired: number;
-    /** Base time in s */
-    timeToGrow: number;
-    /** ItemID of harvested item */
-    grownItemID: ItemID;
-    /** Unused ID */
-    farmingMasteryID?: number;
-}
-/** Helper class for managing the bank */
-declare class BankHelper {
-    protected manager: BaseManager;
-    protected updatesRequired: Set<ItemID>;
-    lostItems: Map<ItemID, number>;
-    constructor(manager: BaseManager);
-    /** Renders the bank as per the updates required */
-    render(): void;
-    /** Adds a quantity of an item to the bank */
-    addItem(itemID: number, quantity: number, logLost: boolean): boolean;
-    /** Adds a quantity of an item to the bank */
-    addQuantity(itemID: number, quantity: number, deactivateGloves?: boolean): void;
-    /** Gets the quantity of an item from the bank */
-    getQty(itemID: number): number;
-    /** Checks for item costs */
-    checkForItems(costs: ItemQuantity2[]): boolean;
-    /** Consumes item costs */
-    consumeItems(costs: ItemQuantity2[]): void;
-}
-/** Golbin raid bank */
-declare class GolbinBank extends BankHelper {
-    protected manager: RaidManager;
-    private inventory;
-    constructor(manager: RaidManager);
-    render(): void;
-    addItem(itemID: number, quantity: number): boolean;
-    addQuantity(itemID: number, quantity: number): void;
-    getQty(itemID: number): number;
-    addToExisting(quantity: number): void;
-    empty(): void;
-    getHistory(): ItemQuantity[];
-}
+/** Returns a reducer for computing the total number of unlocked items in a NamespaceRegistry */
+declare const levelUnlockSum: (skill: AnySkill) => (previous: number, current: BasicSkillRecipe) => number;
+declare function fireBottomToast(text: string, duration?: number): void;
+declare function fireTopToast(text: string, duration?: number): void;
+declare function imageNotify(media: string, message: string, messageTheme?: StandardTheme): void;
+declare let itemNotifyTimer: number;
+declare let itemNotifyToProcess: AnyItemQuantity[];
+/** Queues up an item gain notifiaction for the specified item and quantity */
+declare function itemNotify(item: AnyItem, quantity: number): void;
+/** Fires an item gain notifiaction for the specified item and quantity */
+declare function processItemNotify(item: AnyItem, quantity: number): void;
+/** Fires a stun notification for thieving, with the damage specified */
+declare function stunNotify(damage: number): void;
+/** Fires a bank full notification */
+declare function bankFullNotify(): void;
+/** Fires a skill level up notification */
+declare function levelUpNotify(skill: AnySkill): void;
+/** Unused notification function */
+declare function level99Notify(skill: AnySkill): void;
+/** Fires a resource preservation notification */
+declare function notifyPreserve(skill: AnySkill): void;
+/** Fires a generic notification, with the image of the skill specified */
+declare function notifyPlayer(skill: AnySkill | -1, message: string, messageTheme?: StandardTheme): void;
+/** Fires a notification that skill gloves have run out of charges */
+declare function notifyItemCharges(item: EquipmentItem): void;
+/** Fires a notification that a tutorial task was completed */
+declare function tutorialNotify(): void;
+declare function currencyNotify(media: string, amount: number): void;
+/** Queues a modal notifying the player of a mastery level up for the specified skill and masteryID */
+declare function notifyMasteryLevelUp(action: MasteryAction, newLevel: number): void;
+declare function notify99ItemMastery(action: MasteryAction): void;
+declare function notifyCompletionYay(): void;
+declare function notifyCompletionTotH(): void;
+declare function notifyCompletionEverything(): void;
+declare let pyroInterval: number;
+declare let forcePyro: boolean;
+declare function showFireworks(force?: boolean): void;
+declare function removePyro(): void;
+declare function startPyroInterval(): void;
 /** Helps queue game notifications */
 declare class NotificationQueue {
     private maxNotifiactions;
@@ -98,14 +125,29 @@ declare class NotificationQueue {
     add(notification: QueuedNotify): void;
     clear(): void;
 }
-declare type QueuedNotify = ItemNotify | GPNotify | StunNotify | BankFullNotify | LevelUpNotify | PlayerNotify | GlovesNotify | SlayerNotify | MasteryNotify;
+/** Utility class for computing experience and levels */
+declare class ExperienceCalculator {
+    /** Table of level to xp required */
+    private table;
+    private xpSum;
+    /** Constant used to estimate level */
+    private estConstA;
+    /** Constant used to estimate level */
+    private estConstB;
+    constructor();
+    private equate;
+    level_to_xp(level: number): number;
+    /** XP to level function, utilizing loop. Returns level + 1 */
+    xp_to_level(xp: number, level?: number): number;
+    /** XP To level function utilizing estimate method */
+    xpToLevel(xp: number): number;
+}
+/** Calculator for experience and levels */
+declare const exp: ExperienceCalculator;
+declare type QueuedNotify = ItemNotify | StunNotify | BankFullNotify | LevelUpNotify | PlayerNotify | ItemChargeNotify | MasteryNotify | Mastery99Notify | PreserveNotify | CurrencyNotify | TutorialNotify;
 declare type ItemNotify = {
     type: 'Item';
     args: Parameters<typeof itemNotify>;
-};
-declare type GPNotify = {
-    type: 'GP';
-    args: Parameters<typeof gpNotify>;
 };
 declare type StunNotify = {
     type: 'Stun';
@@ -123,27 +165,34 @@ declare type PlayerNotify = {
     type: 'Player';
     args: Parameters<typeof notifyPlayer>;
 };
-declare type GlovesNotify = {
-    type: 'Gloves';
-    args: Parameters<typeof notifyGloves>;
-};
-declare type SlayerNotify = {
-    type: 'Slayer';
-    args: Parameters<typeof notifySlayer>;
+declare type ItemChargeNotify = {
+    type: 'ItemCharges';
+    args: Parameters<typeof notifyItemCharges>;
 };
 declare type MasteryNotify = {
     type: 'Mastery';
     args: Parameters<typeof notifyMasteryLevelUp>;
 };
-declare function createLevelUpModal(skill: SkillID): SweetAlertOptions;
-declare function getItemBaseStatsBreakdown(itemID: ItemID): string;
-declare function lockedSkillAlert(skillID: number, message: string): void;
-declare function updateMonsterStats(): void;
-declare function updateDungeonCount(): void;
+declare type Mastery99Notify = {
+    type: 'Mastery99';
+    args: Parameters<typeof notify99ItemMastery>;
+};
+declare type PreserveNotify = {
+    type: 'Preserve';
+    args: Parameters<typeof notifyPreserve>;
+};
+declare type CurrencyNotify = {
+    type: 'Currency';
+    args: Parameters<typeof currencyNotify>;
+};
+declare type TutorialNotify = {
+    type: 'TutorialTask';
+};
+declare function getItemBaseStatsBreakdown(item: EquipmentItem): string;
+declare function lockedSkillAlert(skill: AnySkill, messageTemplate: string): void;
 declare function showStunnedNotification(): void;
 declare function showSleepNotification(): void;
 declare function cdnMedia(media: string): string;
-declare function getMonsterMedia(monster: Monster): string;
 declare function compareNameValuePairs(currentPairs: NameValuePair[], oldPairs: NameValuePair[]): void;
 declare function convertNameValuePairToMap(pairs: NameValuePair[]): Map<string, number>;
 /**
@@ -160,13 +209,193 @@ declare function templateString(string: string, templateData: StringDictionary<s
  * @param identifier The identifier for the language string to template
  * @param templateData An object containing replacements strings e.g. {example: "true text"}
  */
-declare function templateLangString(category: LanguageCategory, identifier: string, templateData: StringDictionary<string>): string;
+declare function templateLangString(category: LanguageCategory, identifier: string | number, templateData: StringDictionary<string>): string;
 declare function milliToSeconds(ms: number): number;
 declare function multiplyByNumberMultiplier(value: number): number;
 declare function divideByNumberMultiplier(value: number): number;
+declare function animateProgress(div: string, interval: number, stayFull?: boolean): void;
+declare function resetProgressAnimation(div: string): void;
 /** Gets the dom nodes for `Unlocked at ${image} level ${level}' */
-declare function getUnlockedAtNodes(skill: SkillID, level: number): (HTMLImageElement | Text)[];
-declare function getOfflineTimeDiff(): {
-    timeDiff: number;
-    originalTimeDiff: number;
+declare function getUnlockedAtNodes(skill: AnySkill, level: number): (HTMLImageElement | Text)[];
+declare function templateLangStringWithNodes(category: LanguageCategory, id: string | number, nodeData: StringDictionary<Node>, textData: StringDictionary<string>, clone?: boolean): (Node | string)[];
+declare function templateStringWithNodes(string: string, nodeData: StringDictionary<Node>, textData: StringDictionary<string>, clone?: boolean): (string | Node)[];
+/** Formats a number in it's ordinal form
+ *  @example formatAsOrdinal(1) // '1st'
+ *  @example formatAsOrdinal(2) // '2nd'
+ */
+declare const formatAsOrdinal: (value: number) => string;
+/** Formats a number with a locale specific thousands seperator */
+declare function numberWithCommas(number: number | string, ignoreSetting?: boolean): string;
+/** Formats a number with a postfix */
+declare function formatNumber(number: number): string;
+/** Formats a percentage with locale sensitivity. Uses the 0-100 range
+ * @example formatPercent(5) // 5%
+ * @example formatPercent(34.2,2) // 34.20%
+ */
+declare function formatPercent(percent: number, digits?: number): string;
+declare function getMSAsTime(time: number): {
+    years: number;
+    days: number;
+    hours: number;
+    minutes: number;
+    seconds: number;
+    milliseconds: number;
 };
+/** Locally formats a time period in ms
+ * @example formatAsTimePeriod(1000) // '1s'
+ */
+declare function formatAsTimePeriod(timeInMs: number): string;
+/** Locally formats a time period in ms using shorthand terminology
+ * @example formatAsTimePeriod(1000) // '1s'
+ */
+declare function formatAsShorthandTimePeriod(timeInMs: number): string;
+declare function successSpan(content: string): string;
+declare function getTemplateElement(templateID: string): HTMLTemplateElement;
+declare function getTemplateNode(templateID: string): Node;
+declare function getAnyElementFromFragment(fragment: DocumentFragment, elementID: string): HTMLElement;
+declare function getElementFromFragment<T extends keyof HTMLElementTagNameMap>(fragment: DocumentFragment, elementID: string, tagName: T): HTMLElementTagNameMap[T];
+/** Formats a number to locale sensitive fixed digits */
+declare function formatFixed(num: number, digits: number): string;
+declare function switchToCategory<T extends HasLevel>(tabs: Map<CategoryLike, RecipeSelectionTab<T>>): (categoryToShow: CategoryLike) => void;
+/** Tells the browser to download a text file */
+declare function downloadTextFile(fileName: string, fileText: string, fileType?: string): void;
+/** Takes the original array, and returns a soft copy without the elements contained in remove */
+declare function removeFromArray<T>(original: T[], remove: T[]): T[];
+declare function mapOrder<T, K extends keyof T>(array: T[], order: T[K][], key: K): T[];
+/** Returns a function for use in Array.sort, that will sort an array of objects T, in the order corresponding to their property key */
+declare function sortByOrder<T, K extends keyof T>(order: T[K][], key: K): (a: T, b: T) => number;
+declare function logConsole(message: string): void;
+/** Utility function for throwing errors related to unregistered objects during save game conversion */
+declare const unregisteredMessage: (type: string) => string;
+/** Returns an error message for failing to construct an object that requires registered data. */
+declare class UnregisteredConstructionError extends Error {
+    constructor(object: Object, unregisteredName: string, id: string);
+}
+declare class UnregisteredDataModError extends Error {
+    constructor(unregisteredName: string, id: string);
+}
+declare class UnregisteredApplyDataModError extends Error {
+    constructor(objectBeingModded: NamespacedObject, unregisteredName: string, unregisteredID: string);
+}
+declare const progressBarAttributes: [string, string][];
+declare type DropTableElement = {
+    item: AnyItem;
+    minQuantity: number;
+    maxQuantity: number;
+    weight: number;
+};
+declare class DropTable {
+    private totalWeight;
+    private drops;
+    /** The number of different drops in the table */
+    get size(): number;
+    get weight(): number;
+    get sortedDropsArray(): DropTableElement[];
+    /** Average GP sale value from recieving a drop from the table */
+    get averageDropValue(): number;
+    constructor(game: Game, data: DropTableData[]);
+    registerDrops(game: Game, data: DropTableData[]): void;
+    /** Rolls for a drop on the table */
+    getDrop(): AnyItemQuantity;
+}
+/** Wrapper for sparse numeric maps */
+declare class SparseNumericMap<T> {
+    private data;
+    get size(): number;
+    has(key: T): boolean;
+    get(key: T): number;
+    set(key: T, value: number): void;
+    add(key: T, amount: number): void;
+    inc(key: T): void;
+    sub(key: T, amount: number): void;
+    dec(key: T): void;
+    mult(key: T, multiplier: number): void;
+    div(key: T, divisor: number): void;
+    getSum(): number;
+    getSumOfKeys(keys: T[]): number;
+    clear(): void;
+    forEach(callbackfn: (value: number, key: T) => void): void;
+}
+declare function generateComponentClass(templateID: string, tagName: string, className: string): string;
+declare function generateModifierDataSchema(): string;
+declare type TownshipResourceType = 'Currency' | 'Raw' | 'Product';
+declare enum TownshipResourceTypeID {
+    Currency = 0,
+    Raw = 1,
+    Product = 2
+}
+declare type BuildingType = 'House' | 'Gathering' | 'Production' | 'Storage' | 'Education' | 'Other';
+declare enum BuildingTypeID {
+    House = 0,
+    Gathering = 1,
+    Production = 2,
+    Storage = 3,
+    Education = 4,
+    Other = 5
+}
+interface Citizen {
+    job: TownshipJob;
+    ticksAlive: number;
+    source: CitizenSource;
+}
+declare enum CitizenSource {
+    Birth = 0,
+    Migration = 1
+}
+interface Statue {
+    name: string;
+    media: string;
+}
+declare function formatAsSHTimePeriod(timeInMs: number): string;
+declare function getMAsTime(time: number): {
+    years: number;
+    days: number;
+    hours: number;
+    minutes: number;
+    seconds: number;
+    milliseconds: number;
+};
+declare type ScheduledPushNotifications = ScheduledPushNotificationData[];
+interface ScheduledPushNotificationData {
+    id: string;
+    startDate: number;
+    endDate: number;
+    notificationType: PushNotificationType;
+    platform: string;
+}
+interface OneSignalInfo {
+    oneSignalUserId?: string;
+    oneSignalPushToken?: string;
+    oneSignalSubscribed?: boolean;
+    oneSignalRequiresUserPrivacyConsent?: boolean;
+    platform?: string;
+    appId?: string;
+    appVersion?: string;
+    distribution?: string;
+    hardware?: string;
+    installationId?: string;
+    language?: string;
+    model?: string;
+    os?: string;
+    osVersion?: string;
+    timeZone?: string;
+}
+declare enum PushNotificationType {
+    Unique = 0,
+    Other = 1
+}
+interface SteamPurchaseResult {
+    isOwned: boolean;
+}
+interface BuildingSortList {
+    showAll: boolean[];
+    buildingType: boolean[];
+    resource: boolean[];
+}
+declare type AgilityBlueprintData = {
+    name: string;
+    obstacles: Map<number, AgilityObstacle>;
+    pillar?: AgilityPillar;
+    elitePillar?: AgilityPillar;
+};
+declare type AgilityBlueprints = Map<number, AgilityBlueprintData>;

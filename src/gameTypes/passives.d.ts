@@ -1,11 +1,19 @@
-declare type CombatPassive = {
-    /** Index of passive in combatPassive */
-    id: number;
-    /** Display name of passive */
+interface CombatPassiveData extends IDData {
+    /** Display name of the passive */
     name: string;
-    /** Description of passive */
-    description: string;
-    /** Modifiers to apply to monster */
+    /** Modifiers provided to Enemy by passive */
     modifiers: CombatModifierData;
-};
-declare const combatPassives: CombatPassive[];
+    /** Optional. Specifies a custom description which overrides the modifier generated one. */
+    customDescription?: string;
+}
+declare class CombatPassive extends NamespacedObject {
+    modifiers: CombatModifierData;
+    get name(): string;
+    get description(): string;
+    private _name;
+    private _customDescription?;
+    constructor(namespace: DataNamespace, data: CombatPassiveData);
+}
+declare class ControlledAffliction extends CombatPassive {
+    constructor(namespace: DataNamespace, game: Game);
+}
