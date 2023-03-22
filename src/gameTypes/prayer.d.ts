@@ -16,8 +16,8 @@ declare class ActivePrayer extends NamespacedObject {
     pointsPerRegen: number;
     modifiers: PlayerModifierObject;
     enemyModifiers?: CombatModifierData;
-    private _media;
-    private _name;
+    _media: string;
+    _name: string;
     get name(): string;
     constructor(namespace: DataNamespace, data: PrayerData, game: Game);
 }
@@ -25,23 +25,23 @@ interface PrayerMenuElement extends CombatMenuElement {
     newDiv: HTMLDivElement;
 }
 declare class PrayerMenu {
-    private menuContainer;
-    private activeContainer;
-    private menus;
-    private activeMenu;
+    menuContainer: HTMLDivElement;
+    activeContainer: HTMLDivElement;
+    menus: Map<ActivePrayer, PrayerMenuElement>;
+    activeMenu: CombatMenuElement[];
     constructor();
     createMenu(): void;
     createActiveMenu(): void;
     updateForLevel(level: number, player: Player): void;
-    private setEnabled;
-    private setDisabled;
+    setEnabled(button: HTMLAnchorElement): void;
+    setDisabled(button: HTMLAnchorElement): void;
     setActive(active: Set<ActivePrayer>, player: Player): void;
     setMenuCallbacks(player: Player): void;
-    private createActivePrayer;
-    private createMenuPrayer;
-    private createTooltip;
-    private getLockedTooltipHTML;
-    private getUnlockedTooltipHTML;
+    createActivePrayer(): HTMLAnchorElement;
+    createMenuPrayer(prayer: ActivePrayer): HTMLDivElement;
+    createTooltip(parent: HTMLElement, tooltipHTML: string): TippyTooltip;
+    getLockedTooltipHTML(prayer: ActivePrayer): string;
+    getUnlockedTooltipHTML(prayer: ActivePrayer): string;
 }
 declare type CombatMenuElement = {
     tooltip: TippyTooltip;

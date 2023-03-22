@@ -13,8 +13,8 @@ declare type SlayerTaskData = {
     slayerLevel: number;
 };
 declare class SlayerTask implements Serializable, EncodableObject {
-    private player;
-    private game;
+    player: Player;
+    game: Game;
     /** Task is active */
     active: boolean;
     /** Monsters for task */
@@ -29,35 +29,35 @@ declare class SlayerTask implements Serializable, EncodableObject {
     completion: number[];
     /** Autoslayer option is on */
     get autoSlayer(): boolean;
-    private taskTimer;
-    private autoStartNext;
+    taskTimer: Timer;
+    autoStartNext: boolean;
     renderRequired: boolean;
     renderNewButton: boolean;
-    private areaBypassItems;
-    private allAreaBypassItems;
-    private shouldResetTaskState;
+    areaBypassItems: EquipmentItem[];
+    allAreaBypassItems: EquipmentItem[];
+    shouldResetTaskState: boolean;
     constructor(player: Player, game: Game);
     postDataRegistration(): void;
     render(): void;
     /** Callback function for when the jump to task button is clicked */
     jumpToTaskOnClick(): void;
-    private renderTask;
-    private renderButtonSpinner;
+    renderTask(): void;
+    renderButtonSpinner(): void;
     extendTask(): void;
     addKill(): void;
     tick(): void;
-    private getExtensionCost;
+    getExtensionCost(): number;
     selectTask(tier: number, costsCoins: boolean, render: boolean, fromClick?: boolean): void;
-    private getTaskLength;
-    private setTask;
+    getTaskLength(tier: number): number;
+    setTask(): void;
     /** Returns the monsters available at a slayer tier */
-    private getMonsterSelection;
+    getMonsterSelection(tier: number): Monster[];
     /** Callback function for when the new task button is clicked */
     clickNewTask(): void;
     /** Checks the requirements of an area */
-    private checkRequirements;
+    checkRequirements(requirements: AnyRequirement[], softReq: boolean, slayerLevelReq: number): boolean;
     getTaskCompletionsForTierAndAbove(tier: number): number;
-    private resetTaskState;
+    resetTaskState(): void;
     encode(writer: SaveWriter): SaveWriter;
     decode(reader: SaveWriter, version: number): void;
     deserialize(reader: DataReader, version: number, idMap: NumericIDMap): void;
@@ -65,27 +65,27 @@ declare class SlayerTask implements Serializable, EncodableObject {
     static data: SlayerTaskData[];
 }
 declare class SlayerTaskMenuElement extends HTMLElement {
-    private _content;
-    private slayerIcon;
-    private newTaskSpinner;
-    private newTaskButton;
-    private newTaskButtonText;
-    private selectTaskContainer;
-    private locatingContent;
-    private monsterContainer;
-    private monsterImage;
-    private monsterLevel;
-    private taskTier;
-    private monsterName;
-    private jumpToEnemyButton;
-    private extendContainer;
-    private extendMessage;
-    private extendTaskButton;
-    private extendTaskCost;
-    private autoSlayerCheckBox;
-    private selectTaskButtons;
+    _content: DocumentFragment;
+    slayerIcon: HTMLImageElement;
+    newTaskSpinner: HTMLDivElement;
+    newTaskButton: HTMLAnchorElement;
+    newTaskButtonText: HTMLElement;
+    selectTaskContainer: HTMLDivElement;
+    locatingContent: HTMLDivElement;
+    monsterContainer: HTMLDivElement;
+    monsterImage: HTMLImageElement;
+    monsterLevel: HTMLSpanElement;
+    taskTier: HTMLElement;
+    monsterName: HTMLDivElement;
+    jumpToEnemyButton: HTMLButtonElement;
+    extendContainer: HTMLHeadingElement;
+    extendMessage: HTMLElement;
+    extendTaskButton: HTMLAnchorElement;
+    extendTaskCost: HTMLElement;
+    autoSlayerCheckBox: SettingsCheckboxElement;
+    selectTaskButtons: HTMLButtonElement[];
     taskSelectionOpen: boolean;
-    private slayerIconTooltip?;
+    slayerIconTooltip?: TippyTooltip;
     constructor();
     connectedCallback(): void;
     disconnectedCallback(): void;

@@ -1,22 +1,22 @@
 declare type Resize = 48 | 40 | 32 | 24;
 /** Base class for UI Components that put their content into a container */
 declare abstract class ContainedComponent {
-    protected abstract container: HTMLElement;
+    abstract container: HTMLElement;
     show(): void;
     hide(): void;
     invisible(): void;
     visible(): void;
 }
 declare abstract class InfoIcon extends ContainedComponent {
-    protected container: HTMLDivElement;
-    protected image: HTMLImageElement;
-    private text;
-    protected tooltip: TippyTooltip;
-    private parent;
+    container: HTMLDivElement;
+    image: HTMLImageElement;
+    text: HTMLElement;
+    tooltip: TippyTooltip;
+    parent: HTMLElement;
     constructor(parent: HTMLElement, pillClass: string, size: Resize);
-    protected setImage(media: string): void;
-    protected setText(text: string): void;
-    protected setTooltip(content: string): void;
+    setImage(media: string): void;
+    setText(text: string): void;
+    setTooltip(content: string): void;
     destroy(): void;
     hide(): void;
     show(): void;
@@ -38,18 +38,18 @@ declare abstract class InfoIcon extends ContainedComponent {
     abstract localize(): void;
 }
 declare class XPIcon extends InfoIcon {
-    private xp;
+    xp: number;
     constructor(parent: HTMLElement, xp: number, size?: Resize);
     setXP(xp: number): void;
     localize(): void;
-    private getTooltipContent;
+    getTooltipContent(xp: number): string;
 }
 declare class STRXPIcon extends InfoIcon {
-    private xp;
+    xp: number;
     constructor(parent: HTMLElement, xp: number, size?: Resize);
     setXP(xp: number): void;
     localize(): void;
-    private getTooltipContent;
+    getTooltipContent(xp: number): string;
 }
 declare class IntervalIcon extends InfoIcon {
     constructor(parent: HTMLElement, interval: number, size?: Resize, altMedia?: boolean);
@@ -61,51 +61,51 @@ declare class IntervalIcon extends InfoIcon {
 declare class DoublingIcon extends InfoIcon {
     constructor(parent: HTMLElement, chance: number, size?: Resize);
     localize(): void;
-    private getTooltipContent;
+    getTooltipContent(): string;
     setChance(chance: number): void;
 }
 declare class PreservationIcon extends InfoIcon {
     constructor(parent: HTMLElement, chance: number, size?: Resize);
     localize(): void;
-    private getTooltipContent;
+    getTooltipContent(): string;
     setChance(chance: number): void;
 }
 declare class PerfectCookIcon extends InfoIcon {
     constructor(parent: HTMLElement, chance: number, size?: Resize);
     localize(): void;
-    private getTooltipContent;
+    getTooltipContent(): string;
     setChance(chance: number): void;
 }
 declare class CookingSuccessIcon extends InfoIcon {
     constructor(parent: HTMLElement, chance: number, size?: Resize);
     localize(): void;
-    private getTooltipContent;
+    getTooltipContent(): string;
     setChance(chance: number): void;
 }
 declare class MasteryXPIcon extends InfoIcon {
-    private xp;
+    xp: number;
     constructor(parent: HTMLElement, xp: number, size?: Resize);
     localize(): void;
     setXP(xp: number): void;
-    private getTooltipContent;
+    getTooltipContent(): string;
 }
 declare class MasteryPoolIcon extends InfoIcon {
-    private xp;
+    xp: number;
     constructor(parent: HTMLElement, xp: number, size?: Resize);
     localize(): void;
     setXP(xp: number): void;
-    private getTooltipContent;
+    getTooltipContent(): string;
 }
 declare class StealthIcon extends InfoIcon {
-    private npc?;
+    npc?: ThievingNPC;
     constructor(parent: HTMLElement, size?: Resize);
     setNPC(npc: ThievingNPC): void;
     localize(): void;
-    private getTooltipContent;
+    getTooltipContent(): string;
 }
 /** Info Icon for items that have a chance to drop */
 declare class ItemChanceIcon extends InfoIcon {
-    private item?;
+    item?: AnyItem;
     constructor(parent: HTMLElement, size?: Resize);
     setItem(item: AnyItem): void;
     localize(): void;
@@ -122,22 +122,22 @@ declare class MeteoriteChanceIcon extends InfoIcon {
     setChance(chance: number): void;
 }
 declare abstract class QtyIcon extends InfoIcon {
-    protected qty: number;
-    protected abstract getCurrentQty(): number;
-    protected abstract getName(): string;
+    qty: number;
+    abstract getCurrentQty(): number;
+    abstract getName(): string;
     constructor(parent: HTMLElement, qty: number, size?: Resize);
     localize(): void;
     updateQuantity(): void;
-    private getTooltipContent;
+    getTooltipContent(): string;
 }
 declare class ItemQtyIcon extends QtyIcon {
-    private allowQuickBuy;
-    private autoBuyIcon;
-    private item?;
+    allowQuickBuy: boolean;
+    autoBuyIcon: HTMLImageElement;
+    item?: AnyItem;
     constructor(parent: HTMLElement, quickBuy?: boolean, qty?: number, size?: Resize);
     setItem(item: AnyItem, qty: number, altMedia?: boolean): void;
-    protected getCurrentQty(): number;
-    protected getName(): string;
+    getCurrentQty(): number;
+    getName(): string;
 }
 declare class CookingStockpileIcon extends ItemQtyIcon {
     constructor(parent: HTMLElement, category: CookingCategory, size?: Resize);
@@ -146,40 +146,40 @@ declare class CookingStockpileIcon extends ItemQtyIcon {
 }
 declare class GPQtyIcon extends QtyIcon {
     constructor(parent: HTMLElement, qty: number, size?: Resize);
-    protected getCurrentQty(): number;
-    protected getName(): string;
+    getCurrentQty(): number;
+    getName(): string;
 }
 declare class SCQtyIcon extends QtyIcon {
     constructor(parent: HTMLElement, qty: number, size?: Resize);
-    protected getCurrentQty(): number;
-    protected getName(): string;
+    getCurrentQty(): number;
+    getName(): string;
 }
 declare abstract class QtyCurrentIcon extends InfoIcon {
-    protected abstract getCurrentQty(): number;
-    protected abstract getName(): string;
-    private currentQuantity;
-    private requiredQuantity;
+    abstract getCurrentQty(): number;
+    abstract getName(): string;
+    currentQuantity: number;
+    requiredQuantity: number;
     constructor(parent: HTMLElement, requiredQty: number, size?: Resize);
     localize(): void;
-    protected init(): void;
+    init(): void;
     updateQuantity(): void;
-    private onMouseover;
-    private onMouseleave;
-    private getTooltipContent;
+    onMouseover(): void;
+    onMouseleave(): void;
+    getTooltipContent(): string;
 }
 declare class ItemCurrentIcon extends QtyCurrentIcon {
-    private item;
+    item: AnyItem;
     constructor(parent: HTMLElement, item: AnyItem, requiredQty: number, quickBuy?: boolean, size?: Resize, altMedia?: boolean);
-    protected getCurrentQty(): number;
-    protected getName(): string;
+    getCurrentQty(): number;
+    getName(): string;
 }
 declare class GPCurrentIcon extends QtyCurrentIcon {
     constructor(parent: HTMLElement, requiredQty: number, size?: Resize);
-    protected getCurrentQty(): number;
-    protected getName(): string;
+    getCurrentQty(): number;
+    getName(): string;
 }
 declare class SCCurrentIcon extends QtyCurrentIcon {
     constructor(parent: HTMLElement, requiredQty: number, size?: Resize);
-    protected getCurrentQty(): number;
-    protected getName(): string;
+    getCurrentQty(): number;
+    getName(): string;
 }

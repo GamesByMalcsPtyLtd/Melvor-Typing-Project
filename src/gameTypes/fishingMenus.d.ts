@@ -1,27 +1,27 @@
 declare class FishingAreaMenu extends HTMLElement {
-    private _content;
-    private areaBlock;
-    private areaHeader;
-    private areaName;
-    private areaEyecon;
-    private fishChance;
-    private junkChance;
-    private specialChance;
-    private buttonContainer;
-    private infoContainer;
-    private fishButtons;
-    private fishName;
-    private fishImage;
-    private fishInfoContainer;
-    private fishInterval;
-    private masteryDisplay;
-    private startButton;
-    private statusSpinner;
-    private statusText;
-    private xpIcon;
-    private strXPIcon;
-    private masteryIcon;
-    private masteryPoolIcon;
+    _content: DocumentFragment;
+    areaBlock: HTMLDivElement;
+    areaHeader: HTMLDivElement;
+    areaName: HTMLSpanElement;
+    areaEyecon: HTMLElement;
+    fishChance: HTMLSpanElement;
+    junkChance: HTMLSpanElement;
+    specialChance: HTMLSpanElement;
+    buttonContainer: HTMLDivElement;
+    infoContainer: HTMLDivElement;
+    fishButtons: FishingAreaMenuButton[];
+    fishName: HTMLSpanElement;
+    fishImage: HTMLImageElement;
+    fishInfoContainer: HTMLDivElement;
+    fishInterval: HTMLSpanElement;
+    masteryDisplay: MasteryDisplay;
+    startButton: HTMLButtonElement;
+    statusSpinner: HTMLDivElement;
+    statusText: HTMLSpanElement;
+    xpIcon: XPIcon;
+    strXPIcon: STRXPIcon;
+    masteryIcon: MasteryXPIcon;
+    masteryPoolIcon: MasteryPoolIcon;
     constructor();
     connectedCallback(): void;
     /** Sets the chances of the menu */
@@ -45,10 +45,10 @@ declare class FishingAreaMenu extends HTMLElement {
     setActionInactive(): void;
 }
 declare class FishingAreaMenuButton extends HTMLElement {
-    private _content;
-    private link;
-    private fishImage;
-    private fishName;
+    _content: DocumentFragment;
+    link: HTMLAnchorElement;
+    fishImage: HTMLImageElement;
+    fishName: HTMLElement;
     constructor();
     connectedCallback(): void;
     setFishUnlocked(fish: Fish, area: FishingArea): void;

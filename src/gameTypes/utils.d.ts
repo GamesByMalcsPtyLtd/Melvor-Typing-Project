@@ -60,6 +60,8 @@ declare function checkMediaQuery(mediaQuery: string): boolean;
 declare function createElement<T extends keyof HTMLElementTagNameMap>(tagName: T, options?: ElemCreationOptions): HTMLElementTagNameMap[T];
 declare function hideElement(elem: HTMLElement): void;
 declare function showElement(elem: HTMLElement): void;
+/** Toggles the color of an elements text between success and failure */
+declare function toggleDangerSuccess(elem: HTMLElement, success: boolean): void;
 declare function removeElementID(elem: HTMLElement): void;
 declare type ElemCreationOptions = {
     /** Sets the elements className */
@@ -118,8 +120,8 @@ declare function removePyro(): void;
 declare function startPyroInterval(): void;
 /** Helps queue game notifications */
 declare class NotificationQueue {
-    private maxNotifiactions;
-    private queue;
+    maxNotifiactions: number;
+    queue: QueuedNotify[];
     constructor(maxNotifiactions: number);
     notify(): void;
     add(notification: QueuedNotify): void;
@@ -128,14 +130,14 @@ declare class NotificationQueue {
 /** Utility class for computing experience and levels */
 declare class ExperienceCalculator {
     /** Table of level to xp required */
-    private table;
-    private xpSum;
+    table: number[];
+    xpSum: number;
     /** Constant used to estimate level */
-    private estConstA;
+    estConstA: number;
     /** Constant used to estimate level */
-    private estConstB;
+    estConstB: number;
     constructor();
-    private equate;
+    equate(level: number): number;
     level_to_xp(level: number): number;
     /** XP to level function, utilizing loop. Returns level + 1 */
     xp_to_level(xp: number, level?: number): number;
@@ -285,8 +287,8 @@ declare type DropTableElement = {
     weight: number;
 };
 declare class DropTable {
-    private totalWeight;
-    private drops;
+    totalWeight: number;
+    drops: DropTableElement[];
     /** The number of different drops in the table */
     get size(): number;
     get weight(): number;
@@ -295,12 +297,13 @@ declare class DropTable {
     get averageDropValue(): number;
     constructor(game: Game, data: DropTableData[]);
     registerDrops(game: Game, data: DropTableData[]): void;
+    unregisterDrops(data: string[]): void;
     /** Rolls for a drop on the table */
     getDrop(): AnyItemQuantity;
 }
 /** Wrapper for sparse numeric maps */
 declare class SparseNumericMap<T> {
-    private data;
+    data: Map<T, number>;
     get size(): number;
     has(key: T): boolean;
     get(key: T): number;
@@ -316,6 +319,11 @@ declare class SparseNumericMap<T> {
     clear(): void;
     forEach(callbackfn: (value: number, key: T) => void): void;
 }
+/**
+ * Escapes the characters in a string such that they are considered as their literal values in a RegExp
+ * Taken from: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions
+ */
+declare function escapeRegExp(string: string): string;
 declare function generateComponentClass(templateID: string, tagName: string, className: string): string;
 declare function generateModifierDataSchema(): string;
 declare type TownshipResourceType = 'Currency' | 'Raw' | 'Product';

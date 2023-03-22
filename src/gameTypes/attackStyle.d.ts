@@ -17,6 +17,6 @@ declare class AttackStyle extends NamespacedObject {
     get name(): string;
     get toolTipContent(): string;
     get buttonID(): string;
-    private _name;
+    _name: string;
     constructor(namespace: DataNamespace, data: AttackStyleData, game: Game);
 }

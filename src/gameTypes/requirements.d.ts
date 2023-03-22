@@ -96,6 +96,10 @@ interface TownshipTaskCompletionRequirement {
     type: 'TownshipTask';
     count: number;
 }
+interface TownshipTutorialTaskCompletionRequirement {
+    type: 'TownshipTutorialTask';
+    count: number;
+}
 interface TownshipBuildingRequirementData {
     type: 'TownshipBuilding';
     buildingID: string;
@@ -106,6 +110,6 @@ interface TownshipBuildingRequirement {
     building: TownshipBuilding;
     count: number;
 }
-declare type AnyRequirement = SkillLevelRequirement | AllSkillLevelRequirement | DungeonRequirement | CompletionRequirement | ShopPurchaseRequirement | SlayerItemRequirement | SlayerTaskRequirement | ItemFoundRequirement | MonsterKilledRequirement | TownshipTaskCompletionRequirement | TownshipBuildingRequirement;
-declare type AnyRequirementData = SkillLevelRequirementData | AllSkillLevelRequirementData | DungeonRequirementData | CompletionRequirementData | ShopPurchaseRequirementData | SlayerItemRequirementData | SlayerTaskRequirementData | ItemFoundRequirementData | MonsterKilledRequirementData | TownshipTaskCompletionRequirement | TownshipBuildingRequirementData;
+declare type AnyRequirement = SkillLevelRequirement | AllSkillLevelRequirement | DungeonRequirement | CompletionRequirement | ShopPurchaseRequirement | SlayerItemRequirement | SlayerTaskRequirement | ItemFoundRequirement | MonsterKilledRequirement | TownshipTaskCompletionRequirement | TownshipTutorialTaskCompletionRequirement | TownshipBuildingRequirement;
+declare type AnyRequirementData = SkillLevelRequirementData | AllSkillLevelRequirementData | DungeonRequirementData | CompletionRequirementData | ShopPurchaseRequirementData | SlayerItemRequirementData | SlayerTaskRequirementData | ItemFoundRequirementData | MonsterKilledRequirementData | TownshipTaskCompletionRequirement | TownshipTutorialTaskCompletionRequirement | TownshipBuildingRequirementData;
 declare function getRequirementNodes(requirement: AnyRequirement, imageClass: string): (string | Node)[];

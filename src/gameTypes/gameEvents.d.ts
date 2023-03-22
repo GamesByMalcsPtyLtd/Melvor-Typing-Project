@@ -26,11 +26,11 @@ interface SkillActionEventMatcherOptions {
 /** Matches any skill action */
 declare class SkillActionEventMatcher extends GameEventMatcher {
     /** If present, the SkillActionEvent must match this */
-    private isPotionActive?;
+    isPotionActive?: boolean;
     /** If present, the SkillActionEvent must match this */
-    private succesful?;
+    succesful?: boolean;
     /** If present, the player must be using one of the specified potions during the Events firing */
-    private activePotions?;
+    activePotions?: Set<PotionItem>;
     constructor(options: SkillActionEventMatcherOptions, game: Game);
     doesEventMatch(event: GameEvent): boolean;
 }
@@ -90,13 +90,13 @@ interface FishingActionEventMatcherOptions extends SkillActionEventMatcherOption
 }
 declare class FishingActionEventMatcher extends SkillActionEventMatcher {
     /** If present, the FishingActionEvent's action must match a member */
-    private actions?;
+    actions?: Set<Fish>;
     /** If present, the FishingActionEvent's area must match a member*/
-    private areas?;
+    areas?: Set<FishingArea>;
     /** If present, the FishingActionEvent's property must match this */
-    private gemGiven?;
+    gemGiven?: boolean;
     /** If present, the FishingActionEvent's property must match this */
-    private cookedVersionExists?;
+    cookedVersionExists?: boolean;
     constructor(options: FishingActionEventMatcherOptions, game: Game);
     doesEventMatch(event: GameEvent): boolean;
 }
@@ -116,7 +116,7 @@ interface FiremakingActionEventMatcherOptions extends SkillActionEventMatcherOpt
     actionIDs?: string[];
 }
 declare class FiremakingActionEventMatcher extends SkillActionEventMatcher {
-    private actions?;
+    actions?: Set<FiremakingLog>;
     constructor(options: FiremakingActionEventMatcherOptions, game: Game);
     doesEventMatch(event: GameEvent): boolean;
 }
@@ -137,7 +137,7 @@ interface BonfireLitEventMatcherOptions {
 }
 declare class BonfireLitEventMatcher extends GameEventMatcher {
     /** If present, the log of the BonfireLitEvent must match a member */
-    private logs?;
+    logs?: Set<FiremakingLog>;
     constructor(options: BonfireLitEventMatcherOptions, game: Game);
     doesEventMatch(event: GameEvent): boolean;
 }
@@ -166,11 +166,11 @@ interface CookingActionEventMatcherOptions extends SkillActionEventMatcherOption
 }
 declare class CookingActionEventMatcher extends SkillActionEventMatcher {
     /** If present, the CookingActionEvent's action must match a member */
-    private actions?;
+    actions?: Set<CookingRecipe>;
     /** If present, the CookingActionEvent's category must match a member */
-    private categories?;
+    categories?: Set<CookingCategory>;
     /** If present, the user must be passive cooking during the action */
-    private isPassiveCooking?;
+    isPassiveCooking?: boolean;
     constructor(options: CookingActionEventMatcherOptions, game: Game);
     doesEventMatch(event: GameEvent): boolean;
 }
@@ -200,17 +200,17 @@ interface MiningActionEventMatcherOptions extends SkillActionEventMatcherOptions
 }
 declare class MiningActionEventMatcher extends SkillActionEventMatcher {
     /** If present, the MiningActionEvent's action must match a member */
-    private actions?;
+    actions?: Set<MiningRock>;
     /** If present, the MiningActionEvent's property must match */
-    private gemObtained?;
+    gemObtained?: boolean;
     /** If present, the MiningActionEvent's property must match */
-    private smithedVersionExists?;
+    smithedVersionExists?: boolean;
     /** If present, the actions ability to give gems must match */
-    private actionGivesGems?;
+    actionGivesGems?: boolean;
     /** If present, the actions ability to give superior gems must match */
-    private actionGivesSuperiorGems?;
+    actionGivesSuperiorGems?: boolean;
     /** If present, the action must be one of the specified ore types */
-    private oreTypes?;
+    oreTypes?: Set<MiningRockType>;
     constructor(options: MiningActionEventMatcherOptions, game: Game);
     doesEventMatch(event: GameEvent): boolean;
 }
@@ -233,11 +233,11 @@ interface SmithingActionEventMatcherOptions extends SkillActionEventMatcherOptio
 }
 declare class SmithingActionEventMatcher extends SkillActionEventMatcher {
     /** If present, SmithingActionEvent must match a member */
-    private actions?;
+    actions?: Set<SmithingRecipe>;
     /** If present, the actions catgegory must match a member */
-    private categories?;
+    categories?: Set<SkillCategory>;
     /** If present, the actions ingredient items must match a member */
-    private consumedItems?;
+    consumedItems?: Set<AnyItem>;
     constructor(options: SmithingActionEventMatcherOptions, game: Game);
     doesEventMatch(event: GameEvent): boolean;
 }
@@ -266,11 +266,11 @@ interface ThievingActionEventMatcherOptions extends SkillActionEventMatcherOptio
 }
 declare class ThievingActionEventMatcher extends SkillActionEventMatcher {
     /** If present, the event's action must match a membmer */
-    private npcs?;
+    npcs?: Set<ThievingNPC>;
     /** If present, the event's area must match a member */
-    private areas?;
+    areas?: Set<ThievingArea>;
     /** If present, the event's property must match */
-    private commonDropObtained?;
+    commonDropObtained?: boolean;
     constructor(options: ThievingActionEventMatcherOptions, game: Game);
     doesEventMatch(event: GameEvent): boolean;
 }
@@ -281,9 +281,9 @@ interface FarmingPlantActionEventMatcherOptions {
 }
 declare class FarmingPlantActionEventMatcher extends GameEventMatcher {
     /** If present, the recipe being planted must match a member */
-    private actions?;
+    actions?: Set<FarmingRecipe>;
     /** If present, the category of the recipe being planted must match a member */
-    private categories?;
+    categories?: Set<FarmingCategory>;
     constructor(options: FarmingPlantActionEventMatcherOptions, game: Game);
     doesEventMatch(event: GameEvent): boolean;
 }
@@ -305,9 +305,9 @@ interface FarmingHarvestActionEventMatcherOptions extends SkillActionEventMatche
 }
 declare class FarmingHarvestActionEventMatcher extends SkillActionEventMatcher {
     /** If present, the recipe being harvested must match a member */
-    private actions?;
+    actions?: Set<FarmingRecipe>;
     /** if present, the category of the recipe being harvested must match a member */
-    private categories?;
+    categories?: Set<FarmingCategory>;
     constructor(options: FarmingHarvestActionEventMatcherOptions, game: Game);
     doesEventMatch(event: GameEvent): boolean;
 }
@@ -344,13 +344,13 @@ interface FletchingActionEventMatcherOptions extends SkillActionEventMatcherOpti
 }
 declare class FletchingActionEventMatcher extends SkillActionEventMatcher {
     /** If present, the recipe of the action must match a member */
-    private actions?;
+    actions?: Set<FletchingRecipe>;
     /** If present, the category of the recipe must match a member */
-    private categories?;
+    categories?: Set<SkillCategory>;
     /** If present, the recipe must make arrows */
-    private isArrows?;
+    isArrows?: boolean;
     /** If present, the recipe must make an unstrung bow */
-    private isUnstrungBows?;
+    isUnstrungBows?: boolean;
     constructor(options: FletchingActionEventMatcherOptions, game: Game);
     doesEventMatch(event: GameEvent): boolean;
 }
@@ -372,9 +372,9 @@ interface CraftingActionEventMatcherOptions extends SkillActionEventMatcherOptio
 }
 declare class CraftingActionEventMatcher extends SkillActionEventMatcher {
     /** If present, the recipe of the action must match a member */
-    private actions?;
+    actions?: Set<CraftingRecipe>;
     /** If present, the category of the recipe must match a member */
-    private categories?;
+    categories?: Set<SkillCategory>;
     constructor(options: CraftingActionEventMatcherOptions, game: Game);
     doesEventMatch(event: GameEvent): boolean;
 }
@@ -399,13 +399,13 @@ interface RunecraftingActionEventMatcherOptions extends SkillActionEventMatcherO
 }
 declare class RunecraftingActionEventMatcher extends SkillActionEventMatcher {
     /** If present, the recipe of the action must match a member */
-    private actions?;
+    actions?: Set<RunecraftingRecipe>;
     /** If present, the category of the recipe must match a member */
-    private categories?;
+    categories?: Set<SkillCategory>;
     /** If present, the recipe of the action must consume one of the items in the set */
-    private consumedItems?;
+    consumedItems?: Set<AnyItem>;
     /** If present the recipe of the action must belong to one of the sub categories */
-    private subCategories?;
+    subCategories?: Set<RunecraftingSubCategory>;
     constructor(options: RunecraftingActionEventMatcherOptions, game: Game);
     doesEventMatch(event: GameEvent): boolean;
 }
@@ -427,9 +427,9 @@ interface HerbloreActionEventMatcherOptions extends SkillActionEventMatcherOptio
 }
 declare class HerbloreActionEventMatcher extends SkillActionEventMatcher {
     /** If present, the recipe of the action must match a member */
-    private actions?;
+    actions?: Set<HerbloreRecipe>;
     /** If present, the category of the recipe must match a member */
-    private categories?;
+    categories?: Set<SkillCategory>;
     constructor(options: HerbloreActionEventMatcherOptions, game: Game);
     doesEventMatch(event: GameEvent): boolean;
 }
@@ -451,9 +451,9 @@ interface AgilityActionEventMatcherOptions extends SkillActionEventMatcherOption
 }
 declare class AgilityActionEventMatcher extends SkillActionEventMatcher {
     /** If present, the obstacle of the action must match a member */
-    private actions?;
+    actions?: Set<AgilityObstacle>;
     /** If present, the category of the obstacle must match a member */
-    private categories?;
+    categories?: Set<number>;
     constructor(options: AgilityActionEventMatcherOptions, game: Game);
     doesEventMatch(event: GameEvent): boolean;
 }
@@ -476,9 +476,9 @@ interface SummoningActionEventMatcherOptions extends SkillActionEventMatcherOpti
 }
 declare class SummoningActionEventMatcher extends SkillActionEventMatcher {
     /** If present, the recipe of the action must match a member */
-    private actions?;
+    actions?: Set<SummoningRecipe>;
     /** If present, the category of the recipe must match a member */
-    private categories?;
+    categories?: Set<SkillCategory>;
     constructor(options: SummoningActionEventMatcherOptions, game: Game);
     doesEventMatch(event: GameEvent): boolean;
 }
@@ -499,7 +499,7 @@ interface AstrologyActionEventMatcherOptions extends SkillActionEventMatcherOpti
 }
 declare class AstrologyActionEventMatcher extends SkillActionEventMatcher {
     /** If present, the recipe of the action must match a member */
-    private actions?;
+    actions?: Set<AstrologyRecipe>;
     constructor(options: AstrologyActionEventMatcherOptions, game: Game);
     doesEventMatch(event: GameEvent): boolean;
 }
@@ -520,7 +520,7 @@ interface AltMagicActionEventMatcherOptions extends SkillActionEventMatcherOptio
 }
 declare class AltMagicActionEventMatcher extends SkillActionEventMatcher {
     /** If present, the recipe of the action must match a member */
-    private spells?;
+    spells?: Set<AltMagicSpell>;
     constructor(options: AltMagicActionEventMatcherOptions, game: Game);
     doesEventMatch(event: GameEvent): boolean;
 }
@@ -545,7 +545,7 @@ interface MonsterDropEventMatcherOptions {
 }
 declare class MonsterDropEventMatcher extends GameEventMatcher {
     /** If present the drop event's property must match */
-    private herbSeed?;
+    herbSeed?: boolean;
     constructor(options: MonsterDropEventMatcherOptions);
     doesEventMatch(event: GameEvent): boolean;
 }
@@ -566,7 +566,7 @@ interface PlayerAttackEventMatcherOptions {
 }
 declare class PlayerAttackEventMatcher extends GameEventMatcher {
     /** If present, the attack event's attackType must match a member */
-    private attackTypes?;
+    attackTypes?: Set<AttackType>;
     constructor(options: PlayerAttackEventMatcherOptions);
     doesEventMatch(event: GameEvent): boolean;
 }
@@ -587,7 +587,7 @@ interface EnemyAttackEventMatcherOptions {
 }
 declare class EnemyAttackEventMatcher extends GameEventMatcher {
     /** If present, the attack event's attackType must match a member */
-    private attackTypes?;
+    attackTypes?: Set<AttackType>;
     constructor(options: EnemyAttackEventMatcherOptions);
     doesEventMatch(event: GameEvent): boolean;
 }
@@ -719,9 +719,9 @@ interface MonsterKilledEventMatcherOptions {
 declare class MonsterKilledEventMatcher extends GameEventMatcher {
     get monsterList(): Monster[];
     /** If present, set monster killed must match a member */
-    private monsters?;
+    monsters?: Set<Monster>;
     /** If present, monster must be killed with the specified attack type */
-    private killedWithType?;
+    killedWithType?: AttackType;
     constructor(options: MonsterKilledEventMatcherOptions, game: Game);
     doesEventMatch(event: GameEvent): boolean;
 }
@@ -742,7 +742,7 @@ interface ItemEquippedEventMatcherOptions {
 }
 declare class ItemEquippedEventMatcher extends GameEventMatcher {
     /** If present, equipped item must match a member */
-    private items?;
+    items?: Set<EquipmentItem>;
     constructor(options: ItemEquippedEventMatcherOptions, game: Game);
     doesEventMatch(event: GameEvent): boolean;
 }
@@ -763,7 +763,7 @@ interface FoodEquippedEventMatcherOptions {
 }
 declare class FoodEquippedEventMatcher extends GameEventMatcher {
     /** If present, equipped item must match a member */
-    private items?;
+    items?: Set<FoodItem>;
     constructor(options: FoodEquippedEventMatcherOptions, game: Game);
     doesEventMatch(event: GameEvent): boolean;
 }
@@ -784,7 +784,7 @@ interface ShopPurchaseMadeEventMatcherOptions {
 }
 declare class ShopPurchaseMadeEventMatcher extends GameEventMatcher {
     /** If present, purchase must match a member */
-    private purchases?;
+    purchases?: Set<ShopPurchase>;
     constructor(options: ShopPurchaseMadeEventMatcherOptions, game: Game);
     doesEventMatch(event: GameEvent): boolean;
 }
@@ -800,7 +800,7 @@ interface SummonTabletUsedEventMatcherOptions {
     tabletIDs?: string[];
 }
 declare class SummonTabletUsedEventMatcher extends GameEventMatcher {
-    private tablets?;
+    tablets?: Set<EquipmentItem>;
     constructor(options: SummonTabletUsedEventMatcherOptions, game: Game);
     doesEventMatch(event: GameEvent): boolean;
 }

@@ -97,7 +97,7 @@ declare class SpecialAttack extends NamespacedObject implements SoftDataDependan
     /** Localized description of the attack */
     get description(): string;
     get canNormalAttack(): boolean;
-    private get descriptionTemplateData();
+    get descriptionTemplateData(): StringDictionary<string>;
     /** Default chance for attack to happen in %*/
     defaultChance: number;
     /** Damage dealt by attack */
@@ -131,8 +131,8 @@ declare class SpecialAttack extends NamespacedObject implements SoftDataDependan
     minAccuracy: number;
     /** String used to automatically generate a description */
     descriptionGenerator?: string;
-    private _name;
-    private _description;
+    _name: string;
+    _description: string;
     constructor(namespace: DataNamespace, data: AttackData, game: Game);
     registerSoftDependencies(data: AttackData, game: Game): void;
 }
@@ -146,7 +146,7 @@ declare class ItemEffect extends NamespacedObject {
 declare class ItemEffectAttack extends SpecialAttack {
     /** Effects that have been registered */
     itemEffects: NamespaceRegistry<ItemEffect>;
-    private effectToItemEffectMap;
+    effectToItemEffectMap: Map<AnyEffect, ItemEffect>;
     constructor(namespace: DataNamespace, game: Game);
     registerItemEffects(namespace: DataNamespace, data: ItemEffectData[], game: Game): void;
     getItemEffectFromEffect(effect: AnyEffect): ItemEffect;
@@ -166,9 +166,9 @@ declare class StackingEffect extends NamespacedObject {
     maxStacks: number;
     get name(): string;
     get media(): string;
-    private _media;
-    private _name;
-    private _langName?;
+    _media: string;
+    _name: string;
+    _langName?: LangStringData;
     constructor(namespace: DataNamespace, data: StackingEffectData);
 }
 declare function constructDamageFromData(data: DamageData[]): Damage[];

@@ -1,31 +1,31 @@
 /** Enemy Class for Golbin Raid */
 declare class Golbin extends Enemy {
-    protected manager: RaidManager;
-    protected get encodeMonster(): boolean;
+    manager: RaidManager;
+    get encodeMonster(): boolean;
     /** Constructs an enemy for golbin raid */
     constructor(manager: RaidManager, game: Game);
-    private tempNamespace;
-    protected modifyAttackInterval(interval: number): number;
-    protected computeMagicMaxHit(): number;
-    protected modifyMaxHP(maxHP: number): number;
-    protected modifyEvasion(evasion: Evasion<number>): void;
-    protected modifyMaxHit(maxHit: number): number;
-    protected modifyAccuracy(accuracy: number): number;
+    tempNamespace: DataNamespace;
+    modifyAttackInterval(interval: number): number;
+    computeMagicMaxHit(): number;
+    modifyMaxHP(maxHP: number): number;
+    modifyEvasion(evasion: Evasion<number>): void;
+    modifyMaxHit(maxHit: number): number;
+    modifyAccuracy(accuracy: number): number;
     getMonster(wave: number, isBoss: boolean, hasExtraPassiveChance: boolean, game: Game): Monster;
-    private static getName;
+    static getName(): string;
     computeModifiers(): void;
-    private static getLevel;
-    private static getAttackType;
-    private static getMedia;
-    private static getStats;
-    private static getStatValue;
+    static getLevel(wave: number, isBoss: boolean, hitpoints?: boolean): number;
+    static getAttackType(): AttackType;
+    static getMedia(isBoss: boolean): string;
+    static getStats(wave: number, isBoss: boolean): EquipStatPair[];
+    static getStatValue(wave: number, isBoss: boolean): number;
     encode(writer: SaveWriter): SaveWriter;
     /** Encodes the current Golbins monster data */
-    private encodeMonsterData;
+    encodeMonsterData(writer: SaveWriter): void;
     decode(reader: SaveWriter, version: number): void;
     decodeMonster(reader: SaveWriter, version: number): void;
     deserialize(reader: DataReader, version: number, idMap: NumericIDMap): void;
-    private deserializeMonsterData;
-    private static readonly names;
-    private static readonly traits;
+    deserializeMonsterData(reader: DataReader, version: number, idMap: NumericIDMap): GolbinMonster;
+    static readonly names: string[];
+    static readonly traits: string[];
 }

@@ -1,38 +1,38 @@
 declare class Enemy extends Character {
-    protected manager: BaseManager;
-    protected game: Game;
+    manager: BaseManager;
+    game: Game;
     state: EnemyState;
     modifiers: CombatModifiers;
     spellSelection: SpellSelection;
     noun: Noun;
-    protected get statElements(): EnemyRenderHTMLElements;
-    protected get splashManager(): SplashManager;
-    protected get effectRenderer(): EffectRenderer;
-    protected get attackBar(): ProgressBar;
-    protected get attackBarMinibar(): ProgressBar;
+    get statElements(): EnemyRenderHTMLElements;
+    get splashManager(): SplashManager;
+    get effectRenderer(): EffectRenderer;
+    get attackBar(): ProgressBar;
+    get attackBarMinibar(): ProgressBar;
     rendersRequired: EnemyRenderQueue;
-    private randomAttackType;
+    randomAttackType: AttackType | 'unset';
     monster?: Monster;
     isBoss: boolean;
     /** Flag for if the monster property should be encoded */
-    protected get encodeMonster(): boolean;
+    get encodeMonster(): boolean;
     constructor(manager: BaseManager, game: Game);
     setMonster(monster: Monster): void;
-    protected computeAttackType(): void;
-    protected computeAttackSelection(): void;
-    protected computeLevels(): void;
-    protected computeEquipmentStats(): void;
+    computeAttackType(): void;
+    computeAttackSelection(): void;
+    computeLevels(): void;
+    computeEquipmentStats(): void;
     computeModifiers(): void;
-    protected addGamemodeModifiers(): void;
-    protected getAccuracyValues(): {
+    addGamemodeModifiers(): void;
+    getAccuracyValues(): {
         effectiveLevel: number;
         bonus: number;
     };
-    protected modifyDamageReduction(reduction: number): number;
-    protected getFlatReflectDamage(): number;
+    modifyDamageReduction(reduction: number): number;
+    getFlatReflectDamage(): number;
     damage(amount: number, source: SplashType): void;
     processDeath(): void;
-    protected regen(): void;
+    regen(): void;
     /** Sets the enemy to render as spawning */
     setSpawning(): void;
     setRenderAll(): void;
@@ -40,22 +40,22 @@ declare class Enemy extends Character {
     applyUniqueSpawnEffects(): void;
     initializeForCombat(): void;
     render(): void;
-    protected renderAttacksAndPassives(): void;
-    protected renderDamageValues(): void;
-    protected renderLevels(): void;
-    protected renderImageAndName(): void;
-    protected renderStats(): void;
+    renderAttacksAndPassives(): void;
+    renderDamageValues(): void;
+    renderLevels(): void;
+    renderImageAndName(): void;
+    renderStats(): void;
     getAttackTypeMedia(attackType: string): string;
-    protected renderNoStats(): void;
-    protected renderHitpoints(): void;
+    renderNoStats(): void;
+    renderHitpoints(): void;
     resetActionState(): void;
     encode(writer: SaveWriter): SaveWriter;
-    private setStatsFromMonster;
+    setStatsFromMonster(monster: Monster): void;
     decode(reader: SaveWriter, version: number): void;
     deserialize(reader: DataReader, version: number, idMap: NumericIDMap): void;
-    protected postAttack(attack: SpecialAttack, attackType: AttackType): void;
-    protected onHit(): void;
-    protected onMiss(): void;
+    postAttack(attack: SpecialAttack, attackType: AttackType): void;
+    onHit(): void;
+    onMiss(): void;
 }
 interface EnemyRenderHTMLElements extends RenderHTMLElements {
     image: HTMLDivElement;

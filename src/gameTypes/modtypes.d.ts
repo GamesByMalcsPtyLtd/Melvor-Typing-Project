@@ -347,7 +347,7 @@ namespace Modding {
       /** Method to get the current setting's value from the rendered HTML. */
       get: () => unknown;
       /** Method to set the current setting's value in the rendered HTML. */
-      set: (value: unknown) => void;
+      set: (value: unknown, options?: { isRestoringValue?: boolean }) => void;
     }
 
     interface SettingMap {
@@ -361,11 +361,13 @@ namespace Modding {
       /** Name of the setting. This is the value used for the HTML `id` attribute. */
       name: string;
       /** The default value, used for initial values and upon resetting defaults. */
-      default: unknown;
+      default: primitive | primitive[];
       /** Text label for the input. */
       label: string;
       /** Extra text to be displayed below the label in a smaller font. */
       hint: string;
+      /** Stub for settings with dropdowns. */
+      options?: unknown;
       /** Method responsible for generating the HTML for the input. */
       render(name: string, onChange: () => void, config: SettingConfig): HTMLElement;
       /** Method that handles user input. Return `false` to prevent the value from changing. Return a string to prevent the value from changing and display a validation error. */
@@ -399,7 +401,7 @@ namespace Modding {
 
     /** Configuration object for dropdown input setting type. */
     interface DropdownConfig extends SettingConfig {
-      default: string;
+      default: primitive;
       /** The color of the dropdown button. */
       color: string;
       /** Dropdown options. */
@@ -409,7 +411,7 @@ namespace Modding {
     /** A dropdown option. */
     interface DropdownOption {
       /** The value to be passed to the setting. */
-      value: string;
+      value: primitive;
       /** The value to be displayed in the dropdown. */
       display: string | HTMLElement;
     }
@@ -426,7 +428,7 @@ namespace Modding {
 
     /** Configuration object for checkbox group setting type. */
     interface CheckboxGroupConfig extends SettingConfig {
-      default: string[];
+      default: primitive[];
       /** Checkbox options. */
       options: CheckboxOption[];
     }
@@ -434,7 +436,7 @@ namespace Modding {
     /** A checkbox option. */
     interface CheckboxOption {
       /** The value to be passed to the setting. */
-      value: string;
+      value: primitive;
       /** The primary text to be displayed next to the option. */
       label: string;
       /** The secondary text to be displayed next to the option. */
@@ -443,7 +445,7 @@ namespace Modding {
 
     /** Configuration object for radio group setting type. */
     interface RadioGroupConfig extends CheckboxGroupConfig {
-      default: string;
+      default: primitive;
     }
 
     type SerializedSetting = [string, unknown];
@@ -493,8 +495,31 @@ namespace Modding {
     homepageUrl: string;
     /** Mod dependencies */
     dependencies?: Io.ModDependency[];
+    /** Unix timestamp of when this mod was installed locally */
+    installed?: number;
+    /** Unix timestamp of this mod's version being added */
+    updated?: number;
+    /** Changelog for the currently installed version */
+    changelog?: string;
   }
 
+  interface LocalMod {
+    /** Auto-incremented id specifically for local mods */
+    id: number;
+    /** Name for the mod, only used when unlinked from mod.io */
+    name: string;
+    /** The .zip file used to install the mod */
+    package: File;
+    /** The {@link Mod} object */
+    mod: Mod;
+    /** The priority in which to load the mod */
+    loadPriority: number;
+    /** Whether or not to load the mod */
+    disabled: boolean;
+  }
+
+  type ModBasic = Pick<Mod,'id'|'name'|'version'>;
+  
   /** A mod's categorized tags. */
   interface ModTags {
     /** The mod's supported platforms (Steam, Browser, iOS, Android). */
@@ -535,12 +560,21 @@ namespace Modding {
     expires: Date;
   }
 
-  interface PatchMap<C extends ClassHandle> extends Map<C, Map<ClassMethod<C>, { mods: Set<Mod>, patcher: Patcher<C> }>> { }
+  interface PatchMap<C extends ClassHandle> extends Map<C, Map<ClassMethod<C> | ClassProperty<C>, {
+    mods: Set<Mod>,
+    patcher: MethodPatch<C> | PropertyPatch<C>
+  }>> { }
 
-  interface Patch<C extends ClassHandle, M extends ClassMethod<C>> {
+  interface MethodPatch<C extends ClassHandle, M extends ClassMethod<C>> {
     before(patch: BeforePatch<C['prototype'][M]>): void;
     replace(patch: ReplacePatch<C['prototype'][M]>): void;
     after(patch: AfterPatch<C['prototype'][M]>): void;
+  }
+
+  interface PropertyPatch<C extends ClassHandle, P extends ClassProperty<C>> {
+    get(getter: (o: () => C[P]) => C[P]): void;
+    set(setter: (o: (val: C[P]) => void, val: C[P]) => void): void;
+    replace(getter: () => C[P], setter: (o: (val: C[P]) => void, val: C[P]) => void);
   }
 
   type BeforePatch<M extends Function> = (...args: Parameters<M>) => Parameters<M> | undefined;
@@ -549,6 +583,9 @@ namespace Modding {
   type ReplacePatch<M extends Function> = (replacedMethod: (...args: Parameters<M>) => ReturnType<M>, ...args: Parameters<M>) => ReturnType<M>;
 
   interface ModContext {
+    name: string;
+    namespace?: string;
+    version: string;
     gameData: {
       addPackage: (data: string | GameDataPackage) => Promise<void>;
       buildPackage: (builder: (packageBuilder: Modding.GameDataPackageBuilder) => void) => { package: GameDataPackage; add: () => Promise<void>; };
@@ -581,14 +618,37 @@ namespace Modding {
     loadData: (resourcePath: string) => Promise<any>;
     onModsLoaded: (callback: Modding.LifecycleCallback) => void;
     onCharacterSelectionLoaded: (callback: Modding.LifecycleCallback) => void;
+    onInterfaceAvailable: (callback: Modding.LifecycleCallback) => void;
     onCharacterLoaded: (callback: Modding.LifecycleCallback) => void;
     onInterfaceReady: (callback: Modding.LifecycleCallback) => void;
+    share: (resourcePath: string) => void;
     api: (endpoints: Record<string, unknown>) => any;
-    patch: <C extends ClassHandle>(_class: C, methodName: ClassMethod<C>) => Modding.Patch<C, ClassMethod<C>>;
+    patch: <C extends ClassHandle>(_class: C, methodName: ClassMethod<C>) => Modding.MethodPatch<C, ClassMethod<C>>;
     isPatched: <C extends ClassHandle>(_class: C, methodName: ClassMethod<C>) => boolean;
   }
 
+  interface CreatorToolkitContext extends ModContext {
+    isAuthenticated(): boolean;
+    request(method: string, endpoint: string, data?: Record<string, string>): Promise<any>;
+    binaryPost(endpoint: string, data?: Record<string, string>): Promise<any>;
+    zip(name: string, dir: string): Promise<File>;
+    parse(modIoData: Modding.Io.Mod, modfile: Modding.Io.Modfile, file: Blob): Promise<Modding.Mod>;
+    parseLocal(name: string, file: File): Promise<Modding.Mod>;
+    getModResourceUrl(mod: Modding.Mod, resourcePath: string): string;
+    load(mod: Modding.Mod): Promise<void>;
+    onOpen(callback: Modding.LifecycleCallback): void;
+    db: {
+      count(): Promise<number>;
+      getAll(): Promise<Modding.LocalMod[]>;
+      get(id: number): Promise<Modding.LocalMod | undefined>;
+      put(mod: Modding.LocalMod): Promise<void>;
+      delete(id: number): Promise<void>;
+      deleteAll(): Promise<void>;
+    }
+  }
+
   type LifecycleCallback = (ctx: ModContext) => void | Promise<void>;
+  type CreatorToolkitCallback = (ctx: CreatorToolkitContext) => void | Promise<void>;
 
   interface ModApi {
     [key: string]: any;
@@ -600,41 +660,30 @@ namespace Modding {
 
   type SerializedAccountStorageData = [number, [string, any][]];
 
-  type ConcreteGameData = {
-    [Property in keyof GameData]-?: GameData[Property];
+  type GameDataAdder<T> = {
+    add: (val: T) => void;
+  };
+
+  type GameDataModifier<T> = {
+    modify: (val: T) => void
+  };
+
+  /** Changes the array properties of type T to their element types  */
+  type FlattenProps<T> = {
+    [Property in keyof T]: T[Property] extends Array<infer U> ? U : T[Property];
   }
-  type GameDataDataObject<K extends keyof ConcreteGameData> = ConcreteGameData[K] extends Array<infer D> ? D : ConcreteGameData[K];
+
+  /** Maps each property of T to a GameDataAdder */
+  type ToGameDataAdders<T> = {
+    [Property in keyof T]: GameDataAdder<T[Property]>;
+  }
   
-  type GameDataAdd<K> = {
-    add: GameDataDataObject<K>;
+  /** Maps each property of T to a GameDataModifier */
+  type ToGameDataModifiers<T> = {
+    [Property in keyof T]: GameDataModifier<T[Property]>;
   }
 
-  type ConcreteGameDataModifications = {
-    [Property in keyof GameDataModifications]-?: GameDataModifications[Property];
-  }
-  type GameDataModificationsDataObject<K extends keyof ConcreteGameDataModifications> = ConcreteGameDataModifications[K] extends Array<infer D> ? D : ConcreteGameDataModifications[K];
-
-
-  type GameDataModify<K> = {
-    modify: GameDataModificationsDataObject<K>;
-  }
-
-  type GameDataProperty<T> = keyof T extends infer K 
-    ? K extends unknown
-    ? ({ [I in keyof T as unknown extends T[I] ? I : never]?: never; }
-    & { [I in keyof T as unknown extends T[I] ? never : I]-?: (data: T[I]) => void; })
-    : never
-    : never;
-  
-  interface ConcreteGameDataAndModifications extends ConcreteGameData, ConcreteGameDataModifications {}
-
-  interface GameDataPackageBuilderProperty<K extends keyof ConcreteGameDataAndModifications>
-    extends GameDataProperty<GameDataAdd<K>>, GameDataProperty<GameDataModify<K>> {
-  }
-
-  type GameDataPackageBuilderProperties = {
-    [Property in keyof ConcreteGameDataAndModifications]: GameDataPackageBuilderProperty<Property>;
-  }
+  type GameDataPackageBuilderProperties = ToGameDataAdders<FlattenProps<Required<GameData>>> & ToGameDataModifiers<FlattenProps<Required<GameDataModifications>>>;
 
   interface GameDataPackageBuilder extends GameDataPackageBuilderProperties {
     skills: {
@@ -652,3 +701,7 @@ interface ClassHandle {
 }
 
 type ClassMethod<C extends ClassHandle> = {[M in keyof C['prototype']]-?: C['prototype'][M] extends Function ? M : never}[keyof C['prototype']];
+
+type ClassProperty<C extends ClassHandle> = {[P in keyof C['prototype']]-?: C['prototype'][P] extends Function ? never : P}[keyof C['prototype']];
+
+type primitive = undefined | null | boolean | number | string | void;

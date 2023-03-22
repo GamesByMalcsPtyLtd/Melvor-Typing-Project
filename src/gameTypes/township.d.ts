@@ -1,6 +1,7 @@
 interface TownshipBiomeData extends IDData {
     name: string;
     description: string;
+    media: string;
     resourceUsage?: {
         resourceID: string;
         amount: number;
@@ -21,8 +22,10 @@ declare const enum TownshipConvertType {
 declare class TownshipBiome extends NamespacedObject implements SoftDataDependant<TownshipBiomeData> {
     get name(): string;
     get description(): string;
-    private _name;
-    private _description;
+    get media(): string;
+    _name: string;
+    _description: string;
+    _media: string;
     /** The total number of the biome in the map */
     totalInMap: number;
     /** The total number of the biome available to build in. Can be reconstructed on save load. */
@@ -31,6 +34,16 @@ declare class TownshipBiome extends NamespacedObject implements SoftDataDependan
     amountPurchased: number;
     /** The number of buildings that have been built in the biome */
     buildingsBuilt: Map<TownshipBuilding, number>;
+    provides: {
+        population: boolean;
+        storage: boolean;
+        happiness: boolean;
+        education: boolean;
+        deadStorage: boolean;
+        worship: boolean;
+    };
+    /** Resources available within this Biome provided from buildings */
+    containsResources: Set<TownshipResource>;
     resourceUsage?: {
         resource: TownshipResource;
         amount: number;
@@ -47,6 +60,7 @@ declare class TownshipBiome extends NamespacedObject implements SoftDataDependan
     getBuildingCount(building: TownshipBuilding): number;
     removeBuildings(building: TownshipBuilding, count: number): void;
     addBuildings(building: TownshipBuilding, count: number): void;
+    addResource(resource: TownshipResource): void;
 }
 declare class DummyTownshipBiome extends TownshipBiome {
     constructor(namespace: DataNamespace, id: string, game: Game);
@@ -94,9 +108,9 @@ declare class TownshipBuilding extends NamespacedObject {
     get name(): string;
     get description(): string;
     get media(): string;
-    private _name;
-    private _description;
-    private _media;
+    _name: string;
+    _description: string;
+    _media: string;
     tier: number;
     type: BuildingTypeID;
     upgradesFrom?: TownshipBuilding;
@@ -110,6 +124,7 @@ declare class TownshipBuilding extends NamespacedObject {
     providedModifiers?: MappedModifiers;
     constructor(namespace: DataNamespace, data: TownshipBuildingData, game: Game);
     getBiomeModifier(biome: TownshipBiome): number;
+    isAnUpgradeOf(building: TownshipBuilding): boolean;
 }
 declare class DummyTownshipBuilding extends TownshipBuilding {
     constructor(namespace: DataNamespace, id: string, game: Game);
@@ -131,16 +146,19 @@ declare class TownshipWorship extends NamespacedObject {
     get media(): string;
     get statueName(): string;
     get statueMedia(): string;
-    private _name;
-    private _description;
-    private _media;
+    _name: string;
+    _description: string;
+    _media: string;
     modifiers: PlayerModifierObject;
     isHidden: boolean;
     checkpoints: PlayerModifierObject[];
     unlockRequirements: AnyRequirement[];
-    private _statueName;
-    private _statueMedia;
+    _statueName: string;
+    _statueMedia: string;
     constructor(namespace: DataNamespace, data: TownshipWorshipData, game: Game);
+}
+declare class DummyTownshipWorship extends TownshipWorship {
+    constructor(namespace: DataNamespace, id: string, game: Game);
 }
 interface TownshipMapData extends IDData {
     name: string;
@@ -151,8 +169,8 @@ interface TownshipMapData extends IDData {
 }
 declare class TownshipMap extends NamespacedObject {
     get name(): string;
-    private biomeCounts;
-    private _name;
+    biomeCounts: Map<TownshipBiome, number>;
+    _name: string;
     getBiomeCount(biome: TownshipBiome): number;
     constructor(namespace: DataNamespace, data: TownshipMapData, game: Game);
 }
@@ -163,7 +181,7 @@ interface TownshipJobData extends IDData {
 declare class TownshipJob extends NamespacedObject {
     get name(): string;
     produces?: TownshipResource;
-    private _name;
+    _name: string;
     /** The number of citizens assigned to this job */
     assigned: number;
     /** The maximum number of citizens that may be assigned to this job */
@@ -240,14 +258,19 @@ declare class TownshipResource extends NamespacedObject {
         resources: TownshipResource[];
         maxAge: number;
     };
-    private _name;
-    private _media;
-    private _description;
+    _name: string;
+    _media: string;
+    _description: string;
     /** Amount of resource owned */
     get amount(): number;
     /** Amount of resource owned */
     set amount(amount: number);
-    private _amount;
+    /** Resource cap (% of max storage) */
+    get cap(): number;
+    /** Resource cap (% of max storage) */
+    set cap(cap: number);
+    _amount: number;
+    _cap: number;
     /** Base generation rate of resource */
     baseGeneration: number;
     /** Current generation rate of resource */
@@ -294,9 +317,11 @@ declare class TownshipRenderQueue extends SkillRenderQueue {
     citizens: boolean;
     /** Renders the provision and resource output of buildings */
     buildingProvides: boolean;
+    /** Renders the stock availability of the Trader */
+    traderStock: boolean;
 }
-declare class Township extends Skill<TownshipSkillData> implements StatProvider {
-    protected readonly _media: string;
+declare class Township extends Skill<TownshipSkillData> implements StatProvider, Action {
+    readonly _media: string;
     /** Tick length in seconds */
     readonly TICK_LENGTH = 300;
     readonly MAX_TOWN_SIZE: number;
@@ -307,7 +332,7 @@ declare class Township extends Skill<TownshipSkillData> implements StatProvider 
     readonly AGE_OF_DEATH = 55;
     readonly MIN_MIGRATION_AGE = 16;
     readonly MAX_MIGRATION_AGE = 50;
-    readonly BASE_TAX_RATE = 20;
+    readonly BASE_TAX_RATE = 0;
     readonly EDUCATION_PER_CITIZEN = 3;
     readonly HAPPINESS_PER_CITIZEN = 2;
     readonly CITIZEN_FOOD_USAGE = 1;
@@ -345,40 +370,53 @@ declare class Township extends Skill<TownshipSkillData> implements StatProvider 
     jobsAreAvailable: boolean;
     tickInterval: number;
     tickIntervalActive: boolean;
-    private mapSelectIndex;
-    private mapSelection;
+    mapSelectIndex: number;
+    mapSelection: TownshipMap;
     biomes: NamespaceRegistry<TownshipBiome>;
     buildings: NamespaceRegistry<TownshipBuilding>;
     worships: NamespaceRegistry<TownshipWorship>;
     maps: NamespaceRegistry<TownshipMap>;
     resources: NamespaceRegistry<TownshipResource>;
     jobs: NamespaceRegistry<TownshipJob>;
-    private availableMaps;
+    availableMaps: TownshipMap[];
     buildingDisplayOrder: NamespacedArray<TownshipBuilding>;
     resourceDisplayOrder: NamespacedArray<TownshipResource>;
     noWorship: TownshipWorship;
     unemployedJob: TownshipJob;
-    private buildingPenalties;
-    private statPenalties;
-    private healthBonusResources;
+    worshipInSelection: TownshipWorship | undefined;
+    buildingPenalties: {
+        happiness: TownshipBuildingPenalty[];
+        education: TownshipBuildingPenalty[];
+        resources: TownshipBuildingPenalty[];
+        worship: TownshipBuildingPenalty[];
+    };
+    statPenalties: {
+        happinessModifier: TownshipStatPenalty[];
+        deathRate: TownshipStatPenalty[];
+        flatHappiness: TownshipStatPenalty[];
+    };
+    healthBonusResources: TownshipResource[];
     /** Resources that are required for population growth */
-    private popGrowthResources;
+    popGrowthResources: TownshipResource[];
     /** Resoureces that can prevent pop death under a certain age */
-    private deathPreventingResources;
-    private updateUnemployedCount;
-    private _unemployedCount;
+    deathPreventingResources: TownshipResource[];
+    updateUnemployedCount: boolean;
+    _unemployedCount: number;
     changeMapWarningShown: boolean;
     changeWorshipWarningShown: boolean;
+    readonly MAX_TRADER_STOCK_INCREASE = 100000000;
+    get traderStockIncrease(): number;
+    get decayTickAmount(): number;
     get foodJob(): TownshipJob | undefined;
     get unemployedCount(): number;
-    protected get citizenSources(): string[];
+    get citizenSources(): string[];
     get oneDayInTicks(): number;
     get traderTimePeriod(): number;
     get isTraderAvailable(): boolean;
     get traderLeavesIn(): number;
     get traderArrivesIn(): number;
     get minWidthForListItem(): string;
-    private get chanceForPet();
+    get chanceForPet(): number;
     get statueName(): string;
     get statueMedia(): string;
     /** The base rate of xp gained per tick, before modifiers */
@@ -408,62 +446,70 @@ declare class Township extends Skill<TownshipSkillData> implements StatProvider 
     getResourceQuantityFromData(resourceData: IDQuantity[]): ResourceQuantity[];
     postDataRegistration(): void;
     buildResourceItemConversions(): void;
+    getErrorLog(): string;
+    increaseTraderStockAvailable(): void;
     grantOfflineTicks(): void;
     toggleTickInterval(): void;
-    private encodeResource;
-    private encodeBiome;
+    encodeResource(writer: SaveWriter, resource: TownshipResource): void;
+    encodeBiome(writer: SaveWriter, biome: TownshipBiome): void;
     encode(writer: SaveWriter): SaveWriter;
-    private decodeResource;
-    private decodeBiome;
+    decodeResource(reader: SaveWriter, version: number): void;
+    decodeBiome(reader: SaveWriter, version: number): void;
     decode(reader: SaveWriter, version: number): void;
     deserialize(reader: DataReader, version: number, idMap: NumericIDMap): void;
-    private deserializeCitizens;
+    deserializeCitizens(reader: DataReader, version: number, idMap: NumericIDMap): void;
     deserializeTownData(reader: DataReader, version: number, idMap: NumericIDMap): void;
     deserializeTownDataResources(reader: DataReader, version: number, idMap: NumericIDMap): void;
     deserializeTownDataWorkers(reader: DataReader, version: number, idMap: NumericIDMap): void;
-    protected onLevelUp(oldLevel: number, newLevel: number): void;
+    onLevelUp(oldLevel: number, newLevel: number): void;
     /** Queues renders when resources change */
-    private onResourceAmountChange;
-    private renderTownStats;
-    private renderResourceAmounts;
-    private renderResourceRates;
-    private renderWorkerCounts;
-    private renderBuildingCosts;
-    private renderBuildingRequirements;
-    private renderTicksAvailable;
-    private renderTownAge;
-    private renderCitizens;
-    private renderBuildingProvides;
+    onResourceAmountChange(): void;
+    renderTownStats(): void;
+    renderResourceAmounts(): void;
+    renderResourceRates(): void;
+    renderWorkerCounts(): void;
+    renderBuildingCosts(): void;
+    renderBuildingRequirements(): void;
+    renderTicksAvailable(): void;
+    renderTownAge(): void;
+    renderCitizens(): void;
+    renderBuildingProvides(): void;
+    renderTraderStockRemaining(): void;
     render(): void;
     initTownCreation(): void;
     updateConvertType(type: TownshipConvertType): void;
     updateGeneratedTownBreakdown(): void;
     /** Callback method */
     confirmTownCreation(): void;
-    private regenerateTown;
+    regenerateTown(showConfirmation?: boolean): void;
     selectWorship(worship: TownshipWorship): void;
-    private preLoad;
+    confirmWorship(): void;
+    preLoad(): void;
     postStatLoad(): void;
     postLoad(): void;
     onLoad(): void;
+    /** @deprecated This method will be removed in the next major update. Use renderModifierChange instead */
     onModifierChange(): void;
     onPageChange(): void;
+    renderModifierChange(): void;
     tick(): boolean;
     rollForPets(interval: number): void;
     catchupTicks(tickAmount: number, confirmed?: boolean): void;
-    private fireCatchupConfirmation;
-    private selectNewMapConfirmation;
+    fireCatchupConfirmation(tickAmount: number): void;
+    selectNewMapConfirmation(): void;
+    deleteConfirmationSwal(): void;
     deleteTownshipDataFromLocalStorage(): void;
     resetTownshipLevel(): void;
-    private setBiomeCountsForMap;
-    private generateStartingSection;
+    setBiomeCountsForMap(): void;
+    generateStartingSection(grasslands: TownshipBiome): void;
     /** Creates the initial town buildings in the grasslands biome */
-    private generateEmptyTown;
+    generateEmptyTown(grasslands: TownshipBiome): void;
     /** Handles the spawning and creation of initial Township citizens */
-    private spawnInitialCitizens;
-    private addNewCitizen;
-    setBuildBiome(biome: TownshipBiome | undefined): void;
-    setTownBiome(biome: TownshipBiome | undefined): void;
+    spawnInitialCitizens(): void;
+    addNewCitizen(citizenSource: CitizenSource): void;
+    setBuildBiome(biome: TownshipBiome | undefined, jumpTo?: boolean): void;
+    setTownBiome(biome: TownshipBiome | undefined, jumpTo?: boolean): void;
+    updateForBiomeSelectChange(biome: TownshipBiome | undefined): void;
     setPriorityJob(job: TownshipJob): void;
     setNextSectionQty(qty: number): void;
     setBuildQty(qty: number): void;
@@ -474,30 +520,30 @@ declare class Township extends Skill<TownshipSkillData> implements StatProvider 
         unemployed: number;
     };
     /** Recomputes all stats in the town that only depend on building count */
-    private computeBuildingTownStats;
+    computeBuildingTownStats(): void;
     /** Recomputes all the stats of the town */
-    private computeTownStats;
+    computeTownStats(): void;
     /** Recomputes worship, then provided modifiers if worship changes, then town stats */
-    private computeWorshipAndStats;
-    private popOver55;
-    private recalculatePopOver55;
+    computeWorshipAndStats(): void;
+    popOver55: number;
+    recalculatePopOver55(): void;
     retroactiveCitizenAgeFix(): void;
-    private setCitizenAge;
+    setCitizenAge(citizen: Citizen, age: number): void;
     getCitizenAge(citizen: Citizen): number;
     /** Recomputes the worship of the town provided by buildings an augmented by resource penalties. Returns if the worship tier has changed. */
-    private computeWorship;
+    computeWorship(): boolean;
     getDeadStoragePerBuilding(building: TownshipBuilding): number;
     getTotalDeadStorageForBuilding(building: TownshipBuilding): number;
-    private computeTownDeadStorage;
-    private computeTownHappiness;
+    computeTownDeadStorage(): void;
+    computeTownHappiness(): void;
     applyBuildingHappinessPenalty(happiness: number): number;
     shouldApplyStatPenalty(penalty: TownshipStatPenalty): boolean;
     getTownHappinessNegativeModifiers(): number;
     getFlatTownHappinessNegatives(): number;
     computeTownHealthPercent(): void;
-    private getHealthConditionPercent;
-    private computeTownEducation;
-    private computePopulationLimit;
+    getHealthConditionPercent(bonus: TownshipHealthBonus | undefined, positive: boolean, increasing: boolean): number;
+    computeTownEducation(): void;
+    computePopulationLimit(): void;
     /** Recomputes the base total storage provided by all buildings */
     computeBuildingStorage(): void;
     /** Returns the modified storage of the town */
@@ -516,59 +562,71 @@ declare class Township extends Skill<TownshipSkillData> implements StatProvider 
     removeBuildingFromBiome(biome: TownshipBiome, building: TownshipBuilding, count?: number): number;
     /** Adds a specified count from the town map. Returns the true amount of buildings removed */
     addBuildingToBiome(biome: TownshipBiome, building: TownshipBuilding, count?: number): number;
+    destroyHalfCitizens(): void;
+    confirmChangeOfWorship(): void;
+    destroyAllWorshipBuildings(): void;
     destroyAllBuildings(): void;
     destroyBuilding(building: TownshipBuilding, render?: boolean): void;
     removeBuilding(building: TownshipBuilding, count?: number): boolean;
     removeOverflowingWorkers(building: TownshipBuilding): void;
     /** Recomputes the modifiers provided by buildings. Does not recalculate provided stats or player stats. */
-    private computeModifiersFromBuildings;
+    computeModifiersFromBuildings(): void;
     /** Recomputes the modifiers provided by township */
-    private computeProvidedStats;
+    computeProvidedStats(updatePlayer?: boolean): void;
     /** Sets the modifier for a given building, does not update player stats */
-    private setModifiers;
+    setModifiers(building: TownshipBuilding): void;
     updateBuildingModifierData(building: TownshipBuilding): void;
     updateAllBuildingModifierData(): void;
     updateForBuildingChange(): void;
     buyNewSectionOfLand(): void;
     addSectionOfLand(biome: TownshipBiome, qty: number): void;
     getGPGainRate(): number;
-    private getBuildingsWithResource;
-    private computeTownResourceGain;
+    getBuildingsWithResource(resource: TownshipResource): {
+        building: TownshipBuilding;
+        biome: TownshipBiome;
+        count: number;
+        amount: number;
+        baseAmount: number;
+    }[];
+    computeTownResourceGain(): void;
     getBiomeResourceProductionModifier(biome: TownshipBiome): number;
     getBuildingResourceProductionModifier(building: TownshipBuilding): number;
     getSingleResourceGainAmountInBiome(resource: TownshipResource, building: TownshipBuilding, biome: TownshipBiome): number;
-    private getResourceGainModifier;
+    getResourceGainModifier(resource: TownshipResource): number;
     getTrueResourceUsage(resource: TownshipResource): number;
     getResourceUsage(resource: TownshipResource): number;
     getResourceBiomeUsage(resource: TownshipResource): number;
     getSingleResourceUsageInBiome(resource: TownshipResource, biome: TownshipBiome): number;
     getAllBuildingWorkerCount(): number;
-    private computeMaxWorkerCounts;
-    private computeMaxWorkerCount;
+    computeMaxWorkerCounts(): void;
+    computeMaxWorkerCount(job: TownshipJob): void;
     countNumberOfBuildings(building: TownshipBuilding): number;
-    private addWorker;
-    private removeWorker;
-    private assignCitizenToJob;
-    private removeCitizenFromJob;
-    private removeRandomCitizenFromJob;
-    private addPopulation;
+    addWorker(citizen: Citizen, job: TownshipJob): void;
+    removeWorker(citizen: Citizen): void;
+    assignCitizenToJob(citizen: Citizen, job: TownshipJob): void;
+    removeCitizenFromJob(citizen: Citizen): void;
+    removeRandomCitizenFromJob(job: TownshipJob): void;
+    addPopulation(): void;
     /** This is used to determine the true amount inclusive of resources gained during the tick. */
     getTrueMaxProductCreationAmount(resource: TownshipResource, withoutModifiers?: boolean): number;
     /** This is used to determine the amount during a tick process, as resources have already been awarded at this point. */
     getMaxProductCreationAmount(resource: TownshipResource, withoutModifiers?: boolean): number;
     getMaxRawCreationAmount(resource: TownshipResource): number;
     getNetResourceRate(resource: TownshipResource): number;
-    private addResources;
+    addResources(): void;
+    getMaxResourceAmount(resource: TownshipResource): number;
     applyRandomJobToCitizen(citizen: Citizen): void;
     findAvailableJobForCitzen(): TownshipJob;
     updateDeadStorage(): void;
     updateCitizens(): void;
-    private updateCitizenInfo;
-    private checkCitizenRetirement;
+    assignWorkersOnLoad(): void;
+    updateCitizenInfo(citizen: Citizen): void;
+    checkCitizenRetirement(citizen: Citizen): void;
     checkPopulationOverflow(): void;
     getChanceToDestroyCitizen(citizen: Citizen): number;
     shouldWeKillThisCitizen(citizen: Citizen): boolean;
-    private destroyCitizen;
+    destroyCitizen(citizen: Citizen, index: number): void;
+    setResourceCap(resource: TownshipResource, cap: number): void;
     processYeet(resource: TownshipResource, amount: number): void;
     /** Callback Method */
     updateConvertQty(value: number): void;
@@ -594,8 +652,8 @@ declare const enum TownshipPage {
     Yeet = 6
 }
 declare class TownshipUI {
-    private township;
-    private currentPage;
+    township: Township;
+    currentPage: TownshipPage;
     defaultElements: {
         btn: {
             town: HTMLLinkElement;
@@ -618,7 +676,10 @@ declare class TownshipUI {
             resources: HTMLDivElement;
             container: HTMLDivElement;
             worship: HTMLDivElement;
+            currentWorshipModal: HTMLDivElement;
+            worshipModal: HTMLDivElement;
             worshipModifiers: HTMLDivElement;
+            worshipModifiersModal: HTMLDivElement;
             generateTown: HTMLDivElement;
             townBreakdown: HTMLDivElement;
             tasks: HTMLDivElement;
@@ -629,6 +690,19 @@ declare class TownshipUI {
             education: HTMLSpanElement;
             health: HTMLDivElement;
             worship: HTMLDivElement;
+            deadStorage: HTMLDivElement;
+            breakdown: {
+                map: HTMLDivElement;
+                worship: HTMLSpanElement;
+                worshipProgress: HTMLDivElement;
+                boimesPurchased: HTMLDivElement;
+                storage: HTMLDivElement;
+                population: HTMLDivElement;
+                availableWorkers: HTMLDivElement;
+                deadStorage: HTMLDivElement;
+                over55: HTMLDivElement;
+                over70: HTMLDivElement;
+            };
         };
         trader: {
             trader: HTMLDivElement;
@@ -655,80 +729,97 @@ declare class TownshipUI {
                 noFood: HTMLDivElement;
                 losingFood: HTMLDivElement;
                 noPriority: HTMLDivElement;
+                noStorage: HTMLDivElement;
             };
         };
         icon: {
             taskReady: HTMLSpanElement;
         };
     };
-    private resourceDisplays;
-    private townBiomeSelectButtons;
-    private buildingsInTown;
-    private buildBiomeSelectOptions;
-    private buildBiomeSelectButtons;
-    private buildBuildings;
-    private conversionElements;
-    private worshipSelects;
-    private biomeNoResourceAlerts;
+    resourceDisplays: Map<TownshipResource, TownshipResourceDisplayElement>;
+    townBiomeSelectButtons: Map<TownshipBiome | undefined, TownshipTownBiomeSelectElement>;
+    buildingsInTown: Map<TownshipBuilding, BuildingInTownElement>;
+    buildBiomeSelectOptions: Map<TownshipBiome, HTMLElement>;
+    buildBiomeSelectButtons: Map<TownshipBiome, TownshipBuildBiomeSelectElement>;
+    buildBuildings: Map<TownshipBuilding, TownshipBuildBuildingElement>;
+    conversionElements: Map<TownshipResource, {
+        convertTo: TownshipConversionElement[];
+    }>;
+    worshipSelects: Map<TownshipWorship, TownshipWorshipSelectButtonElement>;
+    worshipSelectsModal: Map<TownshipWorship, TownshipWorshipSelectButtonElement>;
+    biomeNoResourceAlerts: Map<TownshipBiome, HTMLDivElement>;
+    capResourceElements: Map<TownshipResource, TownshipCapResourceElement>;
+    filterIconElements: Map<string, TownshipBuildBiomeFilterIconElement>;
     constructor(township: Township);
     loadTownshipUI(): void;
     updateTownStats(): void;
     updateTownNotifications(): void;
     updateTicksAvailable(): void;
-    private getPageButton;
-    private createBtnEvents;
-    private createTickBtns;
+    getPageButton(page: TownshipPage): HTMLLinkElement;
+    createBtnEvents(): void;
+    createTickBtns(): void;
     showTownCreationDivs(): void;
     hideTownCreationDivs(): void;
     hideMainContainerDivs(): void;
     showMainContainerDivs(): void;
-    private updatePageHighlight;
-    private showPage;
+    updatePageHighlight(oldPage: TownshipPage, newPage: TownshipPage): void;
+    showPage(pageID: TownshipPage): void;
     updateTraderStatus(): void;
-    private traderLockedSwal;
-    private updateTaskUI;
-    private generateTownBiomeData;
-    private generateBiomeSelectionDropdown;
-    private generateBiomeNoResourceAlerts;
-    private sortList;
+    traderLockedSwal(): void;
+    updateTaskUI(category: TownshipTaskCategory): void;
+    generateTownBiomeData(): void;
+    generateFilterIcons(): void;
+    highlightFilterIcon(filter: string): void;
+    filterBuildBoimes(filter: string | TownshipResource): void;
+    highlightBuildBuildingsWithFilter(filter: string | TownshipResource): void;
+    generateBiomeSelectionDropdown(): void;
+    generateBiomeNoResourceAlerts(): void;
+    sortList: BuildingSortList;
     /** Callback Method */
-    private toggleSortList;
-    private setSortListToDefault;
-    private updateSortCheckbox;
-    private addDropdownDivider;
-    private generateTownBiomeSummarySelection;
+    toggleSortList(category: keyof BuildingSortList, index: number): void;
+    setSortListToDefault(): void;
+    updateSortCheckbox(category: keyof BuildingSortList, index: number): void;
+    addDropdownDivider(): string;
+    generateTownBiomeSummarySelection(): void;
     updateNextSectionCost(): void;
-    private updateDestroyDropdowns;
-    private updateUpgradeDropdowns;
+    updateDestroyDropdowns(): void;
+    updateUpgradeDropdowns(): void;
     /** Callback Method */
     setUpgradeQty(qty: number): void;
     /** Callback Method */
     setDestroyQty(qty: number): void;
-    private shouldShowBuilding;
+    shouldShowBuilding(building: TownshipBuilding): boolean;
     updateBuildBuildingProvides(): void;
     updateBuildingsForBiomeSelection(): void;
-    private updateBuildBiomeSelectionNotifications;
+    updateBuildBiomeSelectionNotifications(): void;
     updateTownBiomeSelectionNotifications(): void;
     getBuildingCostHTML(building: TownshipBuilding, buildQty: number): string;
     getBuildingResourceUsage(building: TownshipBuilding): string;
     updateBuildingCounts(): void;
     updateBuilding(building: TownshipBuilding): void;
-    private setupTownTooltips;
-    private displayWorshipTooltip;
-    private displayDeathInfo;
-    private updatePopulation;
-    private updateHappiness;
-    private updateEducation;
-    private updateHealth;
-    private updateWorship;
+    setupTownTooltips(): void;
+    displayWorshipTooltip(): string;
+    displayXPInfo(): string;
+    displayDeathInfo(): string;
+    updatePopulation(): void;
+    updateHappiness(): void;
+    updateEducation(): void;
+    updateHealth(): void;
+    updateWorship(): void;
+    updateDeathStorage(): void;
+    showChangeWorshipSelection(): void;
     updateWorshipCountSpan(): void;
-    private getCurrentWorshipSpan;
+    getCurrentWorshipSpan(): string;
+    getCurrentWorshipProgressSpan(): string;
     updateTimeAlive(): void;
     updateBiomeBreakdown(biome: TownshipBiome | undefined): void;
-    private createResourceBreakdownTable;
+    createResourceBreakdownTable(): void;
     updateStorageBreakdown(): void;
-    private updateStorageBreakdownColour;
-    private getStorageBreakdown;
+    updateStorageBreakdownColour(): void;
+    getStorageBreakdown(): string;
+    updateDeathStorageBreakdown(): void;
+    updateDeadStorageBreakdownColour(): void;
+    getDeadStorageBreakdown(): string;
     updateResourceAmounts(): void;
     updateResourceTickBreakdown(): void;
     unhighlightBuildBiomeBtn(biome: TownshipBiome | undefined): void;
@@ -738,42 +829,67 @@ declare class TownshipUI {
     unhighlightPriorityWorkerBtn(job: TownshipJob): void;
     highlightPriorityWorkerBtn(job: TownshipJob): void;
     updateWorkerCounts(): void;
-    private updateWorkersAvailable;
-    private getWorkersAvailableSpan;
+    updateWorkersAvailable(): void;
+    getWorkersAvailableSpan(): string;
     displayAllCitizens(): void;
-    private getCitizenDetailsElement;
-    private shouldShowBuildingInTown;
+    getCitizenDetailsElement(age: number, count: number): string;
+    shouldShowBuildingInTown(building: TownshipBuilding): boolean;
     updateTownSummary(): void;
     updateAllBuildingUpgradeCosts(): void;
-    private updateBuildingUpgradeCosts;
+    updateBuildingUpgradeCosts(building: TownshipBuilding): void;
     updateTownBuildingProvides(): void;
-    private displayTownSummary;
+    displayTownSummary(): void;
     generateBuildBuildings(): void;
     updateBuildQtyButtons(oldQty: number, newQty: number): void;
     updateForBuildQtyChange(): void;
     updateAllBuildingRequirements(): void;
     updateAllBuildingCosts(): void;
     updateBuildingTotalModifierElement(building: TownshipBuilding): void;
-    private updateBuildingTotalOutput;
+    updateBuildingTotalOutput(building: TownshipBuilding): void;
     createWorshipSelection(): void;
-    private isWorshipUnlocked;
+    updateCurrentWorship(): void;
+    isWorshipUnlocked(worship: TownshipWorship): boolean;
     updateWorshipSelection(): void;
-    private buildConvertItemElements;
-    private updateConvertVisibility;
+    buildCapResourceElements(): void;
+    buildYeetItemElement(): void;
+    buildConvertItemElements(): void;
+    updateConvertVisibility(): void;
     updateConvertQtyElements(): void;
     updateConvertTypeBtn(): void;
     showTaskReadyIcon(): void;
     hideTaskReadyIcon(): void;
+    updateResourceCapElement(resource: TownshipResource): void;
+    showChangeWorshipSwal(): void;
+    updateTotalBiomesPurchased(): void;
+    highlightBiomesWithResource(resource: TownshipResource): void;
+    unhighlightBiomesWithResource(): void;
+    highlightBiomesWithBuilding(building: TownshipBuilding): void;
+    unhighlightBiomesWithBuilding(): void;
+    highlightBiomesWithBuildingBuilt(building: TownshipBuilding): void;
+    unhighlightBiomesWithBuildingBuilt(): void;
+    highlightBiomesWith(provides: 'population' | 'storage' | 'happiness' | 'education' | 'deadStorage' | 'worship'): void;
+    unhighlightBiomes(): void;
+    townViewTab: number;
+    setTownViewTab(tab: number): void;
+    hideTownViewTab(tab: number): void;
+    showTownViewTab(tab: number): void;
+    showAllTownViewTabs(): void;
+    hideAllTownViewTabs(): void;
+    updateTraderStockAvailable(): void;
+    toggleTownInfo(): void;
+    toggleTownResources(): void;
     static readonly destroyBuildingOptions: readonly number[];
     static readonly upgradeBuildingOptions: readonly number[];
     static readonly yeetResourceOptions: readonly number[];
+    static readonly resourceCapOptions: readonly number[];
 }
 interface BuildingRequirement {
     population: number;
     level: number;
 }
 declare class TownshipData implements EncodableObject {
-    private township;
+    township: Township;
+    game: Game;
     happiness: number;
     education: number;
     /** Current health percentage in the town */
@@ -796,7 +912,20 @@ declare class TownshipData implements EncodableObject {
     worship: TownshipWorship;
     /** Save State Property. Stores if the town has been created for the first time. */
     townCreated: boolean;
-    constructor(township: Township);
+    /** Save State Property. Stores stock remaining for the Trader. */
+    traderStock: number;
+    constructor(township: Township, game: Game);
     encode(writer: SaveWriter): SaveWriter;
     decode(reader: SaveWriter, version: number): void;
 }
+declare const townshipIcons: {
+    population: string;
+    happiness: string;
+    education: string;
+    health: string;
+    storage: string;
+    dead: string;
+    worship: string;
+    workers: string;
+    showAll: string;
+};

@@ -1,22 +1,22 @@
 declare class EffectRenderer {
-    private container;
-    private renderedEffects;
-    private removalQueue;
+    container: HTMLElement;
+    renderedEffects: Map<RenderData, RenderedEffect>;
+    removalQueue: Set<RenderData>;
     constructor(container: HTMLElement);
     /** Renders an effect */
     removeEffects(): void;
     /** Clears the removal queue */
-    private flushRemovalQueue;
-    private createEffect;
-    private createTooltip;
-    private addEffect;
+    flushRemovalQueue(): void;
+    createEffect(icon: string, turns: string, tooltipContent: string): RenderedEffect;
+    createTooltip(element: HTMLDivElement, content: string): TippyTooltip;
+    addEffect(data: RenderData, turnText: string, tooltipContent: string, media: string): void;
     addDOT(activeDOT: ActiveDOT): void;
     addModifier(activeEffect: ActiveModifierEffect, effect: ModifierEffect, attack: SpecialAttack, turnNoun: Noun): void;
     addSleep(activeSleep: ActiveSleep): void;
     addStun(activeStun: ActiveStun): void;
     addStunImmunity(stunImmunity: ActiveStunImmunity): void;
-    private formatTurnsLeft;
-    private formatStacks;
+    formatTurnsLeft(turns: number): string;
+    formatStacks(stacks: number, max?: number): string;
     addCurse(activeCurse: ActiveCurse): void;
     addReflexive(activeReflexive: ActiveReflexiveEffect, effect: ReflexiveEffect, attack: SpecialAttack): void;
     addStacking(activeStacking: ActiveStackingEffect, effect: StackingEffect): void;

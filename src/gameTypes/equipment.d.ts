@@ -1,10 +1,10 @@
 declare const MAX_QUICK_EQUIP_ITEMS = 3;
 declare class Equipment implements EncodableObject, Serializable {
-    private game;
+    game: Game;
     slots: EquipmentObject<EquipSlot>;
     slotArray: EquipSlot[];
     /** Maps item to slot types */
-    private slotMap;
+    slotMap: Map<EquipmentItem, SlotTypes>;
     /** Slots that provide stats and use charges */
     itemChargeUsers: Set<EquipSlot>;
     /** Slots that provide stats and use quantities */
@@ -25,7 +25,7 @@ declare class Equipment implements EncodableObject, Serializable {
     /** Gets the actually equipped slots to unequip when equipping an item */
     getSlotsToUnequip(itemToEquip: EquipmentItem, slot: SlotTypes): SlotTypes[];
     /** Gets the root slot of an occupied slot */
-    private getRootSlot;
+    getRootSlot(slotType: SlotTypes): SlotTypes;
     /** Performs the equipment process, removing equipped items */
     equipItem(itemToEquip: EquipmentItem, slot: SlotTypes, quantity: number): void;
     /** Performs the unequipment process, removing the item */
@@ -42,11 +42,13 @@ declare class Equipment implements EncodableObject, Serializable {
     removeQuantityFromSlot(slot: SlotTypes, quantity: number): boolean;
     /** Adds the stats of the equipped items to an equipment stats object */
     addEquipmentStats(stats: EquipmentStats): void;
+    /** Gets a snapshot of the equipment slots with quantities */
+    getSnapshot(): Map<SlotTypes, AnyItemQuantity>;
     /** Renders the equipment */
     render(player: Player): void;
     renderQuantity(): void;
-    private updateTooltips;
-    private getSynergyTooltipContent;
+    updateTooltips(synergyDescription: string): void;
+    getSynergyTooltipContent(synergyDescription: string): string;
     static getEquipStatDescription(type: EquipStatKey, value: number): string;
     encode(writer: SaveWriter): SaveWriter;
     decode(reader: SaveWriter, version: number, addOnFail?: boolean): void;
@@ -57,7 +59,7 @@ declare class Equipment implements EncodableObject, Serializable {
 }
 /** Class for storing all data for a players equipment set */
 declare class EquipmentSet implements EncodableObject {
-    private game;
+    game: Game;
     equipment: Equipment;
     spellSelection: SpellSelection;
     prayerSelection: Set<ActivePrayer>;
@@ -66,19 +68,19 @@ declare class EquipmentSet implements EncodableObject {
     decode(reader: SaveWriter, version: number, addOnFail?: boolean): void;
 }
 declare class EquipmentSetMenu {
-    private buttonClasses;
-    private container;
-    private buttons;
-    private highlightedButton;
+    buttonClasses: string[];
+    container: HTMLElement;
+    buttons: EquipSetButton[];
+    highlightedButton: number;
     constructor(containerID: string, buttonClasses: string[]);
     render(sets: EquipmentSet[], selected: number, player: Player): void;
-    private renderSets;
-    private renderSelected;
-    private setCallbacks;
-    private getTooltipRow;
-    private getTooltipContent;
-    private addButton;
-    private createTooltip;
+    renderSets(sets: EquipmentSet[], player: Player): void;
+    renderSelected(selected: number): void;
+    setCallbacks(player: Player): void;
+    getTooltipRow(media: string, name: string): string;
+    getTooltipContent(set: EquipmentSet): string;
+    addButton(text: string): EquipSetButton;
+    createTooltip(parent: HTMLElement): TippyTooltip;
 }
 declare type EquipSetButton = {
     button: HTMLButtonElement;
@@ -118,7 +120,7 @@ declare type SlotData = {
 };
 declare class EquipSlot {
     type: SlotTypes;
-    private emptyItem;
+    emptyItem: EquipmentItem;
     /** Item that is in the slot. If Undefined no item is equipped. */
     item: EquipmentItem;
     /** If the item simply occopies the slot and does not contribute to stats */
@@ -140,14 +142,14 @@ declare class EquipSlot {
     trimQuickEquipItems(): void;
 }
 declare class CombatQuickEquipMenu {
-    private player;
-    private game;
+    player: Player;
+    game: Game;
     constructor(player: Player, game: Game);
     /** Migrates the old quick equip data to the appropriate equipment sets */
     deserialize(reader: DataReader, version: number, idMap: NumericIDMap, player: Player): void;
     getTooltipContent(slotID: number): HTMLElement;
     /** Sets quick equip slot to use item that is currently equipped */
-    private setItem;
+    setItem(slotID: number, pos: number): void;
     /** Updates the image of the quick equip image with the one you set */
-    private setImage;
+    setImage(pos: number, item: AnyItem): void;
 }

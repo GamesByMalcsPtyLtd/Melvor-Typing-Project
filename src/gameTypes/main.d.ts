@@ -1,11 +1,11 @@
 declare const useCDN = true;
 declare const CDNVersion = "v018";
 declare const CDNEndpoint = "https://cdn.melvor.net/core";
-declare const DEBUGENABLED = true;
+declare const DEBUGENABLED = false;
 declare const releaseDate = 1637258400000;
 declare const DEBUG_REPORTER: string[];
 declare const CDNDIR: string;
-declare const gameTitle = "Melvor Idle :: v1.1";
+declare const gameTitle = "Melvor Idle :: v1.1.1";
 declare let currentTitleNewsID: string[];
 declare let playFabEventQueue: {
     eventName: string;
@@ -26,6 +26,11 @@ declare let modalIsOpen: boolean;
 declare let offlineProgressCache: string;
 /** Update everything on screen when loading the game */
 declare function updateWindow(): Promise<void>;
+/**
+ * Handles errors when loading the game. Shows the error modal and removes the loader.
+ * @param e Exception from the try catch block
+ */
+declare function showGameLoadError(e: unknown): void;
 /** Loads the lore book modal text */
 declare function loadLore(): void;
 declare let offlineModalID: number;
@@ -67,6 +72,11 @@ declare const IAPPurchaseInProcess = false;
 declare let IAPTimer: number;
 declare const performUnlockIAP: (productID: string) => void;
 declare const performUnlockExpansionIAP: (productID: string) => void;
+declare const performUnlockExpandedEditionIAP: (productID: string) => void;
+declare const enableBuyNowExpandedEditionBtn: () => void;
+declare const disableBuyNowExpandedEditionBtn: () => void;
+declare const enableBuyNowFullGameBtn: () => void;
+declare const disableBuyNowFullGameBtn: () => void;
 declare const startIAPPurchaseInterval: () => void;
 declare const getAndroidIAPStatus: () => Promise<unknown>;
 declare const updateMobilePurchaseStatus: () => void;
@@ -85,3 +95,5 @@ declare function initTooltips(): void;
 declare function generateLoreModals(): string;
 declare function resetSkillsTo99(confirmed?: boolean): void;
 declare function setBackground(id: number): void;
+declare const announcekit: any;
+declare function initChangelog(): void;

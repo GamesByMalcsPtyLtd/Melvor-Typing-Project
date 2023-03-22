@@ -43,7 +43,7 @@ declare class AltMagicSpell extends BaseSpell {
     };
     produces: AltMagicProductionID | AnyItem;
     productionRatio: number;
-    private _description;
+    _description: string;
     constructor(namespace: DataNamespace, data: AltMagicSpellData, game: Game);
 }
 interface MagicSkillData extends MasterySkillData {
@@ -53,27 +53,27 @@ interface MagicSkillData extends MasterySkillData {
 declare class AltMagic extends CraftingSkill<AltMagicSpell, MagicSkillData> {
     get hasMastery(): boolean;
     get isCombat(): boolean;
-    protected readonly _media = "assets/media/skills/magic/magic.svg";
-    protected computeTotalMasteryActions(): void;
-    protected getTotalUnlockedMasteryActions(): number;
+    readonly _media = "assets/media/skills/magic/magic.svg";
+    computeTotalMasteryActions(): void;
+    getTotalUnlockedMasteryActions(): number;
     renderQueue: AltMagicRenderQueue;
     smithingBarRecipes: SmithingRecipe[];
     get actionInterval(): number;
-    protected get actionLevel(): number;
-    protected get masteryAction(): AltMagicSpell;
-    protected get masteryModifiedInterval(): number;
-    protected get noCostsMessage(): string;
-    private get noRunesMessage();
+    get actionLevel(): number;
+    get masteryAction(): AltMagicSpell;
+    get masteryModifiedInterval(): number;
+    get noCostsMessage(): string;
+    get noRunesMessage(): string;
     /** Base interval of casting a spell in ms */
-    private readonly baseInterval;
+    readonly baseInterval = 2000;
     /** Currently selected spell. Undefined if none is selected */
-    private selectedSpell?;
+    selectedSpell?: AltMagicSpell;
     get activeSpell(): AltMagicSpell;
     /** Currently selected smithing recipe for superheat. Undefined if none is selected */
-    private selectedSmithingRecipe?;
+    selectedSmithingRecipe?: SmithingRecipe;
     /** Currently selected itemID to convert. Undefined if none is selected */
     selectedConversionItem?: AnyItem;
-    private get runePreservationChance();
+    get runePreservationChance(): number;
     get selectedSpellMedia(): string;
     constructor(namespace: DataNamespace, game: Game);
     registerData(namespace: DataNamespace, data: MagicSkillData): void;
@@ -91,44 +91,45 @@ declare class AltMagic extends CraftingSkill<AltMagicSpell, MagicSkillData> {
     /** Gets the material costs to cast superheat.
      * @param useCoal Will ignore Coal_Ore costs of the recipe if true
      */
-    private getSuperheatBarCosts;
+    getSuperheatBarCosts(recipe: SmithingRecipe, useCoal: boolean, costQty: number): Costs;
     /** Gets the rune costs required to cast the currently selected spell */
     getCurrentRecipeRuneCosts(): Costs;
     getCurrentRecipeCosts(): Costs;
     getCurrentRecipeBaseProducts(): ItemCurrencyObject;
-    protected getPreservationChance(action: AltMagicSpell, chance: number): number;
+    getPreservationChance(action: AltMagicSpell, chance: number): number;
     getXPModifier(masteryAction?: AltMagicSpell): number;
-    protected recordCostConsumptionStats(costs: Costs): void;
+    recordCostConsumptionStats(costs: Costs): void;
     /** Left as void as it is not possible to preserve items in alt. magic */
-    protected recordCostPreservationStats(costs: Costs): void;
+    recordCostPreservationStats(costs: Costs): void;
     /** Returns the modified GP to add when casting alchemy spells */
-    private getAlchemyGP;
+    getAlchemyGP(item: AnyItem, conversionRatio: number): number;
     /** Performs the main action for Alt. Magic, stopping if required resources or runes are not met */
-    protected action(): void;
+    action(): void;
     get selectedSpellDoublingChance(): number;
-    private randomShardTable;
-    protected preAction(): void;
-    protected get actionRewards(): Rewards;
-    protected postAction(): void;
+    randomShardTable: DropTable;
+    preAction(): void;
+    get actionRewards(): Rewards;
+    postAction(): void;
     onLoad(): void;
     /** Rendering update when the use combination runes setting is changed */
     onComboRunesChange(): void;
     onPageChange(): void;
-    protected onLevelUp(oldLevel: number, newLevel: number): void;
+    queueBankQuantityRender(item: AnyItem): void;
+    onLevelUp(oldLevel: number, newLevel: number): void;
     getErrorLog(): string;
     onModifierChange(): void;
     onEquipmentChange(): void;
     render(): void;
-    private renderProgressBar;
-    private renderSelectedSpellImage;
-    private renderSelectedSpellInfo;
-    private renderQuantities;
-    private renderSelectionTab;
-    protected resetActionState(): void;
+    renderProgressBar(): void;
+    renderSelectedSpellImage(): void;
+    renderSelectedSpellInfo(): void;
+    renderQuantities(): void;
+    renderSelectionTab(): void;
+    resetActionState(): void;
     encode(writer: SaveWriter): SaveWriter;
     decode(reader: SaveWriter, version: number): void;
     deserialize(reader: DataReader, version: number, idMap: NumericIDMap): void;
-    protected getActionIDFromOldID(oldActionID: number, idMap: NumericIDMap): string;
+    getActionIDFromOldID(oldActionID: number, idMap: NumericIDMap): string;
     setFromOldOffline(offline: OfflineMagic, idMap: NumericIDMap): void;
     testTranslations(): void;
 }

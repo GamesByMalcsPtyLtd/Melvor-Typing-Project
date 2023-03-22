@@ -1,12 +1,12 @@
 declare class SkillProgressDisplay {
-    private game;
-    private elems;
+    game: Game;
+    elems: Map<AnySkill, SkillProgressElems>;
     constructor(game: Game);
     updateXP(skill: AnySkill): void;
     updateLevel(skill: AnySkill): void;
-    private getSkillElements;
-    private createTooltip;
-    private createTooltipHTML;
+    getSkillElements(skill: AnySkill): SkillProgressElems;
+    createTooltip(element: HTMLElement, content: string): TippyTooltip;
+    createTooltipHTML(skill: AnySkill): string;
 }
 declare type SkillProgressElems = {
     level: HTMLElement[];
@@ -16,10 +16,10 @@ declare type SkillProgressElems = {
     tooltip: TippyTooltip[];
 };
 declare class SkillNav {
-    private game;
-    private navs;
-    private active;
-    private glowing;
+    game: Game;
+    navs: Map<AnySkill, SkillNavElem[]>;
+    active: Set<AnySkill>;
+    glowing: Set<AnySkill>;
     constructor(game: Game);
     /** Updates the level of a skill */
     updateSkillLevel(skill: AnySkill): void;
@@ -32,10 +32,10 @@ declare class SkillNav {
     setGlowing(skill: AnySkill, shouldGlow: boolean): void;
     /** Removes grene highlights from all skills */
     setAllInactive(): void;
-    private setLocked;
-    private setUnlocked;
-    private setLevel;
-    private getNavs;
+    setLocked(nav: SkillNavElem): void;
+    setUnlocked(nav: SkillNavElem, levelCap: number): void;
+    setLevel(nav: SkillNavElem, level: number, levelCap: number): void;
+    getNavs(skill: AnySkill): SkillNavElem[];
 }
 declare type SkillNavElem = {
     item: SidebarItemWrapper;

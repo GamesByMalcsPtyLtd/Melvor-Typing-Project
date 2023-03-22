@@ -1,7 +1,7 @@
 declare class ItemCharges implements EncodableObject {
-    private game;
-    private charges;
-    private renderQueue;
+    game: Game;
+    charges: Map<EquipmentItem, number>;
+    renderQueue: ItemChargeRenderQueue;
     constructor(game: Game);
     render(): void;
     getSnapShot(): Map<EquipmentItem, number>;

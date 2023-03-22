@@ -35,24 +35,24 @@ declare class Pet extends NamespacedObject {
     modifiers: PlayerModifierObject;
     enemyModifiers?: CombatModifierData;
     activeInRaid: boolean;
-    private _name;
-    private _media;
-    private _hint?;
-    private _langHint?;
-    private _patreonName?;
-    private _customDescription?;
-    private _langCustomDescription?;
+    _name: string;
+    _media: string;
+    _hint?: string;
+    _langHint?: LangStringData;
+    _patreonName?: string;
+    _customDescription?: string;
+    _langCustomDescription?: LangStringData;
     constructor(namespace: DataNamespace, data: PetData, game: Game);
 }
 declare class DummyPet extends Pet {
     constructor(namespace: DataNamespace, id: string, game: Game);
 }
 declare class PetManager implements StatProvider, RaidStatProvider, EncodableObject {
-    private game;
+    game: Game;
     modifiers: MappedModifiers;
     enemyModifiers: TargetModifiers;
     raidStats: Required<Pick<StatProvider, 'modifiers' | 'enemyModifiers'>>;
-    private unlocked;
+    unlocked: Set<Pet>;
     constructor(game: Game);
     onLoad(): void;
     isPetUnlocked(pet: Pet): boolean;
@@ -72,8 +72,8 @@ declare class PetManager implements StatProvider, RaidStatProvider, EncodableObj
      * @param pet The pet to pet
      */
     petPet(pet: Pet): void;
-    private firePetUnlockModal;
-    private computeProvidedStats;
+    firePetUnlockModal(pet: Pet): void;
+    computeProvidedStats(updatePlayers?: boolean): void;
     encode(writer: SaveWriter): SaveWriter;
     decode(reader: SaveWriter, version: number): void;
     convertFromOldFormat(save: NewSaveGame, idMap: NumericIDMap): void;

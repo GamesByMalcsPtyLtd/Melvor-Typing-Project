@@ -1,16 +1,16 @@
 declare class EquippedFood implements EncodableObject, Serializable {
-    private maxSlots;
-    private game;
+    maxSlots: number;
+    game: Game;
     slots: FoodData[];
-    private selectedSlot;
+    selectedSlot: number;
     get currentSlot(): FoodData;
     constructor(maxSlots: number, game: Game);
-    private addSlot;
+    addSlot(): void;
     equip(item: FoodItem, quantity: number): boolean;
     unequipSelected(): void;
     consume(quantity?: number): void;
     setSlot(slotID: number): void;
-    private checkSlotid;
+    checkSlotid(slotID: number): void;
     encode(writer: SaveWriter): SaveWriter;
     decode(reader: SaveWriter, version: number, addOnFail?: boolean): void;
     deserialize(reader: DataReader, version: number, idMap: NumericIDMap, addOnFail?: boolean): void;
@@ -21,20 +21,20 @@ declare type FoodData = {
     quantity: number;
 };
 declare class FoodMenu {
-    private container;
-    private selected;
-    private dropContainer;
-    private dropOptions;
-    private dropDivider;
-    private unequipButton;
+    container: HTMLElement;
+    selected: FoodDropOption;
+    dropContainer: HTMLDivElement;
+    dropOptions: FoodDropOption[];
+    dropDivider: HTMLDivElement;
+    unequipButton: HTMLAnchorElement;
     constructor(containerID: string);
-    private addDropdownOption;
+    addDropdownOption(): void;
     showHoldToEat(): void;
     hideHoldToEat(): void;
-    private removeDropOption;
-    private renderOption;
-    private renderSelected;
-    private renderSelection;
+    removeDropOption(): void;
+    renderOption(food: FoodData, option: FoodDropOption, player: Player): void;
+    renderSelected(food: FoodData, player: Player): void;
+    renderSelection(foods: FoodData[], player: Player): void;
     render(player: Player): void;
     setCallbacks(player: Player): void;
 }

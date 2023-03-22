@@ -14,7 +14,7 @@ declare class SummoningRecipe extends CategorizedArtisanRecipe<SkillCategory> {
     get markMedia(): string;
     product: EquipmentItem;
     baseQuantity: number;
-    private _markMedia;
+    _markMedia: string;
     constructor(namespace: DataNamespace, data: SummoningRecipeData, game: Game, skill: Summoning);
 }
 declare class DummySummoningRecipe extends SummoningRecipe {
@@ -30,7 +30,7 @@ interface SummoningSynergyData {
 }
 declare class SummoningSynergy {
     get description(): string;
-    private _customDescription?;
+    _customDescription?: string;
     modifiers: PlayerModifierObject;
     enemyModifiers?: CombatModifierData;
     conditionalModifiers?: ConditionalModifier[];
@@ -45,46 +45,46 @@ interface SummoningSkillData extends MasterySkillData {
     synergies?: SummoningSynergyData[];
 }
 declare class Summoning extends ArtisanSkill<SummoningRecipe, SummoningSkillData, AnyItem> implements SkillCategoryObject<SkillCategory> {
-    protected readonly _media = "assets/media/skills/summoning/summoning.svg";
-    protected getTotalUnlockedMasteryActions(): number;
+    readonly _media = "assets/media/skills/summoning/summoning.svg";
+    getTotalUnlockedMasteryActions(): number;
     /** Returns the total number of synergies unlocked */
     get totalSynergiesUnlocked(): number;
-    protected readonly baseInterval: number;
-    protected get menu(): ArtisanMenu<AnyItem>;
-    protected selectionTabs: Map<SkillCategory, SummoningSelectionTab>;
+    readonly baseInterval: number;
+    get menu(): ArtisanMenu<AnyItem>;
+    selectionTabs: Map<SkillCategory, SummoningSelectionTab>;
     renderQueue: SummoningRenderQueue;
     categories: NamespaceRegistry<SkillCategory>;
     synergies: SummoningSynergy[];
     synergiesByItem: Map<AnyItem, Map<AnyItem, SummoningSynergy>>;
-    private recipesByProduct;
-    private recipesBySkill;
+    recipesByProduct: Map<AnyItem, SummoningRecipe>;
+    recipesBySkill: Map<AnySkill, SummoningRecipe[]>;
     /** Stores the associated alt. recipe index for a recipe */
-    private setAltRecipes;
+    setAltRecipes: Map<SummoningRecipe, number>;
     /** Stores the number of each mark that has been unlocked */
-    private marksUnlocked;
-    protected get noCostsMessage(): string;
-    protected get actionItem(): EquipmentItem;
-    protected get actionItemQuantity(): number;
+    marksUnlocked: Map<SummoningRecipe, number>;
+    get noCostsMessage(): string;
+    get actionItem(): EquipmentItem;
+    get actionItemQuantity(): number;
     get activeRecipe(): SummoningRecipe;
-    protected get masteryModifiedInterval(): number;
+    get masteryModifiedInterval(): number;
     /** Gets the set alt. recipe index for the currently selected recipe */
-    private get selectedAltRecipe();
+    get selectedAltRecipe(): number;
     get totalMarksDiscovered(): number;
     constructor(namespace: DataNamespace, game: Game);
     registerData(namespace: DataNamespace, data: SummoningSkillData): void;
     postDataRegistration(): void;
     addXPForTabletConsumption(tablet: EquipmentItem, interval: number): void;
-    protected getPercentageIntervalModifier(action: SummoningRecipe): number;
+    getPercentageIntervalModifier(action: SummoningRecipe): number;
     getRecipeFromProduct(product: AnyItem): SummoningRecipe | undefined;
-    protected onLevelUp(oldLevel: number, newLevel: number): void;
+    onLevelUp(oldLevel: number, newLevel: number): void;
     getErrorLog(): string;
     getMarkSnapshot(): Map<SummoningRecipe, number>;
-    protected getNonShardCostReductionModifier(recipe: SummoningRecipe): number;
-    protected modifyItemCost(item: AnyItem, quantity: number, recipe: SummoningRecipe): number;
-    protected modifyGPCost(recipe: SummoningRecipe): number;
-    protected modifySCCost(recipe: SummoningRecipe): number;
+    getNonShardCostReductionModifier(recipe: SummoningRecipe): number;
+    modifyItemCost(item: AnyItem, quantity: number, recipe: SummoningRecipe): number;
+    modifyGPCost(recipe: SummoningRecipe): number;
+    modifySCCost(recipe: SummoningRecipe): number;
     /** Adds the Non shard costs of making a summoning tablet */
-    private addNonShardCosts;
+    addNonShardCosts(recipe: SummoningRecipe, altID: number, costs: Costs): void;
     onLoad(): void;
     onEquipmentChange(): void;
     render(): void;
@@ -93,27 +93,27 @@ declare class Summoning extends ArtisanSkill<SummoningRecipe, SummoningSkillData
     getRecipeCosts(recipe: SummoningRecipe): Costs;
     /** Callback function for selecting an alternative recipe */
     selectAltRecipeOnClick(altID: number): void;
-    protected renderSelectedRecipe(): void;
-    protected renderMarkState(): void;
-    protected renderMarkProgress(): void;
-    private renderSynergyUnlock;
-    private renderSynergyQuantity;
-    protected queueMarkDiscoveryModal(mark: SummoningRecipe): void;
-    protected queueMarkLevelUpModal(mark: SummoningRecipe): void;
-    protected getPreservationChance(action: SummoningRecipe, chance: number): number;
+    renderSelectedRecipe(): void;
+    renderMarkState(): void;
+    renderMarkProgress(): void;
+    renderSynergyUnlock(): void;
+    renderSynergyQuantity(): void;
+    queueMarkDiscoveryModal(mark: SummoningRecipe): void;
+    queueMarkLevelUpModal(mark: SummoningRecipe): void;
+    getPreservationChance(action: SummoningRecipe, chance: number): number;
     getMasteryXPModifier(action: SummoningRecipe): number;
-    protected onMasteryLevelUp(action: SummoningRecipe, oldLevel: number, newLevel: number): void;
-    protected recordCostPreservationStats(costs: Costs): void;
-    protected recordCostConsumptionStats(costs: Costs): void;
-    protected preAction(): void;
-    protected get actionRewards(): Rewards;
-    protected postAction(): void;
+    onMasteryLevelUp(action: SummoningRecipe, oldLevel: number, newLevel: number): void;
+    recordCostPreservationStats(costs: Costs): void;
+    recordCostConsumptionStats(costs: Costs): void;
+    preAction(): void;
+    get actionRewards(): Rewards;
+    postAction(): void;
     encode(writer: SaveWriter): SaveWriter;
     decode(reader: SaveWriter, version: number): void;
     deserialize(reader: DataReader, version: number, idMap: NumericIDMap): void;
     /** Sets object data using the old summoningData variable */
     convertFromOldFormat(summoningData: OldPlayerSummoningData, idMap: NumericIDMap): void;
-    protected getActionIDFromOldID(oldActionID: number, idMap: NumericIDMap): string;
+    getActionIDFromOldID(oldActionID: number, idMap: NumericIDMap): string;
     setFromOldOffline(offline: OfflineSkill, idMap: NumericIDMap): void;
     /** Gets the number of times a mark has been discovered */
     getMarkCount(mark: SummoningRecipe): number;
@@ -130,12 +130,12 @@ declare class Summoning extends ArtisanSkill<SummoningRecipe, SummoningSkillData
     /** Checks if the synergy is unlocked */
     isSynergyUnlocked(synergy: SummoningSynergy): boolean;
     /** Gets the chance to roll for a given mark */
-    private getChanceForMark;
+    getChanceForMark(mark: SummoningRecipe, skill: AnySkill, modifiedInterval: number): number;
     /** Rolls for a summoning mark.*/
-    private rollForMark;
-    private discoverMark;
+    rollForMark(mark: SummoningRecipe, skill: AnySkill, modifiedInterval: number): void;
+    discoverMark(mark: SummoningRecipe): void;
     /** Checks if the player meets the conditions for the pet "Mark" */
-    private checkForPetMark;
+    checkForPetMark(): void;
     /** Rolls for all the summoning marks applicable for the given skill */
     rollMarksForSkill(skill: AnySkill, modifiedInterval: number): void;
     getMarkForSkill(skill: AnySkill): SummoningRecipe | undefined;

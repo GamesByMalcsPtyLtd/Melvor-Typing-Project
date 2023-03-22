@@ -173,7 +173,7 @@ declare class DefaultPageOption implements ChoiceSettingOption<Page> {
     constructor(value: Page);
 }
 declare class Settings implements EncodableObject, BooleanSettings, ChoiceSettings {
-    private game;
+    game: Game;
     get continueIfBankFull(): boolean;
     get continueThievingOnStun(): boolean;
     get autoRestartDungeon(): boolean;
@@ -241,16 +241,16 @@ declare class Settings implements EncodableObject, BooleanSettings, ChoiceSettin
     initializeToggles(): void;
     /** Initializes all <settings-dropdown> components */
     initializeChoices(): void;
-    private isBooleanSetting;
-    private isChoiceSetting;
+    isBooleanSetting(settingID: string): settingID is keyof BooleanSettings;
+    isChoiceSetting(settingID: string): settingID is keyof ChoiceSettings;
     toggleSetting(setting: keyof BooleanSettings): void;
-    private setTogglesChecked;
+    setTogglesChecked(setting: keyof BooleanSettings, isChecked: boolean): void;
     changeChoiceSetting<T extends keyof ChoiceSettings>(setting: T, newValue: ChoiceSettings[T]): void;
-    private getOptionFromValue;
+    getOptionFromValue<T>(value: T, data: ChoiceSettingData<T>): ChoiceSettingOption<T>;
     /** Load the current settings */
     onLoad(): void;
-    private boolData;
-    private choiceData;
+    boolData: MapToSettingsData<BooleanSettings>;
+    choiceData: MapToChoiceSettingData<ChoiceSettings>;
 }
 declare type OldBankSettings = {
     /** @deprecated */

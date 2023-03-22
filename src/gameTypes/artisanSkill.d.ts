@@ -1,52 +1,53 @@
 /** Base class for artisan skills, contains similar code to simplify rendering */
 declare abstract class ArtisanSkill<RecipeClass extends ArtisanSkillRecipe, DataType extends MasterySkillData, ProductType extends Item> extends CraftingSkill<RecipeClass, DataType> {
     /** Associated menu for the skill */
-    protected abstract menu: ArtisanMenu<ProductType>;
-    protected abstract selectionTabs: Map<SkillCategory, RecipeSelectionTab<RecipeClass>>;
+    abstract menu: ArtisanMenu<ProductType>;
+    abstract selectionTabs: Map<SkillCategory, RecipeSelectionTab<RecipeClass>>;
     abstract renderQueue: ArtisanSkillRenderQueue<RecipeClass>;
-    protected abstract readonly baseInterval: number;
+    abstract readonly baseInterval: number;
     /** Gets the base XP for the current action */
-    protected get actionXP(): number;
+    get actionXP(): number;
     /** Gets the primary item ID produced for the current action */
-    protected abstract readonly actionItem: ProductType;
+    abstract readonly actionItem: ProductType;
     /** Gets the primary item quantity produced for the current action */
-    protected abstract readonly actionItemQuantity: number;
+    abstract readonly actionItemQuantity: number;
     /** Currently selected recipe */
     abstract readonly activeRecipe: RecipeClass;
     /** ID of currently selected recipe */
-    protected selectedRecipe?: RecipeClass;
+    selectedRecipe?: RecipeClass;
     /** Doubling chance for currently selected recipe */
-    protected get actionDoublingChance(): number;
-    protected get actionInterval(): number;
-    protected get actionLevel(): number;
-    protected get masteryAction(): RecipeClass;
+    get actionDoublingChance(): number;
+    get actionInterval(): number;
+    get actionLevel(): number;
+    get masteryAction(): RecipeClass;
     /** Callback function for when the create button is pressed */
     createButtonOnClick(): void;
     /** Callback function for when a recipe is selected */
     selectRecipeOnClick(recipe: RecipeClass): void;
     onLoad(): void;
+    queueBankQuantityRender(item: AnyItem): void;
     onModifierChange(): void;
     onEquipmentChange(): void;
-    protected onLevelUp(oldLevel: number, newLevel: number): void;
+    onLevelUp(oldLevel: number, newLevel: number): void;
     getErrorLog(): string;
     render(): void;
     /** Gets the costs for a recipe for this skill */
     getRecipeCosts(recipe: RecipeClass): Costs;
-    protected getCurrentRecipeCosts(): Costs;
+    getCurrentRecipeCosts(): Costs;
     /** Modifies the cost of a specific item for a recipe */
-    protected modifyItemCost(item: AnyItem, quantity: number, recipe: RecipeClass): number;
+    modifyItemCost(item: AnyItem, quantity: number, recipe: RecipeClass): number;
     /** Modifies the cost of gp for a recipe */
-    protected modifyGPCost(recipe: RecipeClass): number;
+    modifyGPCost(recipe: RecipeClass): number;
     /** Modifies the cost of slayer coins for a recipe */
-    protected modifySCCost(recipe: RecipeClass): number;
+    modifySCCost(recipe: RecipeClass): number;
     /** Render the quantities of items, gp, and slayer coins */
-    protected renderQuantities(): void;
+    renderQuantities(): void;
     /** Renders the selected recipe */
-    protected renderSelectedRecipe(): void;
+    renderSelectedRecipe(): void;
     /** Renders the xp, preservation/doubling chance and interval */
-    protected renderRecipeInfo(): void;
-    protected renderProgressBar(): void;
-    protected renderSelectionTabs(): void;
+    renderRecipeInfo(): void;
+    renderProgressBar(): void;
+    renderSelectionTabs(): void;
     encode(writer: SaveWriter): SaveWriter;
     decode(reader: SaveWriter, version: number): void;
     deserialize(reader: DataReader, version: number, idMap: NumericIDMap): void;

@@ -174,7 +174,7 @@ declare type PackagedSave = {
     cd: number[];
 };
 declare const saveFormat2Version = 21;
-declare const currentSaveVersion = 32;
+declare const currentSaveVersion = 36;
 interface AddRemove<T> {
     add: T[];
     remove: T[];
@@ -294,15 +294,15 @@ declare function convertHerbloreBonusesFromArray(herbloreBonuses: OldHerbloreBon
 /** Reconstructs variables that did not need to be saved (and performs some post processing for others) */
 declare function constructRedundantVars(saveGame: NewSaveGame, saveVersion: number): void;
 declare class DataReader {
-    private data;
-    private dataIndex;
+    data: number[];
+    dataIndex: number;
     get dataLength(): number;
     /** If the reader is at the end of the data */
     get atEnd(): boolean;
     constructor(data: number[]);
     getBool(): boolean;
     getNumber(): number;
-    private nextValue;
+    nextValue(): number;
     getChunk(length: number): number[];
     getVariableLengthChunk(): DataReader;
     getBoolArray(): boolean[];

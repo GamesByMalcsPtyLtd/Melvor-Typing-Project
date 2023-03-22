@@ -1,11 +1,11 @@
 /** Contains Mastery Icon with Level, Progress bar for % progress to next level and experience progress */
 declare class MasteryDisplay extends HTMLElement {
-    private _content;
-    private icon;
-    private level;
-    private xpProgress;
-    private progressBar;
-    private iconTooltip?;
+    _content: DocumentFragment;
+    icon: HTMLImageElement;
+    level: HTMLSpanElement;
+    xpProgress: HTMLElement;
+    progressBar: HTMLDivElement;
+    iconTooltip?: TippyTooltip;
     constructor();
     connectedCallback(): void;
     disconnectedCallback(): void;
@@ -15,11 +15,11 @@ declare class MasteryDisplay extends HTMLElement {
 }
 /** Contains Mastery Icon with Level, and percentage to next mastery level */
 declare class CompactMasteryDisplay extends HTMLElement {
-    private _content;
-    private icon;
-    private level;
-    private progressPercent;
-    private iconTooltip?;
+    _content: DocumentFragment;
+    icon: HTMLImageElement;
+    level: HTMLSpanElement;
+    progressPercent: HTMLElement;
+    iconTooltip?: TippyTooltip;
     constructor();
     connectedCallback(): void;
     disconnectedCallback(): void;
@@ -27,13 +27,13 @@ declare class CompactMasteryDisplay extends HTMLElement {
     updateValues(progress: MasteryProgress): void;
 }
 declare class MasteryPoolDisplay extends HTMLElement {
-    private _content;
-    private poolIcon;
-    private poolProgress;
-    private currentXP;
-    private totalXP;
-    private percentXP;
-    private poolTooltip?;
+    _content: DocumentFragment;
+    poolIcon: HTMLImageElement;
+    poolProgress: HTMLDivElement;
+    currentXP: HTMLSpanElement;
+    totalXP: HTMLSpanElement;
+    percentXP: HTMLSpanElement;
+    poolTooltip?: TippyTooltip;
     constructor();
     connectedCallback(): void;
     disconnectedCallback(): void;
@@ -41,13 +41,13 @@ declare class MasteryPoolDisplay extends HTMLElement {
     updateProgress(skill: SkillWithMastery<MasteryAction, MasterySkillData>): void;
 }
 declare class SpendMasteryMenuItem extends HTMLElement {
-    private _content;
-    private actionImage;
-    private level;
-    private xpRequired;
-    private progressBar;
-    private levelUpButton;
-    private actionTooltip?;
+    _content: DocumentFragment;
+    actionImage: HTMLImageElement;
+    level: HTMLElement;
+    xpRequired: HTMLSpanElement;
+    progressBar: HTMLDivElement;
+    levelUpButton: HTMLButtonElement;
+    actionTooltip?: TippyTooltip;
     constructor();
     connectedCallback(): void;
     disconnectedCallback(): void;
@@ -55,21 +55,21 @@ declare class SpendMasteryMenuItem extends HTMLElement {
     updateProgress(skill: SkillWithMastery<MasteryAction, MasterySkillData>, action: MasteryAction, spendAmount: number): void;
 }
 declare class SpendMasteryMenu extends HTMLElement {
-    private _content;
-    private masteryItemContainer;
-    private poolDisplay;
-    private claimTokenButton;
-    private tokenImage;
-    private tokenQuantity;
-    private setLevel1Button;
-    private setLevel5Button;
-    private setLevel10Button;
+    _content: DocumentFragment;
+    masteryItemContainer: HTMLDivElement;
+    poolDisplay: MasteryPoolDisplay;
+    claimTokenButton: HTMLButtonElement;
+    tokenImage: HTMLImageElement;
+    tokenQuantity: HTMLSpanElement;
+    setLevel1Button: HTMLButtonElement;
+    setLevel5Button: HTMLButtonElement;
+    setLevel10Button: HTMLButtonElement;
     get curentSkill(): SkillWithMastery<MasteryAction, MasterySkillData> | undefined;
     get currentToken(): TokenItem | undefined;
-    private _currentSkill?;
-    private masteryItems;
-    private itemsByAction;
-    private levelUpAmount;
+    _currentSkill?: SkillWithMastery<MasteryAction, MasterySkillData>;
+    masteryItems: SpendMasteryMenuItem[];
+    itemsByAction: Map<MasteryAction, SpendMasteryMenuItem>;
+    levelUpAmount: number;
     constructor();
     connectedCallback(): void;
     setSkill(skill: SkillWithMastery<MasteryAction, MasterySkillData>, game: Game): void;
@@ -78,15 +78,15 @@ declare class SpendMasteryMenu extends HTMLElement {
     toggleHideLevel99(): void;
     updateAction(skill: SkillWithMastery<MasteryAction, MasterySkillData>, action: MasteryAction): void;
     updateTokenQuantity(amount: number): void;
-    private changeLevelUpAmount;
+    changeLevelUpAmount(newAmount: number): void;
 }
 declare class MasterySkillOptionsElement extends HTMLElement {
-    private _content;
-    private poolDisplay;
-    private viewCheckpointsButton;
-    private spendMasteryButton;
-    private masteryImage;
-    private masteryTooltip?;
+    _content: DocumentFragment;
+    poolDisplay: MasteryPoolDisplay;
+    viewCheckpointsButton: HTMLButtonElement;
+    spendMasteryButton: HTMLButtonElement;
+    masteryImage: HTMLImageElement;
+    masteryTooltip?: TippyTooltip;
     constructor();
     connectedCallback(): void;
     disconnectedCallback(): void;

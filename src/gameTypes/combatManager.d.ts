@@ -43,11 +43,12 @@ declare class CombatManager extends BaseManager implements PassiveAction {
     get media(): string;
     get name(): string;
     get activeSkills(): AnySkill[];
+    get canStop(): boolean;
     /** Currently selected combat area. undefined if none is selected. */
     selectedArea?: CombatArea | SlayerArea | Dungeon;
     get areaType(): CombatAreaType;
     /** Stores the number of times a dungeon has been completed */
-    private dungeonCompletion;
+    dungeonCompletion: Map<Dungeon, number>;
     dungeonProgress: number;
     /** Currently selected monster. undefined if none is selected. */
     selectedMonster?: Monster;
@@ -56,21 +57,21 @@ declare class CombatManager extends BaseManager implements PassiveAction {
     slayerTask: SlayerTask;
     paused: boolean;
     /** Combat event progress */
-    private activeEvent?;
+    activeEvent?: CombatEvent;
     /** If event state should be reset after loading save */
-    private shouldResetEvent;
+    shouldResetEvent: boolean;
     get isEventActive(): boolean;
     eventProgress: number;
-    private eventPassives;
-    private availableEventPassives;
-    private eventPassivesBeingSelected;
-    private eventDungeonLength;
+    eventPassives: CombatPassive[];
+    availableEventPassives: CombatPassive[];
+    eventPassivesBeingSelected: Set<CombatPassive>;
+    eventDungeonLength: number;
     activeEventAreas: Map<SlayerArea, number>;
-    private itmMonsters;
+    itmMonsters: Monster[];
     spiderLairMonsters: Monster[];
     get isFightingITMBoss(): boolean;
     /** Currently open area menu */
-    private openCombatAreaMenu;
+    openCombatAreaMenu: CombatAreaType;
     get onSlayerTask(): boolean;
     get ignoreSpellRequirements(): boolean;
     get canInteruptAttacks(): boolean;
@@ -78,7 +79,7 @@ declare class CombatManager extends BaseManager implements PassiveAction {
     get slayerAreaLevelReq(): number;
     get playerAreaModifiers(): PlayerModifierObject;
     get enemyAreaModifiers(): CombatModifierData;
-    private addDungeonCompletion;
+    addDungeonCompletion(dungeon: Dungeon): void;
     getDungeonCompleteCount(dungeon: Dungeon): number;
     getDungeonCompletionSnapshot(): Map<Dungeon, number>;
     setDungeonCompleteCount(dungeon: Dungeon, count: number): void;
@@ -94,54 +95,56 @@ declare class CombatManager extends BaseManager implements PassiveAction {
     getErrorLog(): string;
     /** Renders combat in current state */
     render(): void;
-    private renderPause;
-    protected renderLocation(): void;
-    private renderSlayerAreaEffects;
-    private renderEventMenu;
-    private renderAreaRequirements;
-    protected onPlayerDeath(): void;
+    renderPause(): void;
+    renderLocation(): void;
+    renderSlayerAreaEffects(): void;
+    renderEventMenu(): void;
+    renderAreaRequirements(): void;
+    onPlayerDeath(): void;
     /** Called on enemy death, returns if combat should be stopped as a result */
-    protected onEnemyDeath(): boolean;
+    onEnemyDeath(): boolean;
     /** Checks to add one time rewards from dungeon completion that were added after completion */
     retroactivelyAddOneTimeRewards(): void;
-    protected rewardForEnemyDeath(monster: Monster): void;
-    private dropEnemyLoot;
-    private dropSignetHalfB;
-    private dropEnemyBones;
-    private dropEnemyGP;
+    rewardForEnemyDeath(monster: Monster): void;
+    dropEnemyLoot(monster: Monster): void;
+    dropSignetHalfB(monster: Monster): void;
+    dropEnemyBones(monster: Monster): void;
+    dropEnemyGP(monster: Monster): void;
     /** Callback function for starting event */
     startEvent(event: CombatEvent): void;
-    private computeAvailableEventPassives;
-    private fireEventStageCompletionModal;
-    private fireEventPassiveModal;
+    computeAvailableEventPassives(event: CombatEvent): void;
+    fireEventStageCompletionModal(event: CombatEvent): void;
+    fireEventPassiveModal(): void;
     showEventPassivesModal(): void;
     showStartEventModal(event: CombatEvent): void;
     showStopEventModal(): void;
-    private onPassiveSelection;
-    private removeAvailablePassive;
-    private increaseEventProgress;
+    onPassiveSelection(passive: CombatPassive): void;
+    removeAvailablePassive(passive: CombatPassive): void;
+    increaseEventProgress(event: CombatEvent): void;
     stopEvent(): void;
-    private renderEventAreas;
+    renderEventAreas(): void;
     /** Callback function for selecting a monster */
     selectMonster(monster: Monster, areaData: CombatArea | SlayerArea): void;
     /** Callback function for selecting a dungeon */
     selectDungeon(dungeon: Dungeon): void;
     /** Callback function for selecting an event area */
     selectEventArea(areaData: SlayerArea): void;
-    protected preSelection(): boolean;
+    preSelection(): boolean;
     /** Callback function for running from combat */
     stop(fled?: boolean, areaChange?: boolean): boolean;
-    protected loadNextEnemy(): void;
-    protected createNewEnemy(): void;
-    protected spawnEnemy(): void;
-    protected pauseDungeon(): void;
-    protected resumeDungeon(): void;
-    protected onSelection(): void;
+    loadNextEnemy(): void;
+    createNewEnemy(): void;
+    onPageChange(): void;
+    renderModifierChange(): void;
+    spawnEnemy(): void;
+    pauseDungeon(): void;
+    resumeDungeon(): void;
+    onSelection(): void;
     /** Callback function for opening combat area */
     openAreaMenu(areaType: CombatAreaType): void;
-    protected closeAreaMenu(): void;
-    protected resetActionState(): void;
-    private resetEventState;
+    closeAreaMenu(): void;
+    resetActionState(): void;
+    resetEventState(): void;
     encode(writer: SaveWriter): SaveWriter;
     decode(reader: SaveWriter, version: number): void;
     deserialize(reader: DataReader, version: number, idMap: NumericIDMap): void;
@@ -149,7 +152,7 @@ declare class CombatManager extends BaseManager implements PassiveAction {
     /** Sets properties based on the old save file variables */
     convertFromOldSaveFormat(saveGame: NewSaveGame, idMap: NumericIDMap): void;
     convertDungeonCompletion(dungeonCompletion: number[], idMap: NumericIDMap): void;
-    private getStatsLog;
+    getStatsLog(): StatsLog;
     /** Logs player and enemy combat stats to console */
     saveStats(): void;
     compareStatsWithSavedStats(): void;
@@ -166,10 +169,10 @@ declare type StatsLog = {
 };
 declare class Timer implements EncodableObject {
     type: TimerTypes;
-    private action;
-    private _ticksLeft;
-    private _maxTicks;
-    private active;
+    action: VoidFunction;
+    _ticksLeft: number;
+    _maxTicks: number;
+    active: boolean;
     constructor(type: TimerTypes, action: VoidFunction);
     tick(): void;
     start(time: number, offsetByTick?: boolean): void;

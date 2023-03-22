@@ -15,10 +15,17 @@ interface BaseItemData extends IDData {
     customDescription?: string;
     sellsFor: number;
 }
+interface BaseItemModificationData extends IDData {
+    category?: string;
+    obtainFromItemLog?: boolean;
+    sellsFor?: number;
+    type?: string;
+}
 interface ItemData extends BaseItemData {
     itemType: 'Item';
 }
 declare type AnyItemData = ItemData | EquipmentItemData | WeaponItemData | FoodItemData | BoneItemData | PotionItemData | ReadableItemData | OpenableItemData | TokenItemData | CompostItemData;
+declare type AnyItemModificationData = BaseItemModificationData | BaseEquipmentItemModificationData | WeaponItemModificationData | FoodItemModificationData | BoneItemModificationData | PotionItemModificationData | OpenableItemModificationData | TokenItemModificationData | CompostItemModificationData;
 declare type AnyItem = Item | EquipmentItem | WeaponItem | FoodItem | BoneItem | PotionItem | ReadableItem | OpenableItem | TokenItem | CompostItem;
 /** Base class for items in the game */
 declare class Item extends NamespacedObject {
@@ -31,16 +38,17 @@ declare class Item extends NamespacedObject {
     get altMedia(): string;
     get description(): string;
     sellsFor: number;
-    private _name;
-    private _media;
+    _name: string;
+    _media: string;
     get hasDescription(): boolean;
     ignoreCompletion: boolean;
     obtainFromItemLog: boolean;
     golbinRaidExclusive: boolean;
-    private _customDescription?;
-    private _mediaAnimation?;
-    private _altMedia?;
+    _customDescription?: string;
+    _mediaAnimation?: string;
+    _altMedia?: string;
     constructor(namespace: DataNamespace, data: BaseItemData);
+    applyDataModification(modData: BaseItemModificationData, game: Game): void;
 }
 /** Dummy items used for placeholders for official game content that is not registered */
 declare class DummyItem extends Item {
@@ -79,6 +87,51 @@ interface BaseEquipmentItemData extends BaseItemData {
         itemID: string;
         chance: number;
         matchers: GameEventMatcherData[];
+    };
+}
+interface BaseEquipmentItemModificationData extends BaseItemModificationData {
+    ammoType?: AmmoType | null;
+    conditionalModifiers?: {
+        add?: ConditionalModifierData[];
+        remove?: string[];
+    };
+    enemyModifiers?: {
+        add?: CombatModifierData;
+        remove?: (keyof CombatModifierData)[];
+    };
+    equipRequirements?: {
+        add?: AnyRequirementData[];
+        remove?: string[];
+    };
+    equipmentStats?: {
+        add?: EquipStatPair[];
+        remove?: EquipStatKey[];
+    };
+    fightEffects?: {
+        add?: string[];
+        remove?: string[];
+    };
+    modifiers?: {
+        add?: PlayerModifierData;
+        remove?: (keyof PlayerModifierData)[];
+    };
+    occupiesSlots?: {
+        add?: SlotTypes[];
+        remove?: SlotTypes[];
+    };
+    overrideSpecialChances?: number[] | null;
+    providedRunes?: {
+        add?: IDQuantity[];
+        remove?: string[];
+    };
+    specialAttacks?: {
+        add?: string[];
+        remove?: string[];
+    };
+    tier?: string;
+    validSlots?: {
+        add?: SlotTypes[];
+        remove?: SlotTypes[];
     };
 }
 interface EquipmentItemData extends BaseEquipmentItemData {
@@ -126,6 +179,7 @@ declare class EquipmentItem extends Item implements SoftDataDependant<EquipmentI
     get description(): string;
     constructor(namespace: DataNamespace, data: BaseEquipmentItemData, game: Game);
     registerSoftDependencies(data: EquipmentItemData, game: Game): void;
+    applyDataModification(modData: BaseEquipmentItemModificationData, game: Game): void;
 }
 declare class DummyEquipmentItem extends EquipmentItem {
     constructor(namespace: DataNamespace, id: string, game: Game);
@@ -135,28 +189,41 @@ interface WeaponItemData extends BaseEquipmentItemData {
     attackType: AttackType;
     ammoTypeRequired?: AmmoType;
 }
+interface WeaponItemModificationData extends BaseEquipmentItemModificationData {
+    attackType?: AttackType;
+    ammoTypeRequired?: AmmoType | null;
+}
 declare class WeaponItem extends EquipmentItem {
     /** The attack type of this weapon */
     attackType: AttackType;
     /** The ammo type this weapon requires for each attack */
     ammoTypeRequired?: AmmoTypeID;
     constructor(namespace: DataNamespace, itemData: WeaponItemData, game: Game);
+    applyDataModification(modData: WeaponItemModificationData, game: Game): void;
 }
 interface FoodItemData extends BaseItemData {
     itemType: 'Food';
     healsFor: number;
 }
+interface FoodItemModificationData extends BaseItemModificationData {
+    healsFor?: number;
+}
 declare class FoodItem extends Item {
     healsFor: number;
     constructor(namespace: DataNamespace, itemData: FoodItemData);
+    applyDataModification(modData: FoodItemModificationData, game: Game): void;
 }
 interface BoneItemData extends BaseItemData {
     itemType: 'Bone';
     prayerPoints: number;
 }
+interface BoneItemModificationData extends BaseItemModificationData {
+    prayerPoints?: number;
+}
 declare class BoneItem extends Item {
     prayerPoints: number;
     constructor(namespace: DataNamespace, itemData: BoneItemData);
+    applyDataModification(modData: BoneItemModificationData, game: Game): void;
 }
 interface PotionItemData extends BaseItemData {
     itemType: 'Potion';
@@ -165,6 +232,13 @@ interface PotionItemData extends BaseItemData {
     tier: HerbloreTier;
     action: string;
     consumesOn: GameEventMatcherData[];
+}
+interface PotionItemModificationData extends BaseItemModificationData {
+    charges?: number;
+    modifiers?: {
+        add?: PlayerModifierData;
+        remove?: (keyof PlayerModifierData)[];
+    };
 }
 declare class PotionItem extends Item implements SoftDataDependant<PotionItemData> {
     /** Modifiers for the potion */
@@ -180,6 +254,7 @@ declare class PotionItem extends Item implements SoftDataDependant<PotionItemDat
     get description(): string;
     constructor(namespace: DataNamespace, data: PotionItemData, game: Game);
     registerSoftDependencies(data: PotionItemData, game: Game): void;
+    applyDataModification(modData: PotionItemModificationData, game: Game): void;
 }
 declare type ReadableItemSwalData = {
     title: LangStringData;
@@ -191,8 +266,8 @@ interface ReadableItemData extends BaseItemData {
     swalData?: ReadableItemSwalData;
 }
 declare class ReadableItem extends Item {
-    private modalID?;
-    private swalData?;
+    modalID?: string;
+    swalData?: ReadableItemSwalData;
     constructor(namespace: DataNamespace, itemData: ReadableItemData);
     /** Fire the modal for reading the item */
     showContents(): void;
@@ -202,15 +277,29 @@ interface OpenableItemData extends BaseItemData {
     dropTable: DropTableData[];
     keyItem?: IDQuantity;
 }
+interface OpenableItemModificationData extends BaseItemModificationData {
+    dropTable?: {
+        add?: DropTableData[];
+        remove?: string[];
+    };
+    keyItem?: IDQuantity | null;
+}
 declare class OpenableItem extends Item {
     dropTable: DropTable;
     keyItem?: AnyItemQuantity;
     constructor(namespace: DataNamespace, itemData: OpenableItemData, game: Game);
+    applyDataModification(modData: OpenableItemModificationData, game: Game): void;
 }
 interface TokenItemData extends BaseItemData {
     itemType: 'Token';
     /** Modifiers provided by claiming the token */
     modifiers: PlayerModifierData;
+}
+interface TokenItemModificationData extends BaseItemModificationData {
+    modifiers?: {
+        add?: PlayerModifierData;
+        remove?: (keyof PlayerModifierData)[];
+    };
 }
 declare class TokenItem extends Item {
     /** Modifiers that are given to the player based on amount of tokens claimed */
@@ -218,6 +307,7 @@ declare class TokenItem extends Item {
     get hasDescription(): boolean;
     get description(): string;
     constructor(namespace: DataNamespace, itemData: TokenItemData, game: Game);
+    applyDataModification(modData: TokenItemModificationData, game: Game): void;
 }
 interface CompostItemData extends BaseItemData {
     itemType: 'Compost';
@@ -226,12 +316,19 @@ interface CompostItemData extends BaseItemData {
     buttonStyle: string;
     barStyle: string;
 }
+interface CompostItemModificationData extends BaseItemModificationData {
+    barStyle?: string;
+    buttonStyle?: string;
+    compostValue?: number;
+    harvestBonus?: number;
+}
 declare class CompostItem extends Item {
     compostValue: number;
     harvestBonus: number;
     buttonStyle: string;
     barStyle: string;
     constructor(namespace: DataNamespace, itemData: CompostItemData);
+    applyDataModification(modData: CompostItemModificationData, game: Game): void;
 }
 /** Returns the HTML that describes an items special attacks if it has any, else returns an empty string */
 declare function getItemSpecialAttackInformation(item: EquipmentItem): string;

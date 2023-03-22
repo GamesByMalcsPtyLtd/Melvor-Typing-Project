@@ -1,14 +1,14 @@
 declare class CombatLoot implements Serializable, EncodableObject {
-    private maxLoot;
-    private game;
+    maxLoot: number;
+    game: Game;
     drops: AnyItemQuantity[];
-    private renderRequired;
+    renderRequired: boolean;
     lostLoot: Map<AnyItem, number>;
     constructor(maxLoot: number, game: Game);
     initializeMenus(): void;
     add(item: AnyItem, quantity: number, stack?: boolean): void;
     removeAll(): void;
-    private makeDropRoom;
+    makeDropRoom(): void;
     lootAll(): void;
     destroyAllLoot(): void;
     actuallyDestroyAllLootNow(): void;
@@ -26,17 +26,17 @@ declare type LootElements = {
     tooltip: TippyTooltip;
 };
 declare class CombatLootMenuElement extends HTMLElement {
-    private _content;
-    private lootQuantity;
-    private lootAllButton;
-    private lootContainer;
-    private lootingAmuletText;
-    private dropElements;
+    _content: DocumentFragment;
+    lootQuantity: HTMLHeadingElement;
+    lootAllButton: HTMLButtonElement;
+    lootContainer: HTMLDivElement;
+    lootingAmuletText: HTMLElement;
+    dropElements: LootElements[];
     constructor();
     connectedCallback(): void;
     /** Set callbacks and translations */
     initialize(loot: CombatLoot): void;
     renderDrops(drops: AnyItemQuantity[], maxDrops: number, loot: CombatLoot): void;
-    private createDropElement;
-    private createTooltip;
+    createDropElement(): void;
+    createTooltip(parent: HTMLDivElement): TippyTooltip;
 }

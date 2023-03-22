@@ -19,6 +19,7 @@ interface PageData extends IDData {
     skills?: string[];
     sidebarItem?: PageSideBarItemOptions;
     sidebarSubItems?: PageSideBarSubItemOptions[];
+    skillSidebarCategoryID?: string;
 }
 declare class Page extends NamespacedObject {
     get name(): string;
@@ -29,10 +30,11 @@ declare class Page extends NamespacedObject {
     canBeDefault: boolean;
     action?: Action;
     skills?: AnySkill[];
-    private sidebarItem?;
-    private sidebarSubItems?;
-    private _media;
-    private _customName?;
+    skillSidebarCategoryID?: string;
+    sidebarItem?: PageSideBarItemOptions;
+    sidebarSubItems?: PageSideBarSubItemOptions[];
+    _media: string;
+    _customName?: string;
     constructor(namespace: DataNamespace, data: PageData, game: Game);
     /** Generates sidebar elements for the page, with the exception of skills */
     generateSideBar(): void;

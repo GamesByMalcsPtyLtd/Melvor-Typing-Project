@@ -16,6 +16,8 @@ declare function getCloudInfoInSlot(slotID: number): {
     hasCloud: boolean;
 };
 declare function getLocalInfoInSlot(slotID: number): SaveGameHeader | undefined;
+/** Callback function for when the user refreshes the cloud save selection */
+declare function refreshCloudSavesOnClick(): Promise<void>;
 /** Shows the saves that are locally present on the character selection page */
 declare function showLocalSaveSelection(): void;
 /** Shows the saves that have been fetched from the cloud on the character selection page */
@@ -25,10 +27,23 @@ declare function showSaveSelectionLoading(slotLoading: number): void;
 declare function showSaveLoadingError(slotID: number, message: string, isCloud: boolean): void;
 /** Changes the type of saves being displayed. */
 declare function toggleSaveSelectionView(newView?: SaveViewType | -1): void;
+/**
+ * Checks the header of a savegame for expansion or full version content, and if that content is installed.
+ * @param saveInfo A header of a savegame
+ * @returns The first namespace of the expansion that is not installed, or undefined if all are installed
+ */
+declare function checkSaveExpansions(saveInfo: SaveGameHeader): string | undefined;
+/**
+ * Shows an error to the end user that their save cannot be loaded because an expansion is not installed
+ * @param ns The namespace of the expansion that is not installed
+ */
+declare function showSaveExpansionError(ns: string): void;
+/** Callback function for when the force load save setting is clicked on */
+declare function forceLoadSaveOnClick(slotID: number, isCloud: boolean): Promise<void>;
 /** Callback function for when a local save is clicked on */
-declare function loadLocalSaveOnClick(slotID: number): Promise<void>;
+declare function loadLocalSaveOnClick(slotID: number, force?: boolean): Promise<void>;
 /** Callback function for when a cloud save is clicked on */
-declare function loadCloudSaveOnClick(slotID: number): Promise<void>;
+declare function loadCloudSaveOnClick(slotID: number, force?: boolean): Promise<void>;
 /** Gets an element that displays the info on a local save in the given save slot */
 declare function getLocalSaveSummary(slotID: number): HTMLElement;
 /** Gets an element that displays the info on a cloud save in the given save slot */

@@ -796,7 +796,8 @@ declare class PlayerModifiers extends CombatModifiers implements StandardModifie
     bypassAllSlayerItems: number;
     increased5DROnBeingHit: number;
     allowNonMagicCurses: number;
-    private skillModifiers;
+    increasedTownshipTraderStock: number;
+    skillModifiers: Map<SkillModifierKeys, Map<AnySkill, number>>;
     constructor();
     get combatLootDoubleChance(): number;
     get increasedCombatGP(): number;
@@ -823,8 +824,8 @@ declare class MappedModifiers {
     skillModifiers: Map<SkillModifierKeys, Map<AnySkill, number>>;
     standardModifiers: Map<StandardModifierKeys, number>;
     constructor();
-    private addStandardModifier;
-    private addSkillModifiers;
+    addStandardModifier(key: StandardModifierKeys, value: number): void;
+    addSkillModifiers(key: SkillModifierKeys, values: SkillModifier[], negMult?: number, posMult?: number): void;
     /** Adds a modifier data object */
     addModifiers(modifiers: PlayerModifierObject, negMult?: number, posMult?: number): void;
     /** Adds a modifier array */
@@ -837,7 +838,7 @@ declare class MappedModifiers {
     getModifierDescriptionsAsNodes<T extends keyof HTMLElementTagNameMap>(tagName: T, additionalClasses?: string[]): HTMLElementTagNameMap[T][];
 }
 declare class TargetModifiers {
-    private modifiers;
+    modifiers: Map<CombatModifierKey, number>;
     addTargetModifiers(modifiers: TargetModifiers): void;
     addModifiers(modifiers: CombatModifierData, negMult?: number, posMult?: number): void;
     addToCombatModifiers(combatModifiers: CombatModifiers): void;
@@ -1958,6 +1959,7 @@ interface StandardModifierObject<Standard> extends CombatModifierObject<Standard
     bypassAllSlayerItems: Standard;
     increased5DROnBeingHit: Standard;
     allowNonMagicCurses: Standard;
+    increasedTownshipTraderStock: Standard;
 }
 interface SkillModifierObject<Skill> {
     /** Increases the skill level used to compute combat stats by value: Implemented */

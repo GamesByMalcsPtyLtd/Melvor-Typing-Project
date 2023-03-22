@@ -42,8 +42,8 @@ declare class AstrologyRecipe extends BasicSkillRecipe {
     standardModifiers: AstrologyModifier[];
     uniqueModifiers: AstrologyModifier[];
     masteryXPModifier?: SkillModifierKeys;
-    private _name;
-    private _media;
+    _name: string;
+    _media: string;
     /** The number of times each standard modifier has been bought */
     standardModsBought: number[];
     /** The number of times each unique modifier has been bought */
@@ -61,83 +61,87 @@ interface AstrologySkillData extends MasterySkillData {
     goldenStardustItemID?: string;
 }
 declare class Astrology extends GatheringSkill<AstrologyRecipe, AstrologySkillData> implements StatProvider {
-    protected readonly _media = "assets/media/skills/astrology/astrology.svg";
-    protected getTotalUnlockedMasteryActions(): number;
+    readonly _media = "assets/media/skills/astrology/astrology.svg";
+    getTotalUnlockedMasteryActions(): number;
     renderQueue: AstrologyRenderQueue;
-    protected get actionInterval(): number;
-    protected get actionLevel(): number;
-    protected get masteryAction(): AstrologyRecipe;
+    get actionInterval(): number;
+    get actionLevel(): number;
+    get masteryAction(): AstrologyRecipe;
     get meteoriteChance(): number;
     get stardustChance(): number;
     get goldenStardustChance(): number;
     /** The constellation that is currently being studied. Undefined if none is selected. */
     get activeConstellation(): AstrologyRecipe;
     /** The constellation that is currently being studied. Undefined if none is selected. */
-    private studiedConstellation?;
+    studiedConstellation?: AstrologyRecipe;
     /** The constellation that is currently being explored. Undefined if none is selected. */
-    private exploredConstellation?;
+    exploredConstellation?: AstrologyRecipe;
     modifiers: MappedModifiers;
     /** Constellations which have a modifier that provides increased mastery xp */
     masteryXPConstellations: AstrologyRecipe[];
     /** Progress bar that is currently animated */
-    private renderedProgressBar?;
+    renderedProgressBar?: ProgressBar;
     starDustItem?: AnyItem;
     goldenStardustItem?: AnyItem;
     shouldRefundStardust: boolean;
+    shouldRefundStardustAgain: boolean;
+    readonly newRefundDate = 1666051201000;
     constructor(namespace: DataNamespace, game: Game);
     registerData(namespace: DataNamespace, data: AstrologySkillData): void;
     postDataRegistration(): void;
-    private isModifierUnlocked;
+    isModifierUnlocked(constellation: AstrologyRecipe, type: AstrologyModifierType, modID: number): boolean;
     /** Checks modifiers have been bought for the given constellation, modifier type and id */
-    private isModifierBought;
-    private refundStardust;
-    private getConstellationInterval;
-    private getStardustQuantity;
+    isModifierBought(constellation: AstrologyRecipe, type: AstrologyModifierType, modID: number): boolean;
+    refundStardust(): void;
+    refundStardustAgain(): void;
+    getConstellationInterval(constellation: AstrologyRecipe): number;
+    getStardustQuantity(action: AstrologyRecipe): number;
     getMasteryXPModifier(action: AstrologyRecipe): number;
     /** Recomputes the passive bonuses provided by this skill */
-    private computeProvidedStats;
-    protected preAction(): void;
-    protected get actionRewards(): Rewards;
-    protected postAction(): void;
+    computeProvidedStats(updatePlayer?: boolean): void;
+    preAction(): void;
+    get actionRewards(): Rewards;
+    postAction(): void;
     /** Queues up rendering for explored constellation modifiers */
-    private queueModifierRender;
-    private getModifierElement;
+    queueModifierRender(constellation: AstrologyRecipe, type: AstrologyModifierType, modId: number): void;
+    getModifierElement(modifier: AstrologyModifier, value: number): ModifierArray;
     /** Checks for stardust costs, and uses them. Returns true if successful. */
-    private checkStardustCostsAndConsume;
+    checkStardustCostsAndConsume(item: AnyItem, quantity: number): boolean;
     isStarMaxValue(constellation: AstrologyRecipe, type: AstrologyModifierType, modID: number): boolean;
     countMaxValuesInConstellation(constellation: AstrologyRecipe): number;
     /** Perform actions when an upgrade of a star is performed */
-    private onConstellationUpgrade;
+    onConstellationUpgrade(constellation: AstrologyRecipe, type: AstrologyModifierType, modID: number): void;
     getStandardModifierUpgradeCost(constellation: AstrologyRecipe, modID: number): number;
     getUniqueModifierUpgradeCost(constellation: AstrologyRecipe, modID: number): number;
     upgradeStandardModifier(constellation: AstrologyRecipe, modID: number): void;
     upgradeUniqueModifier(constellation: AstrologyRecipe, modID: number): void;
-    protected get masteryModifiedInterval(): number;
+    get masteryModifiedInterval(): number;
     onLoad(): void;
     onPageChange(): void;
+    queueBankQuantityRender(item: AnyItem): void;
     onModifierChange(): void;
     onEquipmentChange(): void;
-    protected onLevelUp(oldLevel: number, newLevel: number): void;
+    onLevelUp(oldLevel: number, newLevel: number): void;
     getErrorLog(): string;
     /** Checks the mastery level of a constellation and unlocks new modifiers if they are unset */
-    private unlockNewModifiers;
+    unlockNewModifiers(constellation: AstrologyRecipe): void;
     setUnlock(isUnlocked: boolean): void;
     /** Unlocks new modifiers when the skill is unlocked */
     onSkillUnlock(): void;
     /** Unlocks new modifiers when a constellation is unlocked by level up */
     unlockNewModifierOnLevelUp(oldLevel: number): void;
-    protected onMasteryLevelUp(action: AstrologyRecipe, oldLevel: number, newLevel: number): void;
+    onMasteryLevelUp(action: AstrologyRecipe, oldLevel: number, newLevel: number): void;
     /** Sets rendering when a constellation is explored */
-    private onConstellationExplore;
+    onConstellationExplore(): void;
     render(): void;
-    private renderProgressBar;
-    private renderStardustRates;
-    private renderConstellationRates;
-    private renderStardustQuantities;
-    private renderExploredStandardMods;
-    private renderExploredUniqueMods;
-    private renderVisibleConstellations;
-    private renderUpgradeCosts;
+    renderProgressBar(): void;
+    renderStardustRates(): void;
+    renderConstellationRates(): void;
+    renderStardustQuantities(): void;
+    renderExploredStandardMods(): void;
+    renderExploredUniqueMods(): void;
+    renderVisibleConstellations(): void;
+    renderUpgradeCosts(): void;
     /** Callback function for when the "View All Active Modifiers" button is clicked */
     viewAllModifiersOnClick(): void;
     /** Callback function for when the "Study" button is clicked */
@@ -148,13 +152,13 @@ declare class Astrology extends GatheringSkill<AstrologyRecipe, AstrologySkillDa
     rerollSpecificStandardModifierOnClick(constellation: AstrologyRecipe, modID: number): void;
     /** Callback function for when the individual reroll button for a unique modifier is clicked */
     rerollSpecificUniqueModifierOnClick(constellation: AstrologyRecipe, modID: number): void;
-    protected resetActionState(): void;
-    private encodeAction;
+    resetActionState(): void;
+    encodeAction(writer: SaveWriter, recipe: AstrologyRecipe): void;
     encode(writer: SaveWriter): SaveWriter;
-    private decodeAction;
+    decodeAction(reader: SaveWriter, version: number): void;
     decode(reader: SaveWriter, version: number): void;
     deserialize(reader: DataReader, version: number, idMap: NumericIDMap): void;
-    protected getActionIDFromOldID(oldActionID: number, idMap: NumericIDMap): string;
+    getActionIDFromOldID(oldActionID: number, idMap: NumericIDMap): string;
     setFromOldOffline(offline: OfflineSkill, idMap: NumericIDMap): void;
     rollForMeteorite(): void;
     testTranslations(): void;

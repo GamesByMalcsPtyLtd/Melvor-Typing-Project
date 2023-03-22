@@ -1,8 +1,8 @@
 declare class CombatEventMenu extends HTMLElement {
-    private _content;
-    private _title;
-    private _startButton;
-    private _passiveButton;
+    _content: DocumentFragment;
+    _title: HTMLHeadingElement;
+    _startButton: HTMLButtonElement;
+    _passiveButton: HTMLButtonElement;
     constructor();
     connectedCallback(): void;
     setButtonCallbacks(): void;

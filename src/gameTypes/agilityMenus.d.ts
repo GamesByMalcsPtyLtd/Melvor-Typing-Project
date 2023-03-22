@@ -1,27 +1,27 @@
 /** Component for the built obstacles on the agility page */
 declare class BuiltAgilityObstacle extends HTMLElement {
-    private _content;
-    private blockContainer;
-    private builtContent;
-    private unbuiltContent;
-    private inactiveText;
-    private name;
-    private interval;
-    private xpGrants;
-    private gpGrants;
-    private masteryDisplay;
-    private bonusContainer;
-    private selectObstacleButton;
-    private destroyObstacleButton;
-    private unbuiltText;
-    private tierName;
+    _content: DocumentFragment;
+    blockContainer: HTMLDivElement;
+    builtContent: HTMLDivElement;
+    unbuiltContent: HTMLDivElement;
+    inactiveText: HTMLHeadingElement;
+    name: HTMLSpanElement;
+    interval: HTMLSpanElement;
+    xpGrants: HTMLSpanElement;
+    gpGrants: HTMLSpanElement;
+    masteryDisplay: MasteryDisplay;
+    bonusContainer: HTMLDivElement;
+    selectObstacleButton: HTMLButtonElement;
+    destroyObstacleButton: HTMLButtonElement;
+    unbuiltText: HTMLHeadingElement;
+    tierName: HTMLHeadingElement;
     constructor();
     connectedCallback(): void;
     /** Sets the obstacle as unbuilt */
     setUnbuilt(tier: number): void;
     /** Sets the name and mastery of the obstacle, and button callbacks */
     setBuiltObstacle(obstacle: AgilityObstacle): void;
-    private setTier;
+    setTier(tier: number): void;
     /** Sets the unbuilt obstacle to being locked */
     setLevelLocked(level: number): void;
     /** Sets the unbuilt obstacle to beng unlocked */
@@ -38,95 +38,98 @@ declare class BuiltAgilityObstacle extends HTMLElement {
     setInactive(): void;
 }
 declare class PassivePillarMenu extends HTMLElement {
-    private _content;
-    private blockContainer;
-    private unbuiltContent;
-    private builtContent;
-    private activeText;
-    private name;
-    private passiveContainer;
-    private pillarSelectButton;
-    private pillarDestroyButton;
+    _content: DocumentFragment;
+    blockContainer: HTMLDivElement;
+    unbuiltContent: HTMLDivElement;
+    builtContent: HTMLDivElement;
+    activeText: HTMLHeadingElement;
+    name: HTMLHeadingElement;
+    passiveContainer: HTMLDivElement;
+    pillarSelectButton: HTMLButtonElement;
+    pillarDestroyButton: HTMLButtonElement;
     constructor();
     connectedCallback(): void;
     setUnbuilt(): void;
     setBuilt(pillar: AgilityPillar): void;
     /** Updates the modifiers provided by the pillar */
-    private updatePassives;
+    updatePassives(passives: MappedModifiers): void;
     setActive(): void;
     setInactive(): void;
 }
 declare class ElitePassivePillarMenu extends HTMLElement {
-    private _content;
-    private blockContainer;
-    private unbuiltContent;
-    private builtContent;
-    private activeText;
-    private name;
-    private passiveContainer;
-    private pillarSelectButton;
-    private pillarDestroyButton;
+    _content: DocumentFragment;
+    blockContainer: HTMLDivElement;
+    unbuiltContent: HTMLDivElement;
+    builtContent: HTMLDivElement;
+    activeText: HTMLHeadingElement;
+    name: HTMLHeadingElement;
+    passiveContainer: HTMLDivElement;
+    pillarSelectButton: HTMLButtonElement;
+    pillarDestroyButton: HTMLButtonElement;
     constructor();
     connectedCallback(): void;
     setUnbuilt(): void;
     setBuilt(pillar: AgilityPillar): void;
     /** Updates the modifiers provided by the pillar */
-    private updatePassives;
+    updatePassives(passives: MappedModifiers): void;
     setActive(): void;
     setInactive(): void;
 }
 /** Component for the obstacle selection modal */
 declare class AgilityObstacleSelection extends HTMLElement {
-    private _content;
-    private link;
-    private activeText;
-    private name;
-    private interval;
-    private masteryLevel;
-    private masteryPercent;
-    private buildCount;
-    private gpReduction;
-    private scReduction;
-    private itemReduction;
-    private costContainer;
-    private requirementContainer;
-    private xpGrants;
-    private gpGrants;
-    private passivesContainer;
-    private obstacleOnlyElements;
+    _content: DocumentFragment;
+    link: HTMLAnchorElement;
+    activeText: HTMLHeadingElement;
+    name: HTMLSpanElement;
+    interval: HTMLSpanElement;
+    masteryLevel: HTMLSpanElement;
+    masteryPercent: HTMLElement;
+    buildCount: HTMLHeadingElement;
+    gpReduction: HTMLSpanElement;
+    scReduction: HTMLSpanElement;
+    itemReduction: HTMLSpanElement;
+    costContainer: HTMLDivElement;
+    requirementContainer: HTMLDivElement;
+    xpGrants: HTMLSpanElement;
+    gpGrants: HTMLSpanElement;
+    passivesContainer: HTMLDivElement;
+    obstacleOnlyElements: HTMLElement[];
     constructor();
     connectedCallback(): void;
     createInlineRequirement(textClass: string): InlineRequirement;
     /** Sets the content of the costs container */
-    private setCosts;
-    private setPassives;
-    private setBuildStatus;
+    setCosts(items: AnyItemQuantity[], gpReq: number, scReq: number): void;
+    setPassives(passives: MappedModifiers): void;
+    setBuildStatus(built: boolean): void;
     setObstacle(obstacle: AgilityObstacle): void;
     setPillar(pillar: AgilityPillar): void;
     setElitePillar(pillar: AgilityPillar): void;
 }
 declare class InlineRequirement extends HTMLElement {
-    private _content;
-    private image;
-    private text;
-    private imageTooltip?;
+    _content: DocumentFragment;
+    image: HTMLImageElement;
+    text: HTMLSpanElement;
+    imageTooltip?: TippyTooltip;
     constructor();
     setContent(media: string, text: string, tooltipText: string): void;
     connectedCallback(): void;
     disconnectedCallback(): void;
 }
 declare class MultiProgressBar extends HTMLElement {
-    private _content;
-    private barContainer;
-    private progressDivs;
-    private animatedSegment;
-    private filledSegments;
-    private segmentPattern;
+    _content: DocumentFragment;
+    barContainer: HTMLDivElement;
+    progressDivs: {
+        container: HTMLDivElement;
+        bar: HTMLDivElement;
+    }[];
+    animatedSegment: number;
+    filledSegments: number;
+    segmentPattern: string[];
     constructor();
     connectedCallback(): void;
-    private getPatternClass;
-    private stopSegmentAnimation;
-    private startSegmentAnimation;
+    getPatternClass(segmentNumber: number): string;
+    stopSegmentAnimation(segmentNumber: number): void;
+    startSegmentAnimation(segmentNumber: number, timer: Timer): void;
     setMaxSegments(count: number): void;
     setSegmentPattern(classPattern: string[]): void;
     animateFromTimer(segment: number, timer: Timer): void;

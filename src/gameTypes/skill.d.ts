@@ -70,7 +70,7 @@ declare class SkillRenderQueue {
 /** Base class for all skills */
 declare abstract class Skill<DataType extends BaseSkillData> extends NamespacedObject implements EncodableObject {
     /** Game object to which this skill is registered to */
-    protected game: Game;
+    game: Game;
     /** Readonly. Returns the current level of the skill. */
     get level(): number;
     /** Readonly. Returns the current xp of the skill */
@@ -89,11 +89,11 @@ declare abstract class Skill<DataType extends BaseSkillData> extends NamespacedO
     /** Pets that can be rolled after completing an action for the skill */
     pets: Pet[];
     /** Rare item drops that occur on an action */
-    private rareDrops;
+    rareDrops: RareSkillDrop[];
     minibarOptions: MinibarOptions;
-    protected milestones: MilestoneLike[];
+    milestones: MilestoneLike[];
     /** Sorts the milestones by skill level (ascending) */
-    protected sortMilestones(): void;
+    sortMilestones(): void;
     /** Readonly. Returns the current virtual level of the skill */
     get virtualLevel(): number;
     /** Maximum skill level achievable */
@@ -104,27 +104,27 @@ declare abstract class Skill<DataType extends BaseSkillData> extends NamespacedO
     get tutorialLevelCap(): number;
     get isUnlocked(): boolean;
     /** Stores the current level of the skill */
-    private _level;
+    _level: number;
     /** Stores the current xp of the skill */
-    private _xp;
+    _xp: number;
     /** Stores if the skill is unlocked */
-    private _unlocked;
+    _unlocked: boolean;
     /** Media of string without CDN */
-    protected abstract readonly _media: string;
+    abstract readonly _media: string;
     abstract renderQueue: SkillRenderQueue;
     constructor(namespace: DataNamespace, id: string, 
     /** Game object to which this skill is registered to */
     game: Game);
-    protected getItemForRegistration(id: string): AnyItem;
+    getItemForRegistration(id: string): AnyItem;
     onLoad(): void;
     render(): void;
-    private renderXP;
-    private renderLevel;
-    private renderLockStatus;
-    private fireLevelUpModal;
-    private getNewMilestoneHTML;
+    renderXP(): void;
+    renderLevel(): void;
+    renderLockStatus(): void;
+    fireLevelUpModal(previousLevel: number): void;
+    getNewMilestoneHTML(previousLevel: number): string;
     /** Rendering for the xp cap message */
-    private renderXPCap;
+    renderXPCap(): void;
     /**
      * Adds experience to the skill
      * @param amount The unmodified experience to add
@@ -133,11 +133,11 @@ declare abstract class Skill<DataType extends BaseSkillData> extends NamespacedO
      */
     addXP(amount: number, masteryAction?: NamespacedObject): boolean;
     /** Caps skill experience during the tutorial */
-    private capXPForTutorial;
+    capXPForTutorial(): void;
     /** Caps skill experience based on the current gamemode */
-    private capXPForGamemode;
+    capXPForGamemode(): void;
     /** Method for performing a level up on this skill */
-    private levelUp;
+    levelUp(): void;
     /**
      * Gets the modified xp to add to the skill
      * @param amount The unmodified experience
@@ -153,11 +153,11 @@ declare abstract class Skill<DataType extends BaseSkillData> extends NamespacedO
     /** Gets the uncapped doubling chance for this skill.
      *  This should be overrode to add skill specific bonuses
      */
-    protected getUncappedDoublingChance(action?: NamespacedObject): number;
+    getUncappedDoublingChance(action?: NamespacedObject): number;
     /** Gets the clamped doubling chance for this skill */
-    protected getDoublingChance(action?: NamespacedObject): number;
+    getDoublingChance(action?: NamespacedObject): number;
     /** Gets the gp gain modifier for this skill */
-    protected getGPModifier(action?: NamespacedObject): number;
+    getGPModifier(action?: NamespacedObject): number;
     /** Sets the experience of the skill to the specified value */
     setXP(value: number): void;
     setUnlock(isUnlocked: boolean): void;
@@ -165,9 +165,9 @@ declare abstract class Skill<DataType extends BaseSkillData> extends NamespacedO
     unlockOnClick(): void;
     rollForPets(interval: number): void;
     /** Method called when skill is leveled up */
-    protected onLevelUp(oldLevel: number, newLevel: number): void;
-    protected rollForRareDrops(level: number, rewards: Rewards): void;
-    private getRareDropChance;
+    onLevelUp(oldLevel: number, newLevel: number): void;
+    rollForRareDrops(level: number, rewards: Rewards): void;
+    getRareDropChance(level: number, chance: RareSkillDropChance): number;
     /** Callback function for showing the milestones for this skill */
     openMilestoneModal(): void;
     encode(writer: SaveWriter): SaveWriter;
@@ -189,11 +189,11 @@ interface MasteryLevelUnlockData {
     level: number;
 }
 declare class MasteryLevelUnlock {
-    private skill;
+    skill: SkillWithMastery<MasteryAction, MasterySkillData>;
     level: number;
     get description(): string;
-    private _descriptionID?;
-    private _description;
+    _descriptionID?: number;
+    _description: string;
     constructor(data: MasteryLevelUnlockData, skill: SkillWithMastery<MasteryAction, MasterySkillData>);
 }
 /** Base Data type for skills which have mastery */
@@ -206,11 +206,11 @@ declare class MasterySkillRenderQueue<ActionType extends MasteryAction> extends 
     masteryPool: boolean;
 }
 /** Base class for skills that have mastery */
-declare abstract class SkillWithMastery<ActionType extends MasteryAction, DataType extends MasterySkillData> extends Skill<DataType> {
+declare abstract class SkillWithMastery<ActionType extends MasteryAction, DataType extends MasterySkillData> extends Skill<DataType> implements Action {
     get hasMastery(): boolean;
     actions: NamespaceRegistry<ActionType>;
-    protected actionMastery: Map<MasteryAction, ActionMastery>;
-    private _masteryPoolXP;
+    actionMastery: Map<MasteryAction, ActionMastery>;
+    _masteryPoolXP: number;
     get masteryLevelCap(): number;
     /** The mastery token for this skill. Must be registered as data. */
     masteryToken?: TokenItem;
@@ -227,14 +227,21 @@ declare abstract class SkillWithMastery<ActionType extends MasteryAction, DataTy
     abstract renderQueue: MasterySkillRenderQueue<ActionType>;
     /** Sorted array of all mastery actions for the skill */
     sortedMasteryActions: ActionType[];
-    private masteryLevelUnlocks;
+    masteryLevelUnlocks: MasteryLevelUnlock[];
     totalMasteryActions: CompletionMap;
-    private _totalCurrentMasteryLevel;
-    private toStrang?;
+    _totalCurrentMasteryLevel: CompletionMap;
+    toStrang?: Pet;
     onLoad(): void;
-    /** Rendering hook for when the page is changed to this skill */
+    abstract getErrorLog(): string;
     onPageChange(): void;
-    /** Rendering hook for when skill modifiers change */
+    onPageVisible?(): void;
+    onPageLeave?(): void;
+    renderModifierChange(): void;
+    queueBankQuantityRender?(item: AnyItem): void;
+    /**
+     * @description Rendering hook for when skill modifiers change
+     * @deprecated This method will be removed in an upcoming major update. Use renderModifierChange instead.
+     */
     onModifierChange(): void;
     render(): void;
     renderActionMastery(): void;
@@ -245,7 +252,7 @@ declare abstract class SkillWithMastery<ActionType extends MasteryAction, DataTy
      * @param levels The number of levels to increase the action by
      */
     levelUpMasteryWithPoolXP(action: ActionType, levels: number): void;
-    private exchangePoolXPForActionXP;
+    exchangePoolXPForActionXP(action: ActionType, xpToAdd: number): void;
     /**
      * Adds mastery xp and mastery pool xp for completing an action with the given interval
      * @param action The action object to give mastery xp to
@@ -259,12 +266,12 @@ declare abstract class SkillWithMastery<ActionType extends MasteryAction, DataTy
      * @returns True, if the mastery level was increased
      */
     addMasteryXP(action: ActionType, xp: number): boolean;
-    protected onMasteryLevelUp(action: ActionType, oldLevel: number, newLevel: number): void;
+    onMasteryLevelUp(action: ActionType, oldLevel: number, newLevel: number): void;
     /** Fires a modal indicating the skill has reached the maximum mastery level */
-    private fireMaximumMasteryModal;
+    fireMaximumMasteryModal(): void;
     /** Method fired when a mastery pool bonus is lost/gained */
-    protected onMasteryPoolBonusChange(oldBonusLevel: number, newBonusLevel: number): void;
-    protected wasPoolBonusChanged(oldBonusLevel: number, newBonusLevel: number, tier: number): boolean;
+    onMasteryPoolBonusChange(oldBonusLevel: number, newBonusLevel: number): void;
+    wasPoolBonusChanged(oldBonusLevel: number, newBonusLevel: number, tier: number): boolean;
     addMasteryPoolXP(xp: number): void;
     /** Gets if a particular mastery pool tier active */
     isPoolTierActive(tier: number): boolean;
@@ -272,7 +279,7 @@ declare abstract class SkillWithMastery<ActionType extends MasteryAction, DataTy
     getPoolBonusChange(xp: number): number;
     /** Gets the level of mastery pool bonus active based on an amount of pool xp */
     getMasteryCheckPointLevel(xp: number): number;
-    private updateTotalCurrentMasteryLevel;
+    updateTotalCurrentMasteryLevel(): void;
     /** Returns the sum of all current mastery levels */
     get totalCurrentMasteryLevel(): number;
     getTotalCurrentMasteryLevels(namespace: string): number;
@@ -283,13 +290,13 @@ declare abstract class SkillWithMastery<ActionType extends MasteryAction, DataTy
     /** Readonly. Returns the total amount of mastery XP earned for the skill */
     get totalMasteryXP(): number;
     /** Returns the total number of actions that have mastery that are currently unlocked */
-    protected totalUnlockedMasteryActions: number;
+    totalUnlockedMasteryActions: number;
     /** Calculates the numer of mastery actions unlocked for this skill. By default, updated on skill level up. */
-    protected abstract getTotalUnlockedMasteryActions(): number;
+    abstract getTotalUnlockedMasteryActions(): number;
     /** Returns the total number of actions that have mastery for this skill */
-    protected get trueTotalMasteryActions(): number;
+    get trueTotalMasteryActions(): number;
     /** Gets the mastery pool progress for the skill in %  */
-    protected get masteryPoolProgress(): number;
+    get masteryPoolProgress(): number;
     /**
      * Gets the modified mastery xp to add for performing an action.
      * @param action The action object to compute mastery xp for
@@ -308,15 +315,15 @@ declare abstract class SkillWithMastery<ActionType extends MasteryAction, DataTy
     getMasteryXP(action: ActionType): number;
     get isAnyMastery99(): boolean;
     /** Gets the flat change in [ms] for the given masteryID */
-    protected getFlatIntervalModifier(action: ActionType): number;
+    getFlatIntervalModifier(action: ActionType): number;
     /** Gets the percentage change in interval for the given masteryID */
-    protected getPercentageIntervalModifier(action: ActionType): number;
-    protected modifyInterval(interval: number, action: ActionType): number;
+    getPercentageIntervalModifier(action: ActionType): number;
+    modifyInterval(interval: number, action: ActionType): number;
     constructor(namespace: DataNamespace, id: string, game: Game);
-    protected onLevelUp(oldLevel: number, newLevel: number): void;
+    onLevelUp(oldLevel: number, newLevel: number): void;
     registerData(namespace: DataNamespace, data: DataType): void;
     postDataRegistration(): void;
-    protected computeTotalMasteryActions(): void;
+    computeTotalMasteryActions(): void;
     getMasteryProgress(action: ActionType): MasteryProgress;
     /** Updates all mastery displays in the DOM for the given action */
     updateMasteryDisplays(action: ActionType): void;
@@ -332,7 +339,7 @@ declare abstract class SkillWithMastery<ActionType extends MasteryAction, DataTy
     decode(reader: SaveWriter, version: number): void;
     /** Converts the old mastery array for the skill */
     convertOldMastery(oldMastery: OldMasteryData, idMap: NumericIDMap): void;
-    protected abstract getActionIDFromOldID(oldActionID: number, idMap: NumericIDMap): string;
+    abstract getActionIDFromOldID(oldActionID: number, idMap: NumericIDMap): string;
 }
 interface MasteryProgress {
     xp: number;
@@ -343,29 +350,29 @@ interface MasteryProgress {
 /** Base class for gathering skills. E.g. Skills that return resources but does not consume them. */
 declare abstract class GatheringSkill<ActionType extends MasteryAction, DataType extends MasterySkillData> extends SkillWithMastery<ActionType, DataType> implements ActiveAction, Serializable {
     /** Timer for skill action */
-    protected actionTimer: Timer;
+    actionTimer: Timer;
     abstract renderQueue: GatheringSkillRenderQueue<ActionType>;
     /** If the skill is the currently active skill */
     isActive: boolean;
     get activeSkills(): this[];
     /** Returns if the skill can currently stop */
-    protected get canStop(): boolean;
+    get canStop(): boolean;
     /** Gets the rewards for the current action of the skill */
-    protected abstract readonly actionRewards: Rewards;
+    abstract readonly actionRewards: Rewards;
     /** Gets the interval for the next action to perform */
-    protected abstract readonly actionInterval: number;
+    abstract readonly actionInterval: number;
     /** Gets the level for the current action of the skill */
-    protected abstract readonly actionLevel: number;
+    abstract readonly actionLevel: number;
     /** Mastery Object for the currently running action */
-    protected abstract readonly masteryAction: ActionType;
+    abstract readonly masteryAction: ActionType;
     /** If the action state should be reset after save load */
-    protected shouldResetAction: boolean;
+    shouldResetAction: boolean;
     /** Mastery Level for the currently running action */
-    protected get masteryLevel(): number;
+    get masteryLevel(): number;
     /** Gets the interval of the currently running action in [ms] */
-    protected get currentActionInterval(): number;
+    get currentActionInterval(): number;
     /** Modified interval for mastery XP/summoning calculations */
-    protected abstract masteryModifiedInterval: number;
+    abstract masteryModifiedInterval: number;
     /** Is the potion for the skill active */
     get isPotionActive(): boolean;
     get activePotion(): PotionItem | undefined;
@@ -374,6 +381,7 @@ declare abstract class GatheringSkill<ActionType extends MasteryAction, DataType
     /** Rendering hook for when the player's equipment changes */
     abstract onEquipmentChange(): void;
     onPageChange(): void;
+    onModifierChangeWhileActive?(): void;
     /** Performs rendering for the skill */
     render(): void;
     /** Gets debugging information for the skill */
@@ -385,29 +393,29 @@ declare abstract class GatheringSkill<ActionType extends MasteryAction, DataType
     /** Method that occurs on stopping a skill, but before saving.
      *  Usage is for state changes required
      */
-    protected onStop(): void;
+    onStop(): void;
     /** Starts the timer for the skill with the actionInterval */
-    protected startActionTimer(): void;
+    startActionTimer(): void;
     /** Hook for state mutatations at start of action */
-    protected abstract preAction(): void;
+    abstract preAction(): void;
     /** Hook for state mutatations at end of action
      *  Things that should go here:
      *  Potion Usage, Glove Charge Usage, Action/Interval Statistics
      *  Renders required after an action
      *  Tutorial Tracking
      */
-    protected abstract postAction(): void;
+    abstract postAction(): void;
     /** Performs the main action for the skill, then determines if it should continue */
-    protected action(): void;
+    action(): void;
     /** Addes rewards to player, returns false if skill should stop */
-    protected addActionRewards(): boolean;
+    addActionRewards(): boolean;
     /** Rolls to add a mastery token to action rewards */
-    protected addMasteryToken(rewards: Rewards): void;
+    addMasteryToken(rewards: Rewards): void;
     /** Adds rewards that are common to all skills for a successful action */
-    protected addCommonRewards(rewards: Rewards): void;
+    addCommonRewards(rewards: Rewards): void;
     /** Adds the mastery XP reward for the current action */
-    protected addMasteryXPReward(): void;
-    protected resetActionState(): void;
+    addMasteryXPReward(): void;
+    resetActionState(): void;
     encode(writer: SaveWriter): SaveWriter;
     decode(reader: SaveWriter, version: number): void;
     /** Deserializes the skills state data */
@@ -416,20 +424,20 @@ declare abstract class GatheringSkill<ActionType extends MasteryAction, DataType
 /** Base class for crafting skills. E.g. Skills that consume resources to make other resources. */
 declare abstract class CraftingSkill<T extends MasteryAction, DataType extends MasterySkillData> extends GatheringSkill<T, DataType> {
     /** Gets the costs for the currently selected recipe */
-    protected abstract getCurrentRecipeCosts(): Costs;
+    abstract getCurrentRecipeCosts(): Costs;
     /** Gets the ingredient preservation chance for the currently selected recipe */
-    protected get actionPreservationChance(): number;
+    get actionPreservationChance(): number;
     /** Records statistics for preserving resources */
-    protected abstract recordCostPreservationStats(costs: Costs): void;
+    abstract recordCostPreservationStats(costs: Costs): void;
     /** Records statistics for consuming resources */
-    protected abstract recordCostConsumptionStats(costs: Costs): void;
+    abstract recordCostConsumptionStats(costs: Costs): void;
     /** Gets the message for when the player does not have the required costs for an action */
-    protected abstract noCostsMessage: string;
+    abstract noCostsMessage: string;
     /** Gets the preservation chance for the skill for a given masteryID */
-    protected getPreservationChance(action: T, chance: number): number;
-    protected getPreservationCap(): number;
+    getPreservationChance(action: T, chance: number): number;
+    getPreservationCap(): number;
     /** Performs the main action for the skill, stopping if the required resources are not met */
-    protected action(): void;
+    action(): void;
 }
 declare class DummyActiveAction extends NamespacedObject implements ActiveAction {
     get name(): string;
@@ -466,11 +474,11 @@ interface SkillCategoryData extends IDData {
     name: string;
 }
 declare class SkillCategory extends NamespacedObject {
-    protected skill: AnySkill;
+    skill: AnySkill;
     get media(): string;
     get name(): string;
-    private _name;
-    private _media;
+    _name: string;
+    _media: string;
     constructor(namespace: DataNamespace, data: SkillCategoryData, skill: AnySkill);
 }
 declare class GatheringSkillRenderQueue<ActionType extends MasteryAction> extends MasterySkillRenderQueue<ActionType> {
@@ -483,14 +491,14 @@ declare type ItemCurrencyObject = {
 };
 /** Class to manage the item, gp, and slayer coin costs of crafting skills */
 declare class Costs {
-    protected game: Game;
+    game: Game;
     get gp(): number;
     get sc(): number;
     get raidCoins(): number;
-    protected _items: Map<AnyItem, number>;
-    protected _gp: number;
-    protected _sc: number;
-    protected _raidCoins: number;
+    _items: Map<AnyItem, number>;
+    _gp: number;
+    _sc: number;
+    _raidCoins: number;
     constructor(game: Game);
     /** Adds an item by its unique string identifier */
     addItemByID(itemID: string, quantity: number): void;
@@ -521,7 +529,7 @@ declare class Costs {
 }
 /** Class to manage the gain of rewards from crafting skills */
 declare class Rewards extends Costs {
-    private _xp;
+    _xp: Map<AnySkill, number>;
     addXP(skill: AnySkill, amount: number): void;
     getXP(skill: AnySkill): number;
     /** Gives the currently set rewards to the player, returns true if not all items were given */

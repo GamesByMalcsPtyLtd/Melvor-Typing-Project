@@ -1,14 +1,14 @@
 declare class WoodcuttingTreeMenu extends ContainedComponent {
-    private tree;
-    private woodcutting;
-    protected container: HTMLDivElement;
-    private cutText;
-    private treeName;
-    private mastery;
-    private button;
-    private xpText;
-    private intervalText;
-    private progressBar;
+    tree: WoodcuttingTree;
+    woodcutting: Woodcutting;
+    container: HTMLDivElement;
+    cutText: HTMLElement;
+    treeName: HTMLElement;
+    mastery: MasteryDisplay;
+    button: HTMLAnchorElement;
+    xpText: HTMLElement;
+    intervalText: HTMLElement;
+    progressBar: HTMLDivElement;
     constructor(tree: WoodcuttingTree, woodcutting: Woodcutting, before: HTMLElement);
     localize(): void;
     updateRates(): void;
@@ -17,26 +17,26 @@ declare class WoodcuttingTreeMenu extends ContainedComponent {
 }
 /** Class to manage the woodcutting page's menu */
 declare class WoodcuttingMenu {
-    private woodcutting;
-    private treeMenus;
+    woodcutting: Woodcutting;
+    treeMenus: Map<WoodcuttingTree, WoodcuttingTreeMenu>;
     progressBar: ProgressBar;
-    private infoMessage;
-    private grantsContainer;
-    private lockedTree;
-    private nextLevelText;
-    private shopItemPurchased;
-    private treeGrants;
-    private lowerGrants;
-    private xpIcon;
-    private poolXPIcon;
-    private intervalIcon;
-    private selectedTrees;
+    infoMessage: HTMLHeadingElement;
+    grantsContainer: HTMLDivElement;
+    lockedTree: HTMLDivElement;
+    nextLevelText: HTMLElement;
+    shopItemPurchased: HTMLElement;
+    treeGrants: TreeGrantElements[];
+    lowerGrants: HTMLDivElement;
+    xpIcon: XPIcon;
+    poolXPIcon: MasteryPoolIcon;
+    intervalIcon: IntervalIcon;
+    selectedTrees: Set<WoodcuttingTree>;
     constructor(woodcutting: Woodcutting);
     localize(): void;
     updateTreeRates(): void;
     updateTreeUnlocks(): void;
     setTrees(trees: Set<WoodcuttingTree>): void;
-    private destroyTreeGrants;
+    destroyTreeGrants(treeGrant: TreeGrantElements): void;
     /** Updates the currently selected tree icons */
     updateSelectedTrees(): void;
 }

@@ -4,19 +4,21 @@ declare type QuickEquipIcon = {
     equippedTick: HTMLImageElement;
 };
 declare class Minibar implements EncodableObject {
-    private game;
-    private get minibarElement();
-    private get quickEquipContainer();
-    private masteryUnlocks;
-    private milestones;
-    private summoning;
-    private quickEquip;
-    private pets;
-    private upgrades;
-    private customItems;
-    private activeSkill?;
-    private renderQueue;
-    private quickEquipIcons;
+    game: Game;
+    get minibarElement(): HTMLDivElement;
+    get quickEquipContainer(): HTMLElement;
+    masteryUnlocks: MinibarItem;
+    milestones: MinibarItem;
+    summoning: MinibarItem;
+    quickEquip: MinibarItem;
+    pets: MinibarItem[];
+    upgrades: MinibarItem[];
+    customItems: Map<AnySkill, EquipmentItem[]>;
+    activeSkill?: AnySkill;
+    renderQueue: {
+        quickEquipIcons: boolean;
+    };
+    quickEquipIcons: Map<EquipmentItem, QuickEquipIcon>;
     minibar: MinibarItem[];
     constructor(game: Game);
     /** Appends the minibar items to the DOM */
@@ -25,7 +27,7 @@ declare class Minibar implements EncodableObject {
     encode(writer: SaveWriter): SaveWriter;
     decode(reader: SaveWriter, version: number): void;
     convertFromOldformat(save: NewSaveGame, idMap: NumericIDMap): void;
-    private getCustomItemsForSkill;
+    getCustomItemsForSkill(skill: AnySkill): EquipmentItem[];
     setCustomItemsToDefault(skill: AnySkill): EquipmentItem[];
     /** Adds an item to a skills custom items */
     addItemOnDiscovery(item: EquipmentItem): void;
@@ -35,16 +37,16 @@ declare class Minibar implements EncodableObject {
     isCustomItemSet(skill: AnySkill, item: EquipmentItem): boolean;
     setSkill(skill?: AnySkill): void;
     updateEquippedTicks(): void;
-    private destroyQuickEquipIcons;
-    private createQuickEquipIcons;
-    private createQuickEquipIcon;
-    private createPetItem;
-    private createUpgradeItem;
-    private createMinibarItem;
-    private applyOptionsToElement;
-    private createElementTooltip;
-    private removeItem;
-    private changeItemOrder;
+    destroyQuickEquipIcons(): void;
+    createQuickEquipIcons(skill: AnySkill): void;
+    createQuickEquipIcon(item: EquipmentItem, skill: AnySkill): void;
+    createPetItem(pet: Pet): MinibarItem;
+    createUpgradeItem(upgrade: ShopPurchase): MinibarItem;
+    createMinibarItem(elementID: string, media: string, tooltipContent: string, options: MinibarOption): MinibarItem;
+    applyOptionsToElement(element: HTMLButtonElement, options: MinibarOption): void;
+    createElementTooltip(element: HTMLButtonElement, tooltipContent: string): TippyTooltip;
+    removeItem(item: MinibarItem): void;
+    changeItemOrder(newIndex: number, oldIndex: number): void;
 }
 interface MinibarItem {
     element: HTMLButtonElement;

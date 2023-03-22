@@ -17,6 +17,16 @@ interface Action extends NamespacedObject {
   media: string;
   /** Returns a log of the action state, in the event an error occurs trying to tick it. */
   getErrorLog(): string;
+  /** Optional. Called when changing to the actions page, but before the page is visible in the DOM */
+  onPageChange?(): void;
+  /** Optional. Called when changing to the actions page, just after the page is visible in the DOM */
+  onPageVisible?(): void;
+  /** Optional. Called when changing from the actions page. */
+  onPageLeave?(): void;
+  /** Optional. Called when rendering if the player is on a page associated with the action, and player modifiers have changed between the last render */
+  renderModifierChange?(): void;
+  /** Optional. Called when the the specified item's quantity changes in the bank, and the player is on a page associated with the action. Utilized to queue up renders required on the action's page. */
+  queueBankQuantityRender?(item: AnyItem): void;
 }
 /** Action that has behaviour that is always active */
 interface PassiveAction extends Action {
@@ -33,6 +43,8 @@ interface ActiveAction extends Action {
   activeTick(): void;
   /** Returns an array of skills which should be highlighted in the sidebar */
   activeSkills: AnySkill[];
+  /** Optional. Called when player modifiers change, and this action is the current active action. */
+  onModifierChangeWhileActive?(): void;
 }
 /** Provides modifiers or stats to the Player or Enemy class */
 interface StatProvider {

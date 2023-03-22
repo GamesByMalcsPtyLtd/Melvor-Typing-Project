@@ -1,11 +1,11 @@
 /// <reference types="sortablejs" />
 declare class BankItemIcon extends HTMLElement {
-    private _content;
-    private link;
-    private image;
-    private quantity;
-    private item?;
-    private tooltip?;
+    _content: DocumentFragment;
+    link: HTMLAnchorElement;
+    image: HTMLImageElement;
+    quantity: HTMLElement;
+    item?: AnyItem;
+    tooltip?: TippyTooltip;
     constructor();
     connectedCallback(): void;
     disconnectedCallback(): void;
@@ -31,29 +31,29 @@ interface BankTabElements {
     containerSortable: Sortable;
 }
 declare class BankTabMenu extends HTMLElement {
-    private _content;
-    private tabContainer;
-    private spaceFractionLabel;
-    private spaceFraction;
-    private bankValueLabel;
-    private tabValueLabel;
-    private sellAllButton;
-    private sellAllText;
-    private unlockAllButton;
-    private unlockAllText;
-    private lockAllButton;
-    private lockAllText;
-    private paneContainer;
-    private tabs;
+    _content: DocumentFragment;
+    tabContainer: HTMLUListElement;
+    spaceFractionLabel: HTMLSpanElement;
+    spaceFraction: HTMLSpanElement;
+    bankValueLabel: HTMLSpanElement;
+    tabValueLabel: HTMLSpanElement;
+    sellAllButton: HTMLAnchorElement;
+    sellAllText: HTMLSpanElement;
+    unlockAllButton: HTMLAnchorElement;
+    unlockAllText: HTMLSpanElement;
+    lockAllButton: HTMLAnchorElement;
+    lockAllText: HTMLSpanElement;
+    paneContainer: HTMLDivElement;
+    tabs: BankTabElements[];
     /** All item icons that are currently present in the bank */
     itemIcons: Map<AnyItem, BankItemIcon>;
-    private isSorting;
-    private tabValueTooltip?;
-    private bankValueTooltip?;
+    isSorting: boolean;
+    tabValueTooltip?: TippyTooltip;
+    bankValueTooltip?: TippyTooltip;
     constructor();
     connectedCallback(): void;
     disconnectedCallback(): void;
-    private getFromTabID;
+    getFromTabID(from: HTMLElement): number;
     /** Initializes the element with a bank object */
     initialize(bank: Bank): void;
     loadAllItems(bank: Bank): void;
@@ -76,17 +76,17 @@ declare class BankTabMenu extends HTMLElement {
     showAllItems(): void;
     /** Sets the specified tabs image to the media string provided */
     setTabImage(tabID: number, media: string): void;
-    private getValueTemplate;
-    private selectTab;
+    getValueTemplate(value: number): StringDictionary<string>;
+    selectTab(tabID: number, bank: Bank): void;
     updateBankValue(bank: Bank): void;
     updateBankSpace(bank: Bank): void;
 }
 /** Dropdown menu for selecting a tab in the bank */
 declare class BankTabDropdownMenu extends HTMLElement {
-    private _content;
-    private tabImages;
-    private openButton;
-    private optionsContainer;
+    _content: DocumentFragment;
+    tabImages: HTMLImageElement[];
+    openButton: HTMLButtonElement;
+    optionsContainer: HTMLDivElement;
     constructor();
     connectedCallback(): void;
     /**
@@ -95,15 +95,15 @@ declare class BankTabDropdownMenu extends HTMLElement {
      * @param optionSelectCallback The callback function when a tab option is selected
      */
     initialize(bank: Bank, optionSelectCallback: (tabID: number) => void): void;
-    private updateTabImages;
+    updateTabImages(bank: Bank): void;
 }
 declare class BankOptionsMenu extends HTMLElement {
-    private _content;
-    private sortButton;
-    private moveModeButton;
-    private sellModeButton;
-    private searchBar;
-    private clearSearchButton;
+    _content: DocumentFragment;
+    sortButton: HTMLButtonElement;
+    moveModeButton: HTMLButtonElement;
+    sellModeButton: HTMLButtonElement;
+    searchBar: HTMLInputElement;
+    clearSearchButton: HTMLButtonElement;
     constructor();
     connectedCallback(): void;
     initialize(bank: Bank): void;
@@ -111,21 +111,21 @@ declare class BankOptionsMenu extends HTMLElement {
     setSearchNormal(): void;
 }
 declare class BankMoveModeMenu extends HTMLElement {
-    private _content;
-    private tabSelection;
-    private confirmMoveButton;
-    private selectionCount;
-    private tabSelectedToMove;
+    _content: DocumentFragment;
+    tabSelection: BankTabDropdownMenu;
+    confirmMoveButton: HTMLButtonElement;
+    selectionCount: HTMLSpanElement;
+    tabSelectedToMove: number;
     constructor();
     connectedCallback(): void;
     initialize(bank: Bank): void;
     updateSelectionCount(bank: Bank): void;
 }
 declare class BankSellModeMenu extends HTMLElement {
-    private _content;
-    private confirmSellButton;
-    private selectionCount;
-    private selectionValue;
+    _content: DocumentFragment;
+    confirmSellButton: HTMLButtonElement;
+    selectionCount: HTMLSpanElement;
+    selectionValue: HTMLSpanElement;
     constructor();
     connectedCallback(): void;
     initialize(bank: Bank): void;
@@ -138,17 +138,17 @@ declare const enum BankRangeSliderMode {
 }
 /** Wrapper class for ion-range-slider for the purposes of bank quantity sliders */
 declare class BankRangeSlider {
-    private inputElement;
+    inputElement: HTMLInputElement;
     get quantity(): number;
-    private _sliderValue;
-    private sliderInstance;
-    private sliderMode;
-    private sliderMin;
-    private sliderMax;
-    private customOnChange;
+    _sliderValue: number;
+    sliderInstance: JQuery<HTMLElement>;
+    sliderMode: BankRangeSliderMode;
+    sliderMin: number;
+    sliderMax: number;
+    customOnChange: (newValue: number, modeReset: boolean) => void;
     constructor(inputElement: HTMLInputElement);
-    private onSliderChange;
-    private checkSliderMode;
+    onSliderChange(newValue: number): void;
+    checkSliderMode(newValue: number): boolean;
     /** Sets the slider to behave in special modes */
     setSliderMode(mode: BankRangeSliderMode): void;
     /** Sets the slider range based on the quantity of the bank item provided */
@@ -161,96 +161,96 @@ declare class BankRangeSlider {
 declare type BankSelectedItemAttribute = 'col-size';
 /** Component for displaying bank item information and interaction options */
 declare class BankSelectedItemMenu extends HTMLElement {
-    private _content;
-    private noneSelectedMessage;
-    private selectedItemContainer;
-    private itemImage;
-    private itemLockButton;
-    private itemLockIcon;
-    private quantityBadge;
-    private handednessBadge;
-    private itemName;
-    private itemDescription;
-    private itemHealing;
-    private viewStatsButton;
-    private specialAttackContainer;
-    private specialAttackList;
-    private upgradeContainer;
-    private upgradeText;
-    private upgradeButton;
-    private upgradeDropdownButton;
-    private upgradeOptionsContainer;
-    private readContainer;
-    private readButton;
-    private friendContainer;
-    private findFriendButton;
-    private equipItemContainer;
-    private equipSlotImage;
-    private equipSlotName;
-    private equipSetButtonContainer;
-    private equipReplacementContainer;
-    private equipQuantitySliderContainer;
-    private equipQuantitySlider;
-    private equipSlotButtonContainer;
-    private equipFoodContainer;
-    private foodQuantitySlider;
-    private equipFoodButton;
-    private openItemContainer;
-    private viewChestContentsButton;
-    private openItemQuantitySlider;
-    private openItemButton;
-    private buryItemContainer;
-    private buryItemPrayerPoints;
-    private buryItemQuantitySlider;
-    private buryItemButton;
-    private buryItemTotalPoints;
-    private claimTokenContainer;
-    private claimTokenQuantitySlider;
-    private claimTokenButton;
-    private useEightContainer;
-    private useEightButton;
-    private singleItemSalePrice;
-    private sellItemQuantitySlider;
-    private customSellQuantity;
-    private sellAllButOneButton;
-    private sellAllButton;
-    private sellItemButton;
-    private totalItemSalePrice;
-    private sizeElements;
-    private equipToSetButtons;
-    private handednessTooltip?;
+    _content: DocumentFragment;
+    noneSelectedMessage: HTMLDivElement;
+    selectedItemContainer: HTMLDivElement;
+    itemImage: HTMLImageElement;
+    itemLockButton: HTMLButtonElement;
+    itemLockIcon: HTMLElement;
+    quantityBadge: HTMLElement;
+    handednessBadge: HTMLElement;
+    itemName: HTMLSpanElement;
+    itemDescription: HTMLElement;
+    itemHealing: HTMLHeadingElement;
+    viewStatsButton: HTMLHeadingElement;
+    specialAttackContainer: HTMLDivElement;
+    specialAttackList: HTMLDivElement;
+    upgradeContainer: HTMLDivElement;
+    upgradeText: HTMLHeadingElement;
+    upgradeButton: HTMLButtonElement;
+    upgradeDropdownButton: HTMLButtonElement;
+    upgradeOptionsContainer: HTMLDivElement;
+    readContainer: HTMLDivElement;
+    readButton: HTMLButtonElement;
+    friendContainer: HTMLDivElement;
+    findFriendButton: HTMLButtonElement;
+    equipItemContainer: HTMLDivElement;
+    equipSlotImage: HTMLImageElement;
+    equipSlotName: HTMLSpanElement;
+    equipSetButtonContainer: HTMLDivElement;
+    equipReplacementContainer: HTMLElement;
+    equipQuantitySliderContainer: HTMLDivElement;
+    equipQuantitySlider: BankRangeSlider;
+    equipSlotButtonContainer: HTMLElement;
+    equipFoodContainer: HTMLDivElement;
+    foodQuantitySlider: BankRangeSlider;
+    equipFoodButton: HTMLButtonElement;
+    openItemContainer: HTMLDivElement;
+    viewChestContentsButton: HTMLHeadingElement;
+    openItemQuantitySlider: BankRangeSlider;
+    openItemButton: HTMLButtonElement;
+    buryItemContainer: HTMLDivElement;
+    buryItemPrayerPoints: HTMLHeadingElement;
+    buryItemQuantitySlider: BankRangeSlider;
+    buryItemButton: HTMLButtonElement;
+    buryItemTotalPoints: HTMLHeadingElement;
+    claimTokenContainer: HTMLDivElement;
+    claimTokenQuantitySlider: BankRangeSlider;
+    claimTokenButton: HTMLButtonElement;
+    useEightContainer: HTMLDivElement;
+    useEightButton: HTMLButtonElement;
+    singleItemSalePrice: HTMLHeadingElement;
+    sellItemQuantitySlider: BankRangeSlider;
+    customSellQuantity: HTMLInputElement;
+    sellAllButOneButton: HTMLButtonElement;
+    sellAllButton: HTMLButtonElement;
+    sellItemButton: HTMLButtonElement;
+    totalItemSalePrice: HTMLSpanElement;
+    sizeElements: HTMLElement[];
+    equipToSetButtons: HTMLButtonElement[];
+    handednessTooltip?: TippyTooltip;
     constructor();
     connectedCallback(): void;
     disconnectedCallback(): void;
     setUnselected(): void;
     setItem(bankItem: BankItem, bank: Bank): void;
-    private createEquipToSetButtons;
-    private updateEquipToSetHighlight;
-    private createReplaceItemHTML;
-    private createEquipItemButtons;
+    createEquipToSetButtons(player: Player, item: EquipmentItem): void;
+    updateEquipToSetHighlight(setID: number): void;
+    createReplaceItemHTML(item: EquipmentItem, player: Player): string;
+    createEquipItemButtons(item: EquipmentItem, player: Player): void;
     updateItemQuantity(bankItem: BankItem): void;
     /** Performs the necessary updates to the equip item display when player equipment changes */
     updateEquipReplacement(item: EquipmentItem, player: Player): void;
     setItemLocked(isLocked: boolean): void;
-    private getColClasses;
+    getColClasses(attributeValue: string | null): string[][];
     attributeChangedCallback(name: BankSelectedItemAttribute, oldValue: string | null, newValue: string | null): void;
     static get observedAttributes(): BankSelectedItemAttribute[];
     /** Classes for specifying the menus column sizes */
-    private static colSizeClasses;
+    static colSizeClasses: StringDictionary<string[][]>;
 }
 /** Component for displaying bank item stats */
 declare class BankItemStatsMenu extends HTMLElement {
-    private _content;
-    private selectedItemContainer;
-    private itemImage;
-    private itemLockButton;
-    private itemLockIcon;
-    private quantityBadge;
-    private itemName;
-    private itemDescription;
-    private itemHealing;
-    private viewStatsButton;
-    private statsContainer;
+    _content: DocumentFragment;
+    selectedItemContainer: HTMLDivElement;
+    itemImage: HTMLImageElement;
+    itemLockButton: HTMLButtonElement;
+    itemLockIcon: HTMLElement;
+    quantityBadge: HTMLElement;
+    itemName: HTMLHeadingElement;
+    itemDescription: HTMLHeadingElement;
+    itemHealing: HTMLHeadingElement;
+    viewStatsButton: HTMLHeadingElement;
+    statsContainer: HTMLDivElement;
     constructor();
     connectedCallback(): void;
     setUnselected(): void;
@@ -259,10 +259,10 @@ declare class BankItemStatsMenu extends HTMLElement {
     setItemLocked(isLocked: boolean): void;
 }
 declare class BankMinibarToggle extends HTMLElement {
-    private _content;
-    private skillToggle;
-    private skillLabel;
-    private skillImage;
+    _content: DocumentFragment;
+    skillToggle: HTMLInputElement;
+    skillLabel: HTMLLabelElement;
+    skillImage: HTMLImageElement;
     constructor();
     connectedCallback(): void;
     setSkill(skill: AnySkill): void;
@@ -270,14 +270,14 @@ declare class BankMinibarToggle extends HTMLElement {
 }
 /** Component for displaying bank item settings */
 declare class BankItemSettingsMenu extends HTMLElement {
-    private _content;
-    private selectedItemContainer;
-    private selectTabIconDropdown;
-    private minibarSettingsContainer;
-    private minibarSettingsToggles;
-    private unlockAllButton;
-    private lockAllButton;
-    private minibarToggles;
+    _content: DocumentFragment;
+    selectedItemContainer: HTMLDivElement;
+    selectTabIconDropdown: BankTabDropdownMenu;
+    minibarSettingsContainer: HTMLDivElement;
+    minibarSettingsToggles: HTMLDivElement;
+    unlockAllButton: HTMLButtonElement;
+    lockAllButton: HTMLButtonElement;
+    minibarToggles: Map<AnySkill, BankMinibarToggle>;
     constructor();
     connectedCallback(): void;
     initialize(game: Game): void;
@@ -286,13 +286,13 @@ declare class BankItemSettingsMenu extends HTMLElement {
 }
 /** Component to manage the three selected item menus in a tab-pane fashion */
 declare class BankSideBarMenu extends HTMLElement {
-    private _content;
-    private itemImage;
-    private selectedMenu;
-    private statsMenu;
-    private settingsMenu;
-    private sidebarCloseButton;
-    private paneContainer;
+    _content: DocumentFragment;
+    itemImage: HTMLImageElement;
+    selectedMenu: BankSelectedItemMenu;
+    statsMenu: BankItemStatsMenu;
+    settingsMenu: BankItemSettingsMenu;
+    sidebarCloseButton: HTMLButtonElement;
+    paneContainer: HTMLDivElement;
     constructor();
     connectedCallback(): void;
     toggleSidebarMode(isSidebar: boolean): void;

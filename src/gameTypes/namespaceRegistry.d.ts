@@ -7,7 +7,7 @@ interface DataNamespace {
     isModded: boolean;
 }
 declare class NamespaceMap {
-    private registeredNamespaces;
+    registeredNamespaces: Map<string, DataNamespace>;
     /** Returns true if the map has a namespace with the given name */
     hasNamespace(name: string): boolean;
     getNamespace(name: string): DataNamespace | undefined;
@@ -17,7 +17,7 @@ declare class NamespaceMap {
     static isValidModdedName(name: string): boolean;
 }
 declare class NamespacedObject {
-    private _namespace;
+    _namespace: DataNamespace;
     /** Readonly namespace of object */
     get namespace(): string;
     /** Readonly global id of the object */
@@ -26,22 +26,22 @@ declare class NamespacedObject {
     get localID(): string;
     /** Readonly. If the object is from a mod. */
     get isModded(): boolean;
-    private _localID;
+    _localID: string;
     constructor(_namespace: DataNamespace, localID: string);
-    protected getMediaURL(media: string): string;
+    getMediaURL(media: string): string;
     static isValidLocalID(localID: string): boolean;
 }
 interface SoftDataDependant<T extends IDData = IDData> {
     registerSoftDependencies(data: T, game: Game): void;
 }
 declare class NamespaceRegistry<T extends NamespacedObject> {
-    protected rootNamespaceMap: NamespaceMap;
+    rootNamespaceMap: NamespaceMap;
     /** Map of namespace: id: object */
     namespaceMaps: Map<string, Map<string, T>>;
-    private registeredObjects;
-    private dummyObjects;
+    registeredObjects: Map<string, T>;
+    dummyObjects: Map<string, T>;
     /** A map of the old namespace, to a map of ids to the new namespace */
-    private namespaceChanges;
+    namespaceChanges: Map<string, Map<string, string>>;
     /** Returns the number of objects registered */
     get size(): number;
     get dummySize(): number;
@@ -107,7 +107,7 @@ declare type InsertAfter = {
 };
 declare type InsertOrder = InsertStart | InsertEnd | InsertBefore | InsertAfter;
 declare class NamespacedArray<T extends NamespacedObject> extends Array<T> {
-    private registery;
+    registery: NamespaceRegistry<T>;
     constructor(registery: NamespaceRegistry<T>, ...items: T[]);
     registerData(insertions: InsertOrder[]): void;
 }

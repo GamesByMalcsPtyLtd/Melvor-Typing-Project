@@ -43,8 +43,8 @@ declare class MiningRock extends SingleProductRecipe {
     type: MiningRockType;
     gemVeinWeight?: number;
     superiorGemChance?: number;
-    private _name;
-    private _media;
+    _name: string;
+    _media: string;
     currentHP: number;
     maxHP: number;
     isRespawning: boolean;
@@ -56,46 +56,49 @@ interface MiningSkillData extends MasterySkillData {
     runestoneItemID?: string;
 }
 declare class Mining extends GatheringSkill<MiningRock, MiningSkillData> implements PassiveAction {
-    protected readonly _media = "assets/media/skills/mining/mining.svg";
-    protected getTotalUnlockedMasteryActions(): number;
+    readonly _media = "assets/media/skills/mining/mining.svg";
+    getTotalUnlockedMasteryActions(): number;
     renderQueue: MiningRenderQueue;
-    private readonly baseInterval;
-    private readonly baseRockHP;
-    private readonly passiveRegenInterval;
-    protected get actionInterval(): number;
-    protected get actionLevel(): number;
-    protected get masteryAction(): MiningRock;
-    protected get masteryModifiedInterval(): number;
-    private activeProgressRock?;
-    private tier3PoolWasActive;
-    private selectedRock?;
-    private rockRespawnTimers;
-    private passiveRegenTimer;
-    private coalItem?;
-    private runestoneItem?;
-    private gemVeins;
-    private totalGemVeinWeight;
+    readonly baseInterval = 3000;
+    readonly baseRockHP = 5;
+    readonly passiveRegenInterval = 10000;
+    get actionInterval(): number;
+    get actionLevel(): number;
+    get masteryAction(): MiningRock;
+    get masteryModifiedInterval(): number;
+    activeProgressRock?: MiningRock;
+    tier3PoolWasActive: boolean;
+    selectedRock?: MiningRock;
+    rockRespawnTimers: Map<MiningRock, Timer>;
+    passiveRegenTimer: Timer;
+    coalItem?: AnyItem;
+    runestoneItem?: AnyItem;
+    gemVeins: {
+        weight: number;
+        rock: MiningRock;
+    }[];
+    totalGemVeinWeight: number;
     get activeRock(): MiningRock;
     constructor(namespace: DataNamespace, game: Game);
     registerData(namespace: DataNamespace, data: MiningSkillData): void;
     postDataRegistration(): void;
-    protected getFlatIntervalModifier(action: MiningRock): number;
-    protected getUncappedDoublingChance(action: MiningRock): number;
+    getFlatIntervalModifier(action: MiningRock): number;
+    getUncappedDoublingChance(action: MiningRock): number;
     getMasteryXPModifier(action: MiningRock): number;
-    private canMineOre;
+    canMineOre(ore: MiningRock): boolean;
     passiveTick(): void;
     getErrorLog(): string;
     onPageChange(): void;
     onModifierChange(): void;
     onEquipmentChange(): void;
-    protected onLevelUp(oldLevel: number, newLevel: number): void;
+    onLevelUp(oldLevel: number, newLevel: number): void;
     render(): void;
     renderRockRates(): void;
-    private renderRockHP;
-    private renderRockStatus;
-    private renderProgressBar;
-    private stopActiveProgressBar;
-    private renderRespawnProgress;
+    renderRockHP(): void;
+    renderRockStatus(): void;
+    renderProgressBar(): void;
+    stopActiveProgressBar(): void;
+    renderRespawnProgress(): void;
     renderRockUnlock(): void;
     get rockHPPreserveChance(): number;
     get chanceToDoubleGems(): number;
@@ -103,35 +106,38 @@ declare class Mining extends GatheringSkill<MiningRock, MiningSkillData> impleme
     getRockSuperiorGemChance(ore: MiningRock): number;
     /** Callback function for when an ore is clicked */
     onRockClick(rock: MiningRock): void;
-    protected onStop(): void;
+    onStop(): void;
     onLoad(): void;
     encode(writer: SaveWriter): SaveWriter;
     decode(reader: SaveWriter, version: number): void;
     deserialize(reader: DataReader, version: number, idMap: NumericIDMap): void;
-    protected getActionIDFromOldID(oldActionID: number, idMap: NumericIDMap): string;
+    getActionIDFromOldID(oldActionID: number, idMap: NumericIDMap): string;
     setFromOldOffline(offline: OfflineSkill, idMap: NumericIDMap): void;
-    protected preAction(): void;
-    protected get actionRewards(): Rewards;
-    private addRandomGemReward;
-    private addRandomSuperiorGemReward;
-    protected postAction(): void;
-    protected startActionTimer(): void;
-    private regenRockHP;
-    private getRockMaxHP;
-    private updateRockMaxHP;
+    preAction(): void;
+    get actionRewards(): Rewards;
+    addRandomGemReward(rewards: Rewards): void;
+    addRandomSuperiorGemReward(rewards: Rewards): void;
+    postAction(): void;
+    startActionTimer(): void;
+    regenRockHP(): void;
+    getRockMaxHP(rock: MiningRock): number;
+    updateRockMaxHP(rock: MiningRock): void;
     updateAllRockMaxHPs(): void;
-    private startRespawningRock;
-    private respawnRock;
+    startRespawningRock(rock: MiningRock): void;
+    respawnRock(rock: MiningRock): void;
     /** Initializes the HP of rocks that were newly added. */
     initializeRocks(): void;
     addMeteoriteVein(): void;
     /** Post action function to roll for a random Gem Vein and update Mining as required. */
-    private rollForRandomGemVein;
+    rollForRandomGemVein(rock: MiningRock): void;
     /** Rolls HP value for size of Gem Vein and returns respective data to use for processing. */
-    private rollRandomHPForGemVein;
+    rollRandomHPForGemVein(): {
+        size: GemVeinSize;
+        hpToAdd: number;
+    };
     /** Decides which Gem vein was found */
-    private getRandomGemVein;
+    getRandomGemVein(): MiningRock;
     /** Returns size of Gem vein found as a string */
-    private getGemVeinSize;
+    getGemVeinSize(number: number): string;
     testTranslations(): void;
 }

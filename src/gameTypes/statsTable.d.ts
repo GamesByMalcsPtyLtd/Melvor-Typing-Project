@@ -23,18 +23,18 @@ declare type StatsTableData = {
 };
 /** Tables for displaying statistics. Must be initialized with setData method. */
 declare class StatsTable extends HTMLElement {
-    private _content;
-    private _title;
-    private _body;
-    private _rows;
-    private _data;
-    private _border;
+    _content: DocumentFragment;
+    _title: HTMLHeadingElement;
+    _body: HTMLTableSectionElement;
+    _rows: StatsTableRow[];
+    _data: StatsTableData;
+    _border: HTMLDivElement;
     constructor();
     connectedCallback(): void;
-    private removeRows;
+    removeRows(): void;
     setData(data: StatsTableData): void;
-    private addRow;
+    addRow(rowData: StatsRowData): void;
     updateRowValues(): void;
-    private formatRowData;
+    formatRowData(rowData: StatsRowData): string;
     localize(): void;
 }

@@ -34,48 +34,48 @@ declare class BankRenderQueue {
 }
 /** Class for the bank */
 declare class Bank implements EncodableObject {
-    protected game: Game;
+    game: Game;
     maxTabs: number;
-    private baseSlots;
-    private renderQueue;
+    baseSlots: number;
+    renderQueue: BankRenderQueue;
     /** Save State Property. The Set of items that are currently locked in the bank */
     lockedItems: Set<AnyItem>;
     /** Quantity of items that were attempted to be added to the bank but did not fit. Used for offline progress */
     lostItems: Map<AnyItem, number>;
     /** Flags if new items have been added to the bank between renders */
-    private newItemsAdded;
+    newItemsAdded: boolean;
     /** Map of the items stored in the bank, related to the item they store */
-    private items;
+    items: Map<AnyItem, BankItem>;
     /** Save State Property. Array of banktabs containing an array of BankItems. Stores the position of items in the bank. */
     itemsByTab: BankItem[][];
     /** Save State Property. Stores which tab an item should default to in the bank. */
-    private defaultItemTabs;
+    defaultItemTabs: Map<AnyItem, number>;
     /** Save State Property. Stores the user customized order in which to sort the bank */
-    private customSortOrder;
+    customSortOrder: AnyItem[];
     /** Save State Property. Set of items which have been newly added to the bank and require a glow */
     glowingItems: Set<AnyItem>;
     /** Save State Property. Map of tabId to items to use for bank tab icon */
-    private tabIcons;
+    tabIcons: Map<number, AnyItem>;
     /** The current item selection mode. Controls how items interact when clicked on. */
-    private itemSelectionMode;
+    itemSelectionMode: BankSelectionMode;
     /** The current set of bank items that are selected in a group */
-    private selectedItems;
+    selectedItems: Set<BankItem>;
     /** The current item that is selected and viewed in the bank */
-    private selectedBankItem;
+    selectedBankItem: BankItem | undefined;
     /** Map of root items for upgrades to an upgrade */
     itemUpgrades: Map<AnyItem, ItemUpgrade[]>;
     /** Tab that is currently selected */
     selectedBankTab: number;
     /** Stores the next items that should come from a chest in the even that the bank fills up while opening an item */
-    private nextOpenedItems;
+    nextOpenedItems: Map<OpenableItem, AnyItemQuantity>;
     /** Stores the array used for searching the bank */
-    private searchArray;
-    private defaultSortOrder;
+    searchArray: BankSearch[];
+    defaultSortOrder: NamespacedArray<AnyItem>;
     currentSearchQuery: string;
     /** If Eight is on cooldown */
-    private eightDelay;
+    eightDelay: boolean;
     /** Dummy items that are force added to the bank post save load */
-    private postLoadItems;
+    postLoadItems: Map<DummyItem, number>;
     get slotsSelected(): number;
     get itemCountSelected(): number;
     get selectedItemValue(): number;
@@ -91,6 +91,8 @@ declare class Bank implements EncodableObject {
     /** Method called on save file load */
     onLoad(): void;
     /** Sets rendering updates when modifiers change */
+    renderModifierChange(): void;
+    /** @deprecated Will be removed in the next major update. Use renderModifierChange instead */
     onModifierChange(): void;
     /** Sets rendering updates when equipment changes */
     onEquipmentChange(): void;
@@ -106,8 +108,8 @@ declare class Bank implements EncodableObject {
     render(): void;
     updateSpaceElement(element: Element): void;
     /** Sets rendering queues for updating the quantities on other pages */
-    private queueQuantityUpdates;
-    private getItemDefaultTab;
+    queueQuantityUpdates(item: AnyItem): void;
+    getItemDefaultTab(item: AnyItem): number;
     /** Returns the sale price of an item inclusive of modifiers */
     getItemSalePrice(item: AnyItem, quantity?: number): number;
     getTabValue(tabID: number): number;
@@ -120,7 +122,7 @@ declare class Bank implements EncodableObject {
     empty(): void;
     moveItemInTab(tabID: number, oldTabPosition: number, newTabPosition: number): void;
     moveItemToNewTab(oldTabID: number, newTabID: number, oldTabPosition: number): void;
-    private checkForClueChasers;
+    checkForClueChasers(): void;
     /** Returns the maximum number of slots in the bank */
     get maximumSlots(): number;
     /** Returns the number of slots that are occupied */
@@ -182,36 +184,36 @@ declare class Bank implements EncodableObject {
      * @param tabID The ID of the tab to reassign positions for
      * @param startingPosition The initial position in the tab item array to start from
      */
-    private reassignBankItemPositions;
+    reassignBankItemPositions(tabID: number, startingPosition: number): void;
     /** Toggles the bankItem from being in the selectedItems set, and updates the UI appropriately */
-    private toggleItemSelected;
-    private deselectBankItem;
-    private toggleItemForSelection;
-    private toggleItemForMoving;
-    private toggleItemForSelling;
-    private setItemSelectionMode;
+    toggleItemSelected(bankItem: BankItem): void;
+    deselectBankItem(): void;
+    toggleItemForSelection(bankItem: BankItem): void;
+    toggleItemForMoving(bankItem: BankItem): void;
+    toggleItemForSelling(bankItem: BankItem): void;
+    setItemSelectionMode(selectionMode: BankSelectionMode): void;
     /** Disables the current item selection mode if any */
-    private disableItemSelectionMode;
+    disableItemSelectionMode(): void;
     moveSelectedItemsToTab(newTabID: number): void;
     /** Callback function for selling all selected items */
     sellAllSelectedItems(): void;
     /** Processes the sale of all selected items */
-    private processSellSelectedItems;
+    processSellSelectedItems(): void;
     /** Callback function for selling all the items in the selected bank tab */
     sellUnlockedItemsOnClick(): void;
-    private processSelectedTabSale;
+    processSelectedTabSale(): void;
     /** Callback function for setting all items in the selected tab to match the locked input */
     setLockOfSelectedTab(locked: boolean): void;
     /** Callback function for when the (un)lock all button is clicked. Fires a confirmation modal first. */
     setLockOfAllItemsOnClick(locked: boolean): void;
     /** Callback function for setting all items in the bank to match the locked input */
-    private setLockOfAllItems;
-    private fireBulkItemSaleConfirmation;
+    setLockOfAllItems(locked: boolean): void;
+    fireBulkItemSaleConfirmation(totalGP: number, count: number, onConfirm: VoidFunction): void;
     /** Callback function for when the sort button is clicked */
     sortButtonOnClick(): void;
-    private storeCustomSortOrder;
+    storeCustomSortOrder(): void;
     /** Final method for selling an item */
-    private processItemSale;
+    processItemSale(item: AnyItem, quantity: number): void;
     /** Callback function for when the sell button is clicked */
     sellItemOnClick(item: AnyItem, quantity: number): void;
     /** Callback function for when the bury item button is clicked */
@@ -219,13 +221,13 @@ declare class Bank implements EncodableObject {
     /** Callback function for when the open item button is clicked */
     openItemOnClick(item: OpenableItem, quantity: number): void;
     /** Processes the actual opening of an item */
-    private processItemOpen;
+    processItemOpen(item: OpenableItem, quantity: number): void;
     /** Callback function for when the read item button is clicked */
     readItemOnClick(item: ReadableItem): void;
     /** Callback function for when the claim token button is clicked */
     claimItemOnClick(item: TokenItem, quantity: number): void;
-    private getMaxUpgradeQuantity;
-    private checkUpgradePotionRequirement;
+    getMaxUpgradeQuantity(upgrade: ItemUpgrade): number;
+    checkUpgradePotionRequirement(upgrade: ItemUpgrade): boolean;
     /** Displays the item upgrade modal and sets it to display the upgrade */
     fireItemUpgradeModal(upgrade: ItemUpgrade, rootItem: AnyItem): void;
     /** Callback function for when the upgrade item button is clicked */
@@ -235,7 +237,7 @@ declare class Bank implements EncodableObject {
     /** Callback function for when the find a friend button is clicked */
     findAFriendOnClick(cracker: Item): void;
     /** Updates the search array */
-    private updateSearchArray;
+    updateSearchArray(): void;
     /** Callback function for when the bank search query changes */
     onBankSearchChange(query: string): void;
     /** Callback function for selecting a tab icon option */
@@ -250,7 +252,7 @@ declare class Bank implements EncodableObject {
 /** Class for an individual bank item */
 declare class BankItem {
     /** The bank this item belongs to */
-    private bank;
+    bank: Bank;
     /** The item stored in the bank */
     item: AnyItem;
     /** The quantity of the item */
@@ -278,4 +280,8 @@ declare class BankItem {
     tab: number, 
     /** The current position of the item in it's tab */
     tabPosition: number);
+}
+/** Special variant of the bank with stripped down rendering for golbin raid */
+declare class GolbinRaidBank extends Bank {
+    render(): void;
 }

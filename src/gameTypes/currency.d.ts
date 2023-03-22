@@ -1,19 +1,19 @@
 declare abstract class Currency implements EncodableObject {
-    protected game: Game;
+    game: Game;
     get media(): string;
     get amount(): number;
-    protected _amount: number;
-    private renderRequired;
+    _amount: number;
+    renderRequired: boolean;
     /** Base URL to the currencies icon */
-    protected abstract readonly _media: string;
+    abstract readonly _media: string;
     /** If notifications should be fired */
-    protected abstract readonly shouldNotify: boolean;
+    abstract readonly shouldNotify: boolean;
     constructor(game: Game);
     /** Queues a notification on recieving/losing currency */
-    private queueNotification;
-    protected abstract renderAmount(): void;
+    queueNotification(amount: number): void;
+    abstract renderAmount(): void;
     onLoad(): void;
-    private onAmountChange;
+    onAmountChange(): void;
     render(): void;
     /** Adds amount to the currency */
     add(amount: number): void;
@@ -27,19 +27,19 @@ declare abstract class Currency implements EncodableObject {
     decode(reader: SaveWriter, version: number): void;
 }
 declare class GP extends Currency {
-    protected readonly _media = Assets.GPIcon;
-    protected get shouldNotify(): boolean;
+    readonly _media = Assets.GPIcon;
+    get shouldNotify(): boolean;
     add(amount: number): void;
-    protected renderAmount(): void;
+    renderAmount(): void;
 }
 declare class SlayerCoins extends Currency {
-    protected readonly _media = Assets.SlayerCoinIcon;
-    protected get shouldNotify(): boolean;
+    readonly _media = Assets.SlayerCoinIcon;
+    get shouldNotify(): boolean;
     add(amount: number): void;
-    protected renderAmount(): void;
+    renderAmount(): void;
 }
 declare class RaidCoins extends Currency {
-    protected readonly _media = Assets.RaidCoinIcon;
-    protected readonly shouldNotify = true;
-    protected renderAmount(): void;
+    readonly _media = Assets.RaidCoinIcon;
+    readonly shouldNotify = true;
+    renderAmount(): void;
 }

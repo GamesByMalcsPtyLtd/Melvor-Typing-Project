@@ -1,21 +1,21 @@
 /** Component for individual constellations */
 declare class ConstellationMenu extends HTMLElement {
-    private _content;
-    private image;
-    private name;
-    private skillIcons;
-    private skillIcon0;
-    private xpIcon;
-    private masteryIcon;
-    private masteryPoolIcon;
-    private intervalIcon;
+    _content: DocumentFragment;
+    image: HTMLImageElement;
+    name: HTMLHeadingElement;
+    skillIcons: HTMLDivElement;
+    skillIcon0: HTMLImageElement;
+    xpIcon: XPIcon;
+    masteryIcon: MasteryXPIcon;
+    masteryPoolIcon: MasteryPoolIcon;
+    intervalIcon: IntervalIcon;
     progressBar: ProgressBar;
-    private studyButton;
-    private exploreButton;
-    private masteryDisplay;
-    private stardustBreakdown;
-    private stardustIcons;
-    private viewModifierContainer;
+    studyButton: HTMLButtonElement;
+    exploreButton: HTMLButtonElement;
+    masteryDisplay: MasteryDisplay;
+    stardustBreakdown: HTMLDivElement;
+    stardustIcons: ItemCurrentIcon[];
+    viewModifierContainer: HTMLDivElement;
     constructor();
     connectedCallback(): void;
     /** Sets the display to a given constellation */
@@ -33,15 +33,19 @@ declare class ConstellationMenu extends HTMLElement {
  *  For usage in the AstrologyExplorationPanel component
  */
 declare class AstrologyModifierDisplay extends HTMLElement {
-    private _content;
-    private starImage;
-    private modifierContainer;
-    private modifierText;
-    private upgradeButton;
-    private starDustImage;
-    private starDustQuantity;
-    private modifierProgress;
-    private modifierStatus;
+    _content: DocumentFragment;
+    starImage: HTMLImageElement;
+    modifierContainer: HTMLDivElement;
+    modifierText: HTMLHeadingElement;
+    upgradeButton: HTMLButtonElement;
+    starDustImage: HTMLImageElement;
+    starDustQuantity: HTMLSpanElement;
+    modifierProgress: HTMLUListElement;
+    modifierStatus: {
+        locked: HTMLLIElement;
+        active: HTMLLIElement;
+        inactive: HTMLLIElement;
+    };
     constructor();
     connectedCallback(): void;
     /** Sets the display to a standard modifier */
@@ -65,11 +69,11 @@ declare class AstrologyModifierDisplay extends HTMLElement {
 }
 /** Component for showing an explored constellation in Astrology */
 declare class AstrologyExplorationPanel extends HTMLElement {
-    private _content;
-    private standardModifierContainer;
-    private uniqueModifierContainer;
-    private standardModifiers;
-    private uniqueModifiers;
+    _content: DocumentFragment;
+    standardModifierContainer: HTMLDivElement;
+    uniqueModifierContainer: HTMLDivElement;
+    standardModifiers: AstrologyModifierDisplay[];
+    uniqueModifiers: AstrologyModifierDisplay[];
     constructor();
     connectedCallback(): void;
     setMaxStandardMods(amount: number): void;
@@ -93,12 +97,12 @@ declare class AstrologyExplorationPanel extends HTMLElement {
 }
 /** Component for showing active modifiers, stardust rate and doubling in Astrology */
 declare class AstrologyInformationPanel extends HTMLElement {
-    private _content;
-    private viewAllModifiersButton;
-    private stardustChance;
-    private goldenstardustChance;
-    private doublingChance;
-    private meteoriteChance;
+    _content: DocumentFragment;
+    viewAllModifiersButton: HTMLButtonElement;
+    stardustChance: ItemChanceIcon;
+    goldenstardustChance: ItemChanceIcon;
+    doublingChance: DoublingIcon;
+    meteoriteChance: MeteoriteChanceIcon;
     constructor();
     /** Initializes the menu and sets the stardust icons */
     initialize(game: Game): void;

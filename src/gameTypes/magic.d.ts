@@ -13,18 +13,18 @@ declare enum ArchaicSpellTypeID {
     Other = 3
 }
 declare class RuneMenu {
-    private container;
-    private runes;
-    private highlighted;
+    container: HTMLElement;
+    runes: Map<AnyItem, RuneMenuElement>;
+    highlighted: Set<AnyItem>;
     constructor();
     init(): void;
-    private createMenuElement;
-    private createTooltip;
+    createMenuElement(item: AnyItem): RuneMenuElement;
+    createTooltip(image: HTMLImageElement, item: AnyItem): TippyTooltip;
     updateCounts(): void;
     updateHighlights(spellSelection: SpellSelection, useAltRunes: boolean): void;
-    private addBordersForSpell;
-    private removeBorder;
-    private addBorder;
+    addBordersForSpell(spell: BaseSpell, useAltRunes: boolean): void;
+    removeBorder(item: AnyItem): void;
+    addBorder(item: AnyItem): void;
 }
 interface RuneMenuElement {
     tooltip: TippyTooltip;
@@ -32,88 +32,88 @@ interface RuneMenuElement {
     border: HTMLElement;
 }
 declare abstract class SpellMenu<T extends CombatSpell> {
-    protected abstract menuContainer: HTMLDivElement;
-    protected spellElements: Map<T, CombatMenuElement>;
-    protected abstract book: T[];
-    protected abstract bookData: BookData;
-    protected abstract selectButton: HTMLAnchorElement;
-    protected selection?: T;
+    abstract menuContainer: HTMLDivElement;
+    spellElements: Map<T, CombatMenuElement>;
+    abstract book: T[];
+    abstract bookData: BookData;
+    abstract selectButton: HTMLAnchorElement;
+    selection?: T;
     updateForUnlock(level: number, player: Player, ignoreReqs: boolean): void;
     setMenuCallbacks(player: Player): void;
-    protected abstract getMenuCallback(id: T, player: Player): VoidFunction;
+    abstract getMenuCallback(id: T, player: Player): VoidFunction;
     setSelection(spell: T | undefined): void;
-    protected createMenu(): void;
-    private createSpell;
-    private createTooltip;
-    private getLockedTooltipHTML;
-    protected getRuneHTML(spell: T): string;
-    private getRuneCostHTML;
-    protected abstract getTooltipHTML(spell: T): string;
-    protected getUnlockHTML(spell: T, player: Player, magicLevel: number, ignoreReqs: boolean): string;
-    protected itemRequirement(spell: T, player: Player): boolean;
-    protected checkUnlocked(spell: T, level: number, player: Player, ignoreReqs: boolean): boolean;
+    createMenu(): void;
+    createSpell(spell: T): HTMLDivElement;
+    createTooltip(element: HTMLElement, tooltipHTML: string): TippyTooltip;
+    getLockedTooltipHTML(spell: T, player: Player, magicLevel: number, ignoreReqs: boolean): string;
+    getRuneHTML(spell: T): string;
+    getRuneCostHTML(costs: AnyItemQuantity[]): string;
+    abstract getTooltipHTML(spell: T): string;
+    getUnlockHTML(spell: T, player: Player, magicLevel: number, ignoreReqs: boolean): string;
+    itemRequirement(spell: T, player: Player): boolean;
+    checkUnlocked(spell: T, level: number, player: Player, ignoreReqs: boolean): boolean;
 }
 declare class StandardSpellMenu extends SpellMenu<StandardSpell> {
-    protected menuContainer: HTMLDivElement;
-    protected selectButton: HTMLAnchorElement;
-    protected book: StandardSpell[];
-    protected bookData: {
+    menuContainer: HTMLDivElement;
+    selectButton: HTMLAnchorElement;
+    book: StandardSpell[];
+    bookData: {
         readonly name: string;
         readonly description: string;
     };
     constructor();
-    protected getMenuCallback(spell: StandardSpell, player: Player): VoidFunction;
-    protected getTooltipHTML(spell: StandardSpell): string;
+    getMenuCallback(spell: StandardSpell, player: Player): VoidFunction;
+    getTooltipHTML(spell: StandardSpell): string;
 }
 declare class CurseSpellMenu extends SpellMenu<CurseSpell> {
-    protected menuContainer: HTMLDivElement;
-    protected selectButton: HTMLAnchorElement;
-    protected book: CurseSpell[];
-    protected bookData: {
+    menuContainer: HTMLDivElement;
+    selectButton: HTMLAnchorElement;
+    book: CurseSpell[];
+    bookData: {
         readonly name: string;
         readonly description: string;
     };
     constructor();
-    protected getMenuCallback(spell: CurseSpell, player: Player): VoidFunction;
-    protected getTooltipHTML(curse: CurseSpell): string;
+    getMenuCallback(spell: CurseSpell, player: Player): VoidFunction;
+    getTooltipHTML(curse: CurseSpell): string;
 }
 declare class AuroraSpellMenu extends SpellMenu<AuroraSpell> {
-    protected menuContainer: HTMLDivElement;
-    protected selectButton: HTMLAnchorElement;
-    protected book: AuroraSpell[];
-    protected bookData: {
+    menuContainer: HTMLDivElement;
+    selectButton: HTMLAnchorElement;
+    book: AuroraSpell[];
+    bookData: {
         readonly name: string;
         readonly description: string;
     };
     constructor();
-    protected getMenuCallback(spell: AuroraSpell, player: Player): VoidFunction;
-    protected getTooltipHTML(aurora: AuroraSpell): string;
+    getMenuCallback(spell: AuroraSpell, player: Player): VoidFunction;
+    getTooltipHTML(aurora: AuroraSpell): string;
 }
 declare class AncientSpellMenu extends SpellMenu<AncientSpell> {
-    protected menuContainer: HTMLDivElement;
-    protected selectButton: HTMLAnchorElement;
-    protected book: AncientSpell[];
-    protected bookData: {
+    menuContainer: HTMLDivElement;
+    selectButton: HTMLAnchorElement;
+    book: AncientSpell[];
+    bookData: {
         readonly name: string;
         readonly description: string;
     };
     constructor();
-    protected getMenuCallback(spell: AncientSpell, player: Player): VoidFunction;
-    protected createMenu(): void;
-    protected getTooltipHTML(ancient: AncientSpell): string;
+    getMenuCallback(spell: AncientSpell, player: Player): VoidFunction;
+    createMenu(): void;
+    getTooltipHTML(ancient: AncientSpell): string;
 }
 declare class ArchaicSpellMenu extends SpellMenu<ArchaicSpell> {
-    protected menuContainer: HTMLDivElement;
-    protected selectButton: HTMLAnchorElement;
-    protected book: ArchaicSpell[];
-    protected bookData: {
+    menuContainer: HTMLDivElement;
+    selectButton: HTMLAnchorElement;
+    book: ArchaicSpell[];
+    bookData: {
         readonly name: string;
         readonly description: string;
     };
     constructor();
-    protected getMenuCallback(spell: ArchaicSpell, player: Player): VoidFunction;
-    protected createMenu(): void;
-    protected getTooltipHTML(spell: ArchaicSpell): string;
+    getMenuCallback(spell: ArchaicSpell, player: Player): VoidFunction;
+    createMenu(): void;
+    getTooltipHTML(spell: ArchaicSpell): string;
 }
 declare type BookData = {
     name: string;

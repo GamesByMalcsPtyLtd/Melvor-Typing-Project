@@ -28,12 +28,12 @@ declare class TutorialTask {
     get description(): string;
     get media(): string;
     get complete(): boolean;
-    private _description;
-    private _media;
+    _description: string;
+    _media: string;
     eventMatcher: GameEventMatcher;
     eventCount: number;
     countEventQuantity: boolean;
-    private id;
+    id: string;
     /** Current progress in the task */
     progress: number;
     constructor(game: Game, data: TutorialTaskData);
@@ -94,7 +94,7 @@ declare class TutorialRenderQueue {
     currentStageStatus: boolean;
 }
 declare class Tutorial implements EncodableObject {
-    private game;
+    game: Game;
     /** If the tutorial has been completed */
     complete: boolean;
     /** Items that are allowed to be purchased from the shop */
@@ -108,30 +108,30 @@ declare class Tutorial implements EncodableObject {
     get stagesCompleted(): number;
     get totalStages(): number;
     /** Current stage the user is on. Undefined if tutorial has not been started. */
-    private currentStage?;
+    currentStage?: TutorialStage;
     /** Returns if the tutorial should start for the account */
     get shouldStart(): boolean;
     stages: NamespaceRegistry<TutorialStage>;
-    private _stagesCompleted;
-    private renderQueue;
-    private stageOrder;
+    _stagesCompleted: number;
+    renderQueue: TutorialRenderQueue;
+    stageOrder: NamespacedArray<TutorialStage>;
     constructor(game: Game);
     registerStages(namespace: DataNamespace, data: TutorialStageData[]): void;
     registerStageOrder(order: InsertOrder[]): void;
     render(): void;
     continueOnLoad(): void;
-    private start;
-    private completeTutorial;
-    private startNextStage;
-    private setupForStage;
-    private setStageMenus;
-    private renderProgress;
-    private showStageHints;
-    private removeStageHints;
+    start(): void;
+    completeTutorial(): void;
+    startNextStage(): void;
+    setupForStage(stage: TutorialStage): void;
+    setStageMenus(stage: TutorialStage): void;
+    renderProgress(): void;
+    showStageHints(stage: TutorialStage): void;
+    removeStageHints(stage: TutorialStage): void;
     updateTaskProgress(event: GameEvent): void;
     claimStageOnClick(stage: TutorialStage): void;
     skipButtonOnClick(): void;
-    private skipTutorial;
+    skipTutorial(): void;
     encode(writer: SaveWriter): SaveWriter;
     decode(reader: SaveWriter, version: number): void;
     convertFromOldFormat(savegame: NewSaveGame, idMap: NumericIDMap): void;

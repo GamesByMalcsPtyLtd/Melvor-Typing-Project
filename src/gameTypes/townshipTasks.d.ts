@@ -57,17 +57,22 @@ declare class TownshipTask extends NamespacedObject {
     goals: TownshipTaskGoals;
     rewards: TownshipTaskRewards;
     requirements: AnyRequirement[];
-    private _description?;
-    private _name;
+    _description?: string;
+    _name: string;
     constructor(namespace: DataNamespace, data: TownshipTaskData, game: Game);
 }
+declare class DummyTownshipTask extends TownshipTask {
+    constructor(namespace: DataNamespace, id: string, game: Game);
+}
 declare class TownshipTasks {
-    private game;
+    game: Game;
     completedTasks: Set<TownshipTask>;
-    private activeTaskCategory;
+    activeTaskCategory: TownshipTaskCategory | 'None';
     tasks: NamespaceRegistry<TownshipTask>;
-    private taskReadyIcon;
+    taskReadyIcon: boolean;
     get tasksCompleted(): number;
+    _tasksCompleted: number;
+    get tutorialTasksCompleted(): number;
     get allTasksComplete(): boolean;
     constructor(game: Game);
     registerData(namespace: DataNamespace, taskData: TownshipTaskData[]): void;
@@ -75,6 +80,7 @@ declare class TownshipTasks {
      * Initialization function for Township tasks on game load
      */
     onLoad(): void;
+    computeTaskTotal(): void;
     onPageChange(): void;
     resetTutorial(): void;
     skipTownshipTutorial(): void;
@@ -86,7 +92,7 @@ declare class TownshipTasks {
      * @param task
      */
     completeTask(task: TownshipTask, giveRewards?: boolean, forceComplete?: boolean): void;
-    private showTaskComplete;
+    showTaskComplete(): void;
     checkForTaskReady(forceCheck?: boolean): void;
     checkForTaskReadyInCategory(category: TownshipTaskCategory): boolean;
     /**
@@ -94,12 +100,12 @@ declare class TownshipTasks {
      * @param taskTracker
      * @returns
      */
-    private checkTaskCompletion;
-    private isItemTaskComplete;
-    private isMonsterTaskComplete;
-    private isSkillTaskComplete;
-    private isTownshipBuildingTaskComplete;
-    private isTaskRequirementMet;
+    checkTaskCompletion(task: TownshipTask): boolean;
+    isItemTaskComplete(itemGoal: AnyItemQuantity): boolean;
+    isMonsterTaskComplete(monsterGoal: MonsterQuantity): boolean;
+    isSkillTaskComplete(skillTask: SkillQuantity): boolean;
+    isTownshipBuildingTaskComplete(buildingTask: BuildingQuantity): boolean;
+    isTaskRequirementMet(task: TownshipTask): boolean;
     updateAllTasks(): void;
     isTaskCategoryComplete(category: TownshipTaskCategory): boolean;
     /**
@@ -113,19 +119,19 @@ declare class TownshipTasks {
      * Removes the task items from bank when turning in task completion
      * @param task
      */
-    private removeTaskItemsFromBank;
+    removeTaskItemsFromBank(task: TownshipTask): void;
     /**
      * Creates a task element to display
      * TODO: REPLACE WITH TEMPLATES
      */
-    private createTaskCompletedBreakdown;
-    private getTaskCompletedBreakdownText;
+    createTaskCompletedBreakdown(): HTMLElement;
+    getTaskCompletedBreakdownText(): string;
     updateTaskCompletedBreakdownText(): void;
     /**
      * Creates a task element to display
      * TODO: REPLACE WITH TEMPLATES
      */
-    private createTaskButtonHeader;
+    createTaskButtonHeader(): HTMLElement;
     /**
      * Creates a task element to display
      * TODO: REPLACE WITH TEMPLATES
@@ -135,52 +141,52 @@ declare class TownshipTasks {
     /**
      * Creates task tasks element to display
      */
-    private createTaskTasks;
+    createTaskTasks(task: TownshipTask): HTMLElement;
     /**
      * Creates task item task element to display
      */
-    private createTaskItemTask;
+    createTaskItemTask(task: TownshipTask): HTMLElement;
     /**
      * Creates task monster task element to display
      * @param task
      */
-    private createTaskMonsterTask;
+    createTaskMonsterTask(task: TownshipTask): HTMLElement;
     /**
      * Creates task skill xp task element to display
      * @param task
      */
-    private createTaskSkillTask;
+    createTaskSkillTask(task: TownshipTask): HTMLElement;
     /**
      * Creates task skill xp task element to display
      * @param task
      */
-    private createTaskTownshipBuildingTask;
+    createTaskTownshipBuildingTask(task: TownshipTask): HTMLElement;
     /**
      * Creates task rewards element to display
      * @param task
      */
-    private createTaskRewards;
+    createTaskRewards(task: TownshipTask): HTMLElement;
     /**
      * Creates the task GP reward element to display
      */
-    private createTaskGPReward;
+    createTaskGPReward(task: TownshipTask): HTMLElement;
     /**
      * Creates the task Slayer Coin reward element to display
      */
-    private createTaskSlayerCoinReward;
+    createTaskSlayerCoinReward(task: TownshipTask): HTMLElement;
     /**
      * Creates the task Item reward element to display
      */
-    private createTaskItemsReward;
+    createTaskItemsReward(item: AnyItem, quantity: number): HTMLElement;
     /**
      * Creates the task Skill XP reward element to display
      */
-    private createTaskSkillXPReward;
+    createTaskSkillXPReward(skill: AnySkill, quantity: number): HTMLElement;
     /**
      * Creates the task Township resource reward element to display
      */
-    private createTaskTownshipResourceReward;
-    private claimTaskRewards;
+    createTaskTownshipResourceReward(resource: TownshipResource, quantity: number): HTMLElement;
+    claimTaskRewards(task: TownshipTask): void;
     /**
      * Displays all Township Task categories and their progress
      */
@@ -194,19 +200,19 @@ declare class TownshipTasks {
      * Creates a task category element
      * @param category The Task Category
      */
-    private createTaskCategory;
+    createTaskCategory(category: TownshipTaskCategory): HTMLElement;
     /**
      * Creates a task category link element
      * @param category The Task Category
      */
-    private createTaskLinkCategory;
-    private updateAllTaskProgress;
-    private updateTaskProgress;
-    private getTownshipTaskCategoryIcon;
-    private getTownshipTaskCategoryName;
-    private getTownshipTaskCategoryBG;
-    private countTotalTasksInCategory;
-    private isPlayerLookingAtTask;
+    createTaskLinkCategory(category: TownshipTaskCategory): HTMLElement;
+    updateAllTaskProgress(): void;
+    updateTaskProgress(category: TownshipTaskCategory): void;
+    getTownshipTaskCategoryIcon(category: TownshipTaskCategory): string;
+    getTownshipTaskCategoryName(category: TownshipTaskCategory): string;
+    getTownshipTaskCategoryBG(category: TownshipTaskCategory): string;
+    countTotalTasksInCategory(category: TownshipTaskCategory): number;
+    isPlayerLookingAtTask(task: TownshipTask): boolean;
 }
 declare type TaskTrackingData = {
     task: TownshipTask;

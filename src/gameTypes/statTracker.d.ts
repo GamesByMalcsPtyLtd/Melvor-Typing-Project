@@ -1,6 +1,6 @@
 /** Generic class for tracking statistics */
 declare class StatTracker implements Serializable, EncodableObject {
-    private stats;
+    stats: Map<number, number>;
     wasMutated: boolean;
     add(stat: number, qty: number): void;
     set(stat: number, value: number): void;
@@ -17,10 +17,10 @@ declare class StatTracker implements Serializable, EncodableObject {
 }
 /** Generic class for tracking stats for registries */
 declare class MappedStatTracker<KeyType extends NamespacedObject> implements EncodableObject {
-    private registry;
-    private dummyConstructor;
-    private game;
-    private statsMap;
+    registry: NamespaceRegistry<KeyType>;
+    dummyConstructor: new (namespace: DataNamespace, localID: string, game: Game) => KeyType;
+    game: Game;
+    statsMap: Map<KeyType, StatTracker>;
     constructor(registry: NamespaceRegistry<KeyType>, dummyConstructor: new (namespace: DataNamespace, localID: string, game: Game) => KeyType, game: Game);
     add(key: KeyType, statID: number, qty: number): void;
     get(key: KeyType, statID: number): number;

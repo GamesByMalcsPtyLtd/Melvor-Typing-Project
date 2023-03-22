@@ -1,24 +1,24 @@
 /** Menu class for thieving */
 declare class ThievingMenu {
-    private container;
-    private areaPanels;
-    private npcNavs;
-    private activePanel;
+    container: HTMLElement;
+    areaPanels: Map<ThievingArea, ThievingAreaPanel>;
+    npcNavs: Map<ThievingNPC, ThievingNPCNav>;
+    activePanel: ThievingAreaPanel | undefined;
     constructor(containerID: string);
-    private createInfoBox;
+    createInfoBox(container: HTMLDivElement): ThievingInfoBox;
     hideAreaPanel(area: ThievingArea): void;
     showAreaPanel(area: ThievingArea): void;
     updateNPCsForLevel(level: number): void;
     updateNPCButtons(): void;
     selectNPC(npc: ThievingNPC, area: ThievingArea): void;
-    private selectNPCInPanel;
+    selectNPCInPanel(npc: ThievingNPC, panel: ThievingAreaPanel): void;
     updateAllAreaPanels(): void;
     setStopButton(area: ThievingArea): void;
     removeStopButton(): void;
-    private updateAreaPanelInfo;
-    private updateInfoContainerForNPC;
-    private showNPCDrops;
-    private formatSpecialDrop;
+    updateAreaPanelInfo(panel: ThievingAreaPanel): void;
+    updateInfoContainerForNPC(panel: ThievingAreaPanel, npc: ThievingNPC): void;
+    showNPCDrops(npc: ThievingNPC, area: ThievingArea): void;
+    formatSpecialDrop(item: AnyItem, qty?: number): string;
     getProgressBar(area: ThievingArea): ProgressBar | undefined;
     localize(): void;
 }

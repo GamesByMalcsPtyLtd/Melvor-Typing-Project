@@ -7,10 +7,10 @@ declare class LangString extends HTMLElement {
 }
 declare type LangStringAttribute = 'lang-cat' | 'lang-id';
 declare class ItemChargeDisplay extends HTMLElement {
-    private _content;
-    private itemImage;
-    private itemCharges;
-    private itemTooltip?;
+    _content: DocumentFragment;
+    itemImage: HTMLImageElement;
+    itemCharges: HTMLSpanElement;
+    itemTooltip?: TippyTooltip;
     initialized: boolean;
     constructor();
     connectedCallback(): void;
@@ -19,9 +19,9 @@ declare class ItemChargeDisplay extends HTMLElement {
     updateCharges(charges: number): void;
 }
 declare class SettingsCheckboxElement extends HTMLElement {
-    private _content;
-    private label;
-    private input;
+    _content: DocumentFragment;
+    label: HTMLLabelElement;
+    input: HTMLInputElement;
     constructor();
     connectedCallback(): void;
     initialize(data: SettingData<boolean>, onChange: VoidFunction): void;
@@ -29,36 +29,36 @@ declare class SettingsCheckboxElement extends HTMLElement {
     static elementCount: number;
 }
 declare class SettingsSwitchElement extends HTMLElement {
-    private _content;
-    private label;
-    private input;
-    private control;
+    _content: DocumentFragment;
+    label: HTMLLabelElement;
+    input: HTMLInputElement;
+    control: HTMLDivElement;
     constructor();
     connectedCallback(): void;
     initialize(data: SettingData<boolean>, onChange: VoidFunction): void;
     setChecked(isChecked: boolean): void;
     attributeChangedCallback(name: string, oldValue: string | null, newValue: string | null): void;
-    private setLabel;
+    setLabel(labelHTML: string, size: string | null): void;
     setSize(oldSize: string | null, newSize: 'small' | 'large'): void;
     static get observedAttributes(): string[];
     static elementCount: number;
 }
 declare class SettingsDropdownElement extends HTMLElement {
-    private _content;
-    private dropdownButton;
-    private optionsContainer;
-    private label;
+    _content: DocumentFragment;
+    dropdownButton: HTMLButtonElement;
+    optionsContainer: HTMLDivElement;
+    label: HTMLSpanElement;
     constructor();
     connectedCallback(): void;
     initialize<T>(data: ChoiceSettingData<T>, onChange: (newValue: T) => void): void;
-    private appendOptionToElement;
+    appendOptionToElement<T>(option: ChoiceSettingOption<T>, element: HTMLElement): void;
     updateValue<T>(newOption: ChoiceSettingOption<T>): void;
 }
 declare class UpgradeChainDisplayElement extends HTMLElement {
-    private _content;
-    private chainName;
-    private upgradeName;
-    private descriptionTooltip?;
+    _content: DocumentFragment;
+    chainName: HTMLElement;
+    upgradeName: HTMLElement;
+    descriptionTooltip?: TippyTooltip;
     constructor();
     connectedCallback(): void;
     disconnectedCallback(): void;

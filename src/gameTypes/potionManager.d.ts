@@ -1,9 +1,9 @@
 /** Management class for potion consumption and charges */
 declare class PotionManager implements StatProvider, EncodableObject {
-    private game;
-    private activePotions;
+    game: Game;
+    activePotions: Map<Action, ActivePotion>;
     /** Actions for which potions should not be automatically re-used */
-    private autoReuseActions;
+    autoReuseActions: Set<Action>;
     renderRequired: boolean;
     modifiers: MappedModifiers;
     constructor(game: Game);
@@ -19,10 +19,10 @@ declare class PotionManager implements StatProvider, EncodableObject {
     /** Callback function for opening the potion selection menu */
     openPotionSelectOnClick(action: Action): void;
     /** Recomputes the stats provided by potions */
-    private computeProvidedStats;
+    computeProvidedStats(updatePlayer?: boolean): void;
     render(): void;
     onLoad(): void;
-    private updatePotionHeader;
+    updatePotionHeader(potion: ActivePotion | undefined): void;
     encode(writer: SaveWriter): SaveWriter;
     decode(reader: SaveWriter, version: number): void;
     convertFromOldFormat(save: NewSaveGame, idMap: NumericIDMap): void;
@@ -32,22 +32,22 @@ interface ActivePotion {
     charges: number;
 }
 declare class PotionSelectMenuItem extends HTMLElement {
-    private _content;
-    private potionImage;
-    private potionQuantity;
-    private potionName;
-    private useButton;
-    private potionDescription;
-    private potionCharges;
+    _content: DocumentFragment;
+    potionImage: HTMLImageElement;
+    potionQuantity: HTMLHeadingElement;
+    potionName: HTMLSpanElement;
+    useButton: HTMLButtonElement;
+    potionDescription: HTMLHeadingElement;
+    potionCharges: HTMLHeadingElement;
     constructor();
     connectedCallback(): void;
     setPotion(potion: PotionItem, game: Game): void;
 }
 declare class PotionSelectMenu extends HTMLElement {
-    private _content;
-    private potionContainer;
-    private autoReuseCheckBox;
-    private menuItems;
+    _content: DocumentFragment;
+    potionContainer: HTMLDivElement;
+    autoReuseCheckBox: HTMLInputElement;
+    menuItems: PotionSelectMenuItem[];
     constructor();
     connectedCallback(): void;
     showPotionSelection(potions: PotionItem[], action: Action, game: Game): void;

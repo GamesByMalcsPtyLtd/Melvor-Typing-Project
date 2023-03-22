@@ -6,8 +6,8 @@ interface ShopCategoryData extends IDData {
 declare class ShopCategory extends NamespacedObject {
     get name(): string;
     get media(): string;
-    private _name;
-    private _media;
+    _name: string;
+    _media: string;
     isGolbinRaid: boolean;
     constructor(namespace: DataNamespace, data: ShopCategoryData, game: Game);
 }
@@ -84,7 +84,7 @@ declare class ShopPurchase extends NamespacedObject implements SoftDataDependant
     get media(): string;
     get name(): string;
     get description(): string;
-    private _media;
+    _media: string;
     category: ShopCategory;
     contains: {
         items: AnyItemQuantity[];
@@ -103,12 +103,12 @@ declare class ShopPurchase extends NamespacedObject implements SoftDataDependant
     purchaseRequirements: AnyRequirement[];
     currentDescription?: CurrentShopDescription;
     /** Purchase limit by Gamemode. If unset, no limit exists. */
-    private _buyLimitOverrides;
-    private _defaultBuyLimit;
+    _buyLimitOverrides: Map<Gamemode, number>;
+    _defaultBuyLimit: number;
     allowQuantityPurchase: boolean;
     showBuyLimit: boolean;
-    private _customName?;
-    private _customDescription?;
+    _customName?: string;
+    _customDescription?: string;
     constructor(namespace: DataNamespace, data: ShopPurchaseData, game: Game);
     registerSoftDependencies(data: ShopPurchaseData, game: Game): void;
     applyDataModification(modData: ShopPurchaseModificationData, game: Game): void;
@@ -116,7 +116,7 @@ declare class ShopPurchase extends NamespacedObject implements SoftDataDependant
     /** Returns the description templated with buyQuantity */
     getTemplatedDescription(shop: Shop): string;
     /** Gets template data for the description */
-    private getDescriptionTemplateData;
+    getDescriptionTemplateData(buyQuantity: number): StringDictionary<string>;
 }
 declare class DummyShopPurchase extends ShopPurchase {
     constructor(namespace: DataNamespace, id: string, game: Game);
@@ -144,12 +144,12 @@ declare class ShopUpgradeChain extends NamespacedObject {
     get chainName(): string;
     get defaultName(): string;
     get defaultDescription(): string;
-    private _chainName;
-    private chainNameLang?;
-    private nameLang?;
-    private descriptionLang?;
-    private _defaultName;
-    private _defaultDescription;
+    _chainName: string;
+    chainNameLang?: LangStringData;
+    nameLang?: LangStringData;
+    descriptionLang?: LangStringData;
+    _defaultName: string;
+    _defaultDescription: string;
     constructor(namespace: DataNamespace, data: ShopUpgradeChainData, game: Game);
     applyDataModification(modData: ShopUpgradeChainModificationData, game: Game): void;
 }
@@ -159,18 +159,18 @@ declare class ShopRenderQueue {
     upgrades: boolean;
 }
 declare class Shop implements EncodableObject, StatProvider, RaidStatProvider {
-    private game;
+    game: Game;
     modifiers: MappedModifiers;
     raidStats: Required<Pick<StatProvider, 'modifiers'>>;
     /** Stores the number of times an upgrade has been purchased */
-    private upgradesPurchased;
+    upgradesPurchased: Map<ShopPurchase, number>;
     buyQuantity: number;
     purchases: NamespaceRegistry<ShopPurchase>;
     purchaseDisplayOrder: NamespacedArray<ShopPurchase>;
     upgradeChains: NamespaceRegistry<ShopUpgradeChain>;
     categories: NamespaceRegistry<ShopCategory>;
     categoryDisplayOrder: NamespacedArray<ShopCategory>;
-    private purchasesByItem;
+    purchasesByItem: Map<AnyItem, ShopPurchase>;
     renderQueue: ShopRenderQueue;
     constructor(game: Game);
     onLoad(): void;
@@ -188,8 +188,9 @@ declare class Shop implements EncodableObject, StatProvider, RaidStatProvider {
     getQuickBuyPurchase(item: AnyItem): ShopPurchase | undefined;
     /** Starting with an upgrade, progresses down it's unlock requirements until a purchase that is owned is found. Returns undefined if no purchase found. */
     getLowestUpgradeInChain(purchase: ShopPurchase): ShopPurchase | undefined;
+    getTotalModifierInChain(purchase: ShopPurchase): MappedModifiers;
     capPurchaseQuantity(purchase: ShopPurchase, buyQuantity: number): number;
-    private getPurchaseCosts;
+    getPurchaseCosts(purchase: ShopPurchase, quantity: number): Costs;
     /** On click callback function for quick buying */
     quickBuyItemOnClick(purchase: ShopPurchase): void;
     /** On click callback for buying a shop item */

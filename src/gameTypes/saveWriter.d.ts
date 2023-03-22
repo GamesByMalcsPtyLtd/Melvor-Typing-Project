@@ -1,26 +1,26 @@
 declare class BinaryWriter {
-    private mode;
-    private dataExtensionLength;
-    private set data(value);
-    private get data();
-    private _data;
-    protected stringEncoder: TextEncoder;
-    protected stringDecoder: TextDecoder;
-    private dataView;
-    private uint8View;
+    mode: 'Read' | 'Write';
+    dataExtensionLength: number;
+    set data(newData: ArrayBuffer);
+    get data(): ArrayBuffer;
+    _data: ArrayBuffer;
+    stringEncoder: TextEncoder;
+    stringDecoder: TextDecoder;
+    dataView: DataView;
+    uint8View: Uint8Array;
     /** Current byte position in ArrayBuffer */
-    private byteOffset;
+    byteOffset: number;
     /** Current regions mark offset */
-    private markRegionOffset;
+    markRegionOffset: number;
     /** Returns the number of bytes remaining in the data buffer */
-    private get remainingBytes();
+    get remainingBytes(): number;
     constructor(mode: 'Read' | 'Write', dataExtensionLength: number);
     /** Checks if the current buffer can fit the specified number of bytes
      *  If it cannot, extends the buffer by the dataExtensionLength until it can
      */
-    private checkDataSize;
-    private checkWriteAccess;
-    private checkReadAccess;
+    checkDataSize(bytes: number): void;
+    checkWriteAccess(): void;
+    checkReadAccess(): void;
     /** Adds a Uint32 marker for a region of encoded data */
     startMarkingWriteRegion(): void;
     /** Stops marking a region of encoded data */
@@ -138,15 +138,15 @@ declare class BinaryWriter {
     getRawData(): ArrayBuffer;
     /** Sets the buffer to the supplied data */
     setRawData(data: ArrayBuffer): void;
-    private static readonly Uint32Max;
+    static readonly Uint32Max = 4294967295;
 }
 /** Specialized class for writing save files */
 declare class SaveWriter extends BinaryWriter {
     /** Writer for header data */
-    private header;
-    private namespaceMap;
-    private nextNumericID;
-    private numericToStringIDMap;
+    header: BinaryWriter;
+    namespaceMap: Map<string, Map<string, number>>;
+    nextNumericID: number;
+    numericToStringIDMap: Map<number, string>;
     constructor(mode: 'Read' | 'Write', dataExtensionLength: number);
     writeNamespacedObject<T extends NamespacedObject>(object: T): void;
     /** Gets a namespaced object from a registry. If the object is not registered, returns the ID instead. */
@@ -155,7 +155,7 @@ declare class SaveWriter extends BinaryWriter {
     writeModifierArray(modifiers: ModifierArray): void;
     getCombatModifierArray(): CombatModifierArray;
     getModifierArray(game: Game): ModifierArray;
-    private writeHeaderInfo;
+    writeHeaderInfo(headerInfo: SaveGameHeader): void;
     getHeaderFromSaveString(saveString: string, game: Game): SaveGameHeader;
     getSaveString(headerInfo: SaveGameHeader): string;
     /** Sets the data from a save string. Returns the save version */

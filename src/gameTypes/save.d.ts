@@ -16,6 +16,8 @@ interface SaveGameHeader {
     offlineAction: ActiveAction | undefined;
     tickTimestamp: number;
     saveTimestamp: number;
+    /** The un-modded namespaces that were active in the save when it was created. And empty array indicates the save is old and this information is unknown. */
+    activeNamespaces: string[];
 }
 declare const setSaveGUID: () => void;
 declare let sidebarSwipeTimer: number;
@@ -145,9 +147,9 @@ declare let inFocus: boolean;
 declare const onloadEvent: (accessCheck?: boolean) => void;
 declare function confirmedAuthenticated(): void;
 declare function checkIfAuthenticated(): Promise<void>;
-declare const INTERFACE_VERSION = 23;
+declare const INTERFACE_VERSION = 25;
 declare function loadGameInterface(accessCheck?: boolean): Promise<void>;
-declare const DATA_VERSION = 72;
+declare const DATA_VERSION = 93;
 declare function loadGameData(): Promise<void>;
 declare function changePageCharacterSelection(page: CharacterSelectPage): void;
 /** Future announcement handler that will occur dynamically. For now this is hard coded. */

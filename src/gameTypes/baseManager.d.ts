@@ -1,6 +1,6 @@
 /** Base Class for Combat Managers */
 declare abstract class BaseManager extends NamespacedObject implements Serializable, EncodableObject, ActiveAction {
-    protected game: Game;
+    game: Game;
     abstract media: string;
     abstract activeSkills: AnySkill[];
     abstract name: string;
@@ -9,7 +9,7 @@ declare abstract class BaseManager extends NamespacedObject implements Serializa
     /** The Type of combat area the player is currently in */
     abstract areaType: CombatAreaType;
     fightInProgress: boolean;
-    protected spawnTimer: Timer;
+    spawnTimer: Timer;
     abstract bank: Bank;
     notifications: NotificationQueue;
     allowDuplicateDOTS: boolean;
@@ -17,7 +17,7 @@ declare abstract class BaseManager extends NamespacedObject implements Serializa
     giveFreeDeath: boolean;
     rendersRequired: ManagerRenderQueue;
     shouldResetAction: boolean;
-    private _dotID;
+    _dotID: number;
     get dotID(): number;
     abstract readonly isFightingITMBoss: boolean;
     abstract readonly canInteruptAttacks: boolean;
@@ -30,39 +30,40 @@ declare abstract class BaseManager extends NamespacedObject implements Serializa
     abstract readonly ignoreSpellRequirements: boolean;
     constructor(game: Game, namespace: DataNamespace, id: string);
     initialize(): void;
-    protected setCallbacks(): void;
-    private minibarEatCallback;
-    private minibarRunCallback;
+    setCallbacks(): void;
+    minibarEatCallback(): void;
+    minibarRunCallback(): void;
     minibarShowHoldToEat(): void;
     minibarHideHoldToEat(): void;
     abstract activeTick(): void;
     /** Renders combat in current state */
     render(): void;
     getErrorLog(): string;
-    protected abstract renderLocation(): void;
-    private renderSpellBook;
+    abstract renderLocation(): void;
+    renderSpellBook(): void;
     /** Checks for player or enemy death */
     checkDeath(): void;
-    protected onPlayerDeath(): void;
+    onPlayerDeath(): void;
     /** Called on enemy death, returns if combat should be stopped as a result */
-    protected onEnemyDeath(): boolean;
+    onEnemyDeath(): boolean;
     addMonsterStat(statID: MonsterStats, amount?: number): void;
     addCombatStat(statID: CombatStats, amount?: number): void;
-    protected onSelection(): void;
+    onSelection(): void;
     /** Callback function for running from combat */
     stop(fled?: boolean): boolean;
-    protected loadNextEnemy(): void;
+    loadNextEnemy(): void;
     /** Spawns a new enemy when the spawn timer fires */
-    protected spawnEnemy(): void;
-    private uniqueUpdatesOnEnemySpawn;
-    private statUpdateOnEnemySpawn;
-    protected startFight(tickOffset?: boolean): void;
+    spawnEnemy(): void;
+    uniqueUpdatesOnEnemySpawn(): void;
+    statUpdateOnEnemySpawn(): void;
+    startFight(tickOffset?: boolean): void;
     /** Ends the fight the player is currently in */
-    protected endFight(): void;
-    protected abstract createNewEnemy(): void;
+    endFight(): void;
+    abstract createNewEnemy(): void;
     /** Function to execute on changing to the combat page */
-    onPageChange(): void;
-    protected resetActionState(): void;
+    onCombatPageChange(): void;
+    renderAutoSwapFood(): void;
+    resetActionState(): void;
     encode(writer: SaveWriter): SaveWriter;
     decode(reader: SaveWriter, version: number): void;
     deserialize(reader: DataReader, version: number, idMap: NumericIDMap): void;

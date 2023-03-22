@@ -67,62 +67,62 @@ declare let itemLogSearch: ItemSearch[];
 /** Initializes the item log search array data */
 declare function updateItemLogSearchArray(game: Game): void;
 declare class SkillCompletionElement extends HTMLElement {
-    private _content;
-    private viewMilestonesLink;
-    private blockContainer;
-    private skillImage;
-    private skillName;
-    private skillProgressFraction;
-    private skillProgressBar;
+    _content: DocumentFragment;
+    viewMilestonesLink: HTMLAnchorElement;
+    blockContainer: HTMLDivElement;
+    skillImage: HTMLImageElement;
+    skillName: HTMLHeadingElement;
+    skillProgressFraction: HTMLSpanElement;
+    skillProgressBar: HTMLDivElement;
     constructor();
     connectedCallback(): void;
     setSkill(skill: AnySkill): void;
     updateProgress(skill: AnySkill): void;
 }
 declare class MasteryCompletionElement extends HTMLElement {
-    private _content;
-    private blockContainer;
-    private skillImage;
-    private skillName;
-    private masteryProgressFraction;
-    private masteryProgressPercent;
-    private masteryProgressBar;
-    private progressButton;
-    private unlocksButton;
+    _content: DocumentFragment;
+    blockContainer: HTMLDivElement;
+    skillImage: HTMLImageElement;
+    skillName: HTMLHeadingElement;
+    masteryProgressFraction: HTMLSpanElement;
+    masteryProgressPercent: HTMLSpanElement;
+    masteryProgressBar: HTMLDivElement;
+    progressButton: HTMLButtonElement;
+    unlocksButton: HTMLButtonElement;
     constructor();
     connectedCallback(): void;
     setSkill(skill: SkillWithMastery<MasteryAction, MasterySkillData>): void;
     updateProgress(skill: SkillWithMastery<MasteryAction, MasterySkillData>): void;
 }
 declare class ItemCompletionElement extends HTMLElement {
-    private _content;
-    private itemImage;
-    private tooltip?;
+    _content: DocumentFragment;
+    itemImage: HTMLImageElement;
+    tooltip?: TippyTooltip;
     constructor();
     connectedCallback(): void;
     disconnectedCallback(): void;
     updateItem(item: AnyItem, game: Game): void;
-    private getItemTooltipHTML;
+    getItemTooltipHTML(item: AnyItem, game: Game): string;
 }
 declare class MonsterCompletionElement extends HTMLElement {
-    private _content;
-    private monsterImage;
-    private tooltip?;
+    _content: DocumentFragment;
+    monsterImage: HTMLImageElement;
+    tooltip?: TippyTooltip;
     constructor();
     connectedCallback(): void;
     disconnectedCallback(): void;
     updateMonster(monster: Monster, game: Game): void;
-    private getMonsterTooltipHTML;
+    getMonsterTooltipHTML(monster: Monster, game: Game): string;
 }
 declare class PetCompletionElement extends HTMLElement {
-    private _content;
-    private petImage;
-    private tooltip?;
+    _content: DocumentFragment;
+    petImage: HTMLImageElement;
+    tooltip?: TippyTooltip;
     constructor();
     connectedCallback(): void;
     disconnectedCallback(): void;
     updatePet(pet: Pet, game: Game): void;
-    private getPetTooltipHTML;
+    getPetTooltipHTML(pet: Pet, unlocked: boolean): string;
 }
 declare class CompletionMap extends SparseNumericMap<string> {
     getCompValue(namespace: string): number;
@@ -157,8 +157,8 @@ declare const enum VisibleCompletion {
     TotH = 2
 }
 declare class Completion implements EncodableObject {
-    private game;
-    private renderQueue;
+    game: Game;
+    renderQueue: CompletionRenderQueue;
     /** Percent progress to maximizing skills */
     skillProgress: CompletionProgress;
     /** Percent progress to maximizing skill mastery */
@@ -180,29 +180,29 @@ declare class Completion implements EncodableObject {
     encode(writer: SaveWriter): SaveWriter;
     decode(reader: SaveWriter, version: number): void;
     setVisibleCompletion(visibleCompletion: CompletionNamespace): void;
-    private updateVisbleCompletionButtons;
-    private getSkillProgressPercent;
-    private getMasteryProgressPercent;
-    private getItemProgressPercent;
-    private getMonsterProgressPercent;
-    private getPetProgressPercent;
-    private updateProgressElements;
-    private updateAllProgressElements;
+    updateVisbleCompletionButtons(oldCompletion: CompletionNamespace, newCompletion: CompletionNamespace): void;
+    getSkillProgressPercent(): number;
+    getMasteryProgressPercent(): number;
+    getItemProgressPercent(): number;
+    getMonsterProgressPercent(): number;
+    getPetProgressPercent(): number;
+    updateProgressElements(elementMap: Map<string, CompletionProgressElements>, progress: CompletionProgress, namespace: string): void;
+    updateAllProgressElements(elements: Map<string, CompletionProgressElements>, progress: CompletionProgress): void;
     render(): void;
     /** Runs once when a save file is loaded */
     onLoad(): void;
     /** Upates all completion values, and queues renders for them */
-    private updateAllCompletion;
+    updateAllCompletion(): void;
     updateSkill(skill: AnySkill): void;
     updateSkillMastery(skill: SkillWithMastery<MasteryAction, MasterySkillData>): void;
     updateItem(item: AnyItem): void;
     updateMonster(monster: Monster): void;
     updatePet(pet: Pet): void;
-    private updateSkillProgress;
-    private updateMasteryProgress;
-    private updateItemProgress;
-    private updateMonsterProgress;
-    private updatePetProgress;
-    private computeTotalProgressPercent;
-    private updateTotalProgress;
+    updateSkillProgress(): void;
+    updateMasteryProgress(): void;
+    updateItemProgress(): void;
+    updateMonsterProgress(): void;
+    updatePetProgress(): void;
+    computeTotalProgressPercent(namespace: string): number;
+    updateTotalProgress(): void;
 }

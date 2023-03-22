@@ -1,21 +1,21 @@
 declare class AltMagicMenu extends HTMLElement {
-    private _content;
-    private spellImage;
-    private clickImageInfo;
-    private spellName;
-    private spellDescription;
-    private runeRequirements;
-    private itemRequirements;
-    private runeHaves;
-    private itemHaves;
-    private producesSingle;
-    private producesCurrent;
+    _content: DocumentFragment;
+    spellImage: HTMLImageElement;
+    clickImageInfo: HTMLDivElement;
+    spellName: HTMLSpanElement;
+    spellDescription: HTMLElement;
+    runeRequirements: RequiresBox;
+    itemRequirements: RequiresBox;
+    runeHaves: HavesBox;
+    itemHaves: HavesBox;
+    producesSingle: ProducesBox;
+    producesCurrent: HavesBox;
     grants: GrantsBox;
-    private interval;
-    private progressBar;
-    private castButton;
-    private doublingIcon;
-    private doublingCont;
+    interval: IntervalIcon;
+    progressBar: ProgressBar;
+    castButton: HTMLButtonElement;
+    doublingIcon: DoublingIcon;
+    doublingCont: HTMLDivElement;
     constructor();
     connectedCallback(): void;
     setCastCallback(altMagic: AltMagic): void;
@@ -29,16 +29,16 @@ declare class AltMagicMenu extends HTMLElement {
     renderProgress(altMagic: AltMagic, timer: Timer): void;
 }
 declare class AltMagicItemMenu extends HTMLElement {
-    private _content;
-    private buttonContainer;
-    private selectItemFragment;
-    private selectBarFragment;
-    private lockedBarFragment;
+    _content: DocumentFragment;
+    buttonContainer: HTMLDivElement;
+    selectItemFragment: DocumentFragment;
+    selectBarFragment: DocumentFragment;
+    lockedBarFragment: DocumentFragment;
     constructor();
     connectedCallback(): void;
-    private createItemButton;
-    private createBarButton;
-    private createLockedBarButton;
+    createItemButton(item: AnyItem, callback: VoidFunction): DocumentFragment;
+    createBarButton(item: AnyItem, callback: VoidFunction): DocumentFragment;
+    createLockedBarButton(unlockLevel: number): DocumentFragment;
     /** Sets the available item selection for the given spell */
     setItemSelection(altMagic: AltMagic, spell: AltMagicSpell): void;
     /** Sets the available bar selection */

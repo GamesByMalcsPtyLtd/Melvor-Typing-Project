@@ -1,10 +1,10 @@
 declare class ShopCostsAndUnlock {
-    protected purchase: ShopPurchase;
-    protected game: Game;
-    protected costContainer: HTMLElement;
-    private requirementElements;
-    private costElements;
-    protected get buyQty(): number;
+    purchase: ShopPurchase;
+    game: Game;
+    costContainer: HTMLElement;
+    requirementElements: ShopUnlockElement[];
+    costElements: ShopCostElement[];
+    get buyQty(): number;
     constructor(purchase: ShopPurchase, game: Game, costContainer: HTMLElement);
     updatePurchaseRequirements(): void;
     /** Updates the gp, slayercoin, raidcoin and item costs */
@@ -12,38 +12,38 @@ declare class ShopCostsAndUnlock {
     setToBuyLimit(): void;
     /** Important: When dereferencing this object, make sure to call this method first else memory leaks will ensue*/
     destroy(): void;
-    private createPurchaseRequirements;
-    private createCostElements;
-    private setElementMet;
-    private setUnlockElementMet;
-    private updateCostElement;
-    private getCostQty;
-    private isGPCostMet;
-    private isSlayerCoinCostMet;
-    private isItemCostMet;
-    private isRaidCoinCostMet;
-    private getTextClass;
-    private getSlayerTaskUnlockText;
-    private createUnlockElement;
-    private createImage;
-    private createCostElement;
+    createPurchaseRequirements(): void;
+    createCostElements(): void;
+    setElementMet(element: HTMLElement, met: boolean): void;
+    setUnlockElementMet(element: ShopUnlockElement, met: boolean): void;
+    updateCostElement(element: ShopCostElement, met: boolean, amount: number): void;
+    getCostQty(amount: ShopCostAmount): number;
+    isGPCostMet(amount: number): boolean;
+    isSlayerCoinCostMet(amount: number): boolean;
+    isItemCostMet(item: AnyItem, baseQty: number): boolean;
+    isRaidCoinCostMet(amount: number): boolean;
+    getTextClass(met: boolean): "text-success" | "text-danger";
+    getSlayerTaskUnlockText(requirement: SlayerTaskRequirement): string;
+    createUnlockElement(costNodes: (string | Node)[], met: boolean): ShopUnlockElement;
+    createImage(media: string): HTMLImageElement;
+    createCostElement(media: string, qty: number, met: boolean, tooltipText: string): ShopCostElement;
 }
 declare class ShopConfirmModalItem extends ShopCostsAndUnlock {
-    private buyChargeQty?;
+    buyChargeQty?: HTMLDivElement;
     parent: HTMLElement;
     constructor(purchase: ShopPurchase, game: Game);
     updateForQuantityChange(): void;
 }
 declare class ShopItem extends ShopCostsAndUnlock {
-    private parent;
-    private image;
-    private itemChargeDescription?;
-    private name;
-    private buyChargeQty?;
-    private description;
-    private currentDescription;
-    private mediaBody;
-    protected container: HTMLDivElement;
+    parent: HTMLElement;
+    image: HTMLImageElement;
+    itemChargeDescription?: GloveDescription;
+    name: HTMLDivElement;
+    buyChargeQty?: HTMLDivElement;
+    description: HTMLDivElement;
+    currentDescription: HTMLDivElement;
+    mediaBody: HTMLDivElement;
+    container: HTMLDivElement;
     constructor(purchase: ShopPurchase, game: Game, parent: HTMLElement);
     destroy(): void;
     updateItemChargeDescription(): void;
@@ -52,22 +52,22 @@ declare class ShopItem extends ShopCostsAndUnlock {
     updateForBuyQtyChange(): void;
 }
 declare class QuickBuyItem extends ShopItem {
-    private quantityMenu;
+    quantityMenu: ShopBuyQuantityMenu;
     constructor(purchase: ShopPurchase, game: Game, parent: HTMLElement);
 }
 interface MouseEvent {
     fromBuyQuantityDropdown?: boolean;
 }
 declare class ShopBuyQuantityMenu {
-    private parent;
-    private container;
-    private button;
-    private input;
+    parent: HTMLElement;
+    container: HTMLDivElement;
+    button: HTMLButtonElement;
+    input: HTMLInputElement;
     constructor(parent: HTMLElement, buyOptions?: number[]);
     destroy(): void;
-    private createBuyOption;
-    private onCustomChange;
-    private static menuCount;
+    createBuyOption(value: number): HTMLAnchorElement;
+    onCustomChange(): void;
+    static menuCount: number;
 }
 declare type ShopUnlockElement = {
     parent: HTMLDivElement;
@@ -88,16 +88,16 @@ declare type ShopTabItem = {
     container: HTMLDivElement;
 };
 declare class ShopTabMenu {
-    private parent;
-    private _category;
-    private game;
-    private items;
-    private icon;
-    private itemsContainer;
-    private hideBlock;
-    private isOpen;
-    private purchases;
-    private qtyMenu?;
+    parent: HTMLElement;
+    _category: ShopCategory;
+    game: Game;
+    items: Map<ShopPurchase, ShopTabItem>;
+    icon: HTMLElement;
+    itemsContainer: HTMLDivElement;
+    hideBlock: HTMLDivElement;
+    isOpen: boolean;
+    purchases: ShopPurchase[];
+    qtyMenu?: ShopBuyQuantityMenu;
     get category(): ShopCategory;
     constructor(parent: HTMLElement, _category: ShopCategory, game: Game);
     /** Updates the purchases that are currently available */
@@ -113,9 +113,9 @@ declare class ShopTabMenu {
     /** Updates a specific item in the categories current description */
     updateCurrentItemDescription(purchase: ShopPurchase): void;
     /** Returns 0 if item should not be shown, 1 if item should be shown normally, 2 if item should be shown at buy limit */
-    private shouldShowItem;
-    private createHeader;
-    private toggle;
+    shouldShowItem(purchase: ShopPurchase): ShowShopItem;
+    createHeader(): HTMLElement;
+    toggle(): void;
 }
 declare const enum ShowShopItem {
     DontShow = 0,
@@ -123,18 +123,21 @@ declare const enum ShowShopItem {
     ShowAtBuyLimit = 2
 }
 declare class ShopMenu {
-    private game;
-    private container;
-    private categorySelects;
+    game: Game;
+    container: HTMLElement;
+    categorySelects: Map<ShopCategory, HTMLLIElement>;
     tabs: Map<ShopCategory, ShopMenuTab>;
-    private shownTabs;
-    private quickbuyMenu;
-    private confirmBuyItem?;
-    private quickbuyContainer;
-    private quickBuyButton;
+    shownTabs: Set<ShopMenuTab>;
+    quickbuyMenu: QuickBuyItem;
+    confirmBuyItem?: ShopConfirmModalItem;
+    quickbuyContainer: HTMLElement;
+    quickBuyButton: HTMLElement;
     constructor(game: Game, containerID?: string, quickBuyID?: string);
     /** Creates a new tab for the given category */
-    private createShopTab;
+    createShopTab(category: ShopCategory): {
+        menu: ShopTabMenu;
+        container: HTMLDivElement;
+    };
     updateItemPostPurchase(purchase: ShopPurchase): void;
     /** Updates the visible tabs for a change in cost quantity */
     updateForCostChange(): void;
@@ -145,11 +148,11 @@ declare class ShopMenu {
     /** Updates the visible tabs for a change in buy quantity */
     updateForBuyQtyChange(): void;
     /** Updates a tabs content, then sets it to visible */
-    private showTab;
+    showTab(category: ShopCategory): void;
     /** Hides a tabs content */
-    private hideTab;
-    private showCategoryButton;
-    private hideCategoryButton;
+    hideTab(category: ShopCategory): void;
+    showCategoryButton(category: ShopCategory): void;
+    hideCategoryButton(category: ShopCategory): void;
     showAllTabsButRaid(): void;
     showAllRaidTabs(): void;
     hideAllTabs(): void;

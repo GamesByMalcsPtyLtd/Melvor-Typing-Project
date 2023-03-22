@@ -113,11 +113,11 @@ interface SidebarSubitemWrapper {
     item: SidebarItemWrapper;
 }
 declare class Sidebar {
-    private rootSelector;
+    rootSelector: string;
     rootEl?: HTMLUListElement;
-    private rendered;
-    private categories;
-    private categoriesOrder;
+    rendered: boolean;
+    categories: Map<string, SidebarCategory>;
+    categoriesOrder: string[];
     constructor(rootSelector: string);
     get isRendered(): boolean;
     render(): void;
@@ -127,20 +127,20 @@ declare class Sidebar {
     removeCategory(id: string): void;
     removeAllCategories(): void;
     configureCategory(id: string, config: SidebarCategoryConfig): void;
-    private orderCategory;
-    private renderCategories;
+    orderCategory(id: string, config: SidebarCategoryConfig): void;
+    renderCategories(): void;
 }
 declare class SidebarCategory {
     id: string;
-    private config;
+    config: SidebarCategoryConfig;
     rootEl?: HTMLLIElement;
     categoryEl?: HTMLDivElement;
     nameEl?: HTMLSpanElement;
     toggleEl?: HTMLElement;
-    private rendered;
-    private expanded;
-    private items;
-    private itemsOrder;
+    rendered: boolean;
+    expanded: boolean;
+    items: Map<string, SidebarItem>;
+    itemsOrder: string[];
     constructor(id: string, config?: SidebarCategoryConfig);
     get isRendered(): boolean;
     configure(config?: SidebarCategoryConfig): void;
@@ -153,27 +153,27 @@ declare class SidebarCategory {
     removeItem(id: string): void;
     removeAllItems(): void;
     configureItem(id: string, config: SidebarItemConfig): void;
-    private orderItem;
-    private renderItems;
-    private update;
-    private updateRootEl;
-    private updateCategoryEl;
-    private updateNameEl;
-    private updateToggle;
+    orderItem(id: string, config: SidebarItemConfig): void;
+    renderItems(): void;
+    update(config: SidebarCategoryConfig, initialRender?: boolean): void;
+    updateRootEl(config: SidebarCategoryConfig, initialRender?: boolean): void;
+    updateCategoryEl(config: SidebarCategoryConfig, initialRender?: boolean): void;
+    updateNameEl(config: SidebarCategoryConfig, initialRender?: boolean): void;
+    updateToggle(config: SidebarCategoryConfig): void;
 }
 declare class SidebarItem {
     id: string;
-    private config;
+    config: SidebarItemConfig;
     rootEl?: HTMLLIElement;
     itemEl?: HTMLAnchorElement;
     iconEl?: HTMLSpanElement;
     nameEl?: HTMLSpanElement;
     asideEl?: HTMLElement;
     subMenuEl?: HTMLUListElement;
-    private rendered;
-    private expanded;
-    private subitems;
-    private subitemsOrder;
+    rendered: boolean;
+    expanded: boolean;
+    subitems: Map<string, SidebarSubitem>;
+    subitemsOrder: string[];
     constructor(id: string, config?: SidebarItemConfig);
     get isRendered(): boolean;
     get ignoreToggle(): boolean;
@@ -187,33 +187,33 @@ declare class SidebarItem {
     removeSubitem(id: string, removingAll?: boolean): void;
     removeAllSubitems(): void;
     configureSubitem(id: string, config: SidebarSubitemConfig): void;
-    private orderSubitem;
-    private renderSubitems;
-    private update;
-    private updateRoot;
-    private updateItem;
-    private updateIcon;
-    private updateName;
-    private updateAside;
+    orderSubitem(id: string, config: SidebarSubitemConfig): void;
+    renderSubitems(): void;
+    update(config: SidebarItemConfig, initialRender?: boolean): void;
+    updateRoot(config: SidebarItemConfig, initialRender?: boolean): void;
+    updateItem(config: SidebarItemConfig, initialRender?: boolean): void;
+    updateIcon(config: SidebarItemConfig, initialRender?: boolean): void;
+    updateName(config: SidebarItemConfig, initialRender?: boolean): void;
+    updateAside(config: SidebarItemConfig, initialRender?: boolean): void;
 }
 declare class SidebarSubitem {
     id: string;
-    private config;
+    config: SidebarSubitemConfig;
     rootEl?: HTMLLIElement;
     subitemEl?: HTMLAnchorElement;
     nameEl?: HTMLSpanElement;
     asideEl?: HTMLElement;
-    private rendered;
+    rendered: boolean;
     constructor(id: string, config?: SidebarSubitemConfig);
     get isRendered(): boolean;
     configure(config?: SidebarSubitemConfig): void;
     render(): void;
     click(): void;
-    private update;
-    private updateRoot;
-    private updateSubitem;
-    private updateName;
-    private updateAside;
+    update(config: SidebarSubitemConfig, initialRender?: boolean): void;
+    updateRoot(config: SidebarSubitemConfig, initialRender?: boolean): void;
+    updateSubitem(config: SidebarSubitemConfig, initialRender?: boolean): void;
+    updateName(config: SidebarSubitemConfig, initialRender?: boolean): void;
+    updateAside(config: SidebarSubitemConfig, initialRender?: boolean): void;
 }
 declare const sidebar: SidebarWrapper;
-declare function openLink(e: MouseEvent): void;
+declare function openSidebarLink(e: MouseEvent): boolean;

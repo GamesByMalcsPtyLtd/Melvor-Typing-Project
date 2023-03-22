@@ -2803,7 +2803,8 @@ declare enum ModifierID {
     increasedEvasionAgainstMelee = 765,
     increasedEvasionAgainstRanged = 766,
     increasedEvasionAgainstMagic = 767,
-    allowNonMagicCurses = 768
+    allowNonMagicCurses = 768,
+    increasedTownshipTraderStock = 769
 }
 declare enum AmmoTypeID {
     Arrows = 0,

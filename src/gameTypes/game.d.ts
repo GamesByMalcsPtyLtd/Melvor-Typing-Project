@@ -1,14 +1,14 @@
 declare class Game implements Serializable, EncodableObject {
-    private loopInterval;
-    private loopStarted;
+    loopInterval: number;
+    loopStarted: boolean;
     disableClearOffline: boolean;
-    private isUnpausing;
-    private previousTickTime;
-    private enableRendering;
-    private maxOfflineTicks;
+    isUnpausing: boolean;
+    previousTickTime: number;
+    enableRendering: boolean;
+    maxOfflineTicks: number;
     registeredNamespaces: NamespaceMap;
     /** Contains dummy namespaces used for unregistered data that is to be kept/displayed */
-    private dummyNamespaces;
+    dummyNamespaces: NamespaceMap;
     openPage?: Page;
     /** Standard Normal Attack. Preinitialized for use as default variable. */
     normalAttack: SpecialAttack;
@@ -23,15 +23,15 @@ declare class Game implements Serializable, EncodableObject {
     decreasedEvasionStackingEffect: StackingEffect;
     activeActionPage: Page;
     /** Save state property. Last time the game processed time outside of golbin raid. */
-    private tickTimestamp;
+    tickTimestamp: number;
     /** Last time the game was locally saved */
-    private saveTimestamp;
+    saveTimestamp: number;
     /** Save state property. Currently active action */
     activeAction: ActiveAction | undefined;
     /** Save state property. Currently paused action */
     pausedAction: ActiveAction | undefined;
     /** Save State Property. If the game is currently paused. */
-    private _isPaused;
+    _isPaused: boolean;
     /** Save State Property. If the player has read the Merchant's permite item. */
     merchantsPermitRead: boolean;
     /** Save state property. Current gamemode */
@@ -97,8 +97,9 @@ declare class Game implements Serializable, EncodableObject {
     township: Township;
     lore: Lore;
     eventManager: EventManager;
-    private dropWeightCache;
+    dropWeightCache: Map<[number, number, number][], number>;
     refundedAstrology: boolean;
+    refundedAstrologyAgain: boolean;
     renderQueue: {
         title: boolean;
         combatMinibar: boolean;
@@ -114,9 +115,9 @@ declare class Game implements Serializable, EncodableObject {
     activeActions: NamespaceRegistry<ActiveAction>;
     /** Registry of all passive actions */
     passiveActions: NamespaceRegistry<PassiveAction>;
-    private _passiveTickers;
-    private actionPageMap;
-    private skillPageMap;
+    _passiveTickers: PassiveAction[];
+    actionPageMap: Map<Action, Page>;
+    skillPageMap: Map<AnySkill, Page[]>;
     /** Registery of all skills */
     skills: NamespaceRegistry<AnySkill>;
     /** Registry of all skills that have mastery */
@@ -139,11 +140,11 @@ declare class Game implements Serializable, EncodableObject {
     archaicSpells: NamespaceRegistry<ArchaicSpell>;
     pets: NamespaceRegistry<Pet>;
     gamemodes: NamespaceRegistry<Gamemode>;
-    private steamAchievements;
+    steamAchievements: Map<string, SteamAchievement>;
     itemSynergies: Map<EquipmentItem, ItemSynergy[]>;
     randomGemTable: DropTable;
     randomSuperiorGemTable: DropTable;
-    private softDataRegQueue;
+    softDataRegQueue: [IDData, SoftDataDependant][];
     get playerCombatLevel(): number;
     get isPaused(): boolean;
     get isGolbinRaid(): boolean;
@@ -155,33 +156,34 @@ declare class Game implements Serializable, EncodableObject {
     registerDataPackage(dataPackage: GameDataPackage): void;
     queueForSoftDependencyReg<T extends IDData>(data: T, object: SoftDataDependant<T>): void;
     postDataRegistration(): void;
-    private registerAttackStyles;
-    private registerItemData;
-    private registerAttackData;
-    private registerStackingEffectData;
-    private registerCombatPassiveData;
-    private registerMonsterData;
-    private registerCombatAreaData;
-    private registerSlayerAreaData;
-    private registerDungeonData;
-    private registerCombatEventData;
-    private registerPrayerData;
-    private registerStandardSpellData;
-    private registerCurseSpellData;
-    private registerAuroraSpellData;
-    private registerAncientSpellData;
-    private registerArchaicSpellData;
-    private registerPets;
-    private registerShopCategories;
-    private registerShopPurchases;
-    private registerShopUpgradeChains;
-    private registerItemSynergies;
-    private registerGamemodes;
-    private registerSteamAchievements;
-    private registerPages;
+    registerAttackStyles(namespace: DataNamespace, data: AttackStyleData[]): void;
+    registerItemData(namespace: DataNamespace, data: AnyItemData[]): void;
+    registerAttackData(namespace: DataNamespace, data: AttackData[]): void;
+    registerStackingEffectData(namespace: DataNamespace, data: StackingEffectData[]): void;
+    registerCombatPassiveData(namespace: DataNamespace, data: CombatPassiveData[]): void;
+    registerMonsterData(namespace: DataNamespace, data: MonsterData[]): void;
+    registerRandomMonsters(monsterIDs: string[], monsterArray: Monster[]): void;
+    registerCombatAreaData(namespace: DataNamespace, data: CombatAreaData[]): void;
+    registerSlayerAreaData(namespace: DataNamespace, data: SlayerAreaData[]): void;
+    registerDungeonData(namespace: DataNamespace, data: DungeonData[]): void;
+    registerCombatEventData(namespace: DataNamespace, data: CombatEventData[]): void;
+    registerPrayerData(namespace: DataNamespace, data: PrayerData[]): void;
+    registerStandardSpellData(namespace: DataNamespace, data: StandardSpellData[]): void;
+    registerCurseSpellData(namespace: DataNamespace, data: CurseSpellData[]): void;
+    registerAuroraSpellData(namespace: DataNamespace, data: AuroraSpellData[]): void;
+    registerAncientSpellData(namespace: DataNamespace, data: AncientSpellData[]): void;
+    registerArchaicSpellData(namespace: DataNamespace, data: ArchaicSpellData[]): void;
+    registerPets(namespace: DataNamespace, data: PetData[]): void;
+    registerShopCategories(namespace: DataNamespace, data: ShopCategoryData[]): void;
+    registerShopPurchases(namespace: DataNamespace, data: ShopPurchaseData[]): void;
+    registerShopUpgradeChains(namespace: DataNamespace, data: ShopUpgradeChainData[]): void;
+    registerItemSynergies(data: ItemSynergyData[]): void;
+    registerGamemodes(namespace: DataNamespace, data: GamemodeData[]): void;
+    registerSteamAchievements(data: SteamAchievementData[]): void;
+    registerPages(namespace: DataNamespace, data: PageData[]): void;
     /** Registers a skill. Returns the constructed instance of the skill */
     registerSkill<T extends AnySkill>(namespace: DataNamespace, constructor: new (namespace: DataNamespace, game: Game) => T & Partial<PassiveAction> & Partial<ActiveAction> & Partial<StatProvider>): T;
-    private applyDataModifications;
+    applyDataModifications(modificationData: GameDataModifications): void;
     getPlayerModifiersFromData(data: PlayerModifierData): PlayerModifierObject;
     getRequirementFromData(data: AnyRequirementData): AnyRequirement;
     getDungeonRequirement(data: DungeonRequirementData): DungeonRequirement;
@@ -208,34 +210,37 @@ declare class Game implements Serializable, EncodableObject {
     /** Things to do after a save has loaded */
     onLoad(): void;
     /** Processes time since the last setInterval */
-    private processTime;
+    processTime(): void;
     /** Runs the specified amount of game ticks */
-    private runTicks;
-    private tick;
+    runTicks(ticksToRun: number): void;
+    tick(): void;
     queueRequirementRenders(): void;
-    private render;
-    private renderGameTitle;
+    render(): void;
+    renderGameTitle(): void;
     /** Updates the state of the combat minibar */
-    private renderCombatMinibar;
+    renderCombatMinibar(): void;
     /** Renders which skills are active in the sidebar */
-    private renderActiveSkills;
-    private loop;
-    private getErrorLog;
-    private showBrokenGame;
+    renderActiveSkills(): void;
+    loop(): void;
+    getErrorLog(error: unknown, title: string): string;
+    showBrokenGame(error: unknown, title: string): void;
     clearActiveAction(save?: boolean): void;
-    private getOfflineTimeDiff;
+    getOfflineTimeDiff(): {
+        timeDiff: number;
+        originalTimeDiff: number;
+    };
     processOffline(): Promise<void>;
-    private snapShotOffline;
-    private createOfflineModal;
+    snapShotOffline(): OfflineSnapshot;
+    createOfflineModal(oldSnapshot: OfflineSnapshot, timeDiff: number): string;
     /** Resets properties used to track offline progress */
-    private resetOfflineTracking;
+    resetOfflineTracking(): void;
     /** Puts the game in a state where offline will progress the amount specified */
     testForOffline(timeToGoBack: number): Promise<void>;
     testCombatInitializationStatParity(): void;
     generateSaveString(): string;
     /** Attempts to get a header from a save string. If save is invalid, returns undefined instead. */
     getHeaderFromSaveString(saveString: string): Promise<SaveGameHeader | SaveLoadError>;
-    private getSaveHeader;
+    getSaveHeader(): SaveGameHeader;
     encode(writer: SaveWriter): SaveWriter;
     decode(reader: SaveWriter, version: number): void;
     deserialize(reader: DataReader, version: number, idMap: NumericIDMap): void;
@@ -260,6 +265,7 @@ declare class Game implements Serializable, EncodableObject {
     checkItemFoundRequirement(requirement: ItemFoundRequirement, notifyOnFailure?: boolean): boolean;
     checkMonsterKilledRequirement(requirement: MonsterKilledRequirement, notifyOnFailure?: boolean): boolean;
     checkTownshipTaskRequirement(requirement: TownshipTaskCompletionRequirement, notifyOnFailure?: boolean): boolean;
+    checkTownshipTutorialTaskRequirement(requirement: TownshipTutorialTaskCompletionRequirement, notifyOnFailure?: boolean): boolean;
     checkTownshipBuildingRequirement(requirement: TownshipBuildingRequirement, notifyOnFailure?: boolean): boolean;
     /** Checks a single requirement and optionally displays an error message to the player */
     checkRequirement(requirement: AnyRequirement, notifyOnFailure?: boolean, slayerLevelReq?: number): boolean;
@@ -276,7 +282,7 @@ declare class Game implements Serializable, EncodableObject {
     /** Processes an event */
     processEvent(event: GameEvent, interval?: number): void;
     checkSteamAchievements(): void;
-    private isAchievementMet;
+    isAchievementMet(achievement: SteamAchievement): boolean;
     /** Sets up the current gamemode to it's starting state */
     setupCurrentGamemode(): void;
     getItemFromOldID(itemID: number, idMap: NumericIDMap): AnyItem | undefined;
@@ -296,9 +302,7 @@ interface OfflineSnapshot {
     experience: Map<AnySkill, number>;
     levels: Map<AnySkill, number>;
     food: AnyItemQuantity[];
-    quiverItem: AnyItemQuantity;
-    summon1: AnyItem;
-    summon2: AnyItem;
+    equipment: Map<SlotTypes, AnyItemQuantity>;
     bank: Map<AnyItem, number>;
     loot: Map<AnyItem, number>;
     monsterKills: Map<Monster, number>;

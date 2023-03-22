@@ -1,4 +1,8 @@
 # Changelog
+## v1.11.1
+  - Update types to match game version V1.1.1 (?5064)
+  - Added missing type definition file for GameDataPackage
+  - Type definitions have been generated without private/protected fields, to make method patching easier
 ## v1.11.0
   - Update to V1.1.0
   - Removed the old source getting and documentation code as this is no longer required to use the type defs

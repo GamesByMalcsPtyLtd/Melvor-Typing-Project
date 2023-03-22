@@ -1,6 +1,6 @@
 /** Class to store all statistics in the game */
 declare class Statistics implements SkillObject<StatTracker>, Serializable, EncodableObject {
-    private game;
+    game: Game;
     readonly Woodcutting: StatTracker;
     readonly Fishing: StatTracker;
     readonly Firemaking: StatTracker;

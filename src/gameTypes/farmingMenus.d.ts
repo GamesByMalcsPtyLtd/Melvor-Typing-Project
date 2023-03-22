@@ -1,46 +1,46 @@
 declare class FarmingCategoryButtonElement extends HTMLElement {
-    private _content;
-    private link;
-    private categoryImage;
-    private categoryName;
-    private categoryDescription;
-    private harvestReadyNotice;
+    _content: DocumentFragment;
+    link: HTMLAnchorElement;
+    categoryImage: HTMLImageElement;
+    categoryName: HTMLDivElement;
+    categoryDescription: HTMLDivElement;
+    harvestReadyNotice: HTMLDivElement;
     constructor();
     connectedCallback(): void;
     setCategory(category: FarmingCategory, farming: Farming): void;
     updateNotice(show: boolean): void;
 }
 declare class FarmingCategoryOptionsElement extends HTMLElement {
-    private _content;
-    private harvestAllButton;
-    private plantAllButton;
-    private compostAllButtons;
-    private plantAllSelectedButton;
+    _content: DocumentFragment;
+    harvestAllButton: HTMLButtonElement;
+    plantAllButton: HTMLButtonElement;
+    compostAllButtons: HTMLButtonElement[];
+    plantAllSelectedButton: HTMLButtonElement;
     constructor();
     connectedCallback(): void;
     setCategory(category: FarmingCategory, game: Game): void;
 }
 declare class FarmingPlotElement extends HTMLElement {
-    private _content;
-    private categoryName;
-    private selectSeedDropdownButton;
-    private selectSeedDropdownImage;
-    private selectSeedDropdownOptions;
-    private plantSeedButton;
-    private seedImage;
-    private growthStatus;
-    private compostProgress;
-    private destroyButton;
-    private harvestButton;
-    private compostButtonContainer;
-    private growthChance;
-    private seedQuantities;
-    private compostButtons;
-    private compostTooltips?;
+    _content: DocumentFragment;
+    categoryName: HTMLHeadingElement;
+    selectSeedDropdownButton: HTMLButtonElement;
+    selectSeedDropdownImage: HTMLImageElement;
+    selectSeedDropdownOptions: HTMLDivElement;
+    plantSeedButton: HTMLButtonElement;
+    seedImage: HTMLImageElement;
+    growthStatus: HTMLElement;
+    compostProgress: HTMLDivElement;
+    destroyButton: HTMLButtonElement;
+    harvestButton: HTMLButtonElement;
+    compostButtonContainer: HTMLDivElement;
+    growthChance: HTMLHeadingElement;
+    seedQuantities: Map<FarmingRecipe, HTMLSpanElement>;
+    compostButtons: HTMLButtonElement[];
+    compostTooltips?: TippyTooltip[];
     constructor();
     connectedCallback(): void;
     disconnectedCallback(): void;
-    private destroyTooltips;
+    destroyTooltips(): void;
     setPlot(plot: FarmingPlot, game: Game): void;
     /** Updates the compost level + growth chance */
     updateCompost(plot: FarmingPlot, farming: Farming): void;
@@ -48,29 +48,29 @@ declare class FarmingPlotElement extends HTMLElement {
     /** Updates the display of the plot */
     updatePlotState(plot: FarmingPlot): void;
     updateSelectedSeed(plot: FarmingPlot): void;
-    private updateSeedQuantities;
+    updateSeedQuantities(farming: Farming): void;
 }
 declare class LockedFarmingPlotElement extends HTMLElement {
-    private _content;
-    private farmingLevelRequired;
-    private gpCost;
-    private unlockButton;
+    _content: DocumentFragment;
+    farmingLevelRequired: HTMLSpanElement;
+    gpCost: HTMLSpanElement;
+    unlockButton: HTMLButtonElement;
     constructor();
     connectedCallback(): void;
     setPlot(plot: FarmingPlot, farming: Farming): void;
 }
 declare class FarmingSeedSelectElement extends HTMLElement {
-    private _content;
-    private seedNotice;
-    private seedButtonContainer;
-    private recipeOwnedQuantity;
-    private recipeProductQuantity;
-    private recipeMastery;
-    private recipeCategory;
-    private recipeLevel;
-    private recipeQuantity;
-    private recipeInterval;
-    private plantButton;
+    _content: DocumentFragment;
+    seedNotice: HTMLElement;
+    seedButtonContainer: HTMLDivElement;
+    recipeOwnedQuantity: HTMLSpanElement;
+    recipeProductQuantity: HTMLSpanElement;
+    recipeMastery: MasteryDisplay;
+    recipeCategory: HTMLSpanElement;
+    recipeLevel: HTMLSpanElement;
+    recipeQuantity: HTMLSpanElement;
+    recipeInterval: HTMLSpanElement;
+    plantButton: HTMLButtonElement;
     constructor();
     connectedCallback(): void;
     setSeedSelection(category: FarmingCategory, game: Game, plot?: FarmingPlot): void;

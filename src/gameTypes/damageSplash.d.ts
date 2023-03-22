@@ -1,13 +1,13 @@
 declare class SplashManager {
-    private container;
-    private queue;
-    private splashDelay;
-    private maxSplashes;
+    container: HTMLElement;
+    queue: DamageSplash[];
+    splashDelay: number;
+    maxSplashes: number;
     constructor(container: HTMLElement);
     add(splash: DamageSplash): void;
     render(): void;
-    private renderSplash;
-    private static splashClasses;
+    renderSplash(splash: DamageSplash): void;
+    static splashClasses: Record<SplashType, string>;
 }
 declare type DamageSplash = {
     /** Controls the colour of the splash */

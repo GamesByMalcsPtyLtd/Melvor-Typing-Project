@@ -30,8 +30,8 @@ declare class FishingArea extends NamespacedObject {
     fish: Fish[];
     requiredItem?: EquipmentItem;
     isSecret: boolean;
-    private _name;
-    private _description?;
+    _name: string;
+    _description?: string;
     constructor(namespace: DataNamespace, data: FishingAreaData, fishing: Fishing, game: Game);
 }
 interface FishingSkillData extends MasterySkillData {
@@ -47,28 +47,32 @@ interface FishingSkillData extends MasterySkillData {
     lostChestItem?: string;
 }
 declare class Fishing extends GatheringSkill<Fish, FishingSkillData> {
-    protected readonly _media = "assets/media/skills/fishing/fishing.svg";
-    protected getTotalUnlockedMasteryActions(): number;
+    readonly _media = "assets/media/skills/fishing/fishing.svg";
+    getTotalUnlockedMasteryActions(): number;
     renderQueue: FishingRenderQueue;
-    protected get chanceForLostChest(): number;
-    protected get actionInterval(): number;
-    protected get actionLevel(): number;
-    protected get masteryAction(): Fish;
-    protected get chanceForOneExtraFish(): number;
+    get chanceForLostChest(): number;
+    get actionInterval(): number;
+    get actionLevel(): number;
+    get masteryAction(): Fish;
+    get chanceForOneExtraFish(): number;
     /** If the player has read the message in a bottle */
-    private secretAreaUnlocked;
+    secretAreaUnlocked: boolean;
     /** The fish that are currently selected in each area */
-    private selectedAreaFish;
-    private activeFishingArea?;
+    selectedAreaFish: Map<FishingArea, Fish>;
+    activeFishingArea?: FishingArea;
     /** Areas which the user has decided to hide */
-    private hiddenAreas;
+    hiddenAreas: Set<FishingArea>;
     /** The fish that is currently selected and being fished */
     get activeFish(): Fish;
     areas: NamespaceRegistry<FishingArea>;
     junkItems: AnyItem[];
     specialItems: DropTable;
-    private easterEgg?;
-    private lostChestItem?;
+    easterEgg?: {
+        original: AnyItem;
+        equipped: EquipmentItem;
+        reward: AnyItem;
+    };
+    lostChestItem?: AnyItem;
     constructor(namespace: DataNamespace, game: Game);
     registerData(namespace: DataNamespace, data: FishingSkillData): void;
     postDataRegistration(): void;
@@ -77,41 +81,41 @@ declare class Fishing extends GatheringSkill<Fish, FishingSkillData> {
     getMinFishInterval(fish: Fish): number;
     /** Gets the maximum interval of a fish */
     getMaxFishInterval(fish: Fish): number;
-    protected getUncappedDoublingChance(action: Fish): number;
+    getUncappedDoublingChance(action: Fish): number;
     getMasteryXPModifier(action: Fish): number;
     getAreaChances(area: FishingArea): FishingAreaChances;
-    protected preAction(): void;
-    protected get actionRewards(): Rewards;
-    protected postAction(): void;
-    protected get masteryModifiedInterval(): number;
+    preAction(): void;
+    get actionRewards(): Rewards;
+    postAction(): void;
+    get masteryModifiedInterval(): number;
     onModifierChange(): void;
     onEquipmentChange(): void;
-    protected onLevelUp(oldLevel: number, newLevel: number): void;
+    onLevelUp(oldLevel: number, newLevel: number): void;
     getErrorLog(): string;
     onLoad(): void;
-    protected onStop(): void;
+    onStop(): void;
     /** Callback function for when the start button of an area is clicked */
     onAreaStartButtonClick(area: FishingArea): void;
-    private renderHiddenAreas;
+    renderHiddenAreas(): void;
     /** Callback function for when the fishing area menu header is clicked */
     onAreaHeaderClick(area: FishingArea): void;
     /** Callback function for when a fish is selected */
     onAreaFishSelection(area: FishingArea, fish: Fish): void;
     render(): void;
     /** Renders the fish in areas that have one selected */
-    private renderSelectedAreaFish;
-    private renderSelectedFishRates;
+    renderSelectedAreaFish(): void;
+    renderSelectedFishRates(): void;
     /** Renders the fish chances of all areas */
-    private renderAreaChances;
-    private renderAreaButtons;
-    private renderAreaUnlock;
-    private renderActiveArea;
+    renderAreaChances(): void;
+    renderAreaButtons(): void;
+    renderAreaUnlock(): void;
+    renderActiveArea(): void;
     encode(writer: SaveWriter): SaveWriter;
-    protected resetActionState(): void;
+    resetActionState(): void;
     decode(reader: SaveWriter, version: number): void;
     deserialize(reader: DataReader, version: number, idMap: NumericIDMap): void;
     convertFromOldFormat(savegame: NewSaveGame): void;
-    protected getActionIDFromOldID(oldActionID: number, idMap: NumericIDMap): string;
+    getActionIDFromOldID(oldActionID: number, idMap: NumericIDMap): string;
     setFromOldOffline(offline: OfflineTuple, idMap: NumericIDMap): void;
     testTranslations(): void;
 }

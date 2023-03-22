@@ -40,8 +40,8 @@ declare abstract class BaseSpell extends NamespacedObject {
     level: number;
     runesRequired: AnyItemQuantity[];
     runesRequiredAlt?: AnyItemQuantity[];
-    protected _name: string;
-    private _media;
+    _name: string;
+    _media: string;
     constructor(namespace: DataNamespace, data: BaseSpellData, game: Game);
 }
 declare abstract class CombatSpell extends BaseSpell implements SoftDataDependant<CombatSpellData> {

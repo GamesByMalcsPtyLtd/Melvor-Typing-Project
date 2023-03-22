@@ -1,8 +1,3 @@
-declare enum ModdingStatus {
-    Enabled = 0,
-    Disabled = 1,
-    Hidden = 2
-}
 /**
  * Melvor Idle mod support module
  * typedefs found in mod.d.ts
@@ -25,12 +20,15 @@ declare const mod: {
     trigger: {
         modsLoaded: () => Promise<void>;
         characterSelectionLoaded: () => Promise<void>;
+        interfaceAvailable: () => Promise<void>;
         characterLoaded: () => Promise<void>;
         interfaceReady: () => Promise<void>;
+        creatorToolkitOpen: () => Promise<void>;
     };
     api: Modding.ModApi;
     getContext: (namespaceOrResource: string | HTMLScriptElement | ImportMeta) => Modding.ModContext;
     getDevContext: () => Modding.ModContext;
+    getModsFromError: (error: unknown) => Modding.ModBasic[];
     encode: (writer: SaveWriter) => SaveWriter;
     decode: (reader: SaveWriter, version: number) => void;
     persist: () => Promise<void> | undefined;

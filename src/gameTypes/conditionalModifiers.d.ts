@@ -97,7 +97,7 @@ declare class ConditionalModifier {
     enemyModifiers?: CombatModifierData;
     hooks: Set<ConditionHooks>;
     constructor(data: ConditionalModifierData, game: Game, selfItem?: EquipmentItem);
-    private getConditionFromData;
-    private addConditionHooks;
+    getConditionFromData(conditionData: AnyConditionData, game: Game, selfItem?: EquipmentItem): AnyCondition;
+    addConditionHooks(condition: AnyCondition): void;
 }
 declare type ModifierEffectSubtype = 'Slow' | 'Frostburn';

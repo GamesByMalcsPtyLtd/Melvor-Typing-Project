@@ -2,96 +2,96 @@ interface HasLevel {
     level: number;
 }
 declare abstract class RecipeSelectionTab<Recipe extends HasLevel> extends ContainedComponent {
-    protected skill: AnySkill;
-    protected recipes: Recipe[];
-    private recipeCollapse;
-    private parent;
+    skill: AnySkill;
+    recipes: Recipe[];
+    recipeCollapse: string;
+    parent: HTMLElement;
     container: HTMLDivElement;
-    protected recipeRow: HTMLElement;
-    protected recipeContainers: HTMLLIElement[];
-    protected recipeTooltips: TippyTooltip[];
-    protected recipeUnlocked: boolean[];
+    recipeRow: HTMLElement;
+    recipeContainers: HTMLLIElement[];
+    recipeTooltips: TippyTooltip[];
+    recipeUnlocked: boolean[];
     constructor(parentID: string, skill: AnySkill, recipes: Recipe[], containerID: string, recipeCollapse?: string);
     updateRecipesForLevel(): void;
     updateRecipeTooltips(): void;
     localize(): void;
-    protected abstract getRecipeMedia(recipe: Recipe): string;
-    protected abstract getRecipeName(recipe: Recipe): string;
-    protected abstract getRecipeCallback(recipe: Recipe): VoidFunction;
-    protected abstract getRecipeIngredients(recipe: Recipe): Costs;
-    protected isRecipeUnlocked(recipe: Recipe): boolean;
-    private addRecipeContainer;
-    protected setRecipeUnlocked(id: number): void;
-    protected setRecipeLocked(id: number): void;
-    protected getRequiresTooltip(items: AnyItemQuantity[], gp: number, sc: number): string;
+    abstract getRecipeMedia(recipe: Recipe): string;
+    abstract getRecipeName(recipe: Recipe): string;
+    abstract getRecipeCallback(recipe: Recipe): VoidFunction;
+    abstract getRecipeIngredients(recipe: Recipe): Costs;
+    isRecipeUnlocked(recipe: Recipe): boolean;
+    addRecipeContainer(): void;
+    setRecipeUnlocked(id: number): void;
+    setRecipeLocked(id: number): void;
+    getRequiresTooltip(items: AnyItemQuantity[], gp: number, sc: number): string;
 }
 interface HasItem extends HasLevel {
     product: AnyItem;
 }
 declare abstract class ItemRecipeSelectionTab<Recipe extends HasItem> extends RecipeSelectionTab<Recipe> {
-    protected getRecipeMedia(recipe: HasItem): string;
-    protected getRecipeName(recipe: HasItem): string;
+    getRecipeMedia(recipe: HasItem): string;
+    getRecipeName(recipe: HasItem): string;
 }
 declare class SmithingSelectionTab extends ItemRecipeSelectionTab<SmithingRecipe> {
     constructor(category: SkillCategory);
-    protected getRecipeCallback(recipe: SmithingRecipe): () => void;
-    protected getRecipeIngredients(recipe: SmithingRecipe): Costs;
+    getRecipeCallback(recipe: SmithingRecipe): () => void;
+    getRecipeIngredients(recipe: SmithingRecipe): Costs;
 }
 declare class FletchingSelectionTab extends ItemRecipeSelectionTab<FletchingRecipe> {
     constructor(category: SkillCategory);
-    protected getRecipeCallback(recipe: FletchingRecipe): () => void;
-    protected getRecipeIngredients(recipe: FletchingRecipe): Costs;
+    getRecipeCallback(recipe: FletchingRecipe): () => void;
+    getRecipeIngredients(recipe: FletchingRecipe): Costs;
 }
 declare class CraftingSelectionTab extends ItemRecipeSelectionTab<CraftingRecipe> {
     constructor(category: SkillCategory);
-    protected getRecipeCallback(recipe: CraftingRecipe): () => void;
-    protected getRecipeIngredients(recipe: CraftingRecipe): Costs;
+    getRecipeCallback(recipe: CraftingRecipe): () => void;
+    getRecipeIngredients(recipe: CraftingRecipe): Costs;
 }
 declare class RunecraftingSelectionTab extends ItemRecipeSelectionTab<RunecraftingRecipe> {
     constructor(category: SkillCategory);
-    protected getRecipeCallback(recipe: RunecraftingRecipe): () => void;
-    protected getRecipeIngredients(recipe: RunecraftingRecipe): Costs;
+    getRecipeCallback(recipe: RunecraftingRecipe): () => void;
+    getRecipeIngredients(recipe: RunecraftingRecipe): Costs;
 }
 declare class HerbloreSelectionTab extends RecipeSelectionTab<HerbloreRecipe> {
     constructor(category: SkillCategory);
     updateRecipesForLevel(): void;
-    protected getRecipeMedia(recipe: HerbloreRecipe): string;
-    protected getRecipeName(recipe: HerbloreRecipe): string;
-    protected getRecipeCallback(recipe: HerbloreRecipe): () => void;
-    protected getRecipeIngredients(recipe: HerbloreRecipe): Costs;
+    getRecipeMedia(recipe: HerbloreRecipe): string;
+    getRecipeName(recipe: HerbloreRecipe): string;
+    getRecipeCallback(recipe: HerbloreRecipe): () => void;
+    getRecipeIngredients(recipe: HerbloreRecipe): Costs;
 }
 declare class AltMagicSelectionTab extends RecipeSelectionTab<AltMagicSpell> {
     constructor();
-    protected getRecipeMedia(recipe: AltMagicSpell): string;
-    protected getRecipeName(recipe: AltMagicSpell): string;
-    protected getRecipeCallback(recipe: AltMagicSpell): () => void;
+    getRecipeMedia(recipe: AltMagicSpell): string;
+    getRecipeName(recipe: AltMagicSpell): string;
+    getRecipeCallback(recipe: AltMagicSpell): () => void;
     updateRecipeTooltips(): void;
-    protected getRecipeIngredients(recipe: AltMagicSpell): Costs;
-    protected getSpellTooltip(altSpell: AltMagicSpell): string;
+    getRecipeIngredients(recipe: AltMagicSpell): Costs;
+    getSpellTooltip(altSpell: AltMagicSpell): string;
 }
 declare class SummoningSelectionTab extends ItemRecipeSelectionTab<SummoningRecipe> {
-    private shardMessage;
+    shardMessage: HTMLHeadingElement;
     constructor(category: SkillCategory);
     localize(): void;
-    protected isRecipeUnlocked(recipe: SummoningRecipe): boolean;
-    protected setRecipeUnlocked(id: number): void;
-    protected setRecipeLocked(id: number): void;
-    protected getRecipeCallback(recipe: SummoningRecipe): () => void;
-    protected getRecipeIngredients(recipe: SummoningRecipe): Costs;
+    isRecipeUnlocked(recipe: SummoningRecipe): boolean;
+    setRecipeUnlocked(id: number): void;
+    setRecipeLocked(id: number): void;
+    getRecipeCallback(recipe: SummoningRecipe): () => void;
+    getRecipeIngredients(recipe: SummoningRecipe): Costs;
 }
 interface CategoryLike {
     name: string;
     media: string;
 }
 declare class CategoryMenu<CategoryType extends CategoryLike> extends ContainedComponent {
-    private navID;
-    private categoryData;
-    private expandTextID;
-    protected container: HTMLDivElement;
-    private expandText;
-    private optionNames;
-    private optionsContainer;
+    navID: string;
+    categoryData: CategoryType[];
+    expandTextID: string;
+    container: HTMLDivElement;
+    expandText: HTMLSpanElement;
+    optionNames: HTMLSpanElement[];
+    optionsContainer: HTMLUListElement;
     constructor(parentID: string, navID: string, categoryData: CategoryType[], expandTextID: string, changeCategoryFunc: (category: CategoryType) => void);
-    private addCategory;
+    addCategory(category: CategoryType, callback: (id: CategoryType) => void): void;
     localize(): void;
 }

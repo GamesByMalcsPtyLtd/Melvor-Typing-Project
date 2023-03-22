@@ -11,34 +11,34 @@ declare class LoreBook extends NamespacedObject {
     get title(): string;
     get media(): string;
     unlockRequirements: AnyRequirement[];
-    private _title;
-    private _media;
+    _title: string;
+    _media: string;
     constructor(namespace: DataNamespace, data: LoreBookData, game: Game);
 }
 declare class Lore {
-    private game;
+    game: Game;
     books: NamespaceRegistry<LoreBook>;
     renderUnlocks: boolean;
-    private bookButtons;
+    bookButtons: Map<LoreBook, LoreBookButtonElement>;
     constructor(game: Game);
     registerLore(namespace: DataNamespace, loreData: LoreBookData[]): void;
     loadLoreButtons(): void;
     onLoad(): void;
     render(): void;
-    private updateLoreBookUnlocks;
+    updateLoreBookUnlocks(): void;
     readLore(book: LoreBook): void;
     static readonly LORE: LoreText[];
 }
 declare class LoreBookButtonElement extends HTMLElement {
-    private _content;
-    private bookImage;
-    private bookTitle;
-    private readButton;
+    _content: DocumentFragment;
+    bookImage: HTMLImageElement;
+    bookTitle: HTMLHeadingElement;
+    readButton: HTMLButtonElement;
     constructor();
     connectedCallback(): void;
     setImage(book: LoreBook): void;
     updateForUnlock(book: LoreBook, game: Game): void;
-    private createUnlockElement;
-    private createUnlockElements;
-    private getTextClass;
+    createUnlockElement(costNodes: (string | Node)[], met: boolean): HTMLDivElement;
+    createUnlockElements(book: LoreBook, game: Game): HTMLDivElement[];
+    getTextClass(met: boolean): "text-success" | "text-danger";
 }

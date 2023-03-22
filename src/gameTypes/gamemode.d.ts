@@ -60,11 +60,11 @@ declare class Gamemode extends NamespacedObject {
     enemyModifiers: CombatModifierData;
     /** If players start in the tutorial in this gamemode */
     hasTutorial: boolean;
-    private _media;
-    private _name;
-    private _description?;
-    private _rules;
-    private _combatTriangle;
+    _media: string;
+    _name: string;
+    _description?: string;
+    _rules: string[];
+    _combatTriangle: CombatTriangles;
     constructor(namespace: DataNamespace, data: GamemodeData, game: Game);
 }
 declare class DummyGamemode extends Gamemode {

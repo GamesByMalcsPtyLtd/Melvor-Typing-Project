@@ -11,10 +11,10 @@ interface EnemyAreaEffect {
 declare type AreaEffect = PlayerAreaEffect | EnemyAreaEffect;
 declare type AnyCombatArea = CombatArea | SlayerArea | Dungeon;
 declare class CombatAreaMenu {
-    private areas;
-    private container;
-    private menuElems;
-    private highlightedArea?;
+    areas: AnyCombatArea[];
+    container: HTMLDivElement;
+    menuElems: Map<AnyCombatArea, AreaMenuElement>;
+    highlightedArea?: AreaMenuElement;
     constructor(containerID: string, areas: AnyCombatArea[]);
     updateRequirements(): void;
     updateEvent(activeAreas: Map<AnyCombatArea, number>): void;
@@ -22,24 +22,33 @@ declare class CombatAreaMenu {
     removeEvent(): void;
     setTutorialHighlight(area: AnyCombatArea): void;
     removeTutorialHighlight(): void;
-    private setReqStatus;
-    private createMenuElement;
-    private toggleTable;
-    private createTutorialDirection;
-    private createName;
-    private createDifficultySpan;
-    private createRequirements;
-    private createReqImage;
-    private createReqSpan;
-    private createDungeonInfo;
-    private createRewardImage;
-    private createEffectInfo;
-    private createDungeonUnlock;
-    private getUnlockMessage;
-    private isDungeonUnlocked;
-    private createMonsterTable;
-    private createDungeonTable;
-    private createEventStartButton;
+    setReqStatus(reqSpan: HTMLSpanElement, met: boolean): void;
+    createMenuElement(areaData: AnyCombatArea, id: number): void;
+    toggleTable(areaData: AnyCombatArea, menuItem: AreaMenuElement): void;
+    createTutorialDirection(areaData: AnyCombatArea): HTMLElement;
+    createName(areaData: AnyCombatArea): HTMLDivElement;
+    createDifficultySpan(difficulty: number): HTMLSpanElement;
+    createRequirements(areaData: AnyCombatArea): {
+        requirements: HTMLDivElement;
+        reqSpans: HTMLSpanElement[];
+    };
+    createReqImage(media: string): HTMLImageElement;
+    createReqSpan(text: string): HTMLSpanElement;
+    createDungeonInfo(areaData: Dungeon): HTMLDivElement[];
+    createRewardImage(media: string): HTMLImageElement;
+    createEffectInfo(areaData: SlayerArea, description: HTMLSpanElement): HTMLDivElement;
+    createDungeonUnlock(dungeon: Dungeon): HTMLDivElement;
+    getUnlockMessage(dungReq: DungeonRequirement[]): string;
+    isDungeonUnlocked(dungeon: Dungeon): boolean;
+    createMonsterTable(areaData: CombatArea | SlayerArea): {
+        table: HTMLTableElement;
+        buttons: HTMLButtonElement[];
+    };
+    createDungeonTable(dungeon: Dungeon): {
+        table: HTMLDivElement;
+        buttons: HTMLButtonElement[];
+    };
+    createEventStartButton(areaData: AnyCombatArea): HTMLDivElement;
     static difficulty: AreaDifficulty[];
     static attackTypeMedia: {
         melee: string;
@@ -72,10 +81,32 @@ interface CombatAreaData extends IDData {
     difficulty: number[];
     entryRequirements: AnyRequirementData[];
 }
+interface CombatAreaModificationData extends IDData {
+    difficulty?: number[];
+    entryRequirements?: {
+        add?: AnyRequirementData[];
+        remove?: string[];
+    };
+    monsters?: {
+        add?: {
+            monsterID: string;
+            insertAt?: number;
+        }[];
+        remove?: {
+            monsterID: string;
+            removeAt?: number;
+        }[];
+    };
+}
 interface SlayerAreaData extends CombatAreaData {
     areaEffectDescription?: string;
     areaEffect?: AreaEffect;
     pet?: PetChanceData;
+}
+interface SlayerAreaModificationData extends CombatAreaModificationData {
+    areaEffect?: AreaEffect | null;
+    areaEffectDescription?: string | null;
+    pet?: PetChanceData | null;
 }
 interface DungeonData extends CombatAreaData {
     rewardItemIDs: string[];
@@ -88,6 +119,27 @@ interface DungeonData extends CombatAreaData {
     fixedPetClears: boolean;
     pauseOnBosses: boolean;
     nonBossPassives?: string[];
+}
+interface DungeonModificationData extends CombatAreaModificationData {
+    dropBones?: boolean;
+    eventID?: string | null;
+    fixedPetClears?: boolean;
+    floors?: number[] | null;
+    nonBossPassives?: {
+        add?: string[];
+        remove?: string[];
+    };
+    oneTimeRewardID?: string | null;
+    pauseOnBosses?: boolean;
+    pet?: PetChanceData;
+    rewardItemIDs?: {
+        add?: string[];
+        remove?: string[];
+    };
+    unlockRequirement?: {
+        add?: DungeonRequirementData[];
+        remove: string[];
+    };
 }
 interface PetChanceData {
     petID: string;
@@ -103,19 +155,21 @@ declare class CombatArea extends NamespacedObject implements SoftDataDependant<C
     get name(): string;
     difficulty: number[];
     entryRequirements: AnyRequirement[];
-    private _media;
-    protected _name: string;
+    _media: string;
+    _name: string;
     constructor(namespace: DataNamespace, data: CombatAreaData, game: Game);
     registerSoftDependencies(data: CombatAreaData, game: Game): void;
+    applyDataModification(modData: CombatAreaModificationData, game: Game): void;
 }
 declare class SlayerArea extends CombatArea {
     areaEffect?: AreaEffect;
     pet?: PetChance;
     get name(): string;
     get areaEffectDescription(): string;
-    private _areaEffectDescription?;
+    _areaEffectDescription?: string;
     slayerLevelRequired: number;
     constructor(namespace: DataNamespace, data: SlayerAreaData, game: Game);
+    applyDataModification(modData: SlayerAreaModificationData, game: Game): void;
 }
 declare class Dungeon extends CombatArea {
     rewards: AnyItem[];
@@ -131,6 +185,7 @@ declare class Dungeon extends CombatArea {
     nonBossPassives?: CombatPassive[];
     get name(): string;
     constructor(namespace: DataNamespace, data: DungeonData, game: Game);
+    applyDataModification(modData: DungeonModificationData, game: Game): void;
 }
 declare class DummyDungeon extends Dungeon {
     constructor(namespace: DataNamespace, id: string, game: Game);

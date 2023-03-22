@@ -12,9 +12,9 @@ declare class CustomSkillMilestone {
     level: number;
     get name(): string;
     get media(): string;
-    private _name;
-    private _milestoneID?;
-    private _media;
+    _name: string;
+    _milestoneID?: string;
+    _media: string;
     constructor(data: CustomSkillMilestoneData);
 }
 interface EquipItemMilestoneData {
@@ -25,40 +25,40 @@ declare class EquipItemMilestone {
     level: number;
     get name(): string;
     get media(): string;
-    private item;
+    item: EquipmentItem;
     constructor(data: EquipItemMilestoneData, game: Game, skill: AnySkill);
     setLevel(skill: AnySkill): void;
 }
 declare class SkillMasteryMilestone implements MilestoneLike {
-    private skill;
+    skill: AnySkill;
     get level(): number;
     get media(): string;
     get name(): string;
     constructor(skill: AnySkill);
 }
 declare class AgilityObstacleMilestone implements MilestoneLike {
-    private tier;
+    tier: number;
     get level(): number;
     get media(): string;
     get name(): string;
     constructor(tier: number);
 }
 declare class AgilityPillarMilestone implements MilestoneLike {
-    private agility;
+    agility: Agility;
     get level(): number;
     get media(): string;
     get name(): string;
     constructor(agility: Agility);
 }
 declare class AgilityElitePillarMilestone implements MilestoneLike {
-    private agility;
+    agility: Agility;
     get level(): number;
     get media(): string;
     get name(): string;
     constructor(agility: Agility);
 }
 declare class SlayerAreaMilestone implements MilestoneLike {
-    private area;
+    area: SlayerArea;
     level: number;
     get name(): string;
     get media(): string;

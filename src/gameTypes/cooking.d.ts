@@ -19,13 +19,13 @@ interface CookingCategoryModificationData extends IDData {
     shopUpgradeIDs: string[];
 }
 declare class CookingCategory extends SkillCategory {
-    private game;
-    protected skill: Cooking;
+    game: Game;
+    skill: Cooking;
     get media(): string;
     get name(): string;
     get upgradeOwned(): boolean;
-    private get highestUpgrade();
-    private shopUpgrades;
+    get highestUpgrade(): ShopPurchase | undefined;
+    shopUpgrades: ShopPurchase[];
     upgradeRequired: boolean;
     constructor(namespace: DataNamespace, data: CookingCategoryData, game: Game, skill: Cooking);
     applyDataModification(modData: CookingCategoryModificationData, game: Game): void;
@@ -35,27 +35,27 @@ interface CookingSkillData extends MasterySkillData {
     recipes?: CookingRecipeData[];
 }
 declare class Cooking extends CraftingSkill<CookingRecipe, CookingSkillData> {
-    protected readonly _media = "assets/media/skills/cooking/cooking.svg";
-    protected computeTotalMasteryActions(): void;
-    protected getTotalUnlockedMasteryActions(): number;
+    readonly _media = "assets/media/skills/cooking/cooking.svg";
+    computeTotalMasteryActions(): void;
+    getTotalUnlockedMasteryActions(): number;
     renderQueue: CookingRenderQueue;
     categories: NamespaceRegistry<CookingCategory>;
-    protected get actionInterval(): number;
-    protected get actionLevel(): number;
-    protected get masteryAction(): CookingRecipe;
-    protected get masteryModifiedInterval(): number;
+    get actionInterval(): number;
+    get actionLevel(): number;
+    get masteryAction(): CookingRecipe;
+    get masteryModifiedInterval(): number;
     get activeRecipe(): CookingRecipe;
-    protected get noCostsMessage(): string;
-    private get noPassiveCostsMessage();
+    get noCostsMessage(): string;
+    get noPassiveCostsMessage(): string;
     /** Recipes that are selected at each cooking station */
-    private selectedRecipes;
+    selectedRecipes: Map<CookingCategory, CookingRecipe>;
     /** Passive cooking timers */
-    private passiveCookTimers;
+    passiveCookTimers: Map<CookingCategory, Timer>;
     /** Stockpiled items from passive Cooking */
-    private stockpileItems;
+    stockpileItems: Map<CookingCategory, AnyItemQuantity>;
     /** Category that is actively being cooked */
-    private activeCookingCategory?;
-    private canStopPassiveCooking;
+    activeCookingCategory?: CookingCategory;
+    canStopPassiveCooking(category: CookingCategory): boolean;
     /** Map of products/perfect items to recipes. Utilized for food healing mastery bonuses. */
     productRecipeMap: Map<AnyItem, CookingRecipe>;
     ingredientRecipeMap: Map<AnyItem, CookingRecipe>;
@@ -72,27 +72,27 @@ declare class Cooking extends CraftingSkill<CookingRecipe, CookingSkillData> {
     getRecipeCookingInterval(recipe: CookingRecipe): number;
     /** Gets the interval for performing a passive cook with a recipe */
     getRecipePassiveCookingInterval(recipe: CookingRecipe): number;
-    private getRecipeSuccessChance;
-    private getRecipePerfectChance;
-    private getRecipeCosts;
-    protected getCurrentRecipeCosts(): Costs;
-    protected getPreservationChance(action: CookingRecipe, chance: number): number;
-    protected getUncappedDoublingChance(action: CookingRecipe): number;
-    protected recordCostConsumptionStats(costs: Costs): void;
-    protected recordCostPreservationStats(costs: Costs): void;
-    protected preAction(): void;
-    protected get actionRewards(): Rewards;
-    protected postAction(): void;
-    protected addMasteryXPReward(): void;
+    getRecipeSuccessChance(recipe: CookingRecipe): number;
+    getRecipePerfectChance(recipe: CookingRecipe): number;
+    getRecipeCosts(recipe: CookingRecipe): Costs;
+    getCurrentRecipeCosts(): Costs;
+    getPreservationChance(action: CookingRecipe, chance: number): number;
+    getUncappedDoublingChance(action: CookingRecipe): number;
+    recordCostConsumptionStats(costs: Costs): void;
+    recordCostPreservationStats(costs: Costs): void;
+    preAction(): void;
+    get actionRewards(): Rewards;
+    postAction(): void;
+    addMasteryXPReward(): void;
     /** Starts passive cooking in the selected category */
-    private startPassiveCooking;
+    startPassiveCooking(category: CookingCategory): void;
     /** Stops passive cooking in the selected category. Returns true if passive cooking was successfully stopped. */
-    private stopPassiveCooking;
+    stopPassiveCooking(category: CookingCategory): boolean;
     /** Adds an item to the stockpile for the given category */
-    private addItemToStockpile;
+    addItemToStockpile(category: CookingCategory, item: AnyItem, quantity: number): void;
     /** Performs passive cooking for a given category */
-    private passiveCookingAction;
-    protected onStop(): void;
+    passiveCookingAction(category: CookingCategory): void;
+    onStop(): void;
     /** Callback function for when the active cook button is pressed */
     onActiveCookButtonClick(category: CookingCategory): void;
     /** Callback function for when the passive cook button is pressed */
@@ -103,25 +103,27 @@ declare class Cooking extends CraftingSkill<CookingRecipe, CookingSkillData> {
     onRecipeSelectionOpenClick(category: CookingCategory): void;
     /** Callback function for when the collect from stockpile button is pressed */
     onCollectStockpileClick(category: CookingCategory): void;
+    renderModifierChange(): void;
     onModifierChange(): void;
     onEquipmentChange(): void;
-    protected onLevelUp(oldLevel: number, newLevel: number): void;
+    onLevelUp(oldLevel: number, newLevel: number): void;
     getErrorLog(): string;
     onLoad(): void;
     onPageChange(): void;
+    queueBankQuantityRender(item: AnyItem): void;
     render(): void;
-    private renderSelectedRecipes;
-    private renderRecipeRates;
-    private renderRecipeQuantities;
-    private renderProgressBars;
-    private renderStockpile;
-    private renderUpgrades;
-    protected resetActionState(): void;
+    renderSelectedRecipes(): void;
+    renderRecipeRates(): void;
+    renderRecipeQuantities(): void;
+    renderProgressBars(): void;
+    renderStockpile(): void;
+    renderUpgrades(): void;
+    resetActionState(): void;
     encode(writer: SaveWriter): SaveWriter;
     decode(reader: SaveWriter, version: number): void;
     deserialize(reader: DataReader, version: number, idMap: NumericIDMap): void;
     convertFromOldFormat(savegame: NewSaveGame, idMap: NumericIDMap): void;
-    protected getActionIDFromOldID(oldActionID: number, idMap: NumericIDMap): string;
+    getActionIDFromOldID(oldActionID: number, idMap: NumericIDMap): string;
     setFromOldOffline(offline: OfflineCooking | OfflineSkill, idMap: NumericIDMap): void;
     static readonly baseSuccessChance = 70;
 }

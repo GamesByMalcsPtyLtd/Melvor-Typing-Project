@@ -10,8 +10,8 @@ interface ThievingNPCData extends BasicSkillRecipeData {
 declare class ThievingNPC extends BasicSkillRecipe {
     get name(): string;
     get media(): string;
-    private _name;
-    private _media;
+    _name: string;
+    _media: string;
     perception: number;
     maxHit: number;
     maxGP: number;
@@ -28,7 +28,7 @@ declare class ThievingArea extends NamespacedObject {
     get name(): string;
     npcs: ThievingNPC[];
     uniqueDrops: AnyItemQuantity[];
-    private _name;
+    _name: string;
     constructor(namespace: DataNamespace, data: ThievingAreaData, game: Game, thieving: Thieving);
 }
 declare const enum DevilResult {
@@ -76,57 +76,61 @@ declare const enum ThievingStunState {
     AvoidedStun = 2
 }
 declare class Thieving extends GatheringSkill<ThievingNPC, ThievingSkillData> {
-    private stunTimer;
-    protected readonly _media = "assets/media/skills/thieving/thieving.svg";
-    protected getTotalUnlockedMasteryActions(): number;
+    stunTimer: Timer;
+    readonly _media = "assets/media/skills/thieving/thieving.svg";
+    getTotalUnlockedMasteryActions(): number;
     readonly baseInterval = 3000;
     readonly baseStunInterval = 3000;
-    private readonly itemChance;
-    private readonly baseAreaUniqueChance;
+    readonly itemChance = 75;
+    readonly baseAreaUniqueChance = 0.2;
     renderQueue: ThievingRenderQueue;
     areas: NamespaceRegistry<ThievingArea>;
     generalRareItems: GeneralThievingRare[];
-    private entLeprechaunItem?;
-    private crowLeprechaunItem?;
-    private bearLeprechaunItem?;
-    private barItems;
-    private easterEgg?;
-    private currentArea?;
+    entLeprechaunItem?: AnyItem;
+    crowLeprechaunItem?: AnyItem;
+    bearLeprechaunItem?: AnyItem;
+    barItems: AnyItem[];
+    easterEgg?: {
+        equipped: EquipmentItem;
+        positioned: AnyItem;
+        reward: AnyItem;
+    };
+    currentArea?: ThievingArea;
     currentNPC?: ThievingNPC;
-    private hiddenAreas;
+    hiddenAreas: Set<ThievingArea>;
     /** Last area that was active. Used for rendering progressbars */
-    private lastActiveAreaProgressBar?;
+    lastActiveAreaProgressBar?: ThievingArea;
     /** Get the chance of a unique area drop with modifiers */
-    private get areaUniqueChance();
-    protected get masteryAction(): ThievingNPC;
-    protected get actionLevel(): number;
-    protected get canStop(): boolean;
-    protected get avoidStunChance(): number;
-    protected get stunInterval(): number;
+    get areaUniqueChance(): number;
+    get masteryAction(): ThievingNPC;
+    get actionLevel(): number;
+    get canStop(): boolean;
+    get avoidStunChance(): number;
+    get stunInterval(): number;
     constructor(namespace: DataNamespace, game: Game);
     registerData(namespace: DataNamespace, data: ThievingSkillData): void;
     postDataRegistration(): void;
     activeTick(): void;
     getErrorLog(): string;
     render(): void;
-    private renderNPCUnlock;
-    protected resetActionState(): void;
+    renderNPCUnlock(): void;
+    resetActionState(): void;
     encode(writer: SaveWriter): SaveWriter;
     decode(reader: SaveWriter, version: number): void;
     deserialize(reader: DataReader, version: number, idMap: NumericIDMap): void;
-    protected getActionIDFromOldID(oldActionID: number, idMap: NumericIDMap): string;
+    getActionIDFromOldID(oldActionID: number, idMap: NumericIDMap): string;
     onModifierChange(): void;
     onEquipmentChange(): void;
-    protected onLevelUp(oldLevel: number, newLevel: number): void;
+    onLevelUp(oldLevel: number, newLevel: number): void;
     onLoad(): void;
-    protected onStop(): void;
+    onStop(): void;
     stopOnDeath(): void;
-    private notifyStunBlockingAction;
-    private renderMenu;
-    private renderStopButton;
+    notifyStunBlockingAction(): void;
+    renderMenu(): void;
+    renderStopButton(): void;
     renderProgressBar(): void;
     /** Updates the visibility of areas */
-    private renderVisibleAreas;
+    renderVisibleAreas(): void;
     /** Callback function for when thieving area menu panel is clicked */
     onAreaHeaderClick(area: ThievingArea): void;
     /** Determines what should be done when an npc is selected in an area
@@ -139,8 +143,8 @@ declare class Thieving extends GatheringSkill<ThievingNPC, ThievingSkillData> {
     getNPCSleightOfHand(npc: ThievingNPC): number;
     getNPCPickpocket(npc: ThievingNPC): number;
     getStealthAgainstNPC(npc: ThievingNPC): number;
-    protected getFlatIntervalModifier(action: ThievingNPC): number;
-    protected getPercentageIntervalModifier(action: ThievingNPC): number;
+    getFlatIntervalModifier(action: ThievingNPC): number;
+    getPercentageIntervalModifier(action: ThievingNPC): number;
     /** Returns the interval an npc in ms */
     getNPCInterval(npc: ThievingNPC): number;
     getNPCDoublingChance(npc: ThievingNPC): number;
@@ -148,22 +152,22 @@ declare class Thieving extends GatheringSkill<ThievingNPC, ThievingSkillData> {
         minGP: number;
         maxGP: number;
     };
-    private getNPCMinGPRoll;
-    private getNPCGPMultiplier;
+    getNPCMinGPRoll(npc: ThievingNPC): number;
+    getNPCGPMultiplier(npc: ThievingNPC): number;
     getXPModifier(masteryAction?: ThievingNPC): number;
     getMasteryXPModifier(action: ThievingNPC): number;
     /** Method for processing a stunned thieving turn */
-    private stunned;
-    private stunState;
-    private get isStunned();
-    protected get actionRewards(): Rewards;
-    private addJesterHatGP;
-    protected get actionInterval(): number;
-    protected get masteryModifiedInterval(): number;
-    protected startActionTimer(): void;
-    protected preAction(): void;
-    protected postAction(): void;
-    private addStat;
+    stunned(): void;
+    stunState: ThievingStunState;
+    get isStunned(): boolean;
+    get actionRewards(): Rewards;
+    addJesterHatGP(item: AnyItem, rewards: Rewards): void;
+    get actionInterval(): number;
+    get masteryModifiedInterval(): number;
+    startActionTimer(): void;
+    preAction(): void;
+    postAction(): void;
+    addStat(stat: ThievingStats, amount?: number): void;
     testTranslations(): void;
     static readonly DevilTable: [number, number, number][];
     static readonly OtherDevilTable: [number, number, number][];
