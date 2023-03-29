@@ -1,4 +1,6 @@
 # Changelog
+## v1.11.2
+  - Improved the type definitions for Class method and property patching
 ## v1.11.1
   - Update types to match game version V1.1.1 (?5064)
   - Added missing type definition file for GameDataPackage

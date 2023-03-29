@@ -1,4 +1,4 @@
-namespace Modding {
+declare namespace Modding {
   type ModId = number;
 
   /** mod.io typedefs */
@@ -560,27 +560,34 @@ namespace Modding {
     expires: Date;
   }
 
-  interface PatchMap<C extends ClassHandle> extends Map<C, Map<ClassMethod<C> | ClassProperty<C>, {
+  type ClassPatches<C extends ClassHandle> = Map<ClassMethod<C>|ClassProperty<C>, {
     mods: Set<Mod>,
-    patcher: MethodPatch<C> | PropertyPatch<C>
-  }>> { }
+    patcher: MethodPatch<C, ClassMethod<C>> | PropertyPatch<C, ClassProperty<C>>
+  }>
+  interface PatchMap extends Map<ClassHandle, ClassPatches<ClassHandle>> {
+    get<C extends ClassHandle>(key: C): ClassPatches<C>;
+  }
 
   interface MethodPatch<C extends ClassHandle, M extends ClassMethod<C>> {
-    before(patch: BeforePatch<C['prototype'][M]>): void;
-    replace(patch: ReplacePatch<C['prototype'][M]>): void;
-    after(patch: AfterPatch<C['prototype'][M]>): void;
+    before(patch: BeforePatch<C, C['prototype'][M]>): void;
+    replace(patch: ReplacePatch<C,C['prototype'][M]>): void;
+    after(patch: AfterPatch<C, C['prototype'][M]>): void;
   }
 
   interface PropertyPatch<C extends ClassHandle, P extends ClassProperty<C>> {
-    get(getter: (o: () => C[P]) => C[P]): void;
-    set(setter: (o: (val: C[P]) => void, val: C[P]) => void): void;
-    replace(getter: () => C[P], setter: (o: (val: C[P]) => void, val: C[P]) => void);
+    get(getter: GetterPatch<C,P>): void;
+    set(setter: SetterPatch<C,P>): void;
+    replace(getter: GetterPatch<C,P>, setter: SetterPatch<C,P>): void;
   }
+  type GetterPatch<C extends ClassHandle, P extends ClassProperty<C>> = (this: InstanceType<C>, o: () => C['prototype'][P]) => C['prototype'][P];
+  type SetterPatch<C extends ClassHandle, P extends ClassProperty<C>> = (this: InstanceType<C>, o: (val: C['prototype'][P]) => void, val: C['prototype'][P]) => void;
 
-  type BeforePatch<M extends Function> = (...args: Parameters<M>) => Parameters<M> | undefined;
-  type AfterPatch<M extends Function> = (returnValue: ReturnType<M>, ...args: Parameters<M>) => ReturnType<M> | undefined;
-  type PatchedMethod<M extends Function> = (...args: Parameters<M>) => ReturnType<M>;
-  type ReplacePatch<M extends Function> = (replacedMethod: (...args: Parameters<M>) => ReturnType<M>, ...args: Parameters<M>) => ReturnType<M>;
+  type AnyFunction = (...args: any) => any;
+  type BeforePatch<C extends ClassHandle, M extends AnyFunction> = (this: InstanceType<C>, ...args: Parameters<M>) => Parameters<M> | void;
+  type AfterPatch<C extends ClassHandle, M extends AnyFunction> = (this: InstanceType<C>, returnValue: ReturnType<M>, ...args: Parameters<M>) => ReturnType<M> | void;
+  type ReplacePatch<C extends ClassHandle, M extends AnyFunction> = (this: InstanceType<C>, replacedMethod: (...args: Parameters<M>) => ReturnType<M>, ...args: Parameters<M>) => ReturnType<M>;
+
+  type MethodOrPropertyPatch<C extends ClassHandle, T extends ClassMethod<C>|ClassProperty<C>> = T extends ClassMethod<C> ? MethodPatch<C, T> : T extends ClassProperty<C> ? PropertyPatch<C,T> : never;
 
   interface ModContext {
     name: string;
@@ -623,8 +630,8 @@ namespace Modding {
     onInterfaceReady: (callback: Modding.LifecycleCallback) => void;
     share: (resourcePath: string) => void;
     api: (endpoints: Record<string, unknown>) => any;
-    patch: <C extends ClassHandle>(_class: C, methodName: ClassMethod<C>) => Modding.MethodPatch<C, ClassMethod<C>>;
-    isPatched: <C extends ClassHandle>(_class: C, methodName: ClassMethod<C>) => boolean;
+    patch: <C extends ClassHandle, MorP extends ClassMethod<C>|ClassProperty<C>>(_class: C, methodOrPropertyName: MorP) => MethodOrPropertyPatch<C,MorP>;
+    isPatched: <C extends ClassHandle>(_class: C, methodOrPropertyName: ClassMethod<C>|ClassProperty<C>) => boolean;
   }
 
   interface CreatorToolkitContext extends ModContext {
