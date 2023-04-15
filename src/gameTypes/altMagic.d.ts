@@ -103,6 +103,7 @@ declare class AltMagic extends CraftingSkill<AltMagicSpell, MagicSkillData> {
     recordCostPreservationStats(costs: Costs): void;
     /** Returns the modified GP to add when casting alchemy spells */
     getAlchemyGP(item: AnyItem, conversionRatio: number): number;
+    get selectSpellTotalBaseXP(): number;
     /** Performs the main action for Alt. Magic, stopping if required resources or runes are not met */
     action(): void;
     get selectedSpellDoublingChance(): number;

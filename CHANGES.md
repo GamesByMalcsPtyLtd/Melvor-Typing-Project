@@ -1,4 +1,6 @@
 # Changelog
+## v1.12.0
+  - Updated types to match game version V1.1.2 (?5867)
 ## v1.11.2
   - Improved the type definitions for Class method and property patching
 ## v1.11.1

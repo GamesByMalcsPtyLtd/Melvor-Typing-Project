@@ -53,7 +53,7 @@ declare class ArtisanMenu<ProductType extends Item> extends ContainedComponent {
     setIngredientsFromRecipe(recipe: ArtisanSkillRecipe): void;
     setProduct(item: ProductType, qty: number): void;
     updateQuantities(): void;
-    updateGrants(xp: number, masteryXP: number, poolXP: number): void;
+    updateGrants(xp: number, baseXP: number, masteryXP: number, baseMasteryXP: number, poolXP: number): void;
     updateChances(preserveChance: number, doublingChance: number): void;
     updateInterval(interval: number): void;
     setCreateCallback(callback: VoidFunction): void;

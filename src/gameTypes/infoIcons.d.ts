@@ -39,17 +39,23 @@ declare abstract class InfoIcon extends ContainedComponent {
 }
 declare class XPIcon extends InfoIcon {
     xp: number;
-    constructor(parent: HTMLElement, xp: number, size?: Resize);
-    setXP(xp: number): void;
+    baseXP: number;
+    constructor(parent: HTMLElement, xp: number, baseXP: number, size?: Resize);
+    setXP(xp: number, baseXP: number): void;
     localize(): void;
-    getTooltipContent(xp: number): string;
+    getTooltipContent(xp: number, baseXP: number): string;
+    getTextClass(value: number): string;
+    getTextClassSymbol(value: number): string;
 }
 declare class STRXPIcon extends InfoIcon {
     xp: number;
-    constructor(parent: HTMLElement, xp: number, size?: Resize);
-    setXP(xp: number): void;
+    baseXP: number;
+    constructor(parent: HTMLElement, xp: number, baseXP: number, size?: Resize);
+    setXP(xp: number, baseXP: number): void;
     localize(): void;
-    getTooltipContent(xp: number): string;
+    getTooltipContent(xp: number, baseXP: number): string;
+    getTextClass(value: number): string;
+    getTextClassSymbol(value: number): string;
 }
 declare class IntervalIcon extends InfoIcon {
     constructor(parent: HTMLElement, interval: number, size?: Resize, altMedia?: boolean);
@@ -84,10 +90,13 @@ declare class CookingSuccessIcon extends InfoIcon {
 }
 declare class MasteryXPIcon extends InfoIcon {
     xp: number;
-    constructor(parent: HTMLElement, xp: number, size?: Resize);
+    baseXP: number;
+    constructor(parent: HTMLElement, xp: number, baseXP: number, size?: Resize);
     localize(): void;
-    setXP(xp: number): void;
-    getTooltipContent(): string;
+    setXP(xp: number, baseXP: number): void;
+    getTooltipContent(xp: number, baseXP: number): string;
+    getTextClass(value: number): string;
+    getTextClassSymbol(value: number): string;
 }
 declare class MasteryPoolIcon extends InfoIcon {
     xp: number;
@@ -182,4 +191,13 @@ declare class SCCurrentIcon extends QtyCurrentIcon {
     constructor(parent: HTMLElement, requiredQty: number, size?: Resize);
     getCurrentQty(): number;
     getName(): string;
+}
+declare class TownshipResourceIcon extends InfoIcon {
+    resource: TownshipResource;
+    qty: number;
+    constructor(parent: HTMLElement, resource: TownshipResource, qty: number, size?: Resize);
+    setQty(qty: number): void;
+    localize(): void;
+    getTooltipContent(): string;
+    getSymbol(): string;
 }

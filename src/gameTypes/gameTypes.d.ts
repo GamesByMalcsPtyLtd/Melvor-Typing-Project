@@ -355,8 +355,8 @@ interface OfflineTuple extends OfflineBase {
 }
 declare type OldOffline = OfflineWoodcut | OfflineTuple | OfflineUnset | OfflineSkill | OfflineMagic | OfflineCooking | OfflineNoAction;
 
-type LanguageData = Record<LanguageCategory,StringDictionary<string>>;
-type SupportedLanguage = 'en'|'zh-CN'|'zh-TW'|'fr'|'de'|'it'|'ko'|'ja'|'pt'|'pt-br'|'es'|'ru'|'tr'|'lemon';
+type LanguageData = Record<string,string>;
+type SupportedLanguage = 'en'|'zh-CN'|'zh-TW'|'fr'|'de'|'it'|'ko'|'ja'|'pt'|'pt-br'|'es'|'ru'|'tr'|'lemon'|'carrot';
 declare type OldCategoryData<T> = {
   id: T;
   name: string;

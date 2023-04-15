@@ -31,8 +31,7 @@ declare function getKeyForSaveSlot(slotID: number): string;
 declare function setItem(key: string, value: any): void;
 declare function getItem(key: string): any;
 declare function removeItem(key: string): void;
-declare let firstSkillAction: boolean;
-declare function saveData(vars?: 'all' | 'offline' | true): void;
+declare function saveData(): void;
 /** Gets a savegame in the old localstorage format */
 declare function getSaveGameOld(keyPrefix: string): NewSaveGame;
 /** Removes a savegame in the old localstorage format */
@@ -147,9 +146,9 @@ declare let inFocus: boolean;
 declare const onloadEvent: (accessCheck?: boolean) => void;
 declare function confirmedAuthenticated(): void;
 declare function checkIfAuthenticated(): Promise<void>;
-declare const INTERFACE_VERSION = 25;
+declare const INTERFACE_VERSION = 29;
 declare function loadGameInterface(accessCheck?: boolean): Promise<void>;
-declare const DATA_VERSION = 93;
+declare const DATA_VERSION = 106;
 declare function loadGameData(): Promise<void>;
 declare function changePageCharacterSelection(page: CharacterSelectPage): void;
 /** Future announcement handler that will occur dynamically. For now this is hard coded. */

@@ -49,6 +49,7 @@ declare class Item extends NamespacedObject {
     _altMedia?: string;
     constructor(namespace: DataNamespace, data: BaseItemData);
     applyDataModification(modData: BaseItemModificationData, game: Game): void;
+    overrideMedia(media: string): void;
 }
 /** Dummy items used for placeholders for official game content that is not registered */
 declare class DummyItem extends Item {

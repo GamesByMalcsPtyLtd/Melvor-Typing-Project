@@ -1,6 +1,6 @@
 /** Global Game Object */
 declare let game: Game;
-declare let showCombatArea: (areaType: CombatAreaType) => void;
+declare let showCombatArea: (areaType: 'Combat' | 'Slayer' | 'Dungeon') => void;
 declare let skillNav: SkillNav;
 declare let skillProgressDisplay: SkillProgressDisplay;
 declare let spendMasteryMenu: SpendMasteryMenu;

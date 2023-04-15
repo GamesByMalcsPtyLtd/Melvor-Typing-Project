@@ -40,5 +40,12 @@ declare const enum Assets {
     RuneArrows = "assets/media/bank/ammo_arrow_rune.png",
     FireRune = "assets/media/bank/rune_fire.png",
     Whale = "assets/media/bank/whale_cooked.png",
-    GuardianAmulet = "assets/media/bank/guardian_amulet.png"
+    GuardianAmulet = "assets/media/bank/guardian_amulet.png",
+    TownshipPopulation = "assets/media/skills/township/population.svg",
+    TownshipHappiness = "assets/media/skills/township/happiness.svg",
+    TownshipEducation = "assets/media/skills/township/education.svg",
+    TownshipHealth = "assets/media/skills/township/health.svg",
+    TownshipStorage = "assets/media/skills/township/storage.svg",
+    TownshipWorship = "assets/media/skills/township/worship.svg",
+    ErrorIcon = "assets/media/main/error.svg"
 }

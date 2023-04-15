@@ -174,7 +174,7 @@ declare type PackagedSave = {
     cd: number[];
 };
 declare const saveFormat2Version = 21;
-declare const currentSaveVersion = 36;
+declare const currentSaveVersion = 50;
 interface AddRemove<T> {
     add: T[];
     remove: T[];

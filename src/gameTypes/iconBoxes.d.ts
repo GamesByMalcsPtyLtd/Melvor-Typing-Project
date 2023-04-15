@@ -47,7 +47,7 @@ declare class GrantsBox extends IconBox<InfoIcon> {
     masteryPoolIcon: MasteryPoolIcon;
     constructor(parent: HTMLElement, smallName: boolean, containerClasses?: string[], size?: Resize, iconContClasses?: string[]);
     localize(): void;
-    updateGrants(xp: number, masteryXP: number, poolXP: number): void;
+    updateGrants(xp: number, baseXP: number, masteryXP: number, baseMasteryXP: number, poolXP: number): void;
     hideMastery(): void;
 }
 declare class CookingBonusBox extends IconBox<InfoIcon> {

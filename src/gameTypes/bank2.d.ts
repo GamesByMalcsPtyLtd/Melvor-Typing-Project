@@ -134,9 +134,11 @@ declare class Bank implements EncodableObject {
      * @param logLost If the item should be logged as lost if it does not fit
      * @param found If the item should contribute to item statistics
      * @param ignoreSpace If the item should ignore conventional bank space limits
+     * @param notify Whether to show a notification when the item is added
+     * @param itemSource The source of the item, where it came from
      * @returns True if the item was successfully added to the bank
      */
-    addItemByID(itemID: string, quantity: number, logLost: boolean, found: boolean, ignoreSpace?: boolean): void;
+    addItemByID(itemID: string, quantity: number, logLost: boolean, found: boolean, ignoreSpace?: boolean, notify?: boolean, itemSource?: string): void;
     /**
      * @description Adds the given quantity of the item to the bank
      * @param item The item to add
@@ -144,9 +146,11 @@ declare class Bank implements EncodableObject {
      * @param logLost If the item should be logged as lost if it does not fit
      * @param found If the item should contribute to item statistics
      * @param ignoreSpace If the item should ignore conventional bank space limits
+     * @param notify Whether to show a notification when the item is added
+     * @param itemSource The source of the item, where it came from
      * @returns True if the item was successfully added to the bank
      */
-    addItem(item: AnyItem, quantity: number, logLost: boolean, found: boolean, ignoreSpace?: boolean, notify?: boolean): boolean;
+    addItem(item: AnyItem, quantity: number, logLost: boolean, found: boolean, ignoreSpace?: boolean, notify?: boolean, itemSource?: string): boolean;
     /**
      * Removes the given quantity of the item from the bank
      * @param item The item to remove

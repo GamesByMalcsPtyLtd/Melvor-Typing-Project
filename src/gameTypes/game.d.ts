@@ -97,6 +97,8 @@ declare class Game implements Serializable, EncodableObject {
     township: Township;
     lore: Lore;
     eventManager: EventManager;
+    notifications: NotificationsManager;
+    telemetry: Telemetry;
     dropWeightCache: Map<[number, number, number][], number>;
     refundedAstrology: boolean;
     refundedAstrologyAgain: boolean;
@@ -222,9 +224,11 @@ declare class Game implements Serializable, EncodableObject {
     /** Renders which skills are active in the sidebar */
     renderActiveSkills(): void;
     loop(): void;
-    getErrorLog(error: unknown, title: string): string;
+    getErrorLog(error: unknown, title: string, modError: Modding.ModError): string;
     showBrokenGame(error: unknown, title: string): void;
     clearActiveAction(save?: boolean): void;
+    /** Clears an action that was paused or active, if it is in either state */
+    clearActionIfActiveOrPaused(action: ActiveAction): void;
     getOfflineTimeDiff(): {
         timeDiff: number;
         originalTimeDiff: number;
@@ -237,6 +241,18 @@ declare class Game implements Serializable, EncodableObject {
     /** Puts the game in a state where offline will progress the amount specified */
     testForOffline(timeToGoBack: number): Promise<void>;
     testCombatInitializationStatParity(): void;
+    /** If a save is scheduled to happen outside of the auto-save interval */
+    _isSaveScheduled: boolean;
+    /** Schedules a save to occur after the next game loop */
+    scheduleSave(): void;
+    /** Handles checking if an auto or scheduled save should occur */
+    autoSave(time: number): void;
+    /** The last timestamp when rich presence was updated */
+    _lastRichPresenceUpdate: number;
+    updateRichPresence(time: number): void;
+    /** The last timestamp when the cloud was updated */
+    _lastCloudUpdate: number;
+    cloudUpdate(time: number): void;
     generateSaveString(): string;
     /** Attempts to get a header from a save string. If save is invalid, returns undefined instead. */
     getHeaderFromSaveString(saveString: string): Promise<SaveGameHeader | SaveLoadError>;
@@ -291,6 +307,12 @@ declare class Game implements Serializable, EncodableObject {
     /** Takes the old offline variable and converts it to the new skill format */
     convertOldOffline(offline: OldOffline, idMap: NumericIDMap): void;
 }
+/** Time between auto-saves in [ms] */
+declare const AUTO_SAVE_INTERVAL = 10000;
+/** Time between checking for updates to the cloud in [ms] */
+declare const CLOUD_UPDATE_INTERVAL = 10000;
+/** Time between rich presence updates in [ms] */
+declare const RICH_PRESENCE_UPDATE_INTERVAL = 10000;
 declare type DummyData = {
     dataNamespace: DataNamespace;
     localID: string;
@@ -315,6 +337,8 @@ interface OfflineSnapshot {
     onyxNode: MiningNodeSnapshot;
     orichaNode: MiningNodeSnapshot;
     ceruleanNode: MiningNodeSnapshot;
+    townshipHealth: number;
+    townshipStorageFull: boolean;
 }
 interface MiningNodeSnapshot {
     totalFound: number;

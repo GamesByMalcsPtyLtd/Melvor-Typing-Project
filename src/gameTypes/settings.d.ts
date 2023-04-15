@@ -81,7 +81,7 @@ interface BooleanSettings {
     enableAutoEquipFood: boolean;
     /** If the auto-swap food upgrade is enabled */
     enableAutoSwapFood: boolean;
-    /** If perfect items can be recieved from Cooking */
+    /** If perfect items can be received from Cooking */
     enablePerfectCooking: boolean;
     /** If confirmation modals should be shown when destroying crops in farming */
     showCropDestructionConfirmations: boolean;
@@ -121,6 +121,14 @@ interface BooleanSettings {
     enableQuickConvert: boolean;
     /** If locked Township buildings should be shown */
     showLockedTownshipBuildings: boolean;
+    /** Whether to use the notifications v2 system or not */
+    useNewNotifications: boolean;
+    /** Whether to display item names in notifications v2 */
+    showItemNamesInNotifications: boolean;
+    /** Notifications v2: Whether summoning mark notifications are important */
+    importanceSummoningMarkFound: boolean;
+    /** Notifications v2: Whether error notifications are important */
+    importanceErrorMessages: boolean;
 }
 interface ChoiceSettings {
     /** If special attack modifiers should use neutral colours */
@@ -133,6 +141,10 @@ interface ChoiceSettings {
     bankSortOrder: BankSortOrderSetting;
     /** Unused. Determines colour blind mode that is applied to the game. */
     colourBlindMode: ColourBlindModeSetting;
+    /** Determine the Horizontal Position of new notifications */
+    notificationHorizontalPosition: NotificationHorizontalPositions;
+    /** Determine the Horizontal Position of new notifications */
+    notificationDisappearDelay: number;
 }
 interface SettingData<T> {
     /** The current value of the setting */
@@ -227,10 +239,16 @@ declare class Settings implements EncodableObject, BooleanSettings, ChoiceSettin
     get enableEyebleachMode(): boolean;
     get enableQuickConvert(): boolean;
     get showLockedTownshipBuildings(): boolean;
+    get useNewNotifications(): boolean;
+    get showItemNamesInNotifications(): boolean;
+    get importanceSummoningMarkFound(): boolean;
+    get importanceErrorMessages(): boolean;
     get defaultPageOnLoad(): Page;
     get formatNumberSetting(): NumberFormatSetting;
     get bankSortOrder(): BankSortOrderSetting;
     get colourBlindMode(): ColourBlindModeSetting;
+    get notificationHorizontalPosition(): NotificationHorizontalPositions;
+    get notificationDisappearDelay(): number;
     constructor(game: Game);
     postDataRegistration(): void;
     encode(writer: SaveWriter): SaveWriter;

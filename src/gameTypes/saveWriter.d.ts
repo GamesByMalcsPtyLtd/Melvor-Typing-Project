@@ -81,6 +81,10 @@ declare class BinaryWriter {
     getBuffer(): ArrayBuffer;
     /** Gets a buffer of a fixed length */
     getFixedLengthBuffer(length: number): ArrayBuffer;
+    /** Tells the reader to skip ahead by length bytes */
+    skipBytes(length: number): void;
+    /** Tells the reader to skip ahead as if an array with elements that encoded elementByteLength bytes each */
+    skipArrayBytes(elementByteLength: number): void;
     /** Writes a bigint as a signed 64-bit integer */
     writeBigInt64(value: bigint): void;
     /** Writes a bigint as an unsigned 64-bit integer */

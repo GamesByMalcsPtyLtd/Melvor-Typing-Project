@@ -7,9 +7,9 @@ declare function generateGaussianNumber($mean: number, $stdDev: number): number;
 declare function getMean(numActions: number, probability: number): number;
 declare function getStdDev(numActions: number, probability: number): number;
 /** Modifies baseStat by modifier
- *   @param type 0 applies a percentage bonus, 1 applies an additive bonus, 2: applies a negative additive bonus, 3: multiplies base number by percentage
+ *   @param type 0 applies a percentage bonus, 1 applies an additive bonus, 2: applies a negative additive bonus, 3: multiplies base number by percentage, 4: same as 3 without flooring
  */
-declare function applyModifier(baseStat: number, modifier: number, type?: 0 | 1 | 2 | 3): number;
+declare function applyModifier(baseStat: number, modifier: number, type?: 0 | 1 | 2 | 3 | 4): number;
 declare function binomial_distribution(n: number, p: number, epsilon?: number): number[];
 declare function sample_from_binomial(numberTrials: number, chance: number): number;
 /**
@@ -101,12 +101,12 @@ declare function level99Notify(skill: AnySkill): void;
 /** Fires a resource preservation notification */
 declare function notifyPreserve(skill: AnySkill): void;
 /** Fires a generic notification, with the image of the skill specified */
-declare function notifyPlayer(skill: AnySkill | -1, message: string, messageTheme?: StandardTheme): void;
+declare function notifyPlayer(skill: AnySkill | -1, message: string, messageTheme?: StandardTheme, quantity?: number): void;
 /** Fires a notification that skill gloves have run out of charges */
 declare function notifyItemCharges(item: EquipmentItem): void;
 /** Fires a notification that a tutorial task was completed */
 declare function tutorialNotify(): void;
-declare function currencyNotify(media: string, amount: number): void;
+declare function currencyNotify(type: string, amount: number): void;
 /** Queues a modal notifying the player of a mastery level up for the specified skill and masteryID */
 declare function notifyMasteryLevelUp(action: MasteryAction, newLevel: number): void;
 declare function notify99ItemMastery(action: MasteryAction): void;
@@ -211,7 +211,7 @@ declare function templateString(string: string, templateData: StringDictionary<s
  * @param identifier The identifier for the language string to template
  * @param templateData An object containing replacements strings e.g. {example: "true text"}
  */
-declare function templateLangString(category: LanguageCategory, identifier: string | number, templateData: StringDictionary<string>): string;
+declare function templateLangString(identifier: string, templateData: StringDictionary<string>): string;
 declare function milliToSeconds(ms: number): number;
 declare function multiplyByNumberMultiplier(value: number): number;
 declare function divideByNumberMultiplier(value: number): number;
@@ -219,7 +219,7 @@ declare function animateProgress(div: string, interval: number, stayFull?: boole
 declare function resetProgressAnimation(div: string): void;
 /** Gets the dom nodes for `Unlocked at ${image} level ${level}' */
 declare function getUnlockedAtNodes(skill: AnySkill, level: number): (HTMLImageElement | Text)[];
-declare function templateLangStringWithNodes(category: LanguageCategory, id: string | number, nodeData: StringDictionary<Node>, textData: StringDictionary<string>, clone?: boolean): (Node | string)[];
+declare function templateLangStringWithNodes(id: string | number, nodeData: StringDictionary<Node>, textData: StringDictionary<string>, clone?: boolean): (Node | string)[];
 declare function templateStringWithNodes(string: string, nodeData: StringDictionary<Node>, textData: StringDictionary<string>, clone?: boolean): (string | Node)[];
 /** Formats a number in it's ordinal form
  *  @example formatAsOrdinal(1) // '1st'
@@ -250,7 +250,7 @@ declare function formatAsTimePeriod(timeInMs: number): string;
 /** Locally formats a time period in ms using shorthand terminology
  * @example formatAsTimePeriod(1000) // '1s'
  */
-declare function formatAsShorthandTimePeriod(timeInMs: number): string;
+declare function formatAsShorthandTimePeriod(timeInMs: number, roundSeconds?: boolean): string;
 declare function successSpan(content: string): string;
 declare function getTemplateElement(templateID: string): HTMLTemplateElement;
 declare function getTemplateNode(templateID: string): Node;
@@ -326,34 +326,17 @@ declare class SparseNumericMap<T> {
 declare function escapeRegExp(string: string): string;
 declare function generateComponentClass(templateID: string, tagName: string, className: string): string;
 declare function generateModifierDataSchema(): string;
-declare type TownshipResourceType = 'Currency' | 'Raw' | 'Product';
-declare enum TownshipResourceTypeID {
-    Currency = 0,
-    Raw = 1,
-    Product = 2
-}
-declare type BuildingType = 'House' | 'Gathering' | 'Production' | 'Storage' | 'Education' | 'Other';
-declare enum BuildingTypeID {
-    House = 0,
-    Gathering = 1,
-    Production = 2,
-    Storage = 3,
-    Education = 4,
-    Other = 5
-}
-interface Citizen {
-    job: TownshipJob;
-    ticksAlive: number;
-    source: CitizenSource;
-}
-declare enum CitizenSource {
-    Birth = 0,
-    Migration = 1
-}
-interface Statue {
-    name: string;
-    media: string;
-}
+declare function getRequirementTextClass(met: boolean): "text-success" | "text-danger";
+declare function createUnlockElement(costNodes: (string | Node)[], met: boolean): HTMLDivElement;
+declare function printUnlockRequirements(requirements: AnyRequirement[]): HTMLDivElement[];
+declare function printUnlockRequirementsAsHTML(requirements: AnyRequirement[]): string[];
+declare function isRequirementMet(requirements: AnyRequirement[]): boolean;
+/**
+ * Create an immutable clone of an array or object
+ * @param  {*} obj The array or object to copy
+ * @return {*}     The clone of the array or object
+ */
+declare function createCopyOfObject(obj: any): any;
 declare function formatAsSHTimePeriod(timeInMs: number): string;
 declare function getMAsTime(time: number): {
     years: number;
@@ -394,11 +377,6 @@ declare enum PushNotificationType {
 }
 interface SteamPurchaseResult {
     isOwned: boolean;
-}
-interface BuildingSortList {
-    showAll: boolean[];
-    buildingType: boolean[];
-    resource: boolean[];
 }
 declare type AgilityBlueprintData = {
     name: string;

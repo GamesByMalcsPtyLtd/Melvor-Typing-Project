@@ -47,6 +47,7 @@ declare class SpendMasteryMenuItem extends HTMLElement {
     xpRequired: HTMLSpanElement;
     progressBar: HTMLDivElement;
     levelUpButton: HTMLButtonElement;
+    masteryName: HTMLSpanElement;
     actionTooltip?: TippyTooltip;
     constructor();
     connectedCallback(): void;

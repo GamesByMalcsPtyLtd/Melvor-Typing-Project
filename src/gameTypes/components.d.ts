@@ -5,7 +5,7 @@ declare class LangString extends HTMLElement {
     attributeChangedCallback(name: LangStringAttribute, oldValue: string, newValue: string): void;
     static get observedAttributes(): LangStringAttribute[];
 }
-declare type LangStringAttribute = 'lang-cat' | 'lang-id';
+declare type LangStringAttribute = 'lang-id';
 declare class ItemChargeDisplay extends HTMLElement {
     _content: DocumentFragment;
     itemImage: HTMLImageElement;

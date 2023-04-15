@@ -104,6 +104,7 @@ declare class Monster extends NamespacedObject {
     };
     constructor(namespace: DataNamespace, data: MonsterData, game: Game);
     applyDataModification(modData: MonsterModificationData, game: Game): void;
+    overrideMedia(media: string): void;
 }
 declare class DummyMonster extends Monster {
     constructor(namespace: DataNamespace, id: string, game: Game);

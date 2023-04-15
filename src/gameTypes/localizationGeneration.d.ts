@@ -1,9 +1,8 @@
 declare type LangJsonData = Record<Exclude<SupportedLanguage, 'lemon'>, LanguageData>;
 declare let LANGJSON: LangJsonData;
 declare let allLangJsons: LanguageData[];
-declare function fillLanguageIdentifiers(category: LanguageCategory, identifier: string | number): void;
-declare function applyEnglishKey(category: LanguageCategory, identifier: string | number, value: string): void;
-declare function createBlankLanguageCategories(category: LanguageCategory): void;
+declare function fillLanguageIdentifiers(identifier: string): void;
+declare function applyEnglishKey(identifier: string, value: string): void;
 declare function setupLangJSON(download?: boolean): Promise<void>;
 declare function langCreateCSV(): Promise<void>;
 declare function formatStringForCSV(text: string): string;

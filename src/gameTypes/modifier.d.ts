@@ -797,6 +797,12 @@ declare class PlayerModifiers extends CombatModifiers implements StandardModifie
     increased5DROnBeingHit: number;
     allowNonMagicCurses: number;
     increasedTownshipTraderStock: number;
+    increasedEssenceFromMining: number;
+    increasedMasteryTokens: number;
+    decreasedTownshipRepairCost: number;
+    decreasedTownshipTraderCost: number;
+    enableNightfallSeason: number;
+    enableSolarEclipseSeason: number;
     skillModifiers: Map<SkillModifierKeys, Map<AnySkill, number>>;
     constructor();
     get combatLootDoubleChance(): number;
@@ -1960,6 +1966,12 @@ interface StandardModifierObject<Standard> extends CombatModifierObject<Standard
     increased5DROnBeingHit: Standard;
     allowNonMagicCurses: Standard;
     increasedTownshipTraderStock: Standard;
+    increasedEssenceFromMining: Standard;
+    increasedMasteryTokens: Standard;
+    decreasedTownshipRepairCost: Standard;
+    decreasedTownshipTraderCost: Standard;
+    enableNightfallSeason: Standard;
+    enableSolarEclipseSeason: Standard;
 }
 interface SkillModifierObject<Skill> {
     /** Increases the skill level used to compute combat stats by value: Implemented */

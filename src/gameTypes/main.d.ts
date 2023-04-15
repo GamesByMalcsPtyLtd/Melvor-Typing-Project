@@ -5,7 +5,7 @@ declare const DEBUGENABLED = false;
 declare const releaseDate = 1637258400000;
 declare const DEBUG_REPORTER: string[];
 declare const CDNDIR: string;
-declare const gameTitle = "Melvor Idle :: v1.1.1";
+declare const gameTitle = "Melvor Idle :: v1.1.2";
 declare let currentTitleNewsID: string[];
 declare let playFabEventQueue: {
     eventName: string;
@@ -37,11 +37,6 @@ declare let offlineModalID: number;
 /** Removes old variables from localstorage, and fixes invalid bank tabs */
 declare function cleanSaveFile(): void;
 declare function getCloudSaveHeartbeatInterval(): number;
-declare const tenSeconds = 10000;
-declare let tenSecondUpdateTimeout: number;
-declare let gameVersionChecker: number;
-/** Updates that happen every 10 seconds */
-declare function updateEvery10Seconds(): void;
 declare const isAdsPath: () => boolean;
 /**
  * DEPRECATED
@@ -97,3 +92,6 @@ declare function resetSkillsTo99(confirmed?: boolean): void;
 declare function setBackground(id: number): void;
 declare const announcekit: any;
 declare function initChangelog(): void;
+/** CORE GAME FUNCTIONS */
+declare function updateAllGameMedia(): void;
+declare function updateGameMedia(media: string): void;

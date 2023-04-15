@@ -519,6 +519,13 @@ declare namespace Modding {
   }
 
   type ModBasic = Pick<Mod,'id'|'name'|'version'>;
+
+  type ModError = {
+    /** An array of basic information on the mods causing the error. Array is empty if no mods are detected, the exception is not an error, or stack traces are not available. */
+    mods: ModBasic[],
+    /** A modified stack trace from the original error, with resource URLs replaced with the mod url */
+    stack: string
+  }
   
   /** A mod's categorized tags. */
   interface ModTags {

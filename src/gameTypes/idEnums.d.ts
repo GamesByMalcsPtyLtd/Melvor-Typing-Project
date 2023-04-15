@@ -4320,6 +4320,14 @@ declare const enum TownshipWorshipIDs {
     Bane = "melvorF:Bane",
     Lemon = "melvorF:Lemon"
 }
+declare const enum TownshipSeasonIDs {
+    Spring = "melvorF:Spring",
+    Summer = "melvorF:Summer",
+    Fall = "melvorF:Fall",
+    Winter = "melvorF:Winter",
+    Nightfall = "melvorF:Nightfall",
+    SolarEclipse = "melvorF:SolarEclipse"
+}
 declare const enum TownshipJobIDs {
     Unemployed = "melvorD:Unemployed",
     Blacksmith = "melvorF:Blacksmith",

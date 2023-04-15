@@ -6,6 +6,8 @@ declare enum CombatAreaType {
 }
 /** Interval between combat ticks in ms */
 declare const TICK_INTERVAL = 50;
+/** Number of ticks contained in a second */
+declare const TICKS_PER_SECOND: number;
 /** Number of ticks contained in a minute */
 declare const TICKS_PER_MINUTE: number;
 interface CombatEventData extends IDData {
@@ -71,7 +73,7 @@ declare class CombatManager extends BaseManager implements PassiveAction {
     spiderLairMonsters: Monster[];
     get isFightingITMBoss(): boolean;
     /** Currently open area menu */
-    openCombatAreaMenu: CombatAreaType;
+    openCombatAreaMenu: 'None' | 'Combat' | 'Slayer' | 'Dungeon';
     get onSlayerTask(): boolean;
     get ignoreSpellRequirements(): boolean;
     get canInteruptAttacks(): boolean;
@@ -141,7 +143,8 @@ declare class CombatManager extends BaseManager implements PassiveAction {
     resumeDungeon(): void;
     onSelection(): void;
     /** Callback function for opening combat area */
-    openAreaMenu(areaType: CombatAreaType): void;
+    openAreaMenu(areaType: 'Combat' | 'Slayer' | 'Dungeon'): void;
+    /** Closes the currently open combat area menu */
     closeAreaMenu(): void;
     resetActionState(): void;
     resetEventState(): void;

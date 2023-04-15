@@ -305,6 +305,13 @@ declare abstract class SkillWithMastery<ActionType extends MasteryAction, DataTy
      */
     getMasteryXPToAddForAction(action: ActionType, interval: number): number;
     /**
+     * Gets the base mastery xp to add for performing an action.
+     * @param action The action object to compute mastery xp for
+     * @param interval The interval of the action performed
+     * @returns The modified XP to add
+     */
+    getBaseMasteryXPToAddForAction(action: ActionType, interval: number): number;
+    /**
      * Gets the mastery XP to add to the pool for performing an action
      * @param xp The modified action mastery xp
      * @returns The mastery XP to add to the pool
@@ -529,6 +536,7 @@ declare class Costs {
 }
 /** Class to manage the gain of rewards from crafting skills */
 declare class Rewards extends Costs {
+    source: string;
     _xp: Map<AnySkill, number>;
     addXP(skill: AnySkill, amount: number): void;
     getXP(skill: AnySkill): number;
@@ -537,5 +545,6 @@ declare class Rewards extends Costs {
     /** Forcefully gives the currently set rewards to the player, ignoring bank space for the items */
     forceGiveRewards(): boolean;
     reset(): void;
+    setSource(source: string): void;
 }
 declare type AnySkill = Skill<any>;

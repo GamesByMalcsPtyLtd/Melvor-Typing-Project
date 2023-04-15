@@ -8,6 +8,7 @@ declare abstract class Currency implements EncodableObject {
     abstract readonly _media: string;
     /** If notifications should be fired */
     abstract readonly shouldNotify: boolean;
+    abstract type: string;
     constructor(game: Game);
     /** Queues a notification on recieving/losing currency */
     queueNotification(amount: number): void;
@@ -28,18 +29,21 @@ declare abstract class Currency implements EncodableObject {
 }
 declare class GP extends Currency {
     readonly _media = Assets.GPIcon;
+    type: string;
     get shouldNotify(): boolean;
     add(amount: number): void;
     renderAmount(): void;
 }
 declare class SlayerCoins extends Currency {
     readonly _media = Assets.SlayerCoinIcon;
+    type: string;
     get shouldNotify(): boolean;
     add(amount: number): void;
     renderAmount(): void;
 }
 declare class RaidCoins extends Currency {
     readonly _media = Assets.RaidCoinIcon;
+    type: string;
     readonly shouldNotify = true;
     renderAmount(): void;
 }

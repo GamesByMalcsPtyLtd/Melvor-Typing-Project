@@ -60,7 +60,7 @@ declare class Enemy extends Character {
 interface EnemyRenderHTMLElements extends RenderHTMLElements {
     image: HTMLDivElement;
     name: HTMLElement[];
-    attackType: HTMLImageElement;
+    attackType: HTMLImageElement[];
     levels: StringDictionary<HTMLElement[]>;
 }
 declare enum EnemyState {

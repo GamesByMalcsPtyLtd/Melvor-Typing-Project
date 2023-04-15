@@ -29,7 +29,7 @@ declare class FishingAreaMenu extends HTMLElement {
     /** Intializes the menu with the provided fishing data. Also performs localization */
     setAreaData(area: FishingArea): void;
     /** Updates the XP, Mastery XP, Mastery Pool XP */
-    updateGrants(xp: number, masteryXP: number, masteryPoolXP: number, strengthXP: number): void;
+    updateGrants(xp: number, baseXP: number, masteryXP: number, baseMasteryXP: number, masteryPoolXP: number, strengthXP: number, baseStrengthXP: number): void;
     hideAreaPanel(): void;
     showAreaPanel(): void;
     /** Sets the current fish information */

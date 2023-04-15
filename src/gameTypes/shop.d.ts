@@ -206,6 +206,8 @@ declare class Shop implements EncodableObject, StatProvider, RaidStatProvider {
     convertFromOldFormat(save: NewSaveGame, idMap: NumericIDMap): void;
     /** Removes purchases that are above their buy limit */
     removePurchasesAboveLimit(): void;
+    /** Maximum that the buy quantity can be set to. Uint32 Max */
+    static readonly MAX_BUY_QUANTITY = 4294967295;
 }
 declare class BankUpgradeCost {
     equate(gp: number): number;

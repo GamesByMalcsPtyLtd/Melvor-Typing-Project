@@ -42,8 +42,9 @@ declare class FarmingPlotElement extends HTMLElement {
     disconnectedCallback(): void;
     destroyTooltips(): void;
     setPlot(plot: FarmingPlot, game: Game): void;
+    updateGrowthChance(plot: FarmingPlot, farming: Farming): void;
     /** Updates the compost level + growth chance */
-    updateCompost(plot: FarmingPlot, farming: Farming): void;
+    updateCompost(plot: FarmingPlot): void;
     updateGrowthTime(plot: FarmingPlot, farming: Farming): void;
     /** Updates the display of the plot */
     updatePlotState(plot: FarmingPlot): void;

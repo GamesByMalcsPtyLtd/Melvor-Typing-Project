@@ -24,5 +24,5 @@ declare class MiningRockMenu extends HTMLElement {
     setRequirement(reqText: string): void;
     hideRequirement(): void;
     /** Updates the XP, Mastery XP, Mastery Pool XP and interval icons */
-    updateGrants(xp: number, masteryXP: number, masteryPoolXP: number, interval: number): void;
+    updateGrants(xp: number, baseXP: number, masteryXP: number, baseMasteryXP: number, masteryPoolXP: number, interval: number): void;
 }

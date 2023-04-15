@@ -40,7 +40,7 @@ declare class WoodcuttingActionEvent extends SkillActionEvent {
     skill: Woodcutting;
     /** The active woodcutting trees during the event */
     actions: Set<WoodcuttingTree>;
-    /** If a bird's nest or similar item was recieved during the action */
+    /** If a bird's nest or similar item was received during the action */
     nestGiven: boolean;
     constructor(
     /** The skill the event originated from */
@@ -508,21 +508,33 @@ declare class AltMagicActionEvent extends SkillActionEvent {
     skill: AltMagic;
     /** The spell being cast */
     spell: AltMagicSpell;
+    /** If alternative runes were used during this event */
+    altRunes: boolean;
     constructor(
     /** The source skill for the event */
     skill: AltMagic, 
     /** The spell being cast */
-    spell: AltMagicSpell);
+    spell: AltMagicSpell, 
+    /** If alternative runes were used during this event */
+    altRunes: boolean);
 }
 interface AltMagicActionEventMatcherOptions extends SkillActionEventMatcherOptions {
     type: 'AltMagicAction';
     actionIDs?: string[];
+    produces?: AltMagicProduction[];
+    usedRuneIDs?: string[];
 }
 declare class AltMagicActionEventMatcher extends SkillActionEventMatcher {
     /** If present, the recipe of the action must match a member */
     spells?: Set<AltMagicSpell>;
+    /** If present the produces of the spell must match a member */
+    produces?: Set<AltMagicProductionID>;
+    /** If present the spell must use one of the runes in this set */
+    usedRunes?: Set<AnyItem>;
     constructor(options: AltMagicActionEventMatcherOptions, game: Game);
     doesEventMatch(event: GameEvent): boolean;
+    /** Checks if the usedRunes property matches */
+    checkRunes(event: AltMagicActionEvent): boolean;
 }
 declare class MonsterDropEvent extends GameEvent {
     /** The item that was dropped */

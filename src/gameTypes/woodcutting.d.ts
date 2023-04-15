@@ -46,6 +46,7 @@ declare class Woodcutting extends GatheringSkill<WoodcuttingTree, WoodcuttingSki
     getTreeInterval(tree: WoodcuttingTree): number;
     getTreeMultiplier(tree: WoodcuttingTree): number;
     getTreeMasteryXP(tree: WoodcuttingTree): number;
+    getBaseTreeMasteryXP(tree: WoodcuttingTree): number;
     getBirdNestChance(): number;
     getRavenNestChance(): number;
     getBirdNestQuantity(): number;
@@ -55,6 +56,8 @@ declare class Woodcutting extends GatheringSkill<WoodcuttingTree, WoodcuttingSki
     /** Callback function for selecting a tree */
     selectTree(tree: WoodcuttingTree): void;
     get actionInterval(): number;
+    /** Woodcutting xp to add per action inclusive of modifiers */
+    get baseXPToAdd(): number;
     /** Woodcutting xp to add per action inclusive of modifiers */
     get totalXPToAdd(): number;
     get totalPoolXPToAdd(): number;

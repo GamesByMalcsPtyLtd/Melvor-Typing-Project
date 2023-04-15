@@ -86,8 +86,4 @@ interface HTMLElementTagNameMap {
   'township-town-biome-select': TownshipTownBiomeSelectElement
   'township-building-summary': TownshipBuildingSummaryElement;
   'building-in-town': BuildingInTownElement;
-  'township-build-biome-select': TownshipBuildBiomeSelectElement;
-  'township-building-sort-dropdown-option': TownshipBuildingSortDropdownOptionElement;
-  'township-building-sort-dropdown': TownshipBuildingSortDropdownElement;
-  'township-build-building': TownshipBuildBuildingElement;
 }

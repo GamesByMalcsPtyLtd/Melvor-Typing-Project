@@ -28,7 +28,7 @@ declare const mod: {
     api: Modding.ModApi;
     getContext: (namespaceOrResource: string | HTMLScriptElement | ImportMeta) => Modding.ModContext;
     getDevContext: () => Modding.ModContext;
-    getModsFromError: (error: unknown) => Modding.ModBasic[];
+    getModErrorFromError: (error: unknown) => Modding.ModError;
     encode: (writer: SaveWriter) => SaveWriter;
     decode: (reader: SaveWriter, version: number) => void;
     persist: () => Promise<void> | undefined;

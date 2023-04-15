@@ -2804,7 +2804,13 @@ declare enum ModifierID {
     increasedEvasionAgainstRanged = 766,
     increasedEvasionAgainstMagic = 767,
     allowNonMagicCurses = 768,
-    increasedTownshipTraderStock = 769
+    increasedTownshipTraderStock = 769,
+    increasedEssenceFromMining = 770,
+    increasedMasteryTokens = 771,
+    decreasedTownshipRepairCost = 772,
+    decreasedTownshipTraderCost = 773,
+    enableNightfallSeason = 774,
+    enableSolarEclipseSeason = 775
 }
 declare enum AmmoTypeID {
     Arrows = 0,

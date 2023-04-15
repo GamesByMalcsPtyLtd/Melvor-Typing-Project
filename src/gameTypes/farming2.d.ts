@@ -82,6 +82,7 @@ declare class FarmingRenderQueue extends MasterySkillRenderQueue<FarmingRecipe> 
     growthTime: Set<FarmingGrowthTimer>;
     growthState: Set<FarmingPlot>;
     compost: Set<FarmingPlot>;
+    growthChance: Set<FarmingPlot>;
     selectedSeed: Set<FarmingPlot>;
     growthIndicators: boolean;
     compostQuantity: boolean;
@@ -148,9 +149,11 @@ declare class Farming extends SkillWithMastery<FarmingRecipe, FarmingSkillData> 
     onMasteryLevelUp(action: FarmingRecipe, oldLevel: number, newLevel: number): void;
     onMasteryPoolBonusChange(oldBonusLevel: number, newBonusLevel: number): void;
     passiveTick(): void;
+    setUnlock(isUnlocked: boolean): void;
     render(): void;
     renderGrowthStatus(): void;
     renderGrowthState(): void;
+    renderGrowthChance(): void;
     renderCompost(): void;
     renderSelectedSeed(): void;
     renderGrowthIndicators(): void;
