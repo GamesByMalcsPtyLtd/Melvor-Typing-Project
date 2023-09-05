@@ -25,6 +25,8 @@ declare class Statistics implements SkillObject<StatTracker>, Serializable, Enco
     readonly Summoning: StatTracker;
     readonly Astrology: StatTracker;
     readonly Township: StatTracker;
+    readonly Archaeology: StatTracker;
+    readonly Cartography: StatTracker;
     /** Map of itemID to item stat tracker */
     readonly Items: MappedStatTracker<AnyItem>;
     /** Map of monsterID to monster stat tracker */
@@ -85,7 +87,8 @@ declare enum FishingStats {
     JunkCaught = 1,
     SpecialItemsCaught = 2,
     TimeSpent = 3,
-    Actions = 4
+    Actions = 4,
+    GPEarned = 5
 }
 declare enum FiremakingStats {
     LogsBurnt = 0,
@@ -235,6 +238,74 @@ declare enum AstrologyStats {
 }
 declare enum TownshipStats {
 }
+declare const enum CartographyStats {
+    /** Total number of survey actions performed */
+    SurveyActions = 0,
+    /** Total time spend surveying in [ms] */
+    TimeSpentSurveying = 1,
+    /** Number of Paper Making actions the player has performed */
+    PaperMakingActions = 2,
+    /** Total amount of time the player has spent making paper in [ms] */
+    TimeSpentMakingPaper = 3,
+    /** Total quantity of paper the player has made */
+    PaperMade = 4,
+    /** Total number of logs consumed making paper */
+    LogsUsed = 5,
+    /** Total number of logs preserved making paper */
+    LogsPreserved = 6,
+    /** Total number of dig site maps created */
+    MapsCreated = 7,
+    /** Total number of map upgrade actions performed */
+    MapUpgradeActions = 8,
+    /** Total time spent upgrading maps in [ms] */
+    TimeSpentUpgradingMaps = 9,
+    /** Total items used upgrading maps */
+    MapUpgradeItemsUsed = 10,
+    /** Total GP used upgrading maps */
+    MapUpgradeGPUsed = 11,
+    /** Total SC used upgrading maps */
+    MapUpgradeSCUsed = 12,
+    /** Total items preserved upgrading maps */
+    MapUpgradeItemsPreserved = 13,
+    /** Total GP preserved upgrading maps */
+    MapUpgradeGPPreserved = 14,
+    /** Total SC preserved upgrading maps */
+    MapUpgradeSCPreserved = 15,
+    /** Total number of items used to travel */
+    TravelItemsUsed = 16,
+    /** Total amount of GP used to travel */
+    TravelGPUsed = 17,
+    /** Total amount of SC used to travel */
+    TravelSCUsed = 18,
+    /** Total number of hexes the player has traversed */
+    HexesTravelled = 19,
+    /** Total number of random events the player has seen */
+    TravelEventsSeen = 20,
+    /** Total number of map refinements the player has bought */
+    RefinementsPurchased = 21
+}
+declare const enum ArchaeologyStats {
+    /** Total number of actions where an artefact was found */
+    SuccessfulActions = 0,
+    /** Total number of actions where an artefact was not found */
+    FailedActions = 1,
+    /** Total time spent training the skill [ms] */
+    TimeSpent = 2,
+    /** Total number of "tiny" artefact items found */
+    TinyArtefactsFound = 3,
+    /** Total number of "small" artefact items found */
+    SmallArtefactsFound = 4,
+    /** Total number of "medium" artefact items found */
+    MediumArtefactsFound = 5,
+    /** Total number of "large" artefact items found */
+    LargeArtefactsFound = 6,
+    /** Total number of excavation actions used */
+    ExcavationActionsUsed = 7,
+    /** Total number of excavation actions preserved */
+    ExcavationActionsPreserved = 8,
+    /** Total number of dig site maps that have been completely used */
+    DigSiteMapsDepleted = 9
+}
 declare enum ShopStats {
     PurchasesMade = 0,
     ItemsPurchased = 1,
@@ -346,7 +417,9 @@ declare enum StatCategories {
     GolbinRaid = 22,
     Slayer = 23,
     Prayer = 24,
-    Township = 25
+    Township = 25,
+    Archaeology = 26,
+    Cartography = 27
 }
 declare const statsData: StatsTableData[];
 declare type KeysMatching<T, V> = {

@@ -21,6 +21,8 @@ declare class SkillNav {
     active: Set<AnySkill>;
     glowing: Set<AnySkill>;
     constructor(game: Game);
+    /** Updates both the current level and max level of a skill. Implemented due to ancient relics gamemode */
+    setLevelAll(skill: AnySkill, level: number, levelCap: number): void;
     /** Updates the level of a skill */
     updateSkillLevel(skill: AnySkill): void;
     /** Updates the lock icon of a skill */

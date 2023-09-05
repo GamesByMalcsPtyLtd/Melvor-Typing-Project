@@ -19,6 +19,8 @@ declare class EffectRenderer {
     formatStacks(stacks: number, max?: number): string;
     addCurse(activeCurse: ActiveCurse): void;
     addReflexive(activeReflexive: ActiveReflexiveEffect, effect: ReflexiveEffect, attack: SpecialAttack): void;
+    addReductive(activeReductive: ActiveReductiveEffect, effect: ReductiveEffect, attack: SpecialAttack): void;
+    addIncremental(activeIncremental: ActiveIncrementalEffect, effect: IncrementalEffect, attack: SpecialAttack): void;
     addStacking(activeStacking: ActiveStackingEffect, effect: StackingEffect): void;
     addCombo(activeCombo: ActiveComboEffect, effect: ComboEffect): void;
     /** Queues the removal of an effect */
@@ -44,6 +46,8 @@ declare const effectMedia: {
     despair: string;
     stunImmunity: string;
     shocked: string;
+    crystallize: string;
+    crystalSanction: string;
 };
 declare const dotMedia: {
     Burn: string;
@@ -51,6 +55,8 @@ declare const dotMedia: {
     Poison: string;
     Regen: string;
     DeadlyPoison: string;
+    BarrierBleed: string;
+    BarrierBurn: string;
 };
 declare type RenderedEffect = {
     tooltip: TippyTooltip;

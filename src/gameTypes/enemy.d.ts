@@ -1,10 +1,20 @@
-declare class Enemy extends Character {
+declare class Enemy extends Character implements IGameEventEmitter<CharacterCombatEvents> {
     manager: BaseManager;
     game: Game;
+    _events: import("mitt").Emitter<CharacterCombatEvents>;
+    on: {
+        <Key extends keyof CharacterCombatEvents>(type: Key, handler: import("mitt").Handler<CharacterCombatEvents[Key]>): void;
+        (type: "*", handler: import("mitt").WildcardHandler<CharacterCombatEvents>): void;
+    };
+    off: {
+        <Key extends keyof CharacterCombatEvents>(type: Key, handler?: import("mitt").Handler<CharacterCombatEvents[Key]> | undefined): void;
+        (type: "*", handler: import("mitt").WildcardHandler<CharacterCombatEvents>): void;
+    };
     state: EnemyState;
     modifiers: CombatModifiers;
     spellSelection: SpellSelection;
-    noun: Noun;
+    stats: CharacterStats;
+    readonly noun: Noun;
     get statElements(): EnemyRenderHTMLElements;
     get splashManager(): SplashManager;
     get effectRenderer(): EffectRenderer;
@@ -17,6 +27,8 @@ declare class Enemy extends Character {
     /** Flag for if the monster property should be encoded */
     get encodeMonster(): boolean;
     constructor(manager: BaseManager, game: Game);
+    /** Resets all mutable properties of this class, as if it were freshly constructed. Does not reset event handlers. */
+    resetStateToDefault(): void;
     setMonster(monster: Monster): void;
     computeAttackType(): void;
     computeAttackSelection(): void;
@@ -40,6 +52,9 @@ declare class Enemy extends Character {
     applyUniqueSpawnEffects(): void;
     initializeForCombat(): void;
     render(): void;
+    /** Updates all barrier numbers and bars */
+    renderBarrier(): void;
+    renderHitpoints(): void;
     renderAttacksAndPassives(): void;
     renderDamageValues(): void;
     renderLevels(): void;
@@ -47,13 +62,12 @@ declare class Enemy extends Character {
     renderStats(): void;
     getAttackTypeMedia(attackType: string): string;
     renderNoStats(): void;
-    renderHitpoints(): void;
     resetActionState(): void;
     encode(writer: SaveWriter): SaveWriter;
     setStatsFromMonster(monster: Monster): void;
     decode(reader: SaveWriter, version: number): void;
     deserialize(reader: DataReader, version: number, idMap: NumericIDMap): void;
-    postAttack(attack: SpecialAttack, attackType: AttackType): void;
+    postAttack(): void;
     onHit(): void;
     onMiss(): void;
 }
@@ -68,7 +82,7 @@ declare enum EnemyState {
     Alive = 1,
     Spawning = 2
 }
-interface EnemyRenderQueue extends RenderQueue {
+declare class EnemyRenderQueue extends CharacterRenderQueue {
     image: boolean;
     levels: boolean;
 }

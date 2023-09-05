@@ -1,5 +1,9 @@
+declare type PotionEvents = {
+    potionUsed: PotionUsedEvent;
+    chargeUsed: PotionChargeUsedEvent;
+};
 /** Management class for potion consumption and charges */
-declare class PotionManager implements StatProvider, EncodableObject {
+declare class PotionManager extends GameEventEmitter<PotionEvents> implements StatProvider, EncodableObject {
     game: Game;
     activePotions: Map<Action, ActivePotion>;
     /** Actions for which potions should not be automatically re-used */
@@ -13,8 +17,10 @@ declare class PotionManager implements StatProvider, EncodableObject {
     autoReusePotionsForAction(action: Action): boolean;
     getPotionCharges(item: PotionItem): number;
     usePotion(item: PotionItem, loadPotions?: boolean): void;
+    /** Creates an ActivePotion object, and assigns its event matchers */
+    createActivePotion(item: PotionItem, charges: number): ActivePotion;
     removePotion(action: Action, loadPotions?: boolean): void;
-    consumeCharges(event: GameEvent): void;
+    consumeChargeForAction(e: GameEvent, action: Action): void;
     toggleAutoReusePotion(action: Action): void;
     /** Callback function for opening the potion selection menu */
     openPotionSelectOnClick(action: Action): void;
@@ -30,6 +36,7 @@ declare class PotionManager implements StatProvider, EncodableObject {
 interface ActivePotion {
     item: PotionItem;
     charges: number;
+    unassigners: VoidFunction[];
 }
 declare class PotionSelectMenuItem extends HTMLElement {
     _content: DocumentFragment;

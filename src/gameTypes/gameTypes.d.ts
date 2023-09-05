@@ -20,6 +20,7 @@ interface ItemSearch {
   category: string;
   description?: string;
   type: string;
+  slot?:string;
 }
 interface BankSearch extends ItemSearch {
     qty: number;
@@ -301,19 +302,25 @@ declare type CombatLevels = {
 declare type MapToElement<Type> = {
     [Property in keyof Type]: HTMLElement;
 };
-declare type SlotTypes = 'Helmet' | 'Platebody' | 'Platelegs' | 'Boots' | 'Weapon' | 'Shield' | 'Amulet' | 'Ring' | 'Gloves' | 'Quiver' | 'Cape' | 'Passive' | 'Summon1' | 'Summon2' | 'Consumable';
+declare type SlotTypes = 'Helmet' | 'Platebody' | 'Platelegs' | 'Boots' | 'Weapon' | 'Shield' | 'Amulet' | 'Ring' | 'Gloves' | 'Quiver' | 'Cape' | 'Passive' | 'Summon1' | 'Summon2' | 'Consumable' | 'Gem';
 declare type EquipStatKey = 'attackSpeed' | 'stabAttackBonus' | 'slashAttackBonus' | 'blockAttackBonus' | 'rangedAttackBonus' | 'magicAttackBonus' | 'meleeStrengthBonus' | 'rangedStrengthBonus' | 'magicDamageBonus' | 'meleeDefenceBonus' | 'rangedDefenceBonus' | 'magicDefenceBonus' | 'damageReduction' | 'summoningMaxhit';
 declare type EquipStatPair = {
     key: EquipStatKey;
     value: number;
 };
 declare type TippyTooltip = import("tippy.js").Instance<import("tippy.js").Props>;
+declare type TippyProps = import("tippy.js").Props;
 declare type OldPurchasedShopItem = {
     category: OldShopCategory;
     id: number;
     quantity: number;
 };
 declare type SweetAlertOptions = import("sweetalert2").SweetAlertOptions<*>;
+declare type SweetAlertCustomClass = import("sweetalert2").SweetAlertCustomClass;
+declare type EventType = import("mitt").EventType;
+declare type Handler<T = unknown> = import("mitt").Handler<T>;
+declare type WildcardHandler<T = Record<string, unknown>> = import("mitt").WildcardHandler<T>;
+declare type Emitter<Events extends Record<EventType, unknown>> = import("mitt").Emitter<Events>;
 interface OfflineBase {
     timestamp: number;
 }

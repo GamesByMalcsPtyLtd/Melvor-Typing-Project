@@ -54,3 +54,26 @@ declare class FishingAreaMenuButton extends HTMLElement {
     setFishUnlocked(fish: Fish, area: FishingArea): void;
     setFishLocked(fish: Fish): void;
 }
+declare class FishingContestMenu extends HTMLElement {
+    _content: DocumentFragment;
+    blockTitle: HTMLHeadingElement;
+    btnStopContest: HTMLButtonElement;
+    contestStatus: HTMLHeadingElement;
+    requiredFish: HTMLSpanElement;
+    bestFish: HTMLSpanElement;
+    leaderboard: HTMLDivElement;
+    remainingActions: HTMLSpanElement;
+    difficultiesContainer: HTMLDivElement;
+    chosenDifficulty: HTMLSpanElement;
+    constructor();
+    connectedCallback(): void;
+    setHeader(contest: FishingContest): void;
+    setDifficulties(contest: FishingContest, difficulties: string[]): void;
+    setDifficultyText(difficulty: string): void;
+    updateBestFish(result: FishingContestResult): void;
+    setActiveFish(activeFish: FishingContestFish): void;
+    updateContestStatus(active: boolean): void;
+    generateLeaderboard(contest: FishingContest, leaderboard: FishingContestLeaderboardEntry[]): void;
+    updateLeaderboard(contest: FishingContest, leaderboard: FishingContestLeaderboardEntry[]): void;
+    updateRemainingActions(remainingActions: number): void;
+}

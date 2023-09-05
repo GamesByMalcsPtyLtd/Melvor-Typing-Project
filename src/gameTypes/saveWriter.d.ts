@@ -14,7 +14,9 @@ declare class BinaryWriter {
     markRegionOffset: number;
     /** Returns the number of bytes remaining in the data buffer */
     get remainingBytes(): number;
-    constructor(mode: 'Read' | 'Write', dataExtensionLength: number);
+    /** Returns the number of bytes in the ArrayBuffer of the writer */
+    get dataSize(): number;
+    constructor(mode: 'Read' | 'Write', dataExtensionLength: number, initialSize?: number);
     /** Checks if the current buffer can fit the specified number of bytes
      *  If it cannot, extends the buffer by the dataExtensionLength until it can
      */
@@ -81,6 +83,12 @@ declare class BinaryWriter {
     getBuffer(): ArrayBuffer;
     /** Gets a buffer of a fixed length */
     getFixedLengthBuffer(length: number): ArrayBuffer;
+    /**
+     * Gets a LinkQueue of arbitrary type
+     * @param decodeValue Decodes a single value in the queue. If it returns undefined, no value is added to the queue
+     * @returns The decoded LinkQueue
+     */
+    getLinkQueue<T>(decodeValue: (reader: this) => T | undefined): LinkQueue<T>;
     /** Tells the reader to skip ahead by length bytes */
     skipBytes(length: number): void;
     /** Tells the reader to skip ahead as if an array with elements that encoded elementByteLength bytes each */
@@ -134,6 +142,12 @@ declare class BinaryWriter {
      * @param encodeValue Function that performs write operations per set value
      */
     writeSet<T>(set: Set<T>, encodeValue: (value: T, writer: this) => void): void;
+    /**
+     * Write a LinkQueue of arbitrary type to the buffer
+     * @param queue The LinkQueue to write
+     * @param encodeValue Function that encodes each value in the queue to the buffer
+     */
+    writeLinkQueue<T>(queue: LinkQueue<T>, encodeValue: (value: T, writer: this) => void): void;
     /** Writes an array buffer to the buffer */
     writeBuffer(buffer: ArrayBuffer): void;
     /** Writes a buffer of a fixed length */
@@ -151,7 +165,8 @@ declare class SaveWriter extends BinaryWriter {
     namespaceMap: Map<string, Map<string, number>>;
     nextNumericID: number;
     numericToStringIDMap: Map<number, string>;
-    constructor(mode: 'Read' | 'Write', dataExtensionLength: number);
+    get headerSize(): number;
+    constructor(mode: 'Read' | 'Write', dataExtensionLength: number, initialBodySize?: number, initialHeaderSize?: number);
     writeNamespacedObject<T extends NamespacedObject>(object: T): void;
     /** Gets a namespaced object from a registry. If the object is not registered, returns the ID instead. */
     getNamespacedObject<T extends NamespacedObject>(registry: NamespaceRegistry<T>): T | string;

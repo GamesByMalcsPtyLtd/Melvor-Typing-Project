@@ -21,7 +21,20 @@ interface FiremakingSkillData extends MasterySkillData {
     fireSpiritItemID?: string;
     charcoalItemID?: string;
 }
-declare class Firemaking extends CraftingSkill<FiremakingLog, FiremakingSkillData> implements StatProvider {
+declare type FiremakingEvents = {
+    action: FiremakingActionEvent;
+    bonfireLit: BonfireLitEvent;
+};
+declare class Firemaking extends CraftingSkill<FiremakingLog, FiremakingSkillData> implements StatProvider, IGameEventEmitter<FiremakingEvents> {
+    _events: import("mitt").Emitter<FiremakingEvents>;
+    on: {
+        <Key extends keyof FiremakingEvents>(type: Key, handler: import("mitt").Handler<FiremakingEvents[Key]>): void;
+        (type: "*", handler: import("mitt").WildcardHandler<FiremakingEvents>): void;
+    };
+    off: {
+        <Key extends keyof FiremakingEvents>(type: Key, handler?: import("mitt").Handler<FiremakingEvents[Key]> | undefined): void;
+        (type: "*", handler: import("mitt").WildcardHandler<FiremakingEvents>): void;
+    };
     bonfireTimer: Timer;
     readonly baseAshChance = 20;
     readonly baseStardustChance = 1;
@@ -80,6 +93,8 @@ declare class Firemaking extends CraftingSkill<FiremakingLog, FiremakingSkillDat
     recordCostConsumptionStats(costs: Costs): void;
     recordCostPreservationStats(costs: Costs): void;
     preAction(): void;
+    /** Applies modifiers to the reward quantity of items */
+    modifyItemQuantity(quantity: number, quantityMultiplier: number, chanceToDouble: number, extraItemChance: number): number;
     get actionRewards(): Rewards;
     postAction(): void;
     endBonFire(): void;
@@ -98,6 +113,7 @@ declare class Firemaking extends CraftingSkill<FiremakingLog, FiremakingSkillDat
     renderSelectedLog(): void;
     renderSelectedLogQty(): void;
     renderLogSelection(): void;
+    getObtainableItems(): Set<AnyItem>;
 }
 declare class FiremakingRenderQueue extends GatheringSkillRenderQueue<FiremakingLog> {
     selectedLog: boolean;

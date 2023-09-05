@@ -28,7 +28,7 @@ declare function playFabStoreDataCallback(result: PlayFabModule.SuccessContainer
 declare function showPlayFabSaveDeletedNotification(): void;
 declare function createPlayFabSaves(): string;
 declare function enableCloudCharacterButton(): void;
-declare function registerToMelvorCloud(): void;
+declare function registerToMelvorCloud(): Promise<void>;
 declare function forgotPasswordMelvorCloud(): void;
 declare function disableLoginForm(): void;
 declare function enableLoginForm(): void;
@@ -43,7 +43,7 @@ declare function enableChangePasswordForm(): void;
 declare function updateEmailMelvorCloud(): void;
 declare function updatePasswordMelvorCloud(): void;
 /** Links the user's Steam ID to their PlayFab account which can be used alongside Steam Web API */
-declare const linkSteamAccountToPlayFab: () => void;
+declare const linkSteamAccountToPlayFab: (forceLink: boolean) => void;
 declare const getPlayFabInfo: () => void;
 /** Promise that uses Playfab to check active purchase status of Steam version. Utilises Steam's Web API */
 declare const getSteamPurchaseStatus: () => Promise<SteamPurchaseResult>;

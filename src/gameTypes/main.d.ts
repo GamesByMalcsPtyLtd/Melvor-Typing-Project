@@ -4,8 +4,10 @@ declare const CDNEndpoint = "https://cdn.melvor.net/core";
 declare const DEBUGENABLED = false;
 declare const releaseDate = 1637258400000;
 declare const DEBUG_REPORTER: string[];
-declare const CDNDIR: string;
-declare const gameTitle = "Melvor Idle :: v1.1.2";
+declare const CDNDIR_ORIGINAL: string;
+declare const CDNDIR: () => string;
+declare function getPathWithoutFile(): string;
+declare const gameTitle = "Melvor Idle :: v1.2";
 declare let currentTitleNewsID: string[];
 declare let playFabEventQueue: {
     eventName: string;
@@ -90,8 +92,8 @@ declare function initTooltips(): void;
 declare function generateLoreModals(): string;
 declare function resetSkillsTo99(confirmed?: boolean): void;
 declare function setBackground(id: number): void;
-declare const announcekit: any;
 declare function initChangelog(): void;
 /** CORE GAME FUNCTIONS */
 declare function updateAllGameMedia(): void;
 declare function updateGameMedia(media: string): void;
+declare function viewExpansion2Details(): void;

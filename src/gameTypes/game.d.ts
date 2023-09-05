@@ -1,4 +1,9 @@
-declare class Game implements Serializable, EncodableObject {
+/** Events emitted by the Game object */
+declare type GameEvents = {
+    requirementChange: RequirementChangedEvent;
+    skillAction: SkillActionEvent;
+};
+declare class Game extends GameEventEmitter<GameEvents> implements Serializable, EncodableObject {
     loopInterval: number;
     loopStarted: boolean;
     disableClearOffline: boolean;
@@ -21,6 +26,8 @@ declare class Game implements Serializable, EncodableObject {
     /** Unknown Combat Area. Used as a default value when a monster has no area, and for class initialization. */
     unknownCombatArea: CombatArea;
     decreasedEvasionStackingEffect: StackingEffect;
+    /** Convenience reference to the unholy mark effect if it is regeistered */
+    unholyMarkEffect?: StackingEffect;
     activeActionPage: Page;
     /** Save state property. Last time the game processed time outside of golbin raid. */
     tickTimestamp: number;
@@ -60,6 +67,8 @@ declare class Game implements Serializable, EncodableObject {
     stats: Statistics;
     /** Save State Property. */
     settings: Settings;
+    /** Save State Property. Manages keybindings and keyboard inputs */
+    keyboard: KeyboardInputManager;
     /** Save State Property. */
     gp: GP;
     /** Save State Property. */
@@ -71,6 +80,7 @@ declare class Game implements Serializable, EncodableObject {
     /** Save State Property. Stores the last version of the game the user has loaded. */
     lastLoadedGameVersion: string;
     completion: Completion;
+    events: GameEventSystem;
     attack: Attack;
     strength: Strength;
     defence: Defence;
@@ -95,10 +105,14 @@ declare class Game implements Serializable, EncodableObject {
     astrology: Astrology;
     farming: Farming;
     township: Township;
+    cartography?: Cartography;
+    archaeology?: Archaeology;
     lore: Lore;
     eventManager: EventManager;
     notifications: NotificationsManager;
     telemetry: Telemetry;
+    clueHunt: ClueHunt;
+    birthdayEvent2023CompletionTracker: boolean[];
     dropWeightCache: Map<[number, number, number][], number>;
     refundedAstrology: boolean;
     refundedAstrologyAgain: boolean;
@@ -106,6 +120,9 @@ declare class Game implements Serializable, EncodableObject {
         title: boolean;
         combatMinibar: boolean;
         activeSkills: boolean;
+        sidebarSkillUnlock: boolean;
+        clueHuntStep6: boolean;
+        birthdayEventProgress: boolean;
     };
     attackStyles: NamespaceRegistry<AttackStyle>;
     stackingEffects: NamespaceRegistry<StackingEffect>;
@@ -146,17 +163,24 @@ declare class Game implements Serializable, EncodableObject {
     itemSynergies: Map<EquipmentItem, ItemSynergy[]>;
     randomGemTable: DropTable;
     randomSuperiorGemTable: DropTable;
-    softDataRegQueue: [IDData, SoftDataDependant][];
+    softDataRegQueue: SoftDataDependantElement<any>[];
+    ancientRelics: NamespaceRegistry<AncientRelic>;
+    skillUnlocksRemaining: number;
+    skillUnlocksRemainingPost99: number;
+    skillUnlocks: AnySkill[];
     get playerCombatLevel(): number;
     get isPaused(): boolean;
     get isGolbinRaid(): boolean;
     /** Quick refereence for player modifiers */
     get modifiers(): PlayerModifiers;
+    get isBirthdayEvent2023Complete(): boolean;
     constructor();
     fetchAndRegisterDataPackage(url: string): Promise<void>;
     /** Performs the registration of a data package to the game */
     registerDataPackage(dataPackage: GameDataPackage): void;
-    queueForSoftDependencyReg<T extends IDData>(data: T, object: SoftDataDependant<T>): void;
+    /** Registers game data under the given namespace */
+    registerGameData(namespace: DataNamespace, gameData: GameData): void;
+    queueForSoftDependencyReg<DataType>(data: DataType, object: SoftDataDependant<DataType>): void;
     postDataRegistration(): void;
     registerAttackStyles(namespace: DataNamespace, data: AttackStyleData[]): void;
     registerItemData(namespace: DataNamespace, data: AnyItemData[]): void;
@@ -183,11 +207,16 @@ declare class Game implements Serializable, EncodableObject {
     registerGamemodes(namespace: DataNamespace, data: GamemodeData[]): void;
     registerSteamAchievements(data: SteamAchievementData[]): void;
     registerPages(namespace: DataNamespace, data: PageData[]): void;
+    registerAncientRelics(namespace: DataNamespace, data: AncientRelicData[]): void;
     /** Registers a skill. Returns the constructed instance of the skill */
     registerSkill<T extends AnySkill>(namespace: DataNamespace, constructor: new (namespace: DataNamespace, game: Game) => T & Partial<PassiveAction> & Partial<ActiveAction> & Partial<StatProvider>): T;
     applyDataModifications(modificationData: GameDataModifications): void;
+    getSkillModifiersFromData(data: SkillModifierData[]): SkillModifier[];
     getPlayerModifiersFromData(data: PlayerModifierData): PlayerModifierObject;
+    getModifierArrayFromData(data: ModifierArrayData): ModifierArray;
     getRequirementFromData(data: AnyRequirementData): AnyRequirement;
+    /** Takes an array of requirement data, and returns an array of requirements */
+    getRequirementsFromData(data: AnyRequirementData[]): AnyRequirement[];
     getDungeonRequirement(data: DungeonRequirementData): DungeonRequirement;
     getLevelRequirement(data: SkillLevelRequirementData): SkillLevelRequirement;
     getSlayerItemRequirement(data: SlayerItemRequirementData): SlayerItemRequirement;
@@ -198,6 +227,9 @@ declare class Game implements Serializable, EncodableObject {
     getAllSkillLevelRequirement(data: AllSkillLevelRequirementData): AllSkillLevelRequirement;
     getSlayerTaskRequirement(data: SlayerTaskRequirementData): SlayerTaskRequirement;
     getCompletionRequirement(data: CompletionRequirementData): CompletionRequirement;
+    getCartographyHexDiscoveryRequirement(data: CartographyHexDiscoveryRequirementData): CartographyHexDiscoveryRequirement;
+    getCartographyPOIDiscoveryRequirement(data: CartographyPOIDiscoveryRequirementData): CartographyPOIDiscoveryRequirement;
+    getArchaeologyItemsDonatedRequirement(data: ArchaeologyItemsDonatedRequirementData): ArchaeologyItemsDonatedRequirement;
     getDummyData(fullID: string): DummyData;
     constructDummyObject<T>(id: string, constructor: new (namespace: DataNamespace, localID: string, game: Game) => T): T;
     startMainLoop(): void;
@@ -218,9 +250,14 @@ declare class Game implements Serializable, EncodableObject {
     tick(): void;
     queueRequirementRenders(): void;
     render(): void;
+    checkUniqueBirthdayEventCompletions(): void;
+    updateBirthdayEventProgress(): void;
+    renderBirthdayEventProgress(): void;
     renderGameTitle(): void;
     /** Updates the state of the combat minibar */
     renderCombatMinibar(): void;
+    /** Renders Skill unlock available in Ancient Relic gamemode */
+    renderSidebarSkillUnlock(): void;
     /** Renders which skills are active in the sidebar */
     renderActiveSkills(): void;
     loop(): void;
@@ -234,8 +271,8 @@ declare class Game implements Serializable, EncodableObject {
         originalTimeDiff: number;
     };
     processOffline(): Promise<void>;
-    snapShotOffline(): OfflineSnapshot;
-    createOfflineModal(oldSnapshot: OfflineSnapshot, timeDiff: number): string;
+    snapshotOffline(): OfflineSnapshot;
+    createOfflineModal(oldSnapshot: OfflineSnapshot, offlineAction: ActiveAction | undefined, timeDiff: number): string;
     /** Resets properties used to track offline progress */
     resetOfflineTracking(): void;
     /** Puts the game in a state where offline will progress the amount specified */
@@ -253,6 +290,8 @@ declare class Game implements Serializable, EncodableObject {
     /** The last timestamp when the cloud was updated */
     _lastCloudUpdate: number;
     cloudUpdate(time: number): void;
+    _lastSaveBodySize: number;
+    _lastSaveHeaderSize: number;
     generateSaveString(): string;
     /** Attempts to get a header from a save string. If save is invalid, returns undefined instead. */
     getHeaderFromSaveString(saveString: string): Promise<SaveGameHeader | SaveLoadError>;
@@ -283,6 +322,9 @@ declare class Game implements Serializable, EncodableObject {
     checkTownshipTaskRequirement(requirement: TownshipTaskCompletionRequirement, notifyOnFailure?: boolean): boolean;
     checkTownshipTutorialTaskRequirement(requirement: TownshipTutorialTaskCompletionRequirement, notifyOnFailure?: boolean): boolean;
     checkTownshipBuildingRequirement(requirement: TownshipBuildingRequirement, notifyOnFailure?: boolean): boolean;
+    checkCartographyHexDiscoveryRequirement(requirement: CartographyHexDiscoveryRequirement, notifyOnFailure?: boolean): boolean;
+    checkCartographyPOIDiscoveryRequirement(requirement: CartographyPOIDiscoveryRequirement, notifyOnFailure?: boolean): boolean;
+    checkArchaeologyItemsDonatedRequirement(requirement: ArchaeologyItemsDonatedRequirement, notifyOnFailure?: boolean): boolean;
     /** Checks a single requirement and optionally displays an error message to the player */
     checkRequirement(requirement: AnyRequirement, notifyOnFailure?: boolean, slayerLevelReq?: number): boolean;
     /** Checks an array of rqeuirements, and optionally displays an error message to the player for the first failed requirement */
@@ -294,9 +336,6 @@ declare class Game implements Serializable, EncodableObject {
     getPageForAction(action: Action): Page | undefined;
     getPageForActiveAction(): Page;
     getPagesForSkill(skill: AnySkill): Page[] | undefined;
-    constructEventMatcher(data: GameEventMatcherData): GameEventMatcher;
-    /** Processes an event */
-    processEvent(event: GameEvent, interval?: number): void;
     checkSteamAchievements(): void;
     isAchievementMet(achievement: SteamAchievement): boolean;
     /** Sets up the current gamemode to it's starting state */
@@ -337,6 +376,7 @@ interface OfflineSnapshot {
     onyxNode: MiningNodeSnapshot;
     orichaNode: MiningNodeSnapshot;
     ceruleanNode: MiningNodeSnapshot;
+    ancientRelics: Map<AnySkill, Map<AncientRelic, number>>;
     townshipHealth: number;
     townshipStorageFull: boolean;
 }

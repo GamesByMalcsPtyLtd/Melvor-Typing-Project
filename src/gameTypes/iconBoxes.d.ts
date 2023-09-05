@@ -22,6 +22,7 @@ declare class RequiresBox extends IconBox<InfoIcon> {
     localize(): void;
     setItems(items: AnyItemQuantity[], gp?: number, sc?: number, altMedia?: boolean): void;
     setItemsFromRecipe(recipe: ArtisanSkillRecipe, altMedia?: boolean): void;
+    setItemsFromCosts(costs: Costs, altMedia?: boolean): void;
 }
 declare class HavesBox extends IconBox<QtyCurrentIcon> {
     size: Resize;
@@ -34,6 +35,7 @@ declare class HavesBox extends IconBox<QtyCurrentIcon> {
     updateQuantities(): void;
     setItems(items: AnyItemQuantity[], gp?: number, sc?: number, altMedia?: boolean): void;
     setItemsFromRecipe(recipe: ArtisanSkillRecipe, altMedia?: boolean): void;
+    setItemsFromCosts(costs: Costs, altMedia?: boolean): void;
 }
 declare class ProducesBox extends IconBox<InfoIcon> {
     size: Resize;

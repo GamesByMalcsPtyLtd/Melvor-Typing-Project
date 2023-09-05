@@ -76,11 +76,11 @@ declare const setStartingGamemode: (gamemode: Gamemode) => void;
 /** Callback function for when the Import Save option is clicked */
 declare function importSaveOnClick(slotID: number): void;
 /** Callback function for when the Create Sharable Save URL option is clicked */
-declare function createSaveShareLink(characterID: number): void;
+declare function createSaveShareLink(characterID: number): Promise<void>;
 /** Callback function for when the Download Save option is clicked */
 declare function openDownloadSave(slotID: number): Promise<void>;
 /** Callback function for when the Export Save option is clicked */
-declare function openExportSave(slotID: number): void;
+declare function openExportSave(slotID: number): Promise<void>;
 /** Callback function for when the Delete Local save option is clicked */
 declare function confirmLocalSaveDeletion(slotID: number): Promise<void>;
 /** Callback function for when the Delete Cloud save option is clicked. */

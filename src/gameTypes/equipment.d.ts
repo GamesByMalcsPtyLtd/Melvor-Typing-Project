@@ -7,10 +7,6 @@ declare class Equipment implements EncodableObject, Serializable {
     slotMap: Map<EquipmentItem, SlotTypes>;
     /** Slots that provide stats and use charges */
     itemChargeUsers: Set<EquipSlot>;
-    /** Slots that provide stats and use quantities */
-    itemQuantityUsers: Set<EquipSlot>;
-    /** Slots that provide stats and use items in the bank */
-    bankItemUsers: Set<EquipSlot>;
     /** Class to manage the equiped items of players */
     constructor(game: Game);
     /** Determines if the equipped Weapon is 2-Handed */
@@ -103,6 +99,7 @@ interface EquipmentObject<T> {
     Summon1: T;
     Summon2: T;
     Consumable: T;
+    Gem: T;
 }
 declare function getEquipmentImageElements(slotID: number): HTMLImageElement[];
 declare function getEquipmentQtyElements(slot: SlotTypes): HTMLSpanElement[];
@@ -113,7 +110,7 @@ declare type SlotData = {
     emptyName: string;
     imageElements: HTMLImageElement[];
     qtyElements: HTMLSpanElement[];
-    tooltips: TippyTooltip[];
+    tooltips: EquipmentTooltipElement[];
     quickEquipTooltip: TippyTooltip[];
     /** If items equipped in this slot provide equipment stats */
     providesStats: boolean;
@@ -152,4 +149,17 @@ declare class CombatQuickEquipMenu {
     setItem(slotID: number, pos: number): void;
     /** Updates the image of the quick equip image with the one you set */
     setImage(pos: number, item: AnyItem): void;
+}
+declare class EquipmentTooltipElement extends HTMLElement {
+    _content: DocumentFragment;
+    itemName: HTMLSpanElement;
+    itemDescription: HTMLElement;
+    statContainer: HTMLElement;
+    unset: boolean;
+    lastItem?: EquipmentItem;
+    constructor();
+    connectedCallback(): void;
+    setFromSlot(slot: EquipSlot): void;
+    setItem(item: EquipmentItem, showStats: boolean): void;
+    setEmpty(): void;
 }

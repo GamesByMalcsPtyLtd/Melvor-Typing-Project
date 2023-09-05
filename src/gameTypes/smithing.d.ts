@@ -2,8 +2,20 @@ interface SmithingSkillData extends MasterySkillData {
     categories?: SkillCategoryData[];
     recipes?: SingleProductArtisanSkillRecipeData[];
 }
+declare type SmithingEvents = {
+    action: SmithingActionEvent;
+};
 declare type SmithingRecipe = SingleProductArtisanSkillRecipe<SkillCategory>;
-declare class Smithing extends ArtisanSkill<SmithingRecipe, SmithingSkillData, AnyItem> implements SkillCategoryObject<SkillCategory> {
+declare class Smithing extends ArtisanSkill<SmithingRecipe, SmithingSkillData, AnyItem> implements SkillCategoryObject<SkillCategory>, IGameEventEmitter<SmithingEvents> {
+    _events: import("mitt").Emitter<SmithingEvents>;
+    on: {
+        <Key extends "action">(type: Key, handler: import("mitt").Handler<SmithingEvents[Key]>): void;
+        (type: "*", handler: import("mitt").WildcardHandler<SmithingEvents>): void;
+    };
+    off: {
+        <Key extends "action">(type: Key, handler?: import("mitt").Handler<SmithingEvents[Key]> | undefined): void;
+        (type: "*", handler: import("mitt").WildcardHandler<SmithingEvents>): void;
+    };
     readonly _media = "assets/media/skills/smithing/smithing.svg";
     getTotalUnlockedMasteryActions(): number;
     readonly baseInterval: number;
@@ -38,4 +50,5 @@ declare class Smithing extends ArtisanSkill<SmithingRecipe, SmithingSkillData, A
     getActionIDFromOldID(oldActionID: number, idMap: NumericIDMap): string;
     setFromOldOffline(offline: OfflineSkill, idMap: NumericIDMap): void;
     testTranslations(): void;
+    getObtainableItems(): Set<AnyItem>;
 }

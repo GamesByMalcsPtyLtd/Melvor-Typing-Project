@@ -110,6 +110,34 @@ interface TownshipBuildingRequirement {
     building: TownshipBuilding;
     count: number;
 }
-declare type AnyRequirement = SkillLevelRequirement | AllSkillLevelRequirement | DungeonRequirement | CompletionRequirement | ShopPurchaseRequirement | SlayerItemRequirement | SlayerTaskRequirement | ItemFoundRequirement | MonsterKilledRequirement | TownshipTaskCompletionRequirement | TownshipTutorialTaskCompletionRequirement | TownshipBuildingRequirement;
-declare type AnyRequirementData = SkillLevelRequirementData | AllSkillLevelRequirementData | DungeonRequirementData | CompletionRequirementData | ShopPurchaseRequirementData | SlayerItemRequirementData | SlayerTaskRequirementData | ItemFoundRequirementData | MonsterKilledRequirementData | TownshipTaskCompletionRequirement | TownshipTutorialTaskCompletionRequirement | TownshipBuildingRequirementData;
+interface CartographyHexDiscoveryRequirementData {
+    type: 'CartographyHexDiscovery';
+    worldMapID: string;
+    count: number;
+}
+interface CartographyHexDiscoveryRequirement {
+    type: 'CartographyHexDiscovery';
+    worldMap: WorldMap;
+    count: number;
+}
+interface CartographyPOIDiscoveryRequirementData {
+    type: 'CartographyPOIDiscovery';
+    worldMapID: string;
+    poiIDs: string[];
+}
+interface CartographyPOIDiscoveryRequirement {
+    type: 'CartographyPOIDiscovery';
+    worldMap: WorldMap;
+    pois: PointOfInterest[];
+}
+interface ArchaeologyItemsDonatedRequirementData {
+    type: 'ArchaeologyItemsDonated';
+    count: number;
+}
+interface ArchaeologyItemsDonatedRequirement {
+    type: 'ArchaeologyItemsDonated';
+    count: number;
+}
+declare type AnyRequirement = SkillLevelRequirement | AllSkillLevelRequirement | DungeonRequirement | CompletionRequirement | ShopPurchaseRequirement | SlayerItemRequirement | SlayerTaskRequirement | ItemFoundRequirement | MonsterKilledRequirement | TownshipTaskCompletionRequirement | TownshipTutorialTaskCompletionRequirement | TownshipBuildingRequirement | CartographyHexDiscoveryRequirement | CartographyPOIDiscoveryRequirement | ArchaeologyItemsDonatedRequirement;
+declare type AnyRequirementData = SkillLevelRequirementData | AllSkillLevelRequirementData | DungeonRequirementData | CompletionRequirementData | ShopPurchaseRequirementData | SlayerItemRequirementData | SlayerTaskRequirementData | ItemFoundRequirementData | MonsterKilledRequirementData | TownshipTaskCompletionRequirement | TownshipTutorialTaskCompletionRequirement | TownshipBuildingRequirementData | CartographyHexDiscoveryRequirementData | CartographyPOIDiscoveryRequirementData | ArchaeologyItemsDonatedRequirementData;
 declare function getRequirementNodes(requirement: AnyRequirement, imageClass: string): (string | Node)[];

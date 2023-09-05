@@ -3,6 +3,7 @@ declare function rollPercentage(chance: number): boolean;
 /** Rolls an interger value between [minValue,maxValue] */
 declare function rollInteger(minValue: number, maxValue: number): number;
 declare function rollForOffItem(baseChance: number): boolean;
+declare function rollForAncientRelic(baseChance: number): boolean;
 declare function generateGaussianNumber($mean: number, $stdDev: number): number;
 declare function getMean(numActions: number, probability: number): number;
 declare function getStdDev(numActions: number, probability: number): number;
@@ -46,6 +47,8 @@ declare function setToLowercase(string: string): string;
 declare function replaceAll(str: string, find: string, replace: string): string;
 /** Returns true if any member of setA is present in setB */
 declare function isAnySetMemberInSet<T>(setA: Set<T>, setB: Set<T>): boolean;
+/** Adds the members of the from set to the addTo set (mutates addTo) */
+declare function addSetToSet<T>(addTo: Set<T>, from: Set<T>): void;
 declare let updateTooltipsTimer: number;
 /** Updates all tooltips enabled by [data-toggle="tooltip"] and [data-toggle="popover"] */
 declare function updateTooltips(): void;
@@ -58,8 +61,8 @@ declare const joinAsSuperList: (list: string[]) => string;
 declare function pluralS(number: number): "" | "s";
 declare function checkMediaQuery(mediaQuery: string): boolean;
 declare function createElement<T extends keyof HTMLElementTagNameMap>(tagName: T, options?: ElemCreationOptions): HTMLElementTagNameMap[T];
-declare function hideElement(elem: HTMLElement): void;
-declare function showElement(elem: HTMLElement): void;
+declare function hideElement(elem: Element): void;
+declare function showElement(elem: Element): void;
 /** Toggles the color of an elements text between success and failure */
 declare function toggleDangerSuccess(elem: HTMLElement, success: boolean): void;
 declare function removeElementID(elem: HTMLElement): void;
@@ -90,6 +93,12 @@ declare let itemNotifyToProcess: AnyItemQuantity[];
 declare function itemNotify(item: AnyItem, quantity: number): void;
 /** Fires an item gain notifiaction for the specified item and quantity */
 declare function processItemNotify(item: AnyItem, quantity: number): void;
+declare let skillXPNotifyTimer: number;
+declare let skillXPNotifyToProcess: SkillQuantity[];
+/** Queues up an item gain notifiaction for the specified item and quantity */
+declare function skillXPNotify(skill: AnySkill, quantity: number): void;
+/** Fires an item gain notifiaction for the specified item and quantity */
+declare function processSkillXPNotify(skill: AnySkill, quantity: number): void;
 /** Fires a stun notification for thieving, with the damage specified */
 declare function stunNotify(damage: number): void;
 /** Fires a bank full notification */
@@ -112,6 +121,7 @@ declare function notifyMasteryLevelUp(action: MasteryAction, newLevel: number): 
 declare function notify99ItemMastery(action: MasteryAction): void;
 declare function notifyCompletionYay(): void;
 declare function notifyCompletionTotH(): void;
+declare function notifyCompletionAoD(): void;
 declare function notifyCompletionEverything(): void;
 declare let pyroInterval: number;
 declare let forcePyro: boolean;
@@ -146,7 +156,7 @@ declare class ExperienceCalculator {
 }
 /** Calculator for experience and levels */
 declare const exp: ExperienceCalculator;
-declare type QueuedNotify = ItemNotify | StunNotify | BankFullNotify | LevelUpNotify | PlayerNotify | ItemChargeNotify | MasteryNotify | Mastery99Notify | PreserveNotify | CurrencyNotify | TutorialNotify;
+declare type QueuedNotify = ItemNotify | StunNotify | BankFullNotify | LevelUpNotify | PlayerNotify | ItemChargeNotify | MasteryNotify | Mastery99Notify | PreserveNotify | CurrencyNotify | TutorialNotify | SkillXPNotify;
 declare type ItemNotify = {
     type: 'Item';
     args: Parameters<typeof itemNotify>;
@@ -189,6 +199,10 @@ declare type CurrencyNotify = {
 };
 declare type TutorialNotify = {
     type: 'TutorialTask';
+};
+declare type SkillXPNotify = {
+    type: 'SkillXP';
+    args: Parameters<typeof skillXPNotify>;
 };
 declare function getItemBaseStatsBreakdown(item: EquipmentItem): string;
 declare function lockedSkillAlert(skill: AnySkill, messageTemplate: string): void;
@@ -235,6 +249,23 @@ declare function formatNumber(number: number): string;
  * @example formatPercent(34.2,2) // 34.20%
  */
 declare function formatPercent(percent: number, digits?: number): string;
+/**
+ * Formats a positive integer number to an alphabetic coordinate
+ * @param int The positive integer to format
+ * @example formatIntegerAlphabetic(0) // A
+ * @example formatIntegerAlphabetic(25) // Z
+ * @example formatIntegerAlphabetic(26) // AA
+ */
+declare function formatIntegerAlphabetic(int: number): string;
+/**
+ * Converts an alphabetic coordinate back to its integer value
+ * @param alpha The alphabetic coordinate to convert
+ * @returns The integer coordinate
+ * @example getIntegerFromAlphabetic('A') // 0
+ * @example getIntegerFromAlphabetic('Z') // 25
+ * @example getIntegerFromAlphabetic('AA') // 26
+ */
+declare function getIntegerFromAlphabetic(alpha: string): number;
 declare function getMSAsTime(time: number): {
     years: number;
     days: number;
@@ -259,6 +290,11 @@ declare function getElementFromFragment<T extends keyof HTMLElementTagNameMap>(f
 /** Formats a number to locale sensitive fixed digits */
 declare function formatFixed(num: number, digits: number): string;
 declare function switchToCategory<T extends HasLevel>(tabs: Map<CategoryLike, RecipeSelectionTab<T>>): (categoryToShow: CategoryLike) => void;
+/**
+ * Creates a promise that resolves after delay
+ * @param delay Time to delay in [ms]
+ */
+declare function delayPromise(delay: number): Promise<void>;
 /** Tells the browser to download a text file */
 declare function downloadTextFile(fileName: string, fileText: string, fileType?: string): void;
 /** Takes the original array, and returns a soft copy without the elements contained in remove */
@@ -286,6 +322,15 @@ declare type DropTableElement = {
     maxQuantity: number;
     weight: number;
 };
+/**
+ * Selects a random element from a weighted array
+ * @param array Weighted array elements
+ * @param totalWeight Sum of all weights in the array
+ * @returns
+ */
+declare function selectFromWeightedArray<T extends {
+    weight: number;
+}>(array: T[], totalWeight: number): T;
 declare class DropTable {
     totalWeight: number;
     drops: DropTableElement[];
@@ -300,6 +345,60 @@ declare class DropTable {
     unregisterDrops(data: string[]): void;
     /** Rolls for a drop on the table */
     getDrop(): AnyItemQuantity;
+    /** Rolls for a drop on the table and returns raw drop data with quantity */
+    getRawDrop(): RawDrop;
+}
+interface RawDrop {
+    drop: DropTableElement;
+    quantity: number;
+}
+declare type SkillModifierTableElementData = {
+    weight: number;
+    key: SkillModifierKeys;
+    skill: string;
+    min: number;
+    max: number;
+    unique?: boolean;
+};
+declare type StandardModifierTableElement = {
+    weight: number;
+    key: StandardModifierKeys;
+    min: number;
+    max: number;
+    unique: boolean;
+};
+declare type StandardModifierTableElementData = Omit<StandardModifierTableElement, 'unique'> & {
+    unique?: boolean;
+};
+declare type SkillModifierTableElement = {
+    weight: number;
+    key: SkillModifierKeys;
+    skill: AnySkill;
+    min: number;
+    max: number;
+    unique: boolean;
+};
+declare type RandomModifierTableElement = StandardModifierTableElement | SkillModifierTableElement;
+declare type RandomModifierTableData = StandardModifierTableElementData | SkillModifierTableElementData;
+/** Utility class for selecting random modifiers */
+declare class RandomModifierTable {
+    totalWeight: number;
+    drops: RandomModifierTableElement[];
+    get size(): number;
+    constructor(game: Game, data: RandomModifierTableData[]);
+    /** Registers new modifiers that can be rolled from this table */
+    registerModifiers(game: Game, data: RandomModifierTableData[]): void;
+    /** Gets a single random modifier from this table */
+    getModifier(): ModifierArrayElement;
+    processRoll(roll: RandomModifierTableElement): ModifierArrayElement;
+    getExcludedTable(existing: ModifierArrayElement[]): {
+        excludedWeight: number;
+        excludedDrops: RandomModifierTableElement[];
+    };
+    /** Gets a single random modifier from this table, excluding the modifiers flagged as unique contained in existing */
+    getModifierExcludingUnique(existing: ModifierArrayElement[]): ModifierArrayElement;
+    /** Gets multiple random modifiers from this table, excluding the modifiers flagged as unique contained in existing. More efficient than calling getModifierExludingUnique multiple times due to excluded table caching. */
+    getModifiersExcludingUnique(existing: ModifierArrayElement[], count: number): ModifierArrayElement[];
 }
 /** Wrapper for sparse numeric maps */
 declare class SparseNumericMap<T> {
@@ -324,8 +423,8 @@ declare class SparseNumericMap<T> {
  * Taken from: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions
  */
 declare function escapeRegExp(string: string): string;
-declare function generateComponentClass(templateID: string, tagName: string, className: string): string;
-declare function generateModifierDataSchema(): string;
+declare function generateComponentClass(tagName: string): string;
+declare function generateModifierDataSchema(): void;
 declare function getRequirementTextClass(met: boolean): "text-success" | "text-danger";
 declare function createUnlockElement(costNodes: (string | Node)[], met: boolean): HTMLDivElement;
 declare function printUnlockRequirements(requirements: AnyRequirement[]): HTMLDivElement[];
@@ -346,6 +445,10 @@ declare function getMAsTime(time: number): {
     seconds: number;
     milliseconds: number;
 };
+/** Adds a blanket listener to all on-combat skilling actions to perform specified function */
+declare function addAllNonCombatSkillActionEventListeners(game: Game, actionFunction: () => void): void;
+/** Removes the blanket listener to all on-combat skilling actions for the specified function */
+declare function removeAllNonCombatSkillActionEventListeners(game: Game, actionFunction: () => void): void;
 declare type ScheduledPushNotifications = ScheduledPushNotificationData[];
 interface ScheduledPushNotificationData {
     id: string;

@@ -64,6 +64,7 @@ declare class GamemodeSelectionElement extends HTMLElement {
     timeRemaining: HTMLSpanElement;
     name: HTMLHeadingElement;
     safety: HTMLHeadingElement;
+    activeNotice: HTMLHeadingElement;
     description: HTMLHeadingElement;
     rules: HTMLHeadingElement[];
     constructor();

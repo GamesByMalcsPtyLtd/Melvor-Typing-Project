@@ -5,8 +5,8 @@ interface NotificationData {
     isImportant: boolean;
     isError: boolean;
 }
-declare type AnyNotification = GenericNotification | AddItemNotification | RemoveItemNotification | SummoningMarkNotification | ErrorNotification | SuccessNotification | InfoNotification;
-declare type NotificationType = 'AddItem' | 'RemoveItem' | 'AddGP' | 'RemoveGP' | 'AddSlayerCoins' | 'RemoveSlayerCoins' | 'SummoningMark' | 'Error' | 'Success' | 'Info';
+declare type AnyNotification = GenericNotification | AddItemNotification | RemoveItemNotification | SummoningMarkNotification | ErrorNotification | SuccessNotification | InfoNotification | SkillXPNotification;
+declare type NotificationType = 'AddItem' | 'RemoveItem' | 'AddGP' | 'RemoveGP' | 'AddSlayerCoins' | 'RemoveSlayerCoins' | 'SummoningMark' | 'Error' | 'Success' | 'Info' | 'SkillXP' | 'MasteryLevel';
 declare const enum NotificationHorizontalPositions {
     LEFT = 0,
     CENTER = 1,
@@ -47,6 +47,16 @@ declare class InfoNotification extends GenericNotification {
     constructor(customID: string);
     get customID(): string;
 }
+declare class SkillXPNotification extends GenericNotification {
+    _skill: AnySkill;
+    constructor(skill: AnySkill);
+    get skill(): AnySkill;
+}
+declare class MasteryLevelNotification extends GenericNotification {
+    _action: MasteryAction;
+    constructor(action: MasteryAction);
+    get action(): MasteryAction;
+}
 declare class NotificationsManager {
     readonly OFFSET = 5;
     activeNotifications: Map<AnyNotification, NotificationData>;
@@ -59,9 +69,15 @@ declare class NotificationsManager {
     successNotificationClasses: Map<string, SuccessNotification>;
     infoNotificationClasses: Map<string, InfoNotification>;
     genericNotificationClasses: Map<string, GenericNotification>;
+    skillXPNotificationClasses: Map<AnySkill, SkillXPNotification>;
+    masteryLevelNotificationClasses: Map<MasteryAction, MasteryLevelNotification>;
     constructor();
     get genericNotificationData(): NotificationData;
     get timeoutDelay(): number;
+    createSkillXPNotification(skill: AnySkill, quantity: number): void;
+    newSkillXPNotification(skill: AnySkill): SkillXPNotification | undefined;
+    createMasteryLevelNotification(action: MasteryAction, level: number): void;
+    newMasteryLevelNotification(action: MasteryAction): MasteryLevelNotification | undefined;
     createItemNotification(item: AnyItem, quantity: number): void;
     newAddItemNotification(item: AnyItem): AddItemNotification | undefined;
     newRemoveItemNotification(item: AnyItem): RemoveItemNotification | undefined;
@@ -90,6 +106,7 @@ declare class NotificationsManager {
     updateAllNotificationPositions(): void;
     updateAllNotificationText(): void;
     updateAllNotificationImportance(): void;
+    toggleCompactNotifications(): void;
     setInBankText(key: AnyNotification): void;
     setNotificationText(key: AnyNotification, notification: NotificationData): void;
     pulseNotificationContainer(key: AnyNotification): void;
@@ -110,13 +127,16 @@ declare class NotificationElement extends HTMLElement {
     splashManager?: SplashManager;
     tooltip?: TippyTooltip;
     constructor();
+    get isCompact(): boolean;
     connectedCallback(): void;
     initSplashManager(): void;
-    setNotification(notification: NotificationData, game: Game): void;
+    setNotification(key: AnyNotification, notification: NotificationData, game: Game): void;
     setImportance(key: AnyNotification, notification: NotificationData, game: Game): void;
+    setTextMinWidth(width: string): void;
     setText(text: string): void;
     setInBankText(text: string): void;
-    setQuantity(notification: NotificationData): void;
+    toggleCompact(): void;
+    setQuantity(notification: NotificationData, type: NotificationType): void;
     setBorder(colour: string): void;
     setBottomPos(pos: number): void;
     setHorizontalPos(posType: NotificationHorizontalPositions): void;

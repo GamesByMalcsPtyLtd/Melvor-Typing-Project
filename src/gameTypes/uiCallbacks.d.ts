@@ -23,9 +23,9 @@ declare function viewMonsterDrops(monster: Monster, respectArea: boolean): void;
 declare let selectedSpellbook: CombatSpellBook;
 /** Changes the spell menu to a spellbook */
 declare function selectSpellbook(spellbook: CombatSpellBook): void;
-/** @deprecated Use Player.equipFood instead. */
-declare function equipFood(): void;
 declare const combatMenuCount = 6;
+/** Currently select combat menu */
+declare let selectedCombatMenu: number;
 declare function changeCombatMenu(menu: number): void;
 declare function togglePlayerContainer(): void;
 /** Callback function that changes the summoning category */
@@ -51,3 +51,20 @@ declare function viewMonsterStats(monster: Monster): void;
 declare const changePage: (page: Page, subCategory?: number, skill?: AnySkill, showRaidShop?: boolean, toggleSidebar?: boolean) => void;
 /** Function for reading an lore entry */
 declare function readLore(loreID: number): void;
+/** TODO: Rename functions due to new mechanic
+ * TODO: Clean up code - current code below is prototyping code in case we don't continue with this idea
+ */
+declare function awardRandomSkillLevelCapIncreaseForPre99(count: number): void;
+declare function awardRandomSkillLevelCapIncreaseForPost99(count: number): void;
+declare function awardRandomSkillLevelCapIncrease(count: number, levelCap: number, displayNextSkillUnlock: () => void): void;
+declare function displayNextSkillUnlock(): void;
+declare function displayNextSkillUnlockForPre99(): void;
+declare function displayNextSkillUnlockForPost99(): void;
+declare function determineRandomSkillsForUnlock(levelCap: number): void;
+declare function getRandomElements<T>(array: T[], count: number): T[];
+declare function displayRandomSkillUnlockForPre99(): void;
+declare function displayRandomSkillUnlockForPost99(): void;
+declare function displayRandomSkillUnlock(levelCap: number, levelIncrease: number, nextSkillUnlock: () => void): void;
+declare function toggleWikiLinkVisibility(): void;
+declare function getSummonMaxHitItemDescription(item: EquipmentItem): string;
+declare function setGameBackgroundImage(image: string): void;

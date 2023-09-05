@@ -37,8 +37,9 @@ declare class RaidPlayer extends Player {
     rewardForDamage(damage: number): void;
     trackItemUsage(costs: AnyItemQuantity[]): void;
     trackWeaponStat(stat: ItemStats, amount?: number): void;
-    processCombatEvent(event: GameEvent, interval?: number): void;
-    consumeEquipmentCharges(event: GameEvent, interval: number): void;
+    consumeItemCharges(e: GameEvent, item: EquipmentItem): void;
+    consumeItemQuantities(e: GameEvent, slot: EquipSlot): void;
+    consumeSynergyTablets(e: GameEvent): void;
     trackArmourStat(stat: ItemStats, amount?: number): void;
     addItemStat(item: EquipmentItem, stat: ItemStats, amount: number): void;
     trackPrayerStats(stat: PrayerStats, amount: number): void;

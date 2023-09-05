@@ -27,6 +27,10 @@ interface BuildingQuantity {
     building: TownshipBuilding;
     quantity: number;
 }
+interface WorldMapQuantity {
+    worldMap: WorldMap;
+    quantity: number;
+}
 interface TownshipTaskTrackingData {
     count: number;
     required: number;
@@ -60,6 +64,10 @@ interface TownshipTaskGoalsData {
     buildings: IDQuantity[];
     /** Monsters that must be killed while the specified items are equipped to complete the task */
     monsterWithItems?: MonsterItemIDQuantity[];
+    /** AoD Only. Number of Points of Interest discovered in Cartography per Map ID. */
+    numPOIs?: WorldMapIDQuantity[];
+    /** AoD Only. Number of times a Map has been refined in Cartography. */
+    numRefinements?: number;
 }
 interface MonsterItemIDQuantity {
     /** The ID of the Monster that must be killed */
@@ -69,12 +77,20 @@ interface MonsterItemIDQuantity {
     /** The number of times the monster must be killed. Integer range [1,Infinity) */
     quantity: number;
 }
+interface WorldMapIDQuantity {
+    /** The ID of the World Map from Cartography */
+    worldMapID: string;
+    /** The number of Points of Interest to Discover */
+    quantity: number;
+}
 declare class TownshipTaskGoals {
     items: AnyItemQuantity[];
     monsters: MonsterQuantity[];
     monsterWithItems: MonsterWithItemQuantity[];
     skillXP: SkillQuantity[];
     buildings: BuildingQuantity[];
+    numPOIs: WorldMapQuantity[];
+    numRefinements: number;
     constructor(data: TownshipTaskGoalsData, game: Game);
 }
 /** Data for constructing a TownshipTask object */
@@ -159,13 +175,25 @@ declare class TownshipCasualTasks implements EncodableObject {
     encode(writer: SaveWriter): SaveWriter;
     decode(reader: SaveWriter, version: number): void;
 }
-declare class TownshipTasks {
+declare type TownshipTaskEvents = {
+    townshipTaskCompleted: TownshipTaskCompletedEvent;
+};
+declare class TownshipTasks implements IGameEventEmitter<TownshipTaskEvents> {
     game: Game;
     completedTasks: Set<TownshipTask>;
     activeTaskCategory: TownshipTaskCategory | 'None';
     tasks: NamespaceRegistry<TownshipTask>;
     taskReadyIcon: boolean;
     _tasksCompleted: number;
+    _events: import("mitt").Emitter<TownshipTaskEvents>;
+    on: {
+        <Key extends "townshipTaskCompleted">(type: Key, handler: import("mitt").Handler<TownshipTaskEvents[Key]>): void;
+        (type: "*", handler: import("mitt").WildcardHandler<TownshipTaskEvents>): void;
+    };
+    off: {
+        <Key extends "townshipTaskCompleted">(type: Key, handler?: import("mitt").Handler<TownshipTaskEvents[Key]> | undefined): void;
+        (type: "*", handler: import("mitt").WildcardHandler<TownshipTaskEvents>): void;
+    };
     get tasksCompleted(): number;
     get tutorialTasksCompleted(): number;
     get allTasksComplete(): boolean;
@@ -198,14 +226,12 @@ declare class TownshipTasks {
     isMonsterTaskComplete(monsterGoal: MonsterQuantity): boolean;
     isSkillTaskComplete(skillTask: SkillQuantity): boolean;
     isTownshipBuildingTaskComplete(buildingTask: BuildingQuantity): boolean;
+    isNumPOIsComplete(numPOIsTask: WorldMapQuantity): boolean;
+    isNumRefinementsComplete(count: number): boolean;
     updateAllTasks(): void;
     isTaskCategoryComplete(category: TownshipTaskCategory): boolean;
-    /**
-     * Updates all tracked tasks upon enemy death
-     * @param monster
-     */
-    updateMonsterTasks(monster: Monster): void;
-    updateTownshipBuildingTasks(building: TownshipBuilding, qty: number): void;
+    get cartographyMapsRefined(): number;
+    updateTaskCategory(): void;
     /**
      * Removes the task items from bank when turning in task completion
      * @param task
@@ -260,6 +286,16 @@ declare class TownshipTasks {
      * @param task
      */
     createTaskMonsterWithItemTask(task: TownshipTask | TownshipCasualTask): HTMLElement;
+    /**
+     * Creates number of POIs discovered task in Cart element to display
+     * @param task
+     */
+    createTaskNumPOIsTask(task: TownshipTask | TownshipCasualTask): HTMLElement;
+    /**
+     * Creates number of POIs discovered task in Cart element to display
+     * @param task
+     */
+    createTaskNumRefinementsTask(task: TownshipTask | TownshipCasualTask): HTMLElement;
     /**
      * Creates task rewards element to display
      * @param task
@@ -331,4 +367,4 @@ declare type TaskTrackingData = {
         quantity: number;
     }[];
 };
-declare type TownshipTaskCategory = 'Easy' | 'Normal' | 'Hard' | 'VeryHard' | 'Elite' | 'TownshipTutorial' | 'Daily' | 'TotH';
+declare type TownshipTaskCategory = 'Easy' | 'Normal' | 'Hard' | 'VeryHard' | 'Elite' | 'TownshipTutorial' | 'Daily' | 'TotH' | 'AoD' | 'Birthday2023';

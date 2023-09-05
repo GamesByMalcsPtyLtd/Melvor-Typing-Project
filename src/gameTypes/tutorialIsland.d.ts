@@ -30,7 +30,9 @@ declare class TutorialTask {
     get complete(): boolean;
     _description: string;
     _media: string;
-    eventMatcher: GameEventMatcher;
+    eventMatcher: AnyGameEventMatcher;
+    /** Event matcher unassignment function */
+    unassigner?: VoidFunction;
     eventCount: number;
     countEventQuantity: boolean;
     id: string;
@@ -128,7 +130,7 @@ declare class Tutorial implements EncodableObject {
     renderProgress(): void;
     showStageHints(stage: TutorialStage): void;
     removeStageHints(stage: TutorialStage): void;
-    updateTaskProgress(event: GameEvent): void;
+    updateTaskProgress(event: GameEvent, task: TutorialTask, stage: TutorialStage): void;
     claimStageOnClick(stage: TutorialStage): void;
     skipButtonOnClick(): void;
     skipTutorial(): void;

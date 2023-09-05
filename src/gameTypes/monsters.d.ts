@@ -30,6 +30,7 @@ interface MonsterData extends IDData {
     isBoss: boolean;
     selectedSpell: string;
     pet?: IDQuantity;
+    barrierPercent?: number;
 }
 interface MonsterModificationData extends IDData {
     attackType?: AttackType | 'random';
@@ -70,6 +71,7 @@ interface MonsterModificationData extends IDData {
 declare class Monster extends NamespacedObject {
     get media(): string;
     get name(): string;
+    get wikiName(): string;
     get description(): string;
     get combatLevel(): number;
     levels: Omit<CombatLevels, 'Prayer'>;
@@ -102,6 +104,8 @@ declare class Monster extends NamespacedObject {
         pet: Pet;
         kills: number;
     };
+    get hasBarrier(): boolean;
+    barrierPercent: number;
     constructor(namespace: DataNamespace, data: MonsterData, game: Game);
     applyDataModification(modData: MonsterModificationData, game: Game): void;
     overrideMedia(media: string): void;

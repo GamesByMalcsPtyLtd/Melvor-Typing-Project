@@ -286,6 +286,81 @@ declare class CombatModifiers implements CombatModifierObject<number> {
     increasedEvasionAgainstMelee: number;
     increasedEvasionAgainstRanged: number;
     increasedEvasionAgainstMagic: number;
+    increasedDamageReductionPer30Defence: number;
+    increasedElusive: number;
+    increasedMeleeAccuracyMaxHitPer8Strength: number;
+    increasedDamageReductionWithActivePrayer: number;
+    increasedMagicMaxHitWithActivePrayer: number;
+    increasedBurnReflectChance: number;
+    increasedFrostburnReflectChance: number;
+    decreasedMaxHitIfCursed: number;
+    decreasedAccuracyIfCursed: number;
+    decreasedEvasionIfCursed: number;
+    increasedRangedStrengthBonusPer8Ranged: number;
+    increasedFlatBarrierSummonDamage: number;
+    increasedBarrierSummonDamage: number;
+    increasedChanceBarrierBleed: number;
+    increasedChanceBarrierBurn: number;
+    increasedFlatBarrierSummonDamageMelee: number;
+    increasedFlatBarrierSummonDamageRanged: number;
+    increasedFlatBarrierSummonDamageMagic: number;
+    increasedBarrierSummonDamageIfSlayerTask: number;
+    enableBarrierBurn: number;
+    increasedGPFromBarrierDamage: number;
+    increasedChanceCrystallization: number;
+    increasedChanceCrystalSanction: number;
+    disableAttackDamage: number;
+    increasedChanceWeakeningTouch: number;
+    underwaterEffect: number;
+    nulled: number;
+    cleansed: number;
+    increasedChanceToNull: number;
+    increasedChanceToCleanse: number;
+    increasedChanceToDodgeCrystallization: number;
+    increasedChanceToDodgeCrystalSanction: number;
+    crystallized: number;
+    increasedChanceToApply5Slow: number;
+    increasedHealEvery200Int: number;
+    gain2MaxHitpointsPerTurn: number;
+    increasedMaxHitPercentBasedOnTargetCurrentHitpoints: number;
+    increasedChanceToApplyBlind: number;
+    increased5DROnBeingHit: number;
+    increasedChanceToPreservePrayerPointsPerPoint: number;
+    increasedMaxHitBasedOnPrayerCost: number;
+    increasedPrayerPointsPerMonsterKill: number;
+    increasedSelfDamageBasedOnCurrentHitpoints: number;
+    increasedChanceToReceiveNoCombatDrops: number;
+    increasedLifestealDamageBasedOnCurrentHitpoints: number;
+    increasedDamageBasedOnCurrentHitpoints: number;
+    increasedDamageBasedOnMaxHitpoints: number;
+    increasedHealingWhenHit: number;
+    decreasedDamageReductionIfCursed: number;
+    increasedDamageTakenIfCursed: number;
+    increasedDamageDealtWith2Effects: number;
+    increasedDamageTakenWhenSlowed: number;
+    increasedUnholyMarkOnHit: number;
+    increasedDamageTakenBasedOnHP: number;
+    increasedCurseOnHitWithUnholyMark: number;
+    decreasedMeleeAttackIntervalPercent: number;
+    increasedChanceToDodge: number;
+    decreasedEnemyMaximumHitpoints: number;
+    increasedAmmoPreservationBypass: number;
+    increasedRunePreservationBypass: number;
+    increasedMinSpellDmg: number;
+    halfAttackInterval: number;
+    increasedSummoningMaxHit: number;
+    decreasedSummoningMaxHit: number;
+    applyAttackMasterRelicEffect: number;
+    applyStrengthMasterRelicEffect: number;
+    applyMagicMasterRelicEffect: number;
+    increasedChanceToApplyConfusionCurse: number;
+    increasedFlatBarrierDamage: number;
+    increasedDamageDealtPerEffect: number;
+    increasedBoltSpellMaxHitFlat: number;
+    increasedGlobalFreezeChance: number;
+    decreasedGlobalFreezeChance: number;
+    increasedRegenPerDamageTaken: number;
+    convertBoneDropsIntoCake: number;
     constructor();
     reset(): void;
     getActiveModifiers(): NameValuePair[];
@@ -305,7 +380,7 @@ declare class CombatModifiers implements CombatModifierObject<number> {
     getFlatMinHitModifier(): number;
     getSpellMinHitModifier(spellType: number): number;
     getArchaicMinHitModifier(archaicSpell: ArchaicSpell): number;
-    getSpellMaxHitModifier(spellType: number): number;
+    getSpellMaxHitModifier(spell: StandardSpell): number;
     getMaxHPPercentModifier(): number;
     getMaxHPFlatModifier(): number;
     getAttackIntervalModifier(): number;
@@ -591,8 +666,6 @@ declare class PlayerModifiers extends CombatModifiers implements StandardModifie
     decreasedFishingSpecialChance: number;
     increasedAllotmentSeedCost: number;
     decreasedAllotmentSeedCost: number;
-    increasedSummoningMaxHit: number;
-    decreasedSummoningMaxHit: number;
     increasedChanceForDiamondFiremaking: number;
     decreasedChanceForDiamondFiremaking: number;
     increasedNonMagicPoisonChance: number;
@@ -794,24 +867,115 @@ declare class PlayerModifiers extends CombatModifiers implements StandardModifie
     decreasedSummoningIntervalForOctopus: number;
     increasedMasteryPoolCap: number;
     bypassAllSlayerItems: number;
-    increased5DROnBeingHit: number;
     allowNonMagicCurses: number;
     increasedTownshipTraderStock: number;
+    increasedSightRange: number;
+    decreasedSightRange: number;
+    increasedSurveyRange: number;
+    decreasedSurveyRange: number;
+    increasedHexTravelCost: number;
+    decreasedHexTravelCost: number;
+    increasedSurveyInterval: number;
+    decreasedSurveyInterval: number;
+    increasedPaperMakingInterval: number;
+    decreasedPaperMakingInterval: number;
+    increasedMapUpgradeInterval: number;
+    decreasedMapUpgradeInterval: number;
+    increasedSurveyXP: number;
+    decreasedSurveyXP: number;
+    increasedMapUpgradeActions: number;
+    decreasedMapUpgradeActions: number;
+    decreasedInitialMapArtefactValues: number;
+    increasedInitialMapArtefactValues: number;
+    increasedDigSiteMapSlots: number;
+    increasedSieveToolLevel: number;
+    increasedTrowelToolLevel: number;
+    increasedBrushToolLevel: number;
+    increasedShovelToolLevel: number;
+    increasedChanceAdditionalSoup: number;
+    increasedHolyDustFromBlessedOffering: number;
+    increasedPrayerPointsFromBurying: number;
+    increasedChanceToCatchExtraSameAreaFish: number;
+    increasedChanceForGoldFromCrafting30: number;
+    increasedGPFromLogSales: number;
+    increasedGPFromRawFishSales: number;
+    increasedChanceForChestOfGemsInWoodcutting: number;
+    increasedChanceToLocateAncientRelic: number;
+    increasedChanceToLocateSkillPet: number;
+    increasedPrayerPointsFromBuryingPercent: number;
+    noDamageFromThievingNPCs: number;
+    increasedArrowProduction: number;
+    increasedBaseCraftingConsumableProduction: number;
+    increasedXPFromMasteryTokens: number;
+    increasedChanceForEnchantedUrnInCrafting: number;
+    increasedCombinationRuneProduction: number;
+    halfSkillInterval: number;
+    halfSkillXP: number;
+    halfMasteryXP: number;
     increasedEssenceFromMining: number;
     increasedMasteryTokens: number;
     decreasedTownshipRepairCost: number;
     decreasedTownshipTraderCost: number;
     enableNightfallSeason: number;
     enableSolarEclipseSeason: number;
+    allowUnholyPrayerUse: number;
+    increasedChanceToPreserveUnholyPrayerPoints: number;
+    disableTownshipHealthDegradation: number;
+    increasedMinimumTownshipBuildingEfficiency: number;
+    enableLemonSeason: number;
+    increasedChanceToPreserveMapCharges: number;
+    decreasedChanceToPreserveMapCharges: number;
+    increasedStandardRuneProduction: number;
+    increasedGlobalPreservationChanceBypass: number;
+    unlockAllSummoningSynergies: number;
+    agilityItemCostReductionCanReach100: number;
+    decreasedAgilityObstacleItemCost: number;
+    removeDebuffsFromAgility: number;
+    doubleModifiersInAstrologyForMaxedConstellations: number;
+    increasedGPFlat: number;
+    increasedChanceForGPFromFishing: number;
+    increasedMapRefinementCost: number;
+    decreasedMapRefinementCost: number;
+    increasedTravelEventChance: number;
+    decreasedTravelEventChance: number;
+    increasedTinyArtefactChance: number;
+    decreasedTinyArtefactChance: number;
+    increasedSmallArtefactChance: number;
+    decreasedSmallArtefactChance: number;
+    increasedMediumArtefactChance: number;
+    decreasedMediumArtefactChance: number;
+    increasedLargeArtefactChance: number;
+    decreasedLargeArtefactChance: number;
+    decreasedTinyArtefactValue: number;
+    decreasedSmallArtefactValue: number;
+    decreasedMediumArtefactValue: number;
+    decreasedLargeArtefactValue: number;
+    increasedMinimumItemsFoundInArchaeology: number;
+    archaeologyVeryRareMapPreservation: number;
+    increasedArchaeologyCommonItemSkillXP: number;
+    increasedDigSiteMapCharges: number;
+    disabledSpecialAttacks: number;
+    increasedMeleeStrengthBonusPer10EnemyDR: number;
+    decreasedCookingIntervalForBasicSoup: number;
+    increasedGPPerArchaeologyLevelNoArtefact: number;
+    increasedPotionsHerblore: number;
+    increasedLemonsPerAction: number;
+    doubleConsumablesArchaeology: number;
+    doubleActiveModifiersCartography: number;
+    increasedTownshipRepairCost: number;
     skillModifiers: Map<SkillModifierKeys, Map<AnySkill, number>>;
     constructor();
     get combatLootDoubleChance(): number;
     get increasedCombatGP(): number;
     get runePreservationChance(): number;
     get ammoPreservationChance(): number;
+    get summoningChargePreservationChance(): number;
+    get foodPreservationChance(): number;
     addModifiers(modifiers: PlayerModifierObject, negMult?: number, posMult?: number): void;
     /** Adds the modifiers from a MappedModifiers object to this */
     addMappedModifiers(modifiers: MappedModifiers): void;
+    /** Subtracts the modifiers from a MappedModifiers object from this */
+    subMappedModifiers(modifiers: MappedModifiers): void;
     getActiveModifiers(): NameValuePair[];
     reset(): void;
     getSkillModifierValue(key: SkillModifierKeys, skill: AnySkill): number;
@@ -851,16 +1015,33 @@ declare class TargetModifiers {
     subFromCombatModifiers(combatModifiers: CombatModifiers): void;
     reset(): void;
 }
+/** Performs a deep clone of a modifier array element (minus skill references) */
+declare function cloneModifierArrayElement(elem: ModifierArrayElement): ModifierArrayElement;
 declare function shouldRoundModifier(key: ModifierKeys, value: number): boolean;
 declare function printPlayerModifier(key: SkillModifierKeys, value: SkillModifier, precision?: number): [string, string];
 declare function printPlayerModifier(key: StandardModifierKeys, value: number, precision?: number): [string, string];
+/** Prints a modifier array element. If a skill modifier, only prints the first skill */
+declare function printModifierArrayElement(element: ModifierArrayElement): [string, string];
 declare function isSkillEntry<Skill, Standard>(entry: ModifierEntry<Skill, Standard>): entry is SkillEntry<Skill>;
 declare function isSkillKey(key: SkillModifierKeys | StandardModifierKeys): key is SkillModifierKeys;
+/**
+ * Formats Modifiers using the given formatter function
+ * @param formatter Formats the description and textClass of a modifier
+ * @param modifiers The modifier object to format
+ * @param negMult Optional. Multiplier applied to negative modifiers.
+ * @param posMult Optional. Multiplier applied to positive modifiers.
+ * @returns An array of formatted descriptions
+ */
+declare function formatModifiers<T>(formatter: (desc: string, textClass: string) => T, modifiers: PlayerModifierObject, negMult?: number, posMult?: number): T[];
 declare function addModifierTemplateData(formatData: StringDictionary<string>, modifiers: PlayerModifierObject, key: string): void;
 declare function generateModifierDataDescription(modifiers: PlayerModifierObject, key: string): string;
+/** Pass a modifier description through here. Applies strike through if modifier is disabled */
+declare function disableModifierPass(modifier: ModifierKeys, desc: string): string;
 /** Gets an array of plain modifier descriptions from data*/
 declare function getPlainModifierDescriptions(modifiers: PlayerModifierObject): string[];
-/** Describes modifiers and joins them as a list with no HTML formatting */
+declare function containsDisabledModifier(modifiers: PlayerModifierObject | undefined): boolean;
+declare function isDisabledModifier(modifier: ModifierKeys | undefined): boolean;
+/** Describes modifiers and joins them as a list with no HTML formatting, unless the modifier is disabled */
 declare function describeModifierDataPlain(modifiers: PlayerModifierObject): string;
 /** Describes modifiers and joins them as a list separated by HTML line breaks with no HTML formatting for the modifier itself */
 declare function describeModifierDataPlainLineBreak(modifiers: PlayerModifierObject): string;
@@ -1129,9 +1310,9 @@ interface CombatModifierObject<Standard> {
     increasedBleedReflectChance: Standard;
     /** % of Maximum Hit added to Minimum Hit when using Nature spells */
     increasedMinNatureSpellDamageBasedOnMaxHit: Standard;
-    /** Increases total damage to bleeds inflicted by flat amount */
+    /** Increases total damage to bleed inflicted by flat amount */
     increasedTotalBleedDamage: Standard;
-    /** % chance to increase the length of stuns inflicted by 1 turn */
+    /** % chance to increase the length of stun inflicted by 1 turn */
     increasedChanceToIncreaseStunDuration: Standard;
     /** Increases Accuracy Rating when using Surge spells */
     increasedSurgeSpellAccuracy: Standard;
@@ -1327,6 +1508,82 @@ interface CombatModifierObject<Standard> {
     increasedEvasionAgainstMelee: Standard;
     increasedEvasionAgainstRanged: Standard;
     increasedEvasionAgainstMagic: Standard;
+    increasedDamageReductionPer30Defence: Standard;
+    increasedElusive: Standard;
+    increasedMeleeAccuracyMaxHitPer8Strength: Standard;
+    increasedDamageReductionWithActivePrayer: Standard;
+    increasedMagicMaxHitWithActivePrayer: Standard;
+    increasedBurnReflectChance: Standard;
+    increasedFrostburnReflectChance: Standard;
+    decreasedMaxHitIfCursed: Standard;
+    decreasedAccuracyIfCursed: Standard;
+    decreasedEvasionIfCursed: Standard;
+    increasedRangedStrengthBonusPer8Ranged: Standard;
+    increasedFlatBarrierSummonDamage: Standard;
+    increasedBarrierSummonDamage: Standard;
+    increasedChanceBarrierBleed: Standard;
+    increasedChanceBarrierBurn: Standard;
+    increasedFlatBarrierSummonDamageMelee: Standard;
+    increasedFlatBarrierSummonDamageRanged: Standard;
+    increasedFlatBarrierSummonDamageMagic: Standard;
+    increasedBarrierSummonDamageIfSlayerTask: Standard;
+    enableBarrierBurn: Standard;
+    increasedGPFromBarrierDamage: Standard;
+    increasedChanceCrystallization: Standard;
+    increasedChanceCrystalSanction: Standard;
+    disableAttackDamage: Standard;
+    increasedChanceWeakeningTouch: Standard;
+    underwaterEffect: Standard;
+    nulled: Standard;
+    cleansed: Standard;
+    increasedChanceToNull: Standard;
+    increasedChanceToCleanse: Standard;
+    increasedChanceToDodgeCrystallization: Standard;
+    increasedChanceToDodgeCrystalSanction: Standard;
+    crystallized: Standard;
+    increasedChanceToApply5Slow: Standard;
+    increasedHealEvery200Int: Standard;
+    gain2MaxHitpointsPerTurn: Standard;
+    increasedMaxHitPercentBasedOnTargetCurrentHitpoints: Standard;
+    increasedChanceToApplyBlind: Standard;
+    increasedChanceToPreservePrayerPointsPerPoint: Standard;
+    increasedMaxHitBasedOnPrayerCost: Standard;
+    increasedPrayerPointsPerMonsterKill: Standard;
+    increasedSelfDamageBasedOnCurrentHitpoints: Standard;
+    increasedChanceToReceiveNoCombatDrops: Standard;
+    increasedLifestealDamageBasedOnCurrentHitpoints: Standard;
+    increasedDamageBasedOnCurrentHitpoints: Standard;
+    increasedDamageBasedOnMaxHitpoints: Standard;
+    increasedHealingWhenHit: Standard;
+    decreasedDamageReductionIfCursed: Standard;
+    increasedDamageTakenIfCursed: Standard;
+    increasedDamageDealtWith2Effects: Standard;
+    increasedDamageTakenWhenSlowed: Standard;
+    increasedUnholyMarkOnHit: Standard;
+    increasedDamageTakenBasedOnHP: Standard;
+    increasedCurseOnHitWithUnholyMark: Standard;
+    decreasedMeleeAttackIntervalPercent: Standard;
+    increasedChanceToDodge: Standard;
+    decreasedEnemyMaximumHitpoints: Standard;
+    increasedAmmoPreservationBypass: Standard;
+    increasedRunePreservationBypass: Standard;
+    increasedMinSpellDmg: Standard;
+    halfAttackInterval: Standard;
+    /** Increases the summoning max hit of the player. Does nothing for enemies */
+    increasedSummoningMaxHit: Standard;
+    /** Decreases the summoning max hit of the player. Does nothing for enemies */
+    decreasedSummoningMaxHit: Standard;
+    applyAttackMasterRelicEffect: Standard;
+    applyStrengthMasterRelicEffect: Standard;
+    applyMagicMasterRelicEffect: Standard;
+    increasedChanceToApplyConfusionCurse: Standard;
+    increasedFlatBarrierDamage: Standard;
+    increasedDamageDealtPerEffect: Standard;
+    increasedBoltSpellMaxHitFlat: Standard;
+    increasedGlobalFreezeChance: Standard;
+    decreasedGlobalFreezeChance: Standard;
+    increasedRegenPerDamageTaken: Standard;
+    convertBoneDropsIntoCake: Standard;
 }
 /** Modifiers that are only common to the player */
 interface StandardModifierObject<Standard> extends CombatModifierObject<Standard> {
@@ -1746,8 +2003,6 @@ interface StandardModifierObject<Standard> extends CombatModifierObject<Standard
     increasedAllotmentSeedCost: Standard;
     /** Decreases the quantity of seeds required to plant allotments by amount */
     decreasedAllotmentSeedCost: Standard;
-    increasedSummoningMaxHit: Standard;
-    decreasedSummoningMaxHit: Standard;
     increasedChanceForDiamondFiremaking: Standard;
     decreasedChanceForDiamondFiremaking: Standard;
     increasedNonMagicPoisonChance: Standard;
@@ -1966,12 +2221,102 @@ interface StandardModifierObject<Standard> extends CombatModifierObject<Standard
     increased5DROnBeingHit: Standard;
     allowNonMagicCurses: Standard;
     increasedTownshipTraderStock: Standard;
+    increasedSightRange: Standard;
+    decreasedSightRange: Standard;
+    increasedSurveyRange: Standard;
+    decreasedSurveyRange: Standard;
+    increasedHexTravelCost: Standard;
+    decreasedHexTravelCost: Standard;
+    increasedSurveyInterval: Standard;
+    decreasedSurveyInterval: Standard;
+    increasedPaperMakingInterval: Standard;
+    decreasedPaperMakingInterval: Standard;
+    increasedMapUpgradeInterval: Standard;
+    decreasedMapUpgradeInterval: Standard;
+    increasedSurveyXP: Standard;
+    decreasedSurveyXP: Standard;
+    increasedMapUpgradeActions: Standard;
+    decreasedMapUpgradeActions: Standard;
+    decreasedInitialMapArtefactValues: Standard;
+    increasedInitialMapArtefactValues: Standard;
+    increasedDigSiteMapSlots: Standard;
+    increasedChanceToPreserveMapCharges: Standard;
+    decreasedChanceToPreserveMapCharges: Standard;
+    increasedMapRefinementCost: Standard;
+    decreasedMapRefinementCost: Standard;
+    increasedTravelEventChance: Standard;
+    decreasedTravelEventChance: Standard;
+    increasedSieveToolLevel: Standard;
+    increasedTrowelToolLevel: Standard;
+    increasedBrushToolLevel: Standard;
+    increasedShovelToolLevel: Standard;
+    increasedChanceAdditionalSoup: Standard;
+    increasedHolyDustFromBlessedOffering: Standard;
+    increasedPrayerPointsFromBurying: Standard;
+    increasedChanceToCatchExtraSameAreaFish: Standard;
+    increasedChanceForGoldFromCrafting30: Standard;
+    increasedGPFromLogSales: Standard;
+    increasedGPFromRawFishSales: Standard;
+    increasedChanceForChestOfGemsInWoodcutting: Standard;
+    increasedChanceToLocateAncientRelic: Standard;
+    increasedChanceToLocateSkillPet: Standard;
+    increasedPrayerPointsFromBuryingPercent: Standard;
+    noDamageFromThievingNPCs: Standard;
+    increasedArrowProduction: Standard;
+    increasedBaseCraftingConsumableProduction: Standard;
+    increasedXPFromMasteryTokens: Standard;
+    increasedChanceForEnchantedUrnInCrafting: Standard;
+    increasedCombinationRuneProduction: Standard;
+    halfSkillInterval: Standard;
+    halfSkillXP: Standard;
+    halfMasteryXP: Standard;
     increasedEssenceFromMining: Standard;
     increasedMasteryTokens: Standard;
     decreasedTownshipRepairCost: Standard;
     decreasedTownshipTraderCost: Standard;
     enableNightfallSeason: Standard;
     enableSolarEclipseSeason: Standard;
+    disableTownshipHealthDegradation: Standard;
+    increasedMinimumTownshipBuildingEfficiency: Standard;
+    enableLemonSeason: Standard;
+    allowUnholyPrayerUse: Standard;
+    increasedChanceToPreserveUnholyPrayerPoints: Standard;
+    increasedStandardRuneProduction: Standard;
+    increasedGlobalPreservationChanceBypass: Standard;
+    unlockAllSummoningSynergies: Standard;
+    agilityItemCostReductionCanReach100: Standard;
+    decreasedAgilityObstacleItemCost: Standard;
+    removeDebuffsFromAgility: Standard;
+    doubleModifiersInAstrologyForMaxedConstellations: Standard;
+    increasedGPFlat: Standard;
+    increasedChanceForGPFromFishing: Standard;
+    increasedTinyArtefactChance: Standard;
+    decreasedTinyArtefactChance: Standard;
+    increasedSmallArtefactChance: Standard;
+    decreasedSmallArtefactChance: Standard;
+    increasedMediumArtefactChance: Standard;
+    decreasedMediumArtefactChance: Standard;
+    increasedLargeArtefactChance: Standard;
+    decreasedLargeArtefactChance: Standard;
+    decreasedTinyArtefactValue: Standard;
+    decreasedSmallArtefactValue: Standard;
+    decreasedMediumArtefactValue: Standard;
+    decreasedLargeArtefactValue: Standard;
+    increasedMinimumItemsFoundInArchaeology: Standard;
+    archaeologyVeryRareMapPreservation: Standard;
+    increasedArchaeologyCommonItemSkillXP: Standard;
+    increasedDigSiteMapCharges: Standard;
+    /** Disables all player special attacks */
+    disabledSpecialAttacks: Standard;
+    /** Increases melee strength bonus by % per 10 base enemy damage reduction */
+    increasedMeleeStrengthBonusPer10EnemyDR: Standard;
+    decreasedCookingIntervalForBasicSoup: Standard;
+    increasedGPPerArchaeologyLevelNoArtefact: Standard;
+    increasedPotionsHerblore: Standard;
+    increasedLemonsPerAction: Standard;
+    doubleConsumablesArchaeology: Standard;
+    doubleActiveModifiersCartography: Standard;
+    increasedTownshipRepairCost: Standard;
 }
 interface SkillModifierObject<Skill> {
     /** Increases the skill level used to compute combat stats by value: Implemented */
@@ -2023,6 +2368,9 @@ interface SkillModifierObject<Skill> {
     increasedSkillMasteryXPPerSyllia: Skill;
     /** Dummy modifier for adding mastery pool xp */
     masteryToken: Skill;
+    increasedHiddenSkillLevelPer2Levels: Skill;
+    increasedHiddenSkillLevelBasedOnLevels: Skill;
+    increasedMeleeStrengthBonusBasedOnSkillLevel: Skill;
 }
 interface SkillModifierData {
     skillID: string;
@@ -2056,3 +2404,9 @@ declare type StandardModifierArrayElement = {
 };
 declare type ModifierArrayElement = SkillModifierArrayElement | StandardModifierArrayElement;
 declare type ModifierArray = ModifierArrayElement[];
+declare type SkillModifierArrayElementData = {
+    key: SkillModifierKeys;
+    values: SkillModifierData[];
+};
+declare type ModifierArrayDataElement = SkillModifierArrayElementData | StandardModifierArrayElement;
+declare type ModifierArrayData = ModifierArrayDataElement[];

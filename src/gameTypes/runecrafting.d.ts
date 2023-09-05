@@ -5,8 +5,20 @@ interface RunecraftingSkillData extends MasterySkillData {
     comboRuneIDs?: string[];
     crowDevilItem?: string;
 }
+declare type RunecraftingEvents = {
+    action: RunecraftingActionEvent;
+};
 declare type RunecraftingRecipe = SingleProductArtisanSkillRecipe<SkillCategory>;
-declare class Runecrafting extends ArtisanSkill<RunecraftingRecipe, RunecraftingSkillData, AnyItem> implements SkillCategoryObject<SkillCategory> {
+declare class Runecrafting extends ArtisanSkill<RunecraftingRecipe, RunecraftingSkillData, AnyItem> implements SkillCategoryObject<SkillCategory>, IGameEventEmitter<RunecraftingEvents> {
+    _events: import("mitt").Emitter<RunecraftingEvents>;
+    on: {
+        <Key extends "action">(type: Key, handler: import("mitt").Handler<RunecraftingEvents[Key]>): void;
+        (type: "*", handler: import("mitt").WildcardHandler<RunecraftingEvents>): void;
+    };
+    off: {
+        <Key extends "action">(type: Key, handler?: import("mitt").Handler<RunecraftingEvents[Key]> | undefined): void;
+        (type: "*", handler: import("mitt").WildcardHandler<RunecraftingEvents>): void;
+    };
     readonly _media = "assets/media/skills/runecrafting/runecrafting.svg";
     getTotalUnlockedMasteryActions(): number;
     readonly baseInterval: number;
@@ -41,4 +53,5 @@ declare class Runecrafting extends ArtisanSkill<RunecraftingRecipe, Runecrafting
     getActionIDFromOldID(oldActionID: number, idMap: NumericIDMap): string;
     setFromOldOffline(offline: OfflineSkill, idMap: NumericIDMap): void;
     testTranslations(): void;
+    getObtainableItems(): Set<AnyItem>;
 }

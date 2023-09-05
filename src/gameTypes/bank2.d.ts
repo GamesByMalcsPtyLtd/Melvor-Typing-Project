@@ -10,9 +10,11 @@ interface ItemUpgradeData {
     rootItemIDs: string[];
     upgradedItemID: string;
     isDowngrade: boolean;
+    quantity?: number;
 }
 declare class ItemUpgrade {
     upgradedItem: AnyItem;
+    upgradedQuantity: number;
     itemCosts: AnyItemQuantity[];
     rootItems: AnyItem[];
     gpCost: number;
@@ -35,7 +37,6 @@ declare class BankRenderQueue {
 /** Class for the bank */
 declare class Bank implements EncodableObject {
     game: Game;
-    maxTabs: number;
     baseSlots: number;
     renderQueue: BankRenderQueue;
     /** Save State Property. The Set of items that are currently locked in the bank */
@@ -81,7 +82,9 @@ declare class Bank implements EncodableObject {
     get selectedItemValue(): number;
     /** Returns an array of all items present in the bank that are currently unlocked */
     get unlockedItemArray(): AnyItem[];
-    constructor(game: Game, maxTabs?: number, baseSlots?: number);
+    /** Readonly. Returns the number of tabs in the bank. */
+    get tabCount(): number;
+    constructor(game: Game, initialTabs?: number, baseSlots?: number);
     registerSortOrder(order: InsertOrder[]): void;
     encode(writer: SaveWriter): SaveWriter;
     decode(reader: SaveWriter, version: number): void;
@@ -120,6 +123,8 @@ declare class Bank implements EncodableObject {
     addQuantityToExistingItems(quantity: number): void;
     /** Removes all items from the bank */
     empty(): void;
+    /** Adds a new tab to the bank */
+    addTabs(quantity: number): void;
     moveItemInTab(tabID: number, oldTabPosition: number, newTabPosition: number): void;
     moveItemToNewTab(oldTabID: number, newTabID: number, oldTabPosition: number): void;
     checkForClueChasers(): void;
@@ -252,6 +257,10 @@ declare class Bank implements EncodableObject {
     updateItemBorders(): void;
     /** Test function. Validates the tab and tabPosition properties of all bank items */
     validateItemOrders(): void;
+    /** Test function. Determines items that are missing from the default sort order per namespace */
+    printItemsNotInDefaultSortOrder(): void;
+    /** Absolute maximum number of bank tabs allowed by save format */
+    static readonly MAXIMUM_TABS = 256;
 }
 /** Class for an individual bank item */
 declare class BankItem {

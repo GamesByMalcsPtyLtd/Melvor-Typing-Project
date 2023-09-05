@@ -6,25 +6,38 @@ interface WoodcuttingSkillData extends MasterySkillData {
     mushroomItemID?: string;
     ravenNestItemID?: string;
 }
+declare type WoodcuttingEvents = {
+    action: WoodcuttingActionEvent;
+};
 interface WoodcuttingTreeData extends SingleProductRecipeData {
     name: string;
     media: string;
     baseInterval: number;
     canDropRavenNest?: boolean;
-    /** If present, shop item must be purchased at least once to perform action */
-    shopItemPurchased?: string;
+    /** Optional. If present, these requirements must also be met to cut to tree, in addition to Woodcutting level. */
+    requirements?: AnyRequirementData[];
 }
-declare class WoodcuttingTree extends SingleProductRecipe {
+declare class WoodcuttingTree extends SingleProductRecipe implements SoftDataDependant<WoodcuttingTreeData> {
     get media(): string;
     get name(): string;
     baseInterval: number;
     _name: string;
     _media: string;
     canDropRavenNest: boolean;
-    shopItemPurchased?: ShopPurchase;
+    requirements: AnyRequirement[];
     constructor(namespace: DataNamespace, data: WoodcuttingTreeData, game: Game);
+    registerSoftDependencies(data: WoodcuttingTreeData, game: Game): void;
 }
-declare class Woodcutting extends GatheringSkill<WoodcuttingTree, WoodcuttingSkillData> {
+declare class Woodcutting extends GatheringSkill<WoodcuttingTree, WoodcuttingSkillData> implements IGameEventEmitter<WoodcuttingEvents> {
+    _events: import("mitt").Emitter<WoodcuttingEvents>;
+    on: {
+        <Key extends "action">(type: Key, handler: import("mitt").Handler<WoodcuttingEvents[Key]>): void;
+        (type: "*", handler: import("mitt").WildcardHandler<WoodcuttingEvents>): void;
+    };
+    off: {
+        <Key extends "action">(type: Key, handler?: import("mitt").Handler<WoodcuttingEvents[Key]> | undefined): void;
+        (type: "*", handler: import("mitt").WildcardHandler<WoodcuttingEvents>): void;
+    };
     readonly _media = "assets/media/skills/woodcutting/woodcutting.svg";
     getTotalUnlockedMasteryActions(): number;
     /** Trees that are currently being cut */
@@ -39,6 +52,7 @@ declare class Woodcutting extends GatheringSkill<WoodcuttingTree, WoodcuttingSki
     mushroomItem?: AnyItem;
     ravenNestItem?: AnyItem;
     constructor(namespace: DataNamespace, game: Game);
+    get chestOfGemsItem(): AnyItem | undefined;
     registerData(namespace: DataNamespace, data: WoodcuttingSkillData): void;
     postDataRegistration(): void;
     getFlatIntervalModifier(action: WoodcuttingTree): number;
@@ -53,6 +67,8 @@ declare class Woodcutting extends GatheringSkill<WoodcuttingTree, WoodcuttingSki
     getMasteryXPModifier(action: WoodcuttingTree): number;
     get treeCutLimit(): number;
     onStop(): void;
+    /** Returns if all requirements to cut the tree have been met */
+    isTreeUnlocked(tree: WoodcuttingTree): boolean;
     /** Callback function for selecting a tree */
     selectTree(tree: WoodcuttingTree): void;
     get actionInterval(): number;
@@ -77,6 +93,7 @@ declare class Woodcutting extends GatheringSkill<WoodcuttingTree, WoodcuttingSki
     onModifierChange(): void;
     onEquipmentChange(): void;
     onLevelUp(oldLevel: number, newLevel: number): void;
+    onAncientRelicUnlock(): void;
     getErrorLog(): string;
     render(): void;
     /** Renders all tree menu rates */
@@ -93,6 +110,7 @@ declare class Woodcutting extends GatheringSkill<WoodcuttingTree, WoodcuttingSki
     getActionIDFromOldID(oldActionID: number, idMap: NumericIDMap): string;
     setFromOldOffline(offline: OfflineWoodcut, idMap: NumericIDMap): void;
     testTranslations(): void;
+    getObtainableItems(): Set<AnyItem>;
 }
 declare class WoodcuttingRenderQueue extends GatheringSkillRenderQueue<WoodcuttingTree> {
     /** Updates the actively cut trees */

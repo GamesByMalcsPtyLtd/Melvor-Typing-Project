@@ -55,14 +55,27 @@ declare class AstrologyRecipe extends BasicSkillRecipe {
 declare class DummyAstrologyRecipe extends AstrologyRecipe {
     constructor(namespace: DataNamespace, id: string, game: Game);
 }
+declare type AstrologyEvents = {
+    action: AstrologyActionEvent;
+};
 interface AstrologySkillData extends MasterySkillData {
     recipes?: AstrologyRecipeData[];
     stardustItemID?: string;
     goldenStardustItemID?: string;
 }
-declare class Astrology extends GatheringSkill<AstrologyRecipe, AstrologySkillData> implements StatProvider {
+declare class Astrology extends GatheringSkill<AstrologyRecipe, AstrologySkillData> implements StatProvider, IGameEventEmitter<AstrologyEvents> {
+    _events: import("mitt").Emitter<AstrologyEvents>;
+    on: {
+        <Key extends "action">(type: Key, handler: import("mitt").Handler<AstrologyEvents[Key]>): void;
+        (type: "*", handler: import("mitt").WildcardHandler<AstrologyEvents>): void;
+    };
+    off: {
+        <Key extends "action">(type: Key, handler?: import("mitt").Handler<AstrologyEvents[Key]> | undefined): void;
+        (type: "*", handler: import("mitt").WildcardHandler<AstrologyEvents>): void;
+    };
     readonly _media = "assets/media/skills/astrology/astrology.svg";
     getTotalUnlockedMasteryActions(): number;
+    isConstellationComplete(constellation: AstrologyRecipe): boolean;
     renderQueue: AstrologyRenderQueue;
     get actionInterval(): number;
     get actionLevel(): number;
@@ -113,7 +126,9 @@ declare class Astrology extends GatheringSkill<AstrologyRecipe, AstrologySkillDa
     onConstellationUpgrade(constellation: AstrologyRecipe, type: AstrologyModifierType, modID: number): void;
     getStandardModifierUpgradeCost(constellation: AstrologyRecipe, modID: number): number;
     getUniqueModifierUpgradeCost(constellation: AstrologyRecipe, modID: number): number;
+    /** onClick callback function for upgrading standard modifiers */
     upgradeStandardModifier(constellation: AstrologyRecipe, modID: number): void;
+    /** onClick callback function for upgrading unique modifiers */
     upgradeUniqueModifier(constellation: AstrologyRecipe, modID: number): void;
     get masteryModifiedInterval(): number;
     onLoad(): void;
@@ -122,6 +137,7 @@ declare class Astrology extends GatheringSkill<AstrologyRecipe, AstrologySkillDa
     onModifierChange(): void;
     onEquipmentChange(): void;
     onLevelUp(oldLevel: number, newLevel: number): void;
+    onAncientRelicUnlock(): void;
     getErrorLog(): string;
     /** Checks the mastery level of a constellation and unlocks new modifiers if they are unset */
     unlockNewModifiers(constellation: AstrologyRecipe): void;
@@ -148,10 +164,6 @@ declare class Astrology extends GatheringSkill<AstrologyRecipe, AstrologySkillDa
     studyConstellationOnClick(constellation: AstrologyRecipe): void;
     /** Callback function for when the "Explore" button is clicked */
     exploreConstellationOnClick(constellation: AstrologyRecipe): void;
-    /** Callback function for when the individual reroll button for a standard modifier is clicked */
-    rerollSpecificStandardModifierOnClick(constellation: AstrologyRecipe, modID: number): void;
-    /** Callback function for when the individual reroll button for a unique modifier is clicked */
-    rerollSpecificUniqueModifierOnClick(constellation: AstrologyRecipe, modID: number): void;
     resetActionState(): void;
     encodeAction(writer: SaveWriter, recipe: AstrologyRecipe): void;
     encode(writer: SaveWriter): SaveWriter;
@@ -162,6 +174,7 @@ declare class Astrology extends GatheringSkill<AstrologyRecipe, AstrologySkillDa
     setFromOldOffline(offline: OfflineSkill, idMap: NumericIDMap): void;
     rollForMeteorite(): void;
     testTranslations(): void;
+    getObtainableItems(): Set<AnyItem>;
     /** Mastery level required to unlock each standard modifier */
     static readonly standardModifierLevels: number[];
     /** Mastery level required to unlock each unique modifier */

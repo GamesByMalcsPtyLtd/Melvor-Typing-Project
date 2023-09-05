@@ -5,6 +5,7 @@ declare class ShopCostsAndUnlock {
     requirementElements: ShopUnlockElement[];
     costElements: ShopCostElement[];
     buyLimit?: HTMLSpanElement;
+    costFlex: HTMLDivElement;
     get buyQty(): number;
     constructor(purchase: ShopPurchase, game: Game, costContainer: HTMLElement);
     updatePurchaseRequirements(): void;

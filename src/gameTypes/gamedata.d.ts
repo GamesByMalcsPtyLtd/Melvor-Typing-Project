@@ -1,5 +1,4 @@
 // Interface for defining the structure of game data.
-// TODO: Write a JSON Schema that reflects this
 interface GameDataPackage {
   $schema: string;
   namespace?: string;
@@ -7,6 +6,11 @@ interface GameDataPackage {
   modifications?: GameDataModifications;
   /** Indicates data that used to be part of this package that must be migrated to a new namespace on load */
   namespaceChange?: GameDataNamespaceChange;
+  /** Data that will only be registered, if the namespace specified is also registered */
+  dependentData?: {
+    namespace: string,
+    data: GameData
+  }[];
 }
 
 interface GameData {
@@ -58,6 +62,7 @@ interface GameData {
   pages?: PageData[];
   bankSortOrder?: InsertOrder[];
   lore?: LoreBookData[];
+  ancientRelics?: AncientRelicData[];
 }
 
 interface GameDataModifications {
@@ -109,6 +114,8 @@ interface SkillIDDataMap {
   'melvorD:Summoning': SummoningSkillData;
   'melvorD:Astrology': AstrologySkillData;
   'melvorD:Township': TownshipSkillData;
+  'melvorAoD:Cartography': CartographySkillData;
+  'melvorAoD:Archaeology': ArchaeologySkillData;
 }
 type ToSkillData<Type> = Type extends keyof SkillIDDataMap ? {
   skillID: Type,

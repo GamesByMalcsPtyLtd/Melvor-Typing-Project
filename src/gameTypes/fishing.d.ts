@@ -20,8 +20,10 @@ interface FishingAreaData extends IDData {
     requiredItemID?: string;
     /** Area requires the message in a bottle to be read to access */
     isSecret?: boolean;
+    /** Optional. If present the Cartography Point of Interest requirement that must be met to to access the area. */
+    poiRequirement?: CartographyPOIDiscoveryRequirementData;
 }
-declare class FishingArea extends NamespacedObject {
+declare class FishingArea extends NamespacedObject implements SoftDataDependant<FishingAreaData> {
     get name(): string;
     get description(): string | undefined;
     fishChance: number;
@@ -30,9 +32,11 @@ declare class FishingArea extends NamespacedObject {
     fish: Fish[];
     requiredItem?: EquipmentItem;
     isSecret: boolean;
+    poiRequirement?: CartographyPOIDiscoveryRequirement;
     _name: string;
     _description?: string;
     constructor(namespace: DataNamespace, data: FishingAreaData, fishing: Fishing, game: Game);
+    registerSoftDependencies(data: FishingAreaData, game: Game): void;
 }
 interface FishingSkillData extends MasterySkillData {
     fish?: FishData[];
@@ -45,8 +49,42 @@ interface FishingSkillData extends MasterySkillData {
         rewardID: string;
     };
     lostChestItem?: string;
+    fishingContestFish?: FishingContestFishData[];
 }
-declare class Fishing extends GatheringSkill<Fish, FishingSkillData> {
+interface FishingContestFishData {
+    fishID: string;
+    level: number;
+    minLength: number;
+    maxLength: number;
+}
+interface FishingContestFish {
+    fish: AnyItem;
+    level: number;
+    minLength: number;
+    maxLength: number;
+}
+interface FishingContestResult {
+    length: number;
+    weight: number;
+}
+interface FishingContestLeaderboardEntry {
+    isPlayer: boolean;
+    name: string;
+    bestResult: FishingContestResult;
+}
+declare type FishingEvents = {
+    action: FishingActionEvent;
+};
+declare class Fishing extends GatheringSkill<Fish, FishingSkillData> implements IGameEventEmitter<FishingEvents> {
+    _events: import("mitt").Emitter<FishingEvents>;
+    on: {
+        <Key extends "action">(type: Key, handler: import("mitt").Handler<FishingEvents[Key]>): void;
+        (type: "*", handler: import("mitt").WildcardHandler<FishingEvents>): void;
+    };
+    off: {
+        <Key extends "action">(type: Key, handler?: import("mitt").Handler<FishingEvents[Key]> | undefined): void;
+        (type: "*", handler: import("mitt").WildcardHandler<FishingEvents>): void;
+    };
     readonly _media = "assets/media/skills/fishing/fishing.svg";
     getTotalUnlockedMasteryActions(): number;
     renderQueue: FishingRenderQueue;
@@ -62,6 +100,7 @@ declare class Fishing extends GatheringSkill<Fish, FishingSkillData> {
     activeFishingArea?: FishingArea;
     /** Areas which the user has decided to hide */
     hiddenAreas: Set<FishingArea>;
+    contest?: FishingContest;
     /** The fish that is currently selected and being fished */
     get activeFish(): Fish;
     areas: NamespaceRegistry<FishingArea>;
@@ -94,6 +133,7 @@ declare class Fishing extends GatheringSkill<Fish, FishingSkillData> {
     getErrorLog(): string;
     onLoad(): void;
     onStop(): void;
+    onAncientRelicUnlock(): void;
     /** Callback function for when the start button of an area is clicked */
     onAreaStartButtonClick(area: FishingArea): void;
     renderHiddenAreas(): void;
@@ -118,6 +158,7 @@ declare class Fishing extends GatheringSkill<Fish, FishingSkillData> {
     getActionIDFromOldID(oldActionID: number, idMap: NumericIDMap): string;
     setFromOldOffline(offline: OfflineTuple, idMap: NumericIDMap): void;
     testTranslations(): void;
+    getObtainableItems(): Set<AnyItem>;
 }
 declare class FishingAreaChances {
     fish: number;
@@ -129,6 +170,62 @@ declare class FishingAreaChances {
     shiftFishToSpecial(amount: number): void;
     shiftJunkToFish(amount: number): void;
     rollForRewardType(): FishingRewardType;
+}
+declare class FishingContest implements EncodableObject {
+    fishing: Fishing;
+    readonly MAX_CONTESTANTS = 10;
+    /** Fishing Contest Data. If not undefined - contest is available */
+    availableFish: FishingContestFish[];
+    /** Fishing contest data variables */
+    menu?: FishingContestMenu;
+    isActive: boolean;
+    activeFish?: FishingContestFish;
+    playerResults: FishingContestResult[];
+    contestantLeaderboard: FishingContestLeaderboardEntry[];
+    actionsRemaining: number;
+    difficulties: string[];
+    currentDifficulty: number;
+    completionTracker: boolean[];
+    masteryTracker: boolean[];
+    renderQueue: {
+        status: boolean;
+        results: boolean;
+        leaderboard: boolean;
+        remainingActions: boolean;
+    };
+    /** Handler function for the fishing action event */
+    actionHandler: Handler<FishingActionEvent>;
+    constructor(fishing: Fishing);
+    registerData(data: FishingContestFishData[]): void;
+    onLoad(): void;
+    startFishingContest(): void;
+    stopFishingContest(forceStop: boolean): void;
+    setFishingContestDifficulty(difficulty: number): void;
+    finalizeFishingContest(): void;
+    showFishingContestResults(completion: boolean, mastered: boolean): void;
+    generateFishingContestResultsHTML(completion: boolean, mastered: boolean): string;
+    generateNewFishingContestLeaderboard(): void;
+    getBestFishingContestResultForPlayer(): FishingContestResult;
+    getBestFishingContestResultForContestant(index: number): FishingContestResult;
+    decideFishingContestFish(): void;
+    /** Handler for Fishing action event, when contest is active */
+    onFishingAction(e: FishingActionEvent): void;
+    peformPlayerFishingContestAction(): void;
+    peformContestantFishingContestActions(): void;
+    updateBestFishResultForPlayer(result: FishingContestResult): void;
+    updateBestFishResultForContestant(result: FishingContestResult, index: number): void;
+    getMinLengthModifierForContestant(): number;
+    getMaxLengthModifierForContestant(): number;
+    rollFishResult(fish: FishingContestFish, isPlayer: boolean): FishingContestResult;
+    getFishRanking(result: FishingContestResult): string;
+    render(): void;
+    renderStatus(): void;
+    renderResults(): void;
+    renderLeaderboard(): void;
+    renderRemainingActions(): void;
+    encode(writer: SaveWriter): SaveWriter;
+    decode(reader: SaveWriter, version: number): void;
+    static dumpData(reader: SaveWriter): void;
 }
 declare enum FishingRewardType {
     Fish = 0,

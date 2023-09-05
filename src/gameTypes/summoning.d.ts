@@ -36,7 +36,7 @@ declare class SummoningSynergy {
     conditionalModifiers?: ConditionalModifier[];
     summons: [SummoningRecipe, SummoningRecipe];
     /** Determines when one of each of the summons are consumed */
-    consumesOn: GameEventMatcher[];
+    consumesOn: AnyGameEventMatcher[];
     constructor(data: SummoningSynergyData, game: Game, summoning: Summoning);
 }
 interface SummoningSkillData extends MasterySkillData {
@@ -44,7 +44,19 @@ interface SummoningSkillData extends MasterySkillData {
     recipes?: SummoningRecipeData[];
     synergies?: SummoningSynergyData[];
 }
-declare class Summoning extends ArtisanSkill<SummoningRecipe, SummoningSkillData, AnyItem> implements SkillCategoryObject<SkillCategory> {
+declare type SummoningEvents = {
+    action: SummoningActionEvent;
+};
+declare class Summoning extends ArtisanSkill<SummoningRecipe, SummoningSkillData, AnyItem> implements SkillCategoryObject<SkillCategory>, IGameEventEmitter<SummoningEvents> {
+    _events: import("mitt").Emitter<SummoningEvents>;
+    on: {
+        <Key extends "action">(type: Key, handler: import("mitt").Handler<SummoningEvents[Key]>): void;
+        (type: "*", handler: import("mitt").WildcardHandler<SummoningEvents>): void;
+    };
+    off: {
+        <Key extends "action">(type: Key, handler?: import("mitt").Handler<SummoningEvents[Key]> | undefined): void;
+        (type: "*", handler: import("mitt").WildcardHandler<SummoningEvents>): void;
+    };
     readonly _media = "assets/media/skills/summoning/summoning.svg";
     getTotalUnlockedMasteryActions(): number;
     /** Returns the total number of synergies unlocked */
@@ -140,6 +152,7 @@ declare class Summoning extends ArtisanSkill<SummoningRecipe, SummoningSkillData
     rollMarksForSkill(skill: AnySkill, modifiedInterval: number): void;
     getMarkForSkill(skill: AnySkill): SummoningRecipe | undefined;
     testTranslations(): void;
+    getObtainableItems(): Set<AnyItem>;
     /** GP value required for non shard costs */
     static readonly recipeGPCost = 1000;
     /** Number of mark discoveries required for each level */

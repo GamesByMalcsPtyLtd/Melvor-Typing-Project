@@ -1,4 +1,7 @@
 # Changelog
+## v1.13.0
+  - Updated types to match game version V1.2 (?7650)
+  - Updated package.json to reflect changes to libraries shipped with the game
 ## v1.12.0
   - Updated types to match game version V1.1.2 (?5867)
 ## v1.11.2

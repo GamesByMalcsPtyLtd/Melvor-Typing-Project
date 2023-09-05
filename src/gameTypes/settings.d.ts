@@ -18,6 +18,11 @@ declare const enum ColourBlindModeSetting {
     None = 0,
     RedGreen = 1
 }
+declare const enum MapTextureQuality {
+    Low = 0,
+    Medium = 1,
+    High = 2
+}
 interface BooleanSettings {
     /** Skills will continue to run even if the bank is full */
     continueIfBankFull: boolean;
@@ -129,6 +134,26 @@ interface BooleanSettings {
     importanceSummoningMarkFound: boolean;
     /** Notifications v2: Whether error notifications are important */
     importanceErrorMessages: boolean;
+    /** Whether bank tabs should show a scroll bar instead of overflowing */
+    enableScrollableBankTabs: boolean;
+    /** Toggle visibility of Open in Wiki links */
+    showWikiLinks: boolean;
+    /** Disables the hex grid in cartography for hexes outside of sight range */
+    disableHexGridOutsideSight: boolean;
+    /** Enables antialiasing on the cartography map */
+    enableMapAntialiasing: boolean;
+    /** Notifications v2: Show Skill XP Notifications */
+    showSkillXPNotifications: boolean;
+    /** Enables Super Dark Mode for the game. Requires Dark Mode enabled. */
+    superDarkMode: boolean;
+    /** Enables background colours for Expansion combat areas*/
+    showExpansionBackgroundColours: boolean;
+    /** Enables warning text for combat areas (like the barrier one) */
+    showCombatAreaWarnings: boolean;
+    /** Whether to use compact styling for notifications v2 */
+    useCompactNotifications: boolean;
+    /** Whether to use the legacy notifications system */
+    useLegacyNotifications: boolean;
 }
 interface ChoiceSettings {
     /** If special attack modifiers should use neutral colours */
@@ -145,6 +170,10 @@ interface ChoiceSettings {
     notificationHorizontalPosition: NotificationHorizontalPositions;
     /** Determine the Horizontal Position of new notifications */
     notificationDisappearDelay: number;
+    /** Determines the texture quality to use for the cartography map */
+    mapTextureQuality: MapTextureQuality;
+    /** Determine what background image to use for the game. Image file is bg_${num}.jpg */
+    backgroundImage: number;
 }
 interface SettingData<T> {
     /** The current value of the setting */
@@ -243,12 +272,24 @@ declare class Settings implements EncodableObject, BooleanSettings, ChoiceSettin
     get showItemNamesInNotifications(): boolean;
     get importanceSummoningMarkFound(): boolean;
     get importanceErrorMessages(): boolean;
+    get showWikiLinks(): boolean;
     get defaultPageOnLoad(): Page;
     get formatNumberSetting(): NumberFormatSetting;
     get bankSortOrder(): BankSortOrderSetting;
     get colourBlindMode(): ColourBlindModeSetting;
     get notificationHorizontalPosition(): NotificationHorizontalPositions;
     get notificationDisappearDelay(): number;
+    get enableScrollableBankTabs(): boolean;
+    get disableHexGridOutsideSight(): boolean;
+    get mapTextureQuality(): MapTextureQuality;
+    get enableMapAntialiasing(): boolean;
+    get showSkillXPNotifications(): boolean;
+    get backgroundImage(): number;
+    get superDarkMode(): boolean;
+    get showExpansionBackgroundColours(): boolean;
+    get showCombatAreaWarnings(): boolean;
+    get useCompactNotifications(): boolean;
+    get useLegacyNotifications(): boolean;
     constructor(game: Game);
     postDataRegistration(): void;
     encode(writer: SaveWriter): SaveWriter;

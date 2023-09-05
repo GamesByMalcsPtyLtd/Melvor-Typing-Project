@@ -26,7 +26,7 @@ interface AgilityObstacleData extends BaseAgilityObjectData {
 declare class AgilityObstacle extends BaseAgilityObject {
     get name(): string;
     get media(): string;
-    get level(): number;
+    level: number;
     _media: string;
     category: ObstacleCategories;
     baseInterval: number;
@@ -54,7 +54,19 @@ interface AgilitySkillData extends MasterySkillData {
     elitePillars?: BaseAgilityObjectData[];
     obstacles?: AgilityObstacleData[];
 }
-declare class Agility extends GatheringSkill<AgilityObstacle, AgilitySkillData> implements StatProvider {
+declare type AgilityEvents = {
+    action: AgilityActionEvent;
+};
+declare class Agility extends GatheringSkill<AgilityObstacle, AgilitySkillData> implements StatProvider, IGameEventEmitter<AgilityEvents> {
+    _events: import("mitt").Emitter<AgilityEvents>;
+    on: {
+        <Key extends "action">(type: Key, handler: import("mitt").Handler<AgilityEvents[Key]>): void;
+        (type: "*", handler: import("mitt").WildcardHandler<AgilityEvents>): void;
+    };
+    off: {
+        <Key extends "action">(type: Key, handler?: import("mitt").Handler<AgilityEvents[Key]> | undefined): void;
+        (type: "*", handler: import("mitt").WildcardHandler<AgilityEvents>): void;
+    };
     readonly _media = "assets/media/skills/agility/agility.svg";
     getTotalUnlockedMasteryActions(): number;
     readonly obstacleUnlockLevels: number[];
@@ -67,8 +79,8 @@ declare class Agility extends GatheringSkill<AgilityObstacle, AgilitySkillData> 
     get activeObstacleCount(): number;
     /** The maximum number of obstacles the player can build */
     maxObstacles: number;
-    /** Gets the number of obstacles the player has unlocked */
-    get numObstaclesUnlocked(): number;
+    /** The number of obstacles the player currently has unlocked. Recomputed by computeNumUnlockedObstacles */
+    numObstaclesUnlocked: number;
     get passivePillarUnlocked(): boolean;
     get elitePassivePillarUnlocked(): boolean;
     /** Map of obstacle tier to which has been built. Unset indicates it has not been built */
@@ -135,10 +147,13 @@ declare class Agility extends GatheringSkill<AgilityObstacle, AgilitySkillData> 
     getAllBlueprintModifiers(blueprint: AgilityBlueprintData): MappedModifiers;
     displayBlueprintSwal(blueprint: AgilityBlueprintData): void;
     replaceCourseWithBlueprint(blueprint: AgilityBlueprintData): void;
+    /** Recomputes the number of obstacles the player has unlocked */
+    computeNumUnlockedObstacles(): void;
     onLoad(): void;
     onModifierChange(): void;
     onEquipmentChange(): void;
     onLevelUp(oldLevel: number, newLevel: number): void;
+    onAncientRelicUnlock(): void;
     getErrorLog(): string;
     render(): void;
     renderCourseRates(): void;
@@ -199,6 +214,7 @@ declare class Agility extends GatheringSkill<AgilityObstacle, AgilitySkillData> 
     setFromOldOffline(offline: OfflineSkill): void;
     getObstacleLevel(category: number): number;
     testTranslations(): void;
+    getObtainableItems(): Set<AnyItem>;
 }
 declare class AgilityRenderQueue extends GatheringSkillRenderQueue<AgilityObstacle> {
     /** Updates the intervals, GP and XP for each obstacle */

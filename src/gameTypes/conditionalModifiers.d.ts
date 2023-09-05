@@ -29,6 +29,9 @@ interface ItemChargeCondition extends ValueCondition {
 interface HitpointsCondition extends ValueCondition {
     type: 'Hitpoints';
 }
+interface BarrierCondition extends ValueCondition {
+    type: 'Barrier';
+}
 interface DOTCondition extends BooleanCondition {
     type: 'DOT';
     dotType: DOTType;
@@ -62,7 +65,7 @@ interface EquipStatCompareCondition {
 interface FightingBossCondition extends BooleanCondition {
     type: 'FightingBoss';
 }
-declare type CombatCondition = HitpointsCondition | DOTCondition | ModifierEffectCondition | AttackTypeCondition | IsFightingCondition | StunnedCondition | SleepingCondition;
+declare type CombatCondition = HitpointsCondition | DOTCondition | ModifierEffectCondition | AttackTypeCondition | IsFightingCondition | StunnedCondition | SleepingCondition | BarrierCondition;
 interface EveryCondition {
     type: 'Every';
     conditions: AnyCondition[];

@@ -17,6 +17,7 @@ declare abstract class RecipeSelectionTab<Recipe extends HasLevel> extends Conta
     localize(): void;
     abstract getRecipeMedia(recipe: Recipe): string;
     abstract getRecipeName(recipe: Recipe): string;
+    abstract getRecipeID(recipe: Recipe): string;
     abstract getRecipeCallback(recipe: Recipe): VoidFunction;
     abstract getRecipeIngredients(recipe: Recipe): Costs;
     isRecipeUnlocked(recipe: Recipe): boolean;
@@ -31,6 +32,7 @@ interface HasItem extends HasLevel {
 declare abstract class ItemRecipeSelectionTab<Recipe extends HasItem> extends RecipeSelectionTab<Recipe> {
     getRecipeMedia(recipe: HasItem): string;
     getRecipeName(recipe: HasItem): string;
+    getRecipeID(recipe: HasItem): string;
 }
 declare class SmithingSelectionTab extends ItemRecipeSelectionTab<SmithingRecipe> {
     constructor(category: SkillCategory);
@@ -57,6 +59,7 @@ declare class HerbloreSelectionTab extends RecipeSelectionTab<HerbloreRecipe> {
     updateRecipesForLevel(): void;
     getRecipeMedia(recipe: HerbloreRecipe): string;
     getRecipeName(recipe: HerbloreRecipe): string;
+    getRecipeID(recipe: HerbloreRecipe): string;
     getRecipeCallback(recipe: HerbloreRecipe): () => void;
     getRecipeIngredients(recipe: HerbloreRecipe): Costs;
 }
@@ -64,6 +67,7 @@ declare class AltMagicSelectionTab extends RecipeSelectionTab<AltMagicSpell> {
     constructor();
     getRecipeMedia(recipe: AltMagicSpell): string;
     getRecipeName(recipe: AltMagicSpell): string;
+    getRecipeID(recipe: AltMagicSpell): string;
     getRecipeCallback(recipe: AltMagicSpell): () => void;
     updateRecipeTooltips(): void;
     getRecipeIngredients(recipe: AltMagicSpell): Costs;

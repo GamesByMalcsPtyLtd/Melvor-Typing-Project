@@ -96,6 +96,7 @@ declare class SpecialAttack extends NamespacedObject implements SoftDataDependan
     get name(): string;
     /** Localized description of the attack */
     get description(): string;
+    get modifiedDescription(): string;
     get canNormalAttack(): boolean;
     get descriptionTemplateData(): StringDictionary<string>;
     /** Default chance for attack to happen in %*/
@@ -138,9 +139,13 @@ declare class SpecialAttack extends NamespacedObject implements SoftDataDependan
 }
 interface ItemEffectData extends IDData {
     effectData: EffectData;
+    /** Optional. Specifies which character the effect should apply to. Defaults to Player */
+    target?: 'Player' | 'Enemy';
 }
 declare class ItemEffect extends NamespacedObject {
     effect: AnyEffect;
+    /** Determines whether the player or enemy should recieve the effect at the start of combat */
+    target: 'Player' | 'Enemy';
     constructor(namespace: DataNamespace, data: ItemEffectData, game: Game);
 }
 declare class ItemEffectAttack extends SpecialAttack {
@@ -172,7 +177,7 @@ declare class StackingEffect extends NamespacedObject {
     constructor(namespace: DataNamespace, data: StackingEffectData);
 }
 declare function constructDamageFromData(data: DamageData[]): Damage[];
-declare function constructEffectFromData(effectData: EffectData, game: Game): AnyEffect;
+declare function constructEffectFromData(effectData: EffectData, game: Game, namespace?: DataNamespace | string): AnyEffect;
 interface CurseEffectData {
     effectType: 'Curse';
     curse: string;

@@ -29,11 +29,15 @@ declare class NamespacedObject {
     _localID: string;
     constructor(_namespace: DataNamespace, localID: string);
     getMediaURL(media: string): string;
+    getPixiAssetURL(media: string): string;
+    /** If the URL to a PIXI.js texture should be resolved as a Blob */
+    isAssetURLExternal(path: string): boolean;
     static isValidLocalID(localID: string): boolean;
 }
-interface SoftDataDependant<T extends IDData = IDData> {
-    registerSoftDependencies(data: T, game: Game): void;
+interface SoftDataDependant<DataType> {
+    registerSoftDependencies(data: DataType, game: Game): void;
 }
+declare type SoftDataDependantElement<DataType> = [DataType, SoftDataDependant<DataType>];
 declare class NamespaceRegistry<T extends NamespacedObject> {
     rootNamespaceMap: NamespaceMap;
     /** Map of namespace: id: object */

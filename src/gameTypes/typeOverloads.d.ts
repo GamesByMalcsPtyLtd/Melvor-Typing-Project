@@ -44,6 +44,7 @@ interface HTMLElementTagNameMap {
   "mining-rock": MiningRockMenu;
   "inline-requirement": InlineRequirement;
   'constellation-menu': ConstellationMenu;
+  'archaeology-dig-site-container': ArchaeologyDigSiteContainerElement;
   "astrology-modifier-display": AstrologyModifierDisplay;
   'astrology-exploration-panel': AstrologyExplorationPanel;
   'astrology-information-panel': AstrologyInformationPanel;
@@ -86,4 +87,22 @@ interface HTMLElementTagNameMap {
   'township-town-biome-select': TownshipTownBiomeSelectElement
   'township-building-summary': TownshipBuildingSummaryElement;
   'building-in-town': BuildingInTownElement;
+  'township-build-biome-select': TownshipBuildBiomeSelectElement;
+  'township-building-sort-dropdown-option': TownshipBuildingSortDropdownOptionElement;
+  'township-building-sort-dropdown': TownshipBuildingSortDropdownElement;
+  'township-build-building': TownshipBuildBuildingElement;
+  'world-map-display': WorldMapDisplayElement;
+  'hex-overview': HexOverviewElement;
+  'world-map-filter': WorldMapFilterElement;
+  'create-map-menu': CreateMapMenuElement;
+  'dig-site-select-menu': DigSiteSelectMenuElement;
+  'paper-making-menu': PaperMakingMenuElement;
+  'map-upgrade-menu': MapUpgradeMenuElement;
+  'map-refinement-menu': MapRefinementMenuElement;
+  'image-search-result': ImageSearchResultElement;
+  'dig-site-map-select': DigSiteMapSelectElement;
+  'item-upgrade-menu': ItemUpgradeMenuElement;
+  'survey-overview': SurveyOverviewElement;
+  'dig-site-map-info': DigSiteMapInfoElement;
+  'map-mastery-menu': MapMasteryMenuElement;
 }

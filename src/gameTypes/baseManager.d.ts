@@ -23,7 +23,7 @@ declare abstract class BaseManager extends NamespacedObject implements Serializa
     abstract readonly canInteruptAttacks: boolean;
     abstract readonly areaRequirements: AnyRequirement[];
     abstract readonly slayerAreaLevelReq: number;
-    abstract readonly playerAreaModifiers: PlayerModifierObject;
+    playerAreaModifiers: MappedModifiers;
     abstract readonly enemyAreaModifiers: CombatModifierData;
     abstract readonly onSlayerTask: boolean;
     /** If the level and requirements of spells should be ignored */
@@ -48,6 +48,8 @@ declare abstract class BaseManager extends NamespacedObject implements Serializa
     onEnemyDeath(): boolean;
     addMonsterStat(statID: MonsterStats, amount?: number): void;
     addCombatStat(statID: CombatStats, amount?: number): void;
+    /** Called after the player queues up an attack action. Returns if combat will be fled from in this case. */
+    shouldStopOnPlayerAttack(): boolean;
     onSelection(): void;
     /** Callback function for running from combat */
     stop(fled?: boolean): boolean;
@@ -77,4 +79,6 @@ interface ManagerRenderQueue {
     areaRequirements: boolean;
     /** Updates the currently open spellbook */
     spellBook: boolean;
+    /** Updates dungeon completions remaining for next ancient relic skill unlock */
+    dungeonRelicCount: boolean;
 }

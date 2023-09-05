@@ -45,6 +45,7 @@ interface FarmingPlotData extends IDData {
     categoryID: string;
     level: number;
     gpCost: number;
+    itemCosts?: IDQuantity[];
 }
 declare const enum FarmingPlotState {
     Locked = 0,
@@ -58,6 +59,7 @@ declare class FarmingPlot extends NamespacedObject implements EncodableObject {
     category: FarmingCategory;
     level: number;
     gpCost: number;
+    itemCosts: AnyItemQuantity[];
     /** Current state of the crop growing in the plot */
     state: FarmingPlotState;
     /** Currently planted recipe */
@@ -84,14 +86,23 @@ declare class FarmingRenderQueue extends MasterySkillRenderQueue<FarmingRecipe> 
     compost: Set<FarmingPlot>;
     growthChance: Set<FarmingPlot>;
     selectedSeed: Set<FarmingPlot>;
+    grants: Set<FarmingPlot>;
     growthIndicators: boolean;
     compostQuantity: boolean;
+    /** Updates which plots should be shown based on currently selected category */
+    plotVisibility: boolean;
+    /** Updates the unlock cost quantities */
+    plotUnlockQuantities: boolean;
 }
 interface FarmingSkillData extends MasterySkillData {
     categories?: FarmingCategoryData[];
     recipes?: FarmingRecipeData[];
     plots?: FarmingPlotData[];
 }
+declare type FarmingEvents = {
+    plant: FarmingPlantActionEvent;
+    harvest: FarmingHarvestActionEvent;
+};
 declare class FarmingGrowthTimer extends Timer {
     plots: FarmingPlot[];
     farming: Farming;
@@ -99,7 +110,16 @@ declare class FarmingGrowthTimer extends Timer {
     encode(writer: SaveWriter): SaveWriter;
     decode(reader: SaveWriter, version: number): void;
 }
-declare class Farming extends SkillWithMastery<FarmingRecipe, FarmingSkillData> implements PassiveAction, SkillCategoryObject<FarmingCategory> {
+declare class Farming extends SkillWithMastery<FarmingRecipe, FarmingSkillData> implements PassiveAction, SkillCategoryObject<FarmingCategory>, IGameEventEmitter<FarmingEvents> {
+    _events: import("mitt").Emitter<FarmingEvents>;
+    on: {
+        <Key extends keyof FarmingEvents>(type: Key, handler: import("mitt").Handler<FarmingEvents[Key]>): void;
+        (type: "*", handler: import("mitt").WildcardHandler<FarmingEvents>): void;
+    };
+    off: {
+        <Key extends keyof FarmingEvents>(type: Key, handler?: import("mitt").Handler<FarmingEvents[Key]> | undefined): void;
+        (type: "*", handler: import("mitt").WildcardHandler<FarmingEvents>): void;
+    };
     readonly _media = "assets/media/skills/farming/farming.svg";
     get isPotionActive(): boolean;
     get activePotion(): PotionItem | undefined;
@@ -116,13 +136,18 @@ declare class Farming extends SkillWithMastery<FarmingRecipe, FarmingSkillData> 
     /** Maps farming plots to growth timers */
     growthTimerMap: Map<FarmingPlot, FarmingGrowthTimer>;
     renderQueue: FarmingRenderQueue;
+    /** Stores the category the player is currently viewing */
+    visibleCategory?: FarmingCategory;
     get composts(): NamespaceRegistry<CompostItem>;
     get isAnyPlotGrown(): boolean;
     getTotalUnlockedMasteryActions(): number;
     constructor(namespace: DataNamespace, game: Game);
     onLoad(): void;
     onPageChange(): void;
+    onLevelUp(oldLevel: number, newLevel: number): void;
+    onAncientRelicUnlock(): void;
     queueBankQuantityRender(item: AnyItem): void;
+    queueCurrencyQuantityRender(currency: Currency): void;
     getErrorLog(): string;
     registerData(namespace: DataNamespace, data: FarmingSkillData): void;
     postDataRegistration(): void;
@@ -151,6 +176,7 @@ declare class Farming extends SkillWithMastery<FarmingRecipe, FarmingSkillData> 
     passiveTick(): void;
     setUnlock(isUnlocked: boolean): void;
     render(): void;
+    renderGrants(): void;
     renderGrowthStatus(): void;
     renderGrowthState(): void;
     renderGrowthChance(): void;
@@ -158,6 +184,8 @@ declare class Farming extends SkillWithMastery<FarmingRecipe, FarmingSkillData> 
     renderSelectedSeed(): void;
     renderGrowthIndicators(): void;
     renderCompostQuantity(): void;
+    renderPlotVisibility(): void;
+    renderPlotUnlockQuantities(): void;
     getMasteryXPModifier(action: FarmingRecipe): number;
     getUncappedDoublingChance(action?: FarmingRecipe): number;
     /** Shows all plots that are part of the category */
@@ -184,6 +212,9 @@ declare class Farming extends SkillWithMastery<FarmingRecipe, FarmingSkillData> 
     plantPlotOnClick(plot: FarmingPlot): void;
     /** Callback function for the Harvest button on a plot */
     harvestPlotOnClick(plot: FarmingPlot): void;
+    getPlotUnlockCosts(plot: FarmingPlot): Costs;
+    /** Returns if the plots requirements and costs are met */
+    canUnlockPlot(plot: FarmingPlot): boolean;
     /** Callback function for the Unlock button on a plot */
     unlockPlotOnClick(plot: FarmingPlot): void;
     /** Callback function for the Plant button in the Plant a seed modal */
@@ -197,4 +228,5 @@ declare class Farming extends SkillWithMastery<FarmingRecipe, FarmingSkillData> 
     decode(reader: SaveWriter, version: number): void;
     convertFromOldFormat(save: NewSaveGame, idMap: NumericIDMap): void;
     testTranslations(): void;
+    getObtainableItems(): Set<AnyItem>;
 }

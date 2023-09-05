@@ -20,6 +20,7 @@ interface PageData extends IDData {
     sidebarItem?: PageSideBarItemOptions;
     sidebarSubItems?: PageSideBarSubItemOptions[];
     skillSidebarCategoryID?: string;
+    displayClass?: string;
 }
 declare class Page extends NamespacedObject {
     get name(): string;
@@ -33,6 +34,7 @@ declare class Page extends NamespacedObject {
     skillSidebarCategoryID?: string;
     sidebarItem?: PageSideBarItemOptions;
     sidebarSubItems?: PageSideBarSubItemOptions[];
+    displayClass?: string;
     _media: string;
     _customName?: string;
     constructor(namespace: DataNamespace, data: PageData, game: Game);

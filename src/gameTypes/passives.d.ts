@@ -10,6 +10,7 @@ declare class CombatPassive extends NamespacedObject {
     modifiers: CombatModifierData;
     get name(): string;
     get description(): string;
+    get modifiedDescription(): string;
     _name: string;
     _customDescription?: string;
     constructor(namespace: DataNamespace, data: CombatPassiveData);

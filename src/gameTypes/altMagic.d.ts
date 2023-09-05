@@ -50,7 +50,20 @@ interface MagicSkillData extends MasterySkillData {
     altSpells?: AltMagicSpellData[];
     randomShards?: DropTableData[];
 }
-declare class AltMagic extends CraftingSkill<AltMagicSpell, MagicSkillData> {
+declare type MagicEvents = {
+    action: AltMagicActionEvent;
+    runesUsed: RuneConsumptionEvent;
+};
+declare class AltMagic extends CraftingSkill<AltMagicSpell, MagicSkillData> implements IGameEventEmitter<MagicEvents> {
+    _events: import("mitt").Emitter<MagicEvents>;
+    on: {
+        <Key extends keyof MagicEvents>(type: Key, handler: import("mitt").Handler<MagicEvents[Key]>): void;
+        (type: "*", handler: import("mitt").WildcardHandler<MagicEvents>): void;
+    };
+    off: {
+        <Key extends keyof MagicEvents>(type: Key, handler?: import("mitt").Handler<MagicEvents[Key]> | undefined): void;
+        (type: "*", handler: import("mitt").WildcardHandler<MagicEvents>): void;
+    };
     get hasMastery(): boolean;
     get isCombat(): boolean;
     readonly _media = "assets/media/skills/magic/magic.svg";
@@ -117,6 +130,7 @@ declare class AltMagic extends CraftingSkill<AltMagicSpell, MagicSkillData> {
     onPageChange(): void;
     queueBankQuantityRender(item: AnyItem): void;
     onLevelUp(oldLevel: number, newLevel: number): void;
+    onAncientRelicUnlock(): void;
     getErrorLog(): string;
     onModifierChange(): void;
     onEquipmentChange(): void;
@@ -133,6 +147,7 @@ declare class AltMagic extends CraftingSkill<AltMagicSpell, MagicSkillData> {
     getActionIDFromOldID(oldActionID: number, idMap: NumericIDMap): string;
     setFromOldOffline(offline: OfflineMagic, idMap: NumericIDMap): void;
     testTranslations(): void;
+    getObtainableItems(): Set<AnyItem>;
 }
 declare class AltMagicRenderQueue extends GatheringSkillRenderQueue<AltMagicSpell> {
     /** Updates the required and produced item quantities */

@@ -53,7 +53,6 @@ declare class RaidManager extends BaseManager {
     get canInteruptAttacks(): boolean;
     get areaRequirements(): AnyRequirement[];
     get slayerAreaLevelReq(): number;
-    get playerAreaModifiers(): PlayerModifierObject;
     get enemyAreaModifiers(): CombatModifierData;
     killCount: number;
     specialAttackSelection: SpecialAttack[];

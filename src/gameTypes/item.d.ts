@@ -14,6 +14,7 @@ interface BaseItemData extends IDData {
     golbinRaidExclusive: boolean;
     customDescription?: string;
     sellsFor: number;
+    isArtefact?: boolean;
 }
 interface BaseItemModificationData extends IDData {
     category?: string;
@@ -31,19 +32,26 @@ declare type AnyItem = Item | EquipmentItem | WeaponItem | FoodItem | BoneItem |
 declare class Item extends NamespacedObject {
     category: string;
     type: string;
+    get nameFromData(): string;
+    get descriptionFromData(): string;
     get name(): string;
+    get wikiName(): string;
     /** Image URL*/
     get media(): string;
     /** Alternative image URL, if one is present, otherwise defaults to media */
     get altMedia(): string;
     get description(): string;
+    get modifiedDescription(): string;
+    get artefactSizeAndLocation(): string;
     sellsFor: number;
     _name: string;
     _media: string;
     get hasDescription(): boolean;
+    get isArtefact(): boolean;
     ignoreCompletion: boolean;
     obtainFromItemLog: boolean;
     golbinRaidExclusive: boolean;
+    _isArtefact?: boolean;
     _customDescription?: string;
     _mediaAnimation?: string;
     _altMedia?: string;
@@ -60,6 +68,9 @@ declare class DummyItem extends Item {
 interface ItemQuantity<T> {
     item: T;
     quantity: number;
+}
+interface ItemQuantityRarity<T> extends ItemQuantity<T> {
+    rarity: number;
 }
 declare type AnyItemQuantity = ItemQuantity<AnyItem>;
 declare type EquipmentQuantity = ItemQuantity<EquipmentItem>;
@@ -89,6 +100,8 @@ interface BaseEquipmentItemData extends BaseItemData {
         chance: number;
         matchers: GameEventMatcherData[];
     };
+    /** Optional. If present sets the priority of losing this item when dying. Lower priority indicates the item will be lost sooner. Defaults to 0. */
+    deathPenaltyPriority?: number;
 }
 interface BaseEquipmentItemModificationData extends BaseItemModificationData {
     ammoType?: AmmoType | null;
@@ -138,6 +151,11 @@ interface BaseEquipmentItemModificationData extends BaseItemModificationData {
 interface EquipmentItemData extends BaseEquipmentItemData {
     itemType: 'Equipment';
 }
+declare type BankItemConsumption = {
+    item: AnyItem;
+    chance: number;
+    matchers: AnyGameEventMatcher[];
+};
 /** Item which can be equipped to the player */
 declare class EquipmentItem extends Item implements SoftDataDependant<EquipmentItemData> {
     /** Used to classify the item */
@@ -167,17 +185,16 @@ declare class EquipmentItem extends Item implements SoftDataDependant<EquipmentI
     /** Property exclusive to ammo */
     ammoType?: AmmoTypeID;
     /** Determines when a single quantity of the item should be consumed */
-    consumesOn?: GameEventMatcher[];
+    consumesOn?: AnyGameEventMatcher[];
     /** Determines when a single item charge of the item should be consumed */
-    consumesChargesOn?: GameEventMatcher[];
+    consumesChargesOn?: AnyGameEventMatcher[];
     /** Determines when a single of the specified item should be consumed from the bank */
-    consumesItemOn?: {
-        item: AnyItem;
-        chance: number;
-        matchers: GameEventMatcher[];
-    };
+    consumesItemOn?: BankItemConsumption;
+    /** Determines the priority of losing this item to the death penalty. Lower priority is lost before other items. */
+    deathPenaltyPriority: number;
     get hasDescription(): boolean;
     get description(): string;
+    get modifiedDescription(): string;
     constructor(namespace: DataNamespace, data: BaseEquipmentItemData, game: Game);
     registerSoftDependencies(data: EquipmentItemData, game: Game): void;
     applyDataModification(modData: BaseEquipmentItemModificationData, game: Game): void;
@@ -250,9 +267,10 @@ declare class PotionItem extends Item implements SoftDataDependant<PotionItemDat
     action: Action;
     tier: HerbloreTier;
     /** When a single charge of the potion should be consumed */
-    consumesOn: GameEventMatcher[];
+    consumesOn: AnyGameEventMatcher[];
     get hasDescription(): boolean;
     get description(): string;
+    get modifiedDescription(): string;
     constructor(namespace: DataNamespace, data: PotionItemData, game: Game);
     registerSoftDependencies(data: PotionItemData, game: Game): void;
     applyDataModification(modData: PotionItemModificationData, game: Game): void;

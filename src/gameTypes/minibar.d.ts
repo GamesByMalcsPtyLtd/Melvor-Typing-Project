@@ -11,6 +11,7 @@ declare class Minibar implements EncodableObject {
     milestones: MinibarItem;
     summoning: MinibarItem;
     quickEquip: MinibarItem;
+    ancientRelics: MinibarItem;
     pets: MinibarItem[];
     upgrades: MinibarItem[];
     customItems: Map<AnySkill, EquipmentItem[]>;

@@ -70,12 +70,24 @@ interface ThievingSkillData extends MasterySkillData {
         rewardID: string;
     };
 }
+declare type ThievingEvents = {
+    action: ThievingActionEvent;
+};
 declare const enum ThievingStunState {
     None = 0,
     Stunned = 1,
     AvoidedStun = 2
 }
-declare class Thieving extends GatheringSkill<ThievingNPC, ThievingSkillData> {
+declare class Thieving extends GatheringSkill<ThievingNPC, ThievingSkillData> implements IGameEventEmitter<ThievingEvents> {
+    _events: import("mitt").Emitter<ThievingEvents>;
+    on: {
+        <Key extends "action">(type: Key, handler: import("mitt").Handler<ThievingEvents[Key]>): void;
+        (type: "*", handler: import("mitt").WildcardHandler<ThievingEvents>): void;
+    };
+    off: {
+        <Key extends "action">(type: Key, handler?: import("mitt").Handler<ThievingEvents[Key]> | undefined): void;
+        (type: "*", handler: import("mitt").WildcardHandler<ThievingEvents>): void;
+    };
     stunTimer: Timer;
     readonly _media = "assets/media/skills/thieving/thieving.svg";
     getTotalUnlockedMasteryActions(): number;
@@ -124,6 +136,7 @@ declare class Thieving extends GatheringSkill<ThievingNPC, ThievingSkillData> {
     onLevelUp(oldLevel: number, newLevel: number): void;
     onLoad(): void;
     onStop(): void;
+    onAncientRelicUnlock(): void;
     stopOnDeath(): void;
     notifyStunBlockingAction(): void;
     renderMenu(): void;
@@ -169,6 +182,7 @@ declare class Thieving extends GatheringSkill<ThievingNPC, ThievingSkillData> {
     postAction(): void;
     addStat(stat: ThievingStats, amount?: number): void;
     testTranslations(): void;
+    getObtainableItems(): Set<AnyItem>;
     static readonly DevilTable: [number, number, number][];
     static readonly OtherDevilTable: [number, number, number][];
 }

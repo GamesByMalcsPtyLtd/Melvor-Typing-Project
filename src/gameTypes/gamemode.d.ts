@@ -20,7 +20,15 @@ interface GamemodeData extends IDData {
     skillUnlockCost: number[];
     playerModifiers: PlayerModifierData;
     enemyModifiers: CombatModifierData;
+    disabledModifiers?: ModifierKeys[];
     hasTutorial: boolean;
+    overrideLevelCap?: number;
+    allowDungeonLevelCapIncrease?: boolean;
+    allowXPOverLevelCap?: boolean;
+    disablePreservation?: boolean;
+    disableItemDoubling?: boolean;
+    hasActiveGameplay?: boolean;
+    allowAncientRelicDrops?: boolean;
 }
 declare type CombatTriangleType = 'Standard' | 'Hardcore' | 'InvertedHardcore';
 declare const enum CombatTriangles {
@@ -58,8 +66,24 @@ declare class Gamemode extends NamespacedObject {
     playerModifiers: PlayerModifierObject;
     /** Modifiers that apply to the enemy from the gamemode */
     enemyModifiers: CombatModifierData;
+    /** Modifiers that are disabled in the gamemode */
+    disabledModifiers: ModifierKeys[];
     /** If players start in the tutorial in this gamemode */
     hasTutorial: boolean;
+    /** Override the initial level cap of the gamemode regardless of entitlement */
+    overrideLevelCap?: number;
+    /** Determines if the player can increase skill level caps via dungeon completions */
+    allowDungeonLevelCapIncrease: boolean;
+    /** Determine if player can gain XP above level cap */
+    allowXPOverLevelCap: boolean;
+    /** If all forms of preservation (Items, Runes, Ammo, Prayer Points, Summoning Tablets, Food, Potion Charges, Dig Site Map Actions) should be disabled */
+    disablePreservation: boolean;
+    /** If item doubling for skills should be disabled */
+    disableItemDoubling: boolean;
+    /** If the active gameplay warning should be shown for this gamemode on the character select screen. */
+    hasActiveGameplay: boolean;
+    /** If ancient relics can be dropped from skills in this gamemode. Only available with the Atlas of Discovery Expansion. */
+    allowAncientRelicDrops: boolean;
     _media: string;
     _name: string;
     _description?: string;

@@ -2,7 +2,19 @@ interface FletchingSkillData extends MasterySkillData {
     categories?: SkillCategoryData[];
     recipes?: FletchingRecipeData[];
 }
-declare class Fletching extends ArtisanSkill<FletchingRecipe, FletchingSkillData, AnyItem> implements SkillCategoryObject<SkillCategory> {
+declare type FletchingEvents = {
+    action: FletchingActionEvent;
+};
+declare class Fletching extends ArtisanSkill<FletchingRecipe, FletchingSkillData, AnyItem> implements SkillCategoryObject<SkillCategory>, IGameEventEmitter<FletchingEvents> {
+    _events: import("mitt").Emitter<FletchingEvents>;
+    on: {
+        <Key extends "action">(type: Key, handler: import("mitt").Handler<FletchingEvents[Key]>): void;
+        (type: "*", handler: import("mitt").WildcardHandler<FletchingEvents>): void;
+    };
+    off: {
+        <Key extends "action">(type: Key, handler?: import("mitt").Handler<FletchingEvents[Key]> | undefined): void;
+        (type: "*", handler: import("mitt").WildcardHandler<FletchingEvents>): void;
+    };
     readonly _media = "assets/media/skills/fletching/fletching.svg";
     getTotalUnlockedMasteryActions(): number;
     readonly baseInterval: number;
@@ -45,6 +57,7 @@ declare class Fletching extends ArtisanSkill<FletchingRecipe, FletchingSkillData
     getActionIDFromOldID(oldActionID: number, idMap: NumericIDMap): string;
     setFromOldOffline(offline: OfflineTuple, idMap: NumericIDMap): void;
     testTranslations(): void;
+    getObtainableItems(): Set<AnyItem>;
 }
 interface FletchingRecipeData extends SingleProductArtisanSkillRecipeData {
     alternativeCosts?: {

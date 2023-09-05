@@ -34,7 +34,19 @@ interface CookingSkillData extends MasterySkillData {
     categories?: CookingCategoryData[];
     recipes?: CookingRecipeData[];
 }
-declare class Cooking extends CraftingSkill<CookingRecipe, CookingSkillData> {
+declare type CookingEvents = {
+    action: CookingActionEvent;
+};
+declare class Cooking extends CraftingSkill<CookingRecipe, CookingSkillData> implements IGameEventEmitter<CookingEvents> {
+    _events: import("mitt").Emitter<CookingEvents>;
+    on: {
+        <Key extends "action">(type: Key, handler: import("mitt").Handler<CookingEvents[Key]>): void;
+        (type: "*", handler: import("mitt").WildcardHandler<CookingEvents>): void;
+    };
+    off: {
+        <Key extends "action">(type: Key, handler?: import("mitt").Handler<CookingEvents[Key]> | undefined): void;
+        (type: "*", handler: import("mitt").WildcardHandler<CookingEvents>): void;
+    };
     readonly _media = "assets/media/skills/cooking/cooking.svg";
     computeTotalMasteryActions(): void;
     getTotalUnlockedMasteryActions(): number;
@@ -72,6 +84,7 @@ declare class Cooking extends CraftingSkill<CookingRecipe, CookingSkillData> {
     getRecipeCookingInterval(recipe: CookingRecipe): number;
     /** Gets the interval for performing a passive cook with a recipe */
     getRecipePassiveCookingInterval(recipe: CookingRecipe): number;
+    getPercentageIntervalModifier(action: CookingRecipe): number;
     getRecipeSuccessChance(recipe: CookingRecipe): number;
     getRecipePerfectChance(recipe: CookingRecipe): number;
     getRecipeCosts(recipe: CookingRecipe): Costs;
@@ -110,6 +123,7 @@ declare class Cooking extends CraftingSkill<CookingRecipe, CookingSkillData> {
     getErrorLog(): string;
     onLoad(): void;
     onPageChange(): void;
+    onAncientRelicUnlock(): void;
     queueBankQuantityRender(item: AnyItem): void;
     render(): void;
     renderSelectedRecipes(): void;
@@ -125,6 +139,7 @@ declare class Cooking extends CraftingSkill<CookingRecipe, CookingSkillData> {
     convertFromOldFormat(savegame: NewSaveGame, idMap: NumericIDMap): void;
     getActionIDFromOldID(oldActionID: number, idMap: NumericIDMap): string;
     setFromOldOffline(offline: OfflineCooking | OfflineSkill, idMap: NumericIDMap): void;
+    getObtainableItems(): Set<AnyItem>;
     static readonly baseSuccessChance = 70;
 }
 declare class CookingRenderQueue extends GatheringSkillRenderQueue<CookingRecipe> {

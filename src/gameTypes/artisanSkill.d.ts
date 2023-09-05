@@ -25,6 +25,7 @@ declare abstract class ArtisanSkill<RecipeClass extends ArtisanSkillRecipe, Data
     /** Callback function for when a recipe is selected */
     selectRecipeOnClick(recipe: RecipeClass): void;
     onLoad(): void;
+    onAncientRelicUnlock(): void;
     queueBankQuantityRender(item: AnyItem): void;
     onModifierChange(): void;
     onEquipmentChange(): void;

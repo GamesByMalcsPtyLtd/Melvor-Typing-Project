@@ -19,6 +19,28 @@ declare class BurnEffect implements DOTEffect {
     interval: number;
     constructor(chance?: number);
 }
+/** Convenience class for generating barrier burn effects */
+declare class BarrierBurnEffect implements DOTEffect {
+    chance: number;
+    type: 'DOT';
+    subtype: DOTType;
+    damage: Damage[];
+    procs: number;
+    interval: number;
+    constructor(chance?: number);
+}
+declare const barrierBurnEffect: DOTEffect;
+/** Convenience class for generating barrier bleed effects */
+declare class BarrierBleedEffect implements DOTEffect {
+    chance: number;
+    type: 'DOT';
+    subtype: DOTType;
+    damage: Damage[];
+    procs: number;
+    interval: number;
+    constructor(chance?: number);
+}
+declare const barrierBleedEffect: DOTEffect;
 /** Convenience class for generating poison effects */
 declare class PoisonEffect implements DOTEffect {
     chance: number;
@@ -49,6 +71,7 @@ declare class SlowEffect implements ModifierEffect {
     maxStacks: number;
     stacksToAdd: number;
     media: string;
+    langName: string;
     constructor(magnitude: number, turns?: number);
 }
 declare class StickyWebs implements ModifierEffect {
@@ -73,6 +96,7 @@ declare class EndOfTurnEvasionEffect implements ModifierEffect {
     maxStacks: number;
     stacksToAdd: number;
     media: string;
+    langName: string;
     constructor(turns: number, maxValue: number, atMax?: boolean);
 }
 /** Burning: Deal 15% of current HP as damage over 5 seconds */
@@ -83,6 +107,7 @@ declare const poisonEffect: DOTEffect;
 /** Deadly Poison: Deal 25% of max HP as damage over 10 seconds, 4 procs */
 declare const deadlyPoisonEffect: DOTEffect;
 declare const frostBurnEffect: ModifierEffect;
+declare const frostBurnReflectEffect: ModifierEffect;
 declare const decreasedEvasionStackingEffect: ModifierEffect;
 declare const afflictionEffect: ModifierEffect;
 declare const shockEffect: ModifierEffect;
@@ -96,7 +121,21 @@ declare const momentInTimeEffect: ModifierEffect;
 declare const reignOverTimeEffect: ModifierEffect;
 declare const shadowCloakEffect: ModifierEffect;
 declare const increased5DROnHitEffect: ModifierEffect;
+declare const elusiveEffect: ModifierEffect;
+declare const crystallizationEffect: ModifierEffect;
+declare const crystallizationStunEffect: StunEffect;
+declare const crystalSanctionEffect: ModifierEffect;
+declare const weakeningTouchEffect: ModifierEffect;
+declare const underwaterSlowEffect: ModifierEffect;
+declare const underwaterAttackSpeedEffect: ModifierEffect;
+declare const cleansedEffect: ModifierEffect;
+declare const nulledEffect: ModifierEffect;
+declare const increasedMaxHitpointsEffect: ModifierEffect;
+declare const blindEffect: ModifierEffect;
 declare const elementalEffects: AnyEffect[];
+declare const attackMasterRelicEffect: IncrementalEffect;
+declare const strengthMasterRelicEffect: IncrementalEffect;
+declare const magicMasterRelicEffect: ReductiveEffect;
 declare function damageReducer(attacker: Character, target: Character, prevDamage?: number): (totalDamage: number, damage: Damage) => number;
 declare function getMaxDamage(damage: Damage, attacker: Character, target: Character, prevDamage?: number): number;
 declare function getDamageRoll(character: Character, type: RollType, percent: number, damageDealt?: number): number;
@@ -107,6 +146,7 @@ declare type RollData = {
     modValue?: (value: number) => number;
 };
 declare function getDamageDescription(damage: Damage, attackerName: Noun, targetName: Noun, i: number, key: string): string;
+declare function applyDescriptionModifications(description: string): string;
 declare function getEffectDescription(effect: AnyEffect, attackerNoun: Noun, targetNoun: Noun, key: string): string;
 declare type AttackDescriber = (attack: SpecialAttack, attackerNoun: Noun, targetNoun: Noun) => string;
 /** Contains functions that return the strings to fill in attack descriptions
@@ -145,10 +185,11 @@ interface FixedDamage extends BaseDamage {
     roll: false;
 }
 declare type CharacterType = 'Target' | 'Attacker';
-declare type AnyEffectData = ModifierEffectData | SleepEffect | StunEffect | DOTEffect | StackingEffect | ReflexiveEffectData | CompoundEffect | ComboEffect | CurseEffect;
+declare type CountsOnType = 'Hit' | 'BeingHit' | 'Turn';
+declare type AnyEffectData = ModifierEffectData | SleepEffect | StunEffect | DOTEffect | StackingEffect | ReflexiveEffectData | CompoundEffect | ComboEffect | CurseEffect | ReductiveEffectData | IncrementalEffectData;
 /** Effects of an attack */
-declare type AnyEffect = ModifierEffect | SleepEffect | StunEffect | DOTEffect | StackingEffect | ReflexiveEffect | CompoundEffect | ComboEffect | CurseEffect;
-declare type RollType = 'MaxHit' | 'MinHit' | 'CurrentHP' | 'MaxHP' | 'DamageDealt' | 'MagicScaling' | 'Fixed' | 'One' | 'Rend' | 'Poisoned' | 'Bleeding' | 'PoisonMax35' | 'PoisonMin35' | 'PoisonFixed100' | 'BurnFixed100' | 'BurnMaxHit100' | 'CursedFixed100' | 'MaxHitDR' | 'MaxHitScaledByHP' | 'MaxHitScaledByHP2x' | 'FixedPlusMaxHit50' | 'HPUnder90' | 'PoisonedMaxHit';
+declare type AnyEffect = ModifierEffect | SleepEffect | StunEffect | DOTEffect | StackingEffect | ReflexiveEffect | CompoundEffect | ComboEffect | CurseEffect | ReductiveEffect | IncrementalEffect;
+declare type RollType = 'MaxHit' | 'MinHit' | 'CurrentHP' | 'MaxHP' | 'DamageDealt' | 'MagicScaling' | 'Fixed' | 'One' | 'Rend' | 'Poisoned' | 'Bleeding' | 'PoisonMax35' | 'PoisonMin35' | 'PoisonFixed100' | 'BurnFixed100' | 'BurnMaxHit100' | 'CursedFixed100' | 'MaxHitDR' | 'MaxHitScaledByHP' | 'MaxHitScaledByHP2x' | 'FixedPlusMaxHit50' | 'HPUnder90' | 'PoisonedMaxHit' | 'Reflection' | 'DefenceLevel' | 'Crystallize';
 declare type EffectType = 'Modifier' | 'Sleep' | 'Stun' | 'DOT' | 'IntoTheMist' | 'MarkOfDeath' | 'Curse';
 declare type EffectTurnData = {
     turns: number | 'Infinity';
@@ -174,6 +215,10 @@ interface ModifierEffect {
     countsOn: CharacterType;
     /** Media to display for the effect */
     media: string;
+    /** Optional custom display name to use for the effect instead of the attacks name */
+    name?: string;
+    /** Optional language string to use for the effect instead of the attacks name */
+    langName?: string;
 }
 declare type ModifierEffectData = Omit<ModifierEffect, 'turns'> & EffectTurnData;
 interface SleepEffect {
@@ -199,8 +244,8 @@ interface ComboEffect {
     modifiers: CombatModifierData;
     media: string;
 }
-declare type StunFlavour = 'Stun' | 'Freeze';
-declare type DOTType = 'Burn' | 'Bleed' | 'Poison' | 'Regen' | 'DeadlyPoison';
+declare type StunFlavour = 'Stun' | 'Freeze' | 'Crystallize';
+declare type DOTType = 'Burn' | 'Bleed' | 'Poison' | 'Regen' | 'DeadlyPoison' | 'BarrierBleed' | 'BarrierBurn';
 interface DOTEffect {
     type: 'DOT';
     subtype: DOTType;
@@ -223,6 +268,29 @@ interface ReflexiveEffect {
     name: string;
 }
 declare type ReflexiveEffectData = Omit<ReflexiveEffect, 'turns'> & EffectTurnData;
+interface ReductiveEffect {
+    type: 'Reductive';
+    modifiers: CombatModifierData;
+    maxStacks: number;
+    media: string;
+    /** Number of turns the effect lasts */
+    turns: number;
+    name: string;
+}
+declare type ReductiveEffectData = Omit<ReductiveEffect, 'turns'> & EffectTurnData;
+interface IncrementalEffect {
+    type: 'Incremental';
+    modifiers: CombatModifierData;
+    maxStacks: number;
+    media: string;
+    /** Number of turns the effect lasts */
+    turns: number;
+    name: string;
+    resetAtMaxStacks?: boolean;
+    applyRandomCurseOnReset?: boolean;
+    selfDamageOnReset?: number;
+}
+declare type IncrementalEffectData = Omit<IncrementalEffect, 'turns'> & EffectTurnData;
 interface Noun {
     plain: string;
     possesive: string;

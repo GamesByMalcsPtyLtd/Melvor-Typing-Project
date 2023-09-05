@@ -10,10 +10,12 @@ declare const enum ItemLogFilter {
     ShowDiscovered = 1,
     ShowUndiscovered = 2,
     ShowBaseGame = 3,
-    ShowTotH = 4
+    ShowTotH = 4,
+    ShowAoD = 5
 }
 /** Callback function for when one of the filter buttons in the item log is clicked */
 declare function filterItemLog(filter: ItemLogFilter): void;
+declare function toggleItemCompletionContainers(visible: Set<CompletionNamespace>): void;
 /** Callback function for changing which tab of the completion log to view */
 declare function showCompletionCategory(category: number): void;
 /** @deprecated Unused Callback Function */
@@ -28,6 +30,7 @@ interface CompletionLogMenuElements {
     skills: Map<AnySkill, SkillCompletionElement>;
     masterySkills: Map<SkillWithMastery<MasteryAction, MasterySkillData>, MasteryCompletionElement>;
     items: Map<AnyItem, ItemCompletionElement>;
+    itemContainers: Map<CompletionNamespace, HTMLDivElement>;
     monsters: Map<Monster, MonsterCompletionElement>;
     pets: Map<Pet, PetCompletionElement>;
     skillProgress: Map<string, CompletionProgressElements>;
@@ -133,9 +136,7 @@ declare class CompletionRenderQueue {
     pets: Set<Pet>;
     skills: Set<AnySkill>;
     masterySkills: Set<SkillWithMastery<MasteryAction, MasterySkillData>>;
-    totalProgressTrue: boolean;
-    totalProgressBaseGame: boolean;
-    totalProgressTotH: boolean;
+    totalProgress: Set<Namespaces>;
 }
 declare class CompletionProgress {
     currentCount: CompletionMap;
@@ -154,7 +155,8 @@ declare type CompletionNamespace = Namespaces | string;
 declare const enum VisibleCompletion {
     True = 0,
     BaseGame = 1,
-    TotH = 2
+    TotH = 2,
+    AoD = 3
 }
 declare class Completion implements EncodableObject {
     game: Game;
@@ -174,6 +176,7 @@ declare class Completion implements EncodableObject {
     get totalProgressTrue(): number;
     get totalProgressBaseGame(): number;
     get totalProgressTotH(): number;
+    get totalProgressAoD(): number;
     /** The namespace to currently display the completion of */
     visibleCompletion: CompletionNamespace;
     constructor(game: Game);

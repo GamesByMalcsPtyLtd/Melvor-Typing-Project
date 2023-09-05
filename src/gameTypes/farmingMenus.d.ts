@@ -32,11 +32,14 @@ declare class FarmingPlotElement extends HTMLElement {
     compostProgress: HTMLDivElement;
     destroyButton: HTMLButtonElement;
     harvestButton: HTMLButtonElement;
-    compostButtonContainer: HTMLDivElement;
+    compostButtonContainer: HTMLUListElement;
     growthChance: HTMLHeadingElement;
     seedQuantities: Map<FarmingRecipe, HTMLSpanElement>;
     compostButtons: HTMLButtonElement[];
     compostTooltips?: TippyTooltip[];
+    xpIcon: XPIcon;
+    masteryIcon: MasteryXPIcon;
+    masteryPoolIcon: MasteryPoolIcon;
     constructor();
     connectedCallback(): void;
     disconnectedCallback(): void;
@@ -50,15 +53,21 @@ declare class FarmingPlotElement extends HTMLElement {
     updatePlotState(plot: FarmingPlot): void;
     updateSelectedSeed(plot: FarmingPlot): void;
     updateSeedQuantities(farming: Farming): void;
+    /** Updates the XP, Mastery XP, Mastery Pool XP and interval icons */
+    updateGrants(xp: number, baseXP: number, masteryXP: number, baseMasteryXP: number, masteryPoolXP: number): void;
 }
 declare class LockedFarmingPlotElement extends HTMLElement {
     _content: DocumentFragment;
     farmingLevelRequired: HTMLSpanElement;
-    gpCost: HTMLSpanElement;
     unlockButton: HTMLButtonElement;
+    quantityIcons: QtyIcon[];
+    iconContainer: HTMLDivElement;
     constructor();
     connectedCallback(): void;
     setPlot(plot: FarmingPlot, farming: Farming): void;
+    updateQuantities(): void;
+    updateRequirements(plot: FarmingPlot, farming: Farming): void;
+    updateUnlockButton(plot: FarmingPlot, farming: Farming): void;
 }
 declare class FarmingSeedSelectElement extends HTMLElement {
     _content: DocumentFragment;
@@ -72,9 +81,14 @@ declare class FarmingSeedSelectElement extends HTMLElement {
     recipeQuantity: HTMLSpanElement;
     recipeInterval: HTMLSpanElement;
     plantButton: HTMLButtonElement;
+    xpIcon: XPIcon;
+    masteryIcon: MasteryXPIcon;
+    masteryPoolIcon: MasteryPoolIcon;
     constructor();
     connectedCallback(): void;
     setSeedSelection(category: FarmingCategory, game: Game, plot?: FarmingPlot): void;
     setSelectedRecipe(recipe: FarmingRecipe, game: Game, plot?: FarmingPlot): void;
     setUnselectedRecipe(): void;
+    /** Updates the XP, Mastery XP, Mastery Pool XP and interval icons */
+    updateGrants(xp: number, baseXP: number, masteryXP: number, baseMasteryXP: number, masteryPoolXP: number): void;
 }

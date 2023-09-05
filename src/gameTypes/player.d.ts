@@ -1,13 +1,32 @@
 declare class PlayerStats extends CharacterStats {
     summoningMaxHit: number;
+    barrierDamage: number;
     constructor();
     getValueTable(): {
         name: string;
         value: number;
     }[];
 }
-declare class Player extends Character {
+declare type PlayerCombatEvents = {
+    summonAttack: PlayerSummonAttackEvent;
+    runesUsed: RuneConsumptionEvent;
+    itemEquipped: ItemEquippedEvent;
+    foodEquipped: FoodEquippedEvent;
+    foodEaten: FoodEatenEvent;
+    prayerPointsUsed: PrayerPointConsumptionEvent;
+    summonTabletUsed: SummonTabletUsedEvent;
+} & CharacterCombatEvents;
+declare class Player extends Character implements IGameEventEmitter<PlayerCombatEvents> {
     manager: BaseManager;
+    _events: import("mitt").Emitter<PlayerCombatEvents>;
+    on: {
+        <Key extends "runesUsed" | "summonAttack" | "itemEquipped" | "foodEquipped" | "foodEaten" | "prayerPointsUsed" | "summonTabletUsed" | keyof CharacterCombatEvents>(type: Key, handler: import("mitt").Handler<PlayerCombatEvents[Key]>): void;
+        (type: "*", handler: import("mitt").WildcardHandler<PlayerCombatEvents>): void;
+    };
+    off: {
+        <Key extends "runesUsed" | "summonAttack" | "itemEquipped" | "foodEquipped" | "foodEaten" | "prayerPointsUsed" | "summonTabletUsed" | keyof CharacterCombatEvents>(type: Key, handler?: import("mitt").Handler<PlayerCombatEvents[Key]> | undefined): void;
+        (type: "*", handler: import("mitt").WildcardHandler<PlayerCombatEvents>): void;
+    };
     equipmentSets: EquipmentSet[];
     selectedEquipmentSet: number;
     get activePrayers(): Set<ActivePrayer>;
@@ -31,6 +50,8 @@ declare class Player extends Character {
     get effectRenderer(): EffectRenderer;
     get attackBar(): ProgressBar;
     get attackBarMinibar(): ProgressBar;
+    get summonBar(): ProgressBar;
+    get summonBarMinibar(): ProgressBar;
     activeSummonSlots: ('Summon1' | 'Summon2')[];
     statProviders: Set<StatProvider>;
     activeItemSynergies: Set<ItemSynergy>;
@@ -66,12 +87,12 @@ declare class Player extends Character {
     constructor(manager: BaseManager, game: Game);
     setDefaultAttackStyles(): void;
     setCallbacks(): void;
-    initialize(): void;
     registerStatProvider(provider: StatProvider): void;
     setRenderAll(): void;
     activeTick(): void;
     baseSpawnInterval: number;
     getErrorLog(): string;
+    queueNextAction(noSpec?: boolean, tickOffset?: boolean): void;
     getMonsterSpawnTime(): number;
     isEquipmentSlotUnlocked(slot: SlotTypes): boolean;
     /** Returns true if the given item is equipped in any equipment set */
@@ -108,11 +129,17 @@ declare class Player extends Character {
     onRangedAttackFailure(quiver: EquipmentItem): void;
     rewardForDamage(damage: number): void;
     attack(target: Character, attack: SpecialAttack): number;
-    lifesteal(attack: SpecialAttack, damage: number): number;
-    rewardForSummonDamage(damage: number): void;
+    lifesteal(attack: SpecialAttack, damage: number, flatBonus: number): number;
+    rewardForSummonDamage(damage: number, isBarrierDmg: boolean): void;
+    /** Applies combat triangle, modifiers and damage reduction to summoning attack damage */
+    modifySummonAttackDamage(damage: number): number;
+    /** Applies multiplicative and flat damage modifiers to summoning attack damage */
+    applySummonDamageModifiers(damage: number): number;
+    /** Clamps summoning attack damage to remaining barrier or hitpoints */
+    clampSummonAttackDamage(damage: number, target: Character): number;
     summonAttack(): void;
     startSummonAttack(tickOffset?: boolean): void;
-    postAttack(attack: SpecialAttack, attackType: AttackType): void;
+    postAttack(): void;
     onHit(): void;
     onBeingHit(): void;
     applyOnBeingHitEffects(): void;
@@ -121,9 +148,15 @@ declare class Player extends Character {
     trackArmourStat(stat: ItemStats, amount?: number): void;
     addItemStat(item: AnyItem, stat: ItemStats, amount: number): void;
     consumeRunes(costs: AnyItemQuantity[]): void;
-    consumeEquipmentCharges(event: GameEvent, interval: number): void;
+    /** Event Handler for item charge use */
+    consumeItemCharges(e: GameEvent, item: EquipmentItem): void;
+    /** Event Handler for item quantity use */
+    consumeItemQuantities(e: GameEvent, slot: EquipSlot): void;
+    /** Event Handler for bank item use */
+    consumeBankItem(e: GameEvent, consumption: BankItemConsumption): void;
+    /** Event Handler for Summoning Synergy tablet usage */
+    consumeSynergyTablets(e: GameEvent): void;
     removeFromQuiver(qty?: number): void;
-    removeFromConsumable(qty?: number): void;
     consumeAmmo(): void;
     trackItemUsage(costs: AnyItemQuantity[]): void;
     applyDOT(effect: DOTEffect, target: Character, damageDealt: number): boolean;
@@ -140,6 +173,7 @@ declare class Player extends Character {
     changeEquipToSet(setID: number): void;
     /** Adds equipment sets based on the modifier value */
     updateEquipmentSets(): void;
+    onUnequipFromQuantityUse(): void;
     /** Perform stat recalculation and ui update, interrupt current player action */
     updateForEquipmentChange(): void;
     /** Updates and renders the equipment sets */
@@ -150,6 +184,11 @@ declare class Player extends Character {
     unequipCallback(slot: SlotTypes): () => void;
     /** Function for unequipping an item from a slot */
     unequipItem(set: number, slot: SlotTypes): boolean;
+    /** The array of event unassigners for events that consume resources based on current equipment */
+    equipmentEventUnassigners: VoidFunction[];
+    assignEquipmentEventHandlers(): void;
+    summoningSynergyEventUnassigners: VoidFunction[];
+    assignSynergyEventHandlers(): void;
     /** Automatically equips the selected food, without taking it from the bank
      *  Will update the completion log and item statistics
      */
@@ -169,18 +208,20 @@ declare class Player extends Character {
     interruptAttack(): void;
     /** Callback Function for clicking on a prayer */
     togglePrayer(prayer: ActivePrayer, render?: boolean): void;
+    /** Checks if the player meets the requirements to use the currently selected prayers */
+    checkPrayerUsage(): void;
     toggleSpell(spell: StandardSpell, render?: boolean): void;
     toggleCurse(spell: CurseSpell, render?: boolean): void;
     toggleAurora(spell: AuroraSpell, render?: boolean): void;
     toggleAncient(spell: AncientSpell, render?: boolean): void;
     toggleArchaic(spell: ArchaicSpell, render?: boolean): void;
-    consumePrayerPoints(amount: number): void;
+    consumePrayerPoints(amount: number, isUnholy: boolean): void;
     disableActivePrayers(): void;
     addPrayerPoints(amount: number): void;
     trackPrayerStats(stat: PrayerStats, amount: number): void;
     applyCostModifiersToPrayerCost(amount: number): number;
-    applyPreservationToPrayerCost(amount: number): number;
-    applyModifiersToPrayerCost(amount: number): number;
+    applyPreservationToPrayerCost(amount: number, isUnholy: boolean): number;
+    applyModifiersToPrayerCost(amount: number, isUnholy: boolean): number;
     computePrayerMaxCost(prayer: ActivePrayer): number;
     renderPrayerPoints(): void;
     renderPrayerSelection(): void;
@@ -195,6 +236,10 @@ declare class Player extends Character {
     computeAttackType(): void;
     setAttackStyle(attackType: AttackType, style: AttackStyle): void;
     computeModifiers(): void;
+    addInheretedModifiers(): void;
+    addAoDSkillcapeInheretedModifiers(): void;
+    inheritModifiersFromItem(itemID: string): void;
+    addAncientRelicModifiers(): void;
     addProviderModifiers(): void;
     addAttackStyleModifiers(): void;
     addEquippedItemModifiers(): void;
@@ -229,6 +274,7 @@ declare class Player extends Character {
     onModifierEffectRemoval(): void;
     onTargetModifierEffectRemoval(): void;
     onTargetModifierEffectApplication(): void;
+    onTargetUnholyMarkChange(oldStacks: number, newStacks: number): void;
     onApplyingStun(target: Character): void;
     onBeingStunned(): void;
     onStunRemoval(): void;
@@ -241,6 +287,7 @@ declare class Player extends Character {
     getRangedDefenceBonus(): number;
     getMagicDefenceBonus(): number;
     processDeath(): void;
+    getMaxHitModifier(): number;
     /** Removes an item from the player's equipment on death */
     applyDeathPenalty(): void;
     regen(): void;
@@ -249,7 +296,7 @@ declare class Player extends Character {
     setAttackStyleButtonCallbacks(): void;
     renderHitpoints(): void;
     renderSummonMaxHit(): void;
-    renderStats(): void;
+    renderDamageValues(): void;
     renderFood(): void;
     render(): void;
     renderAutoEat(): void;
@@ -265,11 +312,12 @@ declare class Player extends Character {
     /** Rewards XP and rolls for pets */
     rewardXPAndPetsForDamage(damage: number): void;
     rollForSummoningMarks(skill: AnySkill, interval: number): void;
-    rewardCurrencyForSummonDamage(damage: number): void;
+    rewardCurrencyForSummonDamage(damage: number, isBarrierDmg: boolean): void;
+    rewardXPForSummonBarrierDamage(damage: number): void;
     rewardCurrencyForDamage(damage: number): void;
+    rewardForKill(): void;
     rewardGPForKill(): void;
-    /** Processes game events relating to combat. Exists for golbin raid override */
-    processCombatEvent(event: GameEvent, interval?: number): void;
+    rewardPrayerPointsForKill(): void;
     /** For specific player only spawn effects */
     applyUniqueSpawnEffects(): void;
     initializeForCombat(): void;
@@ -291,6 +339,7 @@ interface PlayerHTMLElements extends RenderHTMLElements {
     specialIcon: HTMLImageElement;
     specialTooltip: TippyTooltip;
     autoEatIcons: HTMLElement[];
+    autoEatSpans: HTMLElement[];
     autoEatTooltips: TippyTooltip[];
     triangleDamageIcons: HTMLElement[];
     triangleReductionIcon: HTMLElement;
@@ -303,7 +352,7 @@ declare type AttackStyleSelection = {
     ranged?: AttackStyle;
     magic?: AttackStyle;
 };
-interface PlayerRenderQueue extends RenderQueue {
+declare class PlayerRenderQueue extends CharacterRenderQueue {
     prayerPoints: boolean;
     prayerSelection: boolean;
     spellSelection: boolean;
@@ -316,6 +365,7 @@ interface PlayerRenderQueue extends RenderQueue {
     food: boolean;
     combatLevel: boolean;
     summonBar: boolean;
+    summonBarMinibar: boolean;
     attacks: boolean;
     equipmentSets: boolean;
     runesUsed: boolean;

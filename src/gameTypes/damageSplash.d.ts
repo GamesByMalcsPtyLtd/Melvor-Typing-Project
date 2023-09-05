@@ -18,4 +18,4 @@ declare type DamageSplash = {
     text?: string;
     xOffset: number;
 };
-declare type SplashType = DOTType | 'Attack' | 'Crit' | 'Heal';
+declare type SplashType = DOTType | 'Attack' | 'Crit' | 'Heal' | 'SummonAttack';

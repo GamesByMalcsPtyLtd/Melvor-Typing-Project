@@ -174,7 +174,7 @@ declare type PackagedSave = {
     cd: number[];
 };
 declare const saveFormat2Version = 21;
-declare const currentSaveVersion = 50;
+declare const currentSaveVersion = 76;
 interface AddRemove<T> {
     add: T[];
     remove: T[];
@@ -347,14 +347,30 @@ declare const enum AttackEffectType {
     Leviathan = 16,
     ShadowCloak = 17,
     ItemEffect = 18,
-    Increased5DR = 19
+    Increased5DR = 19,
+    Elusive = 20,
+    Crystallization = 21,
+    CrystalSanction = 22,
+    WeakeningTouch = 23,
+    UnderwaterSlowEffect = 24,
+    UnderwaterAttackSpeedEffect = 25,
+    CleansedEffect = 26,
+    NulledEffect = 27,
+    MaxHitpointsEffect = 28,
+    BlindEffect = 29,
+    AttackMasterRelicEffect = 30,
+    StrengthMasterRelicEffect = 31,
+    MagicMasterRelicEffect = 32,
+    FrostBurnReflectEffect = 33
 }
 declare enum DotTypeIDs {
     Burn = 0,
     Bleed = 1,
     Poison = 2,
     Regen = 3,
-    DeadlyPoison = 4
+    DeadlyPoison = 4,
+    BarrierBleed = 5,
+    BarrierBurn = 6
 }
 declare enum AttackTypeID {
     melee = 0,

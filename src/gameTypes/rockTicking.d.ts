@@ -55,7 +55,19 @@ interface MiningSkillData extends MasterySkillData {
     coalItemID?: string;
     runestoneItemID?: string;
 }
-declare class Mining extends GatheringSkill<MiningRock, MiningSkillData> implements PassiveAction {
+declare type MiningEvents = {
+    action: MiningActionEvent;
+};
+declare class Mining extends GatheringSkill<MiningRock, MiningSkillData> implements PassiveAction, IGameEventEmitter<MiningEvents> {
+    _events: import("mitt").Emitter<MiningEvents>;
+    on: {
+        <Key extends "action">(type: Key, handler: import("mitt").Handler<MiningEvents[Key]>): void;
+        (type: "*", handler: import("mitt").WildcardHandler<MiningEvents>): void;
+    };
+    off: {
+        <Key extends "action">(type: Key, handler?: import("mitt").Handler<MiningEvents[Key]> | undefined): void;
+        (type: "*", handler: import("mitt").WildcardHandler<MiningEvents>): void;
+    };
     readonly _media = "assets/media/skills/mining/mining.svg";
     getTotalUnlockedMasteryActions(): number;
     renderQueue: MiningRenderQueue;
@@ -108,6 +120,7 @@ declare class Mining extends GatheringSkill<MiningRock, MiningSkillData> impleme
     onRockClick(rock: MiningRock): void;
     onStop(): void;
     onLoad(): void;
+    onAncientRelicUnlock(): void;
     encode(writer: SaveWriter): SaveWriter;
     decode(reader: SaveWriter, version: number): void;
     deserialize(reader: DataReader, version: number, idMap: NumericIDMap): void;
@@ -140,4 +153,5 @@ declare class Mining extends GatheringSkill<MiningRock, MiningSkillData> impleme
     /** Returns size of Gem vein found as a string */
     getGemVeinSize(number: number): string;
     testTranslations(): void;
+    getObtainableItems(): Set<AnyItem>;
 }

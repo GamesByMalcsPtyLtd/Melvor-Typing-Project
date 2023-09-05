@@ -53,17 +53,27 @@ declare let farmingMenus: {
     plotContainer: HTMLDivElement;
     plots: FarmingPlotElement[];
     plotMap: Map<FarmingPlot, FarmingPlotElement>;
+    lockedPlotMap: Map<FarmingPlot, LockedFarmingPlotElement>;
     lockedPlots: LockedFarmingPlotElement[];
     seedSelect: FarmingSeedSelectElement;
     compostIcons: ItemCurrentIcon[];
 };
 declare let townshipUI: TownshipUI;
+declare let archaeologyMenus: {
+    digSites: Map<ArchaeologyDigSite, ArchaeologyDigSiteContainerElement>;
+};
+declare let archaeologyUI: ArchaeologyUI;
+declare let ancientRelicsMenu: AncientRelicsMenu;
 declare let bankTabMenu: BankTabMenu;
 declare let bankOptionsMenu: BankOptionsMenu;
 declare let bankMoveModeMenu: BankMoveModeMenu;
 declare let bankSellModeMenu: BankSellModeMenu;
 declare let bankSideBarMenu: BankSideBarMenu;
 declare let bankItemSettingsMenu: BankItemSettingsMenu;
+declare let itemUpgradeMenu: ItemUpgradeMenuElement;
+declare let cartographyMap: WorldMapDisplayElement;
+declare let cartographyMapCreateMenu: CreateMapMenuElement;
+declare let cartographyMapMasteryMenu: MapMasteryMenuElement;
 declare const combatSkills: (keyof CombatLevels)[];
 declare let shopMenu: ShopMenu;
 declare const synergyElements: SynergyElements;
@@ -118,6 +128,7 @@ interface ProgressBars {
     playerAttack: ProgressBar;
     playerAttackMinibar: ProgressBar;
     playerSummon: ProgressBar;
+    playerSummonMinibar: ProgressBar;
     enemyAttack: ProgressBar;
     enemyAttackMinibar: ProgressBar;
 }

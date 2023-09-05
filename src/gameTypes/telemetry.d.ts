@@ -1,9 +1,14 @@
 declare class Telemetry {
     readonly ENABLE_TELEMETRY = true;
+    readonly TELEMETRY_FIRE_EVENT_LIMIT_IN_SECONDS = 1;
+    readonly LOG_EVENTS_TO_CONSOLE = false;
+    lastTelemetryEventFire: number;
+    shouldFireTelemetry: boolean;
     enableTelemetryFromCloud: boolean;
     telemetryPayloadsToProcess: TelemetryEvent;
     constructor();
     get isTelemetryEnabled(): boolean;
+    get entitlementStatus(): boolean[];
     setEnableTelemetryFromCloud: () => void;
     /** Create a new Monster kill telemetry event.
      * Will automatically update the count if this event is already queued to process.
@@ -27,12 +32,14 @@ declare class Telemetry {
      * @param cause The cause of the player's death.
      */
     updatePlayerDeathEventCause(cause: PlayerDeathTelemetryEventCause): void;
-    /** Create a new player death event
-     * Will automatically update the count if this event is already queued to process.
-     * This one should always send immediately.
+    /** Create a new offline xp gained event
      * @param skill The skill that gained xp
      */
     createOfflineXPGainEvent(skill: AnySkill, offlineTime: number, xpBefore: number, xpAfter: number, levelBefore: number, levelAfter: number): void;
+    /** Create a new online xp gained event.
+     * Updates an existing event if it already exists
+     */
+    createOnlineXPGainEvent(skill: AnySkill, onlineTime: number, xpBefore: number, xpAfter: number, levelBefore: number, levelAfter: number): void;
     /** Create a new item gained event.
      * Adds volume the existing event if it already exists (Same Item & source)
      * @param item The item that was gained
@@ -47,6 +54,13 @@ declare class Telemetry {
      * @param movedTo Where the item went to (from bank)
      */
     createItemRemovedFromBankEvent(item: AnyItem, volume: number, movedTo: string): void;
+    /** Create a new gp adjusted event.
+     * Adds amount the existing event if it already exists (Same source)
+     * @param amount The GP amount that was gained/lossed
+     * @param total The total GP value.
+     * @param source Where the GP adjustment originated from
+     */
+    createGPAdjustedEvent(amount: number, total: number, source: string): void;
     removeTelemetryEvent(eventType: TelemetryEventID, eventID: string): void;
     /** Returns existing the existing Telemetry Event that is scheduled to send */
     getExistingTelemetryEvent(eventType: TelemetryEventID, eventID: string): TelemetryEvents | undefined;
@@ -79,8 +93,9 @@ declare class Telemetry {
      * @param event The event data to process
      */
     processTelemetryPayload(eventType: TelemetryEventID, event: TelemetryEventData): TelemetryData[];
+    get telemetryCooldownExpired(): boolean;
     /** Fires a Telemetry Event via PlayFab API Call */
-    fireTelemetryEvents(events: TelemetryData[]): void;
+    fireTelemetryEvents(events: TelemetryData[], bypassCooldown: boolean): void;
 }
 declare abstract class GenericTelemetryEvent {
     abstract get payload(): TelemetryEventPayload;
@@ -122,6 +137,18 @@ declare class OfflineXPGainTelemetryEvent extends GenericTelemetryEvent {
     updateValues(level: number, xp: number): void;
     get requiresPurge(): boolean;
 }
+declare class OnlineXPGainTelemetryEvent extends GenericTelemetryEvent {
+    _skill: AnySkill;
+    _xpBefore: number;
+    _xpAfter: number;
+    _levelBefore: number;
+    _levelAfter: number;
+    _onlineTime: number;
+    constructor(skill: AnySkill, onlineTime: number, xpBefore: number, xpAfter: number, levelBefore: number, levelAfter: number);
+    get payload(): OnlineXPGainTelemetryEventPayload;
+    updateValues(level: number, xp: number, onlineTime: number): void;
+    get requiresPurge(): boolean;
+}
 declare class ItemGainedTelemetryEvent extends GenericTelemetryEvent {
     _item: AnyItem;
     itemVolume: number;
@@ -137,6 +164,13 @@ declare class ItemRemovedFromBankTelemetryEvent extends GenericTelemetryEvent {
     constructor(item: AnyItem, itemVolume: number, movedTo: string);
     get payload(): ItemRemovedFromBankEventPayload;
 }
+declare class GPAdjustedTelemetryEvent extends GenericTelemetryEvent {
+    amount: number;
+    total: number;
+    _source: string;
+    constructor(amount: number, total: number, source: string);
+    get payload(): GPAdjustedEventPayload;
+}
 interface GenericTelemetryEventPayload {
     character: string;
     gamemode: string;
@@ -146,6 +180,7 @@ interface GenericTelemetryEventPayload {
     platform: string;
     mods_enabled: boolean;
     active_mods: string[];
+    entitlements: boolean[];
 }
 interface MonsterKilledTelemetryEventPayload extends GenericTelemetryEventPayload {
     monster_id: string;
@@ -167,9 +202,22 @@ interface OfflineXPGainTelemetryEventPayload extends GenericTelemetryEventPayloa
     level_after: number;
     offline_time: number;
 }
+interface OnlineXPGainTelemetryEventPayload extends GenericTelemetryEventPayload {
+    skill_id: string;
+    xp_before: number;
+    xp_after: number;
+    level_before: number;
+    level_after: number;
+    online_time: number;
+}
 interface ItemMovementEventPayload extends GenericTelemetryEventPayload {
     item_id: string;
     item_volume: number;
+    source: string;
+}
+interface GPAdjustedEventPayload extends GenericTelemetryEventPayload {
+    amount: number;
+    total: number;
     source: string;
 }
 interface ItemGainedEventPayload extends ItemMovementEventPayload {
@@ -180,12 +228,12 @@ interface ItemRemovedFromBankEventPayload extends ItemMovementEventPayload {
 }
 declare type TelemetryEvent = Map<TelemetryEventID, TelemetryEventData>;
 declare type TelemetryEventData = Map<string, TelemetryEvents>;
-declare type TelemetryEventID = 'monster_killed' | 'player_death' | 'offline_xp_gain' | 'item_gained' | 'item_removed_from_bank';
+declare type TelemetryEventID = 'monster_killed' | 'player_death' | 'offline_xp_gain' | 'online_xp_gain' | 'item_gained' | 'item_removed_from_bank' | 'gp_adjusted';
 interface TelemetryData {
     EventNamespace: 'custom';
     Name: TelemetryEventID;
     Payload: TelemetryEventPayload;
 }
-declare type TelemetryEvents = MonsterKilledTelemetryEvent | PlayerDeathTelemetryEvent | OfflineXPGainTelemetryEvent | ItemGainedTelemetryEvent | ItemRemovedFromBankTelemetryEvent;
-declare type TelemetryEventPayload = MonsterKilledTelemetryEventPayload | PlayerDeathTelemetryEventPayload | OfflineXPGainTelemetryEventPayload | ItemGainedEventPayload | ItemRemovedFromBankEventPayload;
+declare type TelemetryEvents = MonsterKilledTelemetryEvent | PlayerDeathTelemetryEvent | OfflineXPGainTelemetryEvent | OnlineXPGainTelemetryEvent | ItemGainedTelemetryEvent | ItemRemovedFromBankTelemetryEvent | GPAdjustedTelemetryEvent;
+declare type TelemetryEventPayload = MonsterKilledTelemetryEventPayload | PlayerDeathTelemetryEventPayload | OfflineXPGainTelemetryEventPayload | OnlineXPGainTelemetryEventPayload | ItemGainedEventPayload | ItemRemovedFromBankEventPayload | GPAdjustedEventPayload;
 declare type PlayerDeathTelemetryEventCause = Monster | 'Thieving' | 'GolbinRaid' | 'Unknown';

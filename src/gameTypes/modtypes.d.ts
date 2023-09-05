@@ -599,6 +599,7 @@ declare namespace Modding {
   interface ModContext {
     name: string;
     namespace?: string;
+    namespaceData?: DataNamespace;
     version: string;
     gameData: {
       addPackage: (data: string | GameDataPackage) => Promise<void>;
@@ -624,6 +625,7 @@ declare namespace Modding {
       };
       type: (name: string, config: Modding.Settings.SettingConfig) => void;
     };
+    getResourceBlob: (resourcePath: string) => Blob;
     getResourceUrl: (resourcePath: string) => string;
     loadTemplates: (resourcePath: string) => void;
     loadStylesheet: (resourcePath: string) => void;

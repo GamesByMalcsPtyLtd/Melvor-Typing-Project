@@ -49,13 +49,9 @@ interface ShopPurchaseData extends IDData {
         modifiers?: PlayerModifierData;
         petID?: string;
         lootBox?: boolean;
+        bankTab?: boolean;
     };
-    cost: {
-        gp: ShopCostAmount;
-        slayerCoins: ShopCostAmount;
-        items: IDQuantity[];
-        raidCoins: ShopCostAmount;
-    };
+    cost: ShopCostData;
     allowQuantityPurchase: boolean;
     /** Previous shop purchases required for item to show in shop */
     unlockRequirements: ShopPurchaseRequirementData[];
@@ -71,6 +67,18 @@ interface ShopPurchaseData extends IDData {
     showBuyLimit: boolean;
     currentDescription?: CurrentShopDescription;
 }
+interface ShopCostData {
+    gp: ShopCostAmount;
+    slayerCoins: ShopCostAmount;
+    items: IDQuantity[];
+    raidCoins: ShopCostAmount;
+}
+interface ShopCost {
+    gp: ShopCostAmount;
+    slayerCoins: ShopCostAmount;
+    items: ItemQuantity<AnyItem>[];
+    raidCoins: ShopCostAmount;
+}
 interface ShopPurchaseModificationData {
     /** The ID of the purchase to modify */
     id: string;
@@ -79,11 +87,23 @@ interface ShopPurchaseModificationData {
         gamemodeID: string;
         maximum: number;
     }[];
+    /** Replacement purchase requirements to apply the purchase */
+    purchaseRequirements?: {
+        gamemodeID: string;
+        newRequirements: AnyRequirementData[];
+    }[];
+    /** Replacement purchase costs to apply the purchase */
+    cost?: {
+        gamemodeID: string;
+        newCosts: ShopCostData;
+    }[];
 }
 declare class ShopPurchase extends NamespacedObject implements SoftDataDependant<ShopPurchaseData> {
     get media(): string;
     get name(): string;
     get description(): string;
+    get costs(): ShopCost;
+    get purchaseRequirements(): AnyRequirement[];
     _media: string;
     category: ShopCategory;
     contains: {
@@ -92,15 +112,13 @@ declare class ShopPurchase extends NamespacedObject implements SoftDataDependant
         modifiers?: PlayerModifierObject;
         pet?: Pet;
         lootBox?: boolean;
+        bankTab?: boolean;
     };
-    costs: {
-        gp: ShopCostAmount;
-        slayerCoins: ShopCostAmount;
-        raidCoins: ShopCostAmount;
-        items: AnyItemQuantity[];
-    };
+    _costs: Map<Gamemode, ShopCost>;
+    _defaultCosts: ShopCost;
     unlockRequirements: ShopPurchaseRequirement[];
-    purchaseRequirements: AnyRequirement[];
+    _purchaseRequirements: Map<Gamemode, AnyRequirement[]>;
+    _defaultPurchaseRequirements: AnyRequirement[];
     currentDescription?: CurrentShopDescription;
     /** Purchase limit by Gamemode. If unset, no limit exists. */
     _buyLimitOverrides: Map<Gamemode, number>;
@@ -158,7 +176,10 @@ declare class ShopRenderQueue {
     costs: boolean;
     upgrades: boolean;
 }
-declare class Shop implements EncodableObject, StatProvider, RaidStatProvider {
+declare type ShopEvents = {
+    purchaseMade: ShopPurchaseMadeEvent;
+};
+declare class Shop extends GameEventEmitter<ShopEvents> implements EncodableObject, StatProvider, RaidStatProvider {
     game: Game;
     modifiers: MappedModifiers;
     raidStats: Required<Pick<StatProvider, 'modifiers'>>;
