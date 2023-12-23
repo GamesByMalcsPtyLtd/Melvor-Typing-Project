@@ -18,12 +18,15 @@ interface SkillLevelRequirement {
 interface AllSkillLevelRequirementData {
     type: 'AllSkillLevels';
     level: number;
+    namespace?: string;
     exceptions?: string[];
 }
 /** Requires that all skill registered to the game have a level greater than or equal to the level */
 interface AllSkillLevelRequirement {
     type: 'AllSkillLevels';
     level: number;
+    /** If present, only skills belonging to the specified namespace are included in the requirement */
+    namespace?: DataNamespace;
     /** If present, all skills in this set are not included in the requirement */
     exceptions?: Set<AnySkill>;
 }

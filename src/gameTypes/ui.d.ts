@@ -1,8 +1,9 @@
-interface ComponentProps extends Record<string, unknown> {
+declare type ComponentProps = {
     $template: string;
-}
+    [key: string]: unknown;
+};
 declare const ui: {
     create: (props: ComponentProps, host: Element) => Element;
     createStatic: (template: string, host: Element) => Element;
-    createStore: (props: Record<string, unknown>) => any;
+    createStore: <T extends Record<string, unknown>>(props: T) => T;
 };

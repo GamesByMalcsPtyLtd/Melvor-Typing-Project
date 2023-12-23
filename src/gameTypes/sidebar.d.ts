@@ -50,6 +50,7 @@ interface SidebarItemConfig {
     nameClass?: string | null;
     aside?: string | HTMLElement | null;
     asideClass?: string | null;
+    asideLangID?: string | null;
     link?: string | null;
     ignoreToggle?: boolean | null;
     before?: string | null;

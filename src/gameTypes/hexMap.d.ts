@@ -278,7 +278,9 @@ declare class Hex extends HexCoords implements EncodableObject, SoftDataDependan
     get isSelected(): boolean;
     /** If this hex has a point of interest */
     get hasPOI(): boolean;
-    get accessibleDescription(): string;
+    getAccessibleDescription(cartography: Cartography): string;
+    /** Gets detailed information about the hex when it is queried */
+    getAccessibleDetails(cartography: Cartography): string;
     _lastCostMultiplier: number;
     _combinedCost: number;
     getCombinedCost(multiplier: number): number;
@@ -625,6 +627,8 @@ declare class WorldMap extends NamespacedObject implements EncodableObject {
     getTileTexture(i: number, j: number, quality: MapTextureQuality): string;
     /** Returns if a border should be shown for the given hex */
     shouldHexHaveBorder(hex: Hex): boolean;
+    /** Called for each map on save load. */
+    onLoad(): void;
     encode(writer: SaveWriter): SaveWriter;
     decode(reader: SaveWriter, version: number): void;
     encodeHexCoords(writer: SaveWriter, hex: HexCoords): void;

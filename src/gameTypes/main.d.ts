@@ -7,7 +7,7 @@ declare const DEBUG_REPORTER: string[];
 declare const CDNDIR_ORIGINAL: string;
 declare const CDNDIR: () => string;
 declare function getPathWithoutFile(): string;
-declare const gameTitle = "Melvor Idle :: v1.2";
+declare const gameTitle = "Melvor Idle :: v1.2.2";
 declare let currentTitleNewsID: string[];
 declare let playFabEventQueue: {
     eventName: string;
@@ -41,23 +41,19 @@ declare function cleanSaveFile(): void;
 declare function getCloudSaveHeartbeatInterval(): number;
 declare const isAdsPath: () => boolean;
 /**
- * DEPRECATED
- * Use nativeManager.isIOS
+ * @deprecated Use nativeManager.isIOS
  */
 declare function isIOS(): boolean;
 /**
- * DEPRECATED
- * Use nativeManager.isAndroid
+ * @deprecated Use nativeManager.isAndroid
  */
 declare function isAndroid(): boolean;
 /**
- * DEPRECATED
- * Use nativeManager.isMobile
+ * @deprecated Use nativeManager.isMobile
  */
 declare function isMobile(): true | typeof isAndroid;
 /**
- * DEPRECATED
- * Use nativeManager.isSteam
+ * @deprecated Use nativeManager.isSteam
  */
 declare function isSteam(): boolean;
 declare const isDemoSkill: (skill: AnySkill) => boolean;
@@ -68,7 +64,7 @@ declare const getLocaleIAPPrice: () => void;
 declare const IAPPurchaseInProcess = false;
 declare let IAPTimer: number;
 declare const performUnlockIAP: (productID: string) => void;
-declare const performUnlockExpansionIAP: (productID: string) => void;
+declare const performUnlockExpansionIAP: (productID: string, expansionID: number) => void;
 declare const performUnlockExpandedEditionIAP: (productID: string) => void;
 declare const enableBuyNowExpandedEditionBtn: () => void;
 declare const disableBuyNowExpandedEditionBtn: () => void;
@@ -86,7 +82,6 @@ declare function resetAccountData(): void;
 declare function setDiscordRPCDetails(): Promise<void>;
 declare function initSteam(): void;
 declare function unlockSteamAchievement(achievementName: string, i: number): void;
-declare function resetSteamAchievements(): void;
 declare function showPageLoader(): void;
 declare function initTooltips(): void;
 declare function generateLoreModals(): string;
@@ -97,3 +92,4 @@ declare function initChangelog(): void;
 declare function updateAllGameMedia(): void;
 declare function updateGameMedia(media: string): void;
 declare function viewExpansion2Details(): void;
+declare function resetClient(): void;

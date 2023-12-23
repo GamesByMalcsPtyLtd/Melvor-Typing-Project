@@ -50,11 +50,11 @@ declare namespace Modding {
       /** Can multiple tags be selected via `checkboxes` or should only a single tag be selected via a `dropdown`. */
       type: string;
       /** List of tag names and the count of mods with these tags. */
-      tag_count_map: Record<string, number>
+      tag_count_map: Record<string, number>;
       /** Groups of tags flagged as `locked` should not be editable but can be shown to users. */
       locked: boolean;
       /** Array of tags in this group. */
-      tags: string[]
+      tags: string[];
     }
 
     /** mod.io Get Mods Object {@link | https://docs.mod.io/#get-mods-2} */
@@ -453,6 +453,14 @@ declare namespace Modding {
     type SerializedSection = [string, SerializedSetting[]];
   }
 
+  /** Mod Profile used to determine what mods to enable for what character slot */
+  interface Profile {
+    id: string;
+    name: string;
+    mods: Modding.ModId[];
+    autoEnable: boolean;
+  }
+
   /** The accepted manifest.json format */
   interface ModManifest {
     /** The mod's namespace used for data registration & saving. */
@@ -503,6 +511,13 @@ declare namespace Modding {
     changelog?: string;
   }
 
+  interface ModCache {
+    id: Modding.ModId;
+    io: Modding.Io.Mod | null;
+    local: Modding.Mod | null;
+    loaded: Modding.Mod | null;
+  }
+
   interface LocalMod {
     /** Auto-incremented id specifically for local mods */
     id: number;
@@ -518,6 +533,14 @@ declare namespace Modding {
     disabled: boolean;
   }
 
+  interface ModCache {
+    id: Modding.ModId;
+    io: Modding.Io.Mod | null;
+    local: Modding.Mod | null;
+    loaded: Modding.Mod | null;
+    latest: Modding.Io.Modfile | null;
+  }
+
   type ModBasic = Pick<Mod,'id'|'name'|'version'>;
 
   type ModError = {
@@ -527,6 +550,16 @@ declare namespace Modding {
     stack: string
   }
   
+  interface TagGroup {
+    name: string;
+    tags: Modding.Tag[];
+  }
+
+  interface Tag {
+    name: string;
+    count: number;
+  }
+
   /** A mod's categorized tags. */
   interface ModTags {
     /** The mod's supported platforms (Steam, Browser, iOS, Android). */
@@ -721,3 +754,5 @@ type ClassMethod<C extends ClassHandle> = {[M in keyof C['prototype']]-?: C['pro
 type ClassProperty<C extends ClassHandle> = {[P in keyof C['prototype']]-?: C['prototype'][P] extends Function ? never : P}[keyof C['prototype']];
 
 type primitive = undefined | null | boolean | number | string | void;
+
+declare function require(path: string): any;

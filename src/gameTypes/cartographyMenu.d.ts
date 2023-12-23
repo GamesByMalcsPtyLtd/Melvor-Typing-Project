@@ -103,7 +103,7 @@ declare class WorldMapDisplayElement extends HTMLElement {
     viewportEventRemover?: VoidFunction;
     /** Computes the distance the viewport is from a point */
     getViewportDistance(point: PIXI.Point): Point;
-    configureViewport(map: WorldMap): void;
+    configureViewport(map: WorldMap, cartography: Cartography): void;
     setViewportSize(): void;
     /** Computes the unscaled border region that the viewport should have */
     computeViewportBorders(): void;
@@ -250,15 +250,21 @@ declare class WorldMapDisplayElement extends HTMLElement {
     getAccessibleHexes(map: WorldMap): Hex[];
     visibleAccessibleHexes: Hex[];
     accessibleHexPage: number;
+    /** The last aria-alert given to the user. Used to prevent alert spam. */
+    lastAccessibleAlert: string;
+    /** Hex being detail viewed */
+    detailViewedHex?: Hex;
     showAccessibleInfo(message: string): void;
     updateAccessibleMoveAlert(originalPos: PIXI.Point): void;
     updateAccessibleZoomAlert(originalScale: PIXI.Point): void;
-    updateAccessibleMenu(map: WorldMap): void;
+    updateAccessibleMenu(map: WorldMap, cartography: Cartography): void;
     hasNextAccessiblePage(currentPage: number): boolean;
-    showAccessibleHexPage(page: number): void;
+    showAccessibleHexPage(page: number, cartography: Cartography): void;
+    showAccessibleHexDetails(hex: Hex, cartography: Cartography): void;
     onCanvasKeydown(e: KeyboardEvent, cartography: Cartography): void;
     /** Updates the visibility and image of the POI discovery button */
     updatePOIDiscoveryBtn(nextPOI: PointOfInterest | undefined): void;
+    addFPSCounter(): void;
     static readonly zoomLevels: WorldMapDisplayZoomLevel[];
     /** Configures the dimensions of the region in which accessibility should be enabled */
     readonly accessibilityRectSize: {
@@ -823,10 +829,12 @@ declare class MapMasteryMenuElement extends HTMLElement {
     _content: DocumentFragment;
     mapTitle: HTMLHeadingElement;
     masteryContainer: HTMLDivElement;
+    hexMasteryCount: HTMLDivElement;
     masteryBonuses: MapMasteryBonusElement[];
     constructor();
     connectedCallback(): void;
     setMap(map: WorldMap): void;
+    setHexMasteryCount(map: WorldMap): void;
 }
 declare class MapMasteryBonusElement extends HTMLElement {
     _content: DocumentFragment;

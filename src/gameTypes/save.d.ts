@@ -19,6 +19,8 @@ interface SaveGameHeader {
     saveTimestamp: number;
     /** The un-modded namespaces that were active in the save when it was created. And empty array indicates the save is old and this information is unknown. */
     activeNamespaces: string[];
+    /** The mod profile assigned to this save. Null for no mods. */
+    modProfile: Omit<Modding.Profile, 'autoEnable'> | null;
 }
 declare const setSaveGUID: () => void;
 declare let sidebarSwipeTimer: number;
@@ -152,11 +154,12 @@ declare let inFocus: boolean;
 declare const onloadEvent: (accessCheck?: boolean) => void;
 declare function confirmedAuthenticated(): void;
 declare function checkIfAuthenticated(): Promise<void>;
-declare const INTERFACE_VERSION = 79;
+declare const INTERFACE_VERSION = 102;
 declare function loadGameInterface(accessCheck?: boolean): Promise<void>;
-declare const DATA_VERSION = 221;
+declare const DATA_VERSION = 252;
 declare function changePageCharacterSelection(page: CharacterSelectPage): void;
 declare const showOctaviusPlushieAnnouncement = false;
+declare const showMarcyPlushieAnnouncement = false;
 /** Future announcement handler that will occur dynamically. For now this is hard coded. */
 declare function updateUIForAnnouncements(): void;
 declare function hideUIForAnnouncement(id: number): void;

@@ -27,6 +27,7 @@ declare class Player extends Character implements IGameEventEmitter<PlayerCombat
         <Key extends "runesUsed" | "summonAttack" | "itemEquipped" | "foodEquipped" | "foodEaten" | "prayerPointsUsed" | "summonTabletUsed" | keyof CharacterCombatEvents>(type: Key, handler?: import("mitt").Handler<PlayerCombatEvents[Key]> | undefined): void;
         (type: "*", handler: import("mitt").WildcardHandler<PlayerCombatEvents>): void;
     };
+    get type(): string;
     equipmentSets: EquipmentSet[];
     selectedEquipmentSet: number;
     get activePrayers(): Set<ActivePrayer>;
@@ -57,7 +58,7 @@ declare class Player extends Character implements IGameEventEmitter<PlayerCombat
     activeItemSynergies: Set<ItemSynergy>;
     /** Currently active summoning synergy. Undefined if none active. */
     activeSummoningSynergy?: SummoningSynergy;
-    summonAttackInterval: number;
+    get summonAttackInterval(): number;
     itemEffects: Set<ItemEffect>;
     get equipment(): Equipment;
     /** Gets the equipment for the "Equip to Set" */
@@ -132,9 +133,11 @@ declare class Player extends Character implements IGameEventEmitter<PlayerCombat
     lifesteal(attack: SpecialAttack, damage: number, flatBonus: number): number;
     rewardForSummonDamage(damage: number, isBarrierDmg: boolean): void;
     /** Applies combat triangle, modifiers and damage reduction to summoning attack damage */
-    modifySummonAttackDamage(damage: number): number;
+    modifySummonAttackDamage(damage: number, forceCalc?: boolean): number;
+    /** Returns Summon Max Hit without Barrier modifications. Used for UI rendering */
+    getSummonMaxHitWithoutBarrier(damage: number): number;
     /** Applies multiplicative and flat damage modifiers to summoning attack damage */
-    applySummonDamageModifiers(damage: number): number;
+    applySummonDamageModifiers(damage: number, forceCalc?: boolean): number;
     /** Clamps summoning attack damage to remaining barrier or hitpoints */
     clampSummonAttackDamage(damage: number, target: Character): number;
     summonAttack(): void;
@@ -229,6 +232,8 @@ declare class Player extends Character implements IGameEventEmitter<PlayerCombat
     checkIfCantEquip(): boolean;
     computeEquipmentStats(): void;
     checkActiveSummon(slot: 'Summon1' | 'Summon2'): void;
+    /** Calculates the Max HP stat */
+    computeMaxHP(): void;
     computeMeleeMaxHit(): number;
     computeRangedMaxHit(): number;
     computeMagicMaxHit(): number;

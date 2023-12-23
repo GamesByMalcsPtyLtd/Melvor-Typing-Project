@@ -10,6 +10,7 @@ declare class Enemy extends Character implements IGameEventEmitter<CharacterComb
         <Key extends keyof CharacterCombatEvents>(type: Key, handler?: import("mitt").Handler<CharacterCombatEvents[Key]> | undefined): void;
         (type: "*", handler: import("mitt").WildcardHandler<CharacterCombatEvents>): void;
     };
+    get type(): string;
     state: EnemyState;
     modifiers: CombatModifiers;
     spellSelection: SpellSelection;

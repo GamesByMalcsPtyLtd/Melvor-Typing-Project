@@ -15,6 +15,7 @@ interface BaseItemData extends IDData {
     customDescription?: string;
     sellsFor: number;
     isArtefact?: boolean;
+    isGenericArtefact?: boolean;
 }
 interface BaseItemModificationData extends IDData {
     category?: string;
@@ -48,10 +49,12 @@ declare class Item extends NamespacedObject {
     _media: string;
     get hasDescription(): boolean;
     get isArtefact(): boolean;
+    get isGenericArtefact(): boolean;
     ignoreCompletion: boolean;
     obtainFromItemLog: boolean;
     golbinRaidExclusive: boolean;
     _isArtefact?: boolean;
+    _isGenericArtefact?: boolean;
     _customDescription?: string;
     _mediaAnimation?: string;
     _altMedia?: string;

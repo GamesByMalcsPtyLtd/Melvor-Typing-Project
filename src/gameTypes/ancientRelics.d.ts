@@ -43,6 +43,7 @@ declare class AncientRelicsMenu {
     constructor(game: Game);
     createDropdownItem(skill: AnySkill): HTMLAnchorElement;
     selectSkill(skill: AnySkill): void;
+    showAncientRelicsFromSidebar(): void;
     showAncientRelics(skill: AnySkill): void;
     getSkillItem(skill: AnySkill): HTMLImageElement;
 }

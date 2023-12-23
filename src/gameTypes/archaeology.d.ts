@@ -169,7 +169,7 @@ declare class Archaeology extends GatheringSkill<ArchaeologyDigSite, Archaeology
     museum: ArchaeologyMuseum;
     get levelCap(): 99 | 120;
     getTotalUnlockedMasteryActions(): number;
-    readonly baseInterval = 5000;
+    readonly baseInterval = 4000;
     getMaxDigSiteMaps(digSite: ArchaeologyDigSite): number;
     lastRarityLocated: ArtefactWeightRange;
     tools: NamespaceRegistry<ArchaeologyTool>;
@@ -243,6 +243,7 @@ declare class Archaeology extends GatheringSkill<ArchaeologyDigSite, Archaeology
     deselectMap(digSite: ArchaeologyDigSite): void;
     /** Callback function for when a dig site map is selected */
     setMapAsActive(digSite: ArchaeologyDigSite, index: number): void;
+    onActiveMapChange(digSite: ArchaeologyDigSite): void;
     toggleTool(digSite: ArchaeologyDigSite, tool: ArchaeologyTool): void;
     setToolAsActive(digSite: ArchaeologyDigSite, tool: ArchaeologyTool): void;
     setToolAsInactive(digSite: ArchaeologyDigSite, tool: ArchaeologyTool): void;
@@ -289,6 +290,9 @@ declare class ArchaeologyUI {
             artefactsDonated: HTMLLIElement;
             nextReward: HTMLLIElement;
             content: HTMLDivElement;
+            museumTokensInBank: HTMLSpanElement;
+            museumTokensGained: HTMLSpanElement;
+            donateBtn: HTMLButtonElement;
         };
     };
     constructor(archaeology: Archaeology);
@@ -298,12 +302,24 @@ declare class ArchaeologyUI {
     showPage(pageID: ArchaeologyPage): void;
     createMenuEvents(): void;
     loadMuseum(): void;
+    updateUI(): void;
 }
 declare class ArchaeologyMuseum {
     artefacts: Map<AnyItem, ArchaeologyMuseumItemElement>;
+    museumTokenItem?: AnyItem;
+    genericArtefactCache: Set<AnyItem>;
     constructor();
+    cacheMuseumData(): void;
+    getMuseumTokenGainInfo(): {
+        tokenGain: number;
+        gpValue: number;
+        itemCount: number;
+    };
     loadMuseumArtefacts(archaeology: Archaeology, game: Game): void;
     createMuseumItem(item: AnyItem, el: HTMLDivElement): void;
     updateMuseumProgress(): void;
     updateMuseumItem(item: AnyItem, game: Game): void;
+    cacheGenericArtefacts(): void;
+    onDonateClick(): void;
+    donateAllGenericArtefacts(): void;
 }

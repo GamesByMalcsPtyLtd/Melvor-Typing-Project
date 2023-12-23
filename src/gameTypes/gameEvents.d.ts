@@ -87,10 +87,11 @@ declare type EventMatcherMap = {
     CartographyPaperMaking: CartographyPaperMakingEventMatcher;
     CartographyMapUpgrade: CartographyMapUpgradeEventMatcher;
     CartographyMapRefinement: CartographyMapRefinementEventMatcher;
+    CartographyTravel: CartographyTravelEventMatcher;
     ArchaeologyAction: ArchaeologyActionEventMatcher;
     TownshipTaskCompleted: TownshipTaskCompletedEventMatcher;
 };
-declare type GameEventMatcherData = WoodcuttingEventMatcherOptions | FishingActionEventMatcherOptions | FiremakingActionEventMatcherOptions | BonfireLitEventMatcherOptions | CookingActionEventMatcherOptions | MiningActionEventMatcherOptions | SmithingActionEventMatcherOptions | ThievingActionEventMatcherOptions | FarmingPlantActionEventMatcherOptions | FarmingHarvestActionEventMatcherOptions | FletchingActionEventMatcherOptions | CraftingActionEventMatcherOptions | RunecraftingActionEventMatcherOptions | HerbloreActionEventMatcherOptions | AgilityActionEventMatcherOptions | SummoningActionEventMatcherOptions | AstrologyActionEventMatcherOptions | AltMagicActionEventMatcherOptions | MonsterDropEventMatcherOptions | PlayerAttackEventMatcherOptions | EnemyAttackEventMatcherOptions | FoodEatenEventMatcherOptions | PrayerPointConsumptionEventMatcherOptions | PlayerHitpointsRegenerationEventMatcherOptions | PlayerSummonAttackEventMatcherOptions | RuneConsumptionEventMatcherOptions | PotionUsedEventMatcherOptions | PotionChargeUsedEventMatcherOptions | MonsterKilledEventMatcherOptions | MonsterSpawnedEventMatcherOptions | ItemEquippedEventMatcherOptions | FoodEquippedEventMatcherOptions | ShopPurchaseMadeEventMatcherOptions | SummonTabletUsedEventMatcherOptions | CartographySurveyEventMatcherOptions | CartographyPaperMakingEventMatcherOptions | CartographyMapUpgradeEventMatcherOptions | CartographyMapRefinementEventMatcherOptions | ArchaeologyActionEventMatcherOptions | TownshipTaskCompletedEventMatcherOptions;
+declare type GameEventMatcherData = WoodcuttingEventMatcherOptions | FishingActionEventMatcherOptions | FiremakingActionEventMatcherOptions | BonfireLitEventMatcherOptions | CookingActionEventMatcherOptions | MiningActionEventMatcherOptions | SmithingActionEventMatcherOptions | ThievingActionEventMatcherOptions | FarmingPlantActionEventMatcherOptions | FarmingHarvestActionEventMatcherOptions | FletchingActionEventMatcherOptions | CraftingActionEventMatcherOptions | RunecraftingActionEventMatcherOptions | HerbloreActionEventMatcherOptions | AgilityActionEventMatcherOptions | SummoningActionEventMatcherOptions | AstrologyActionEventMatcherOptions | AltMagicActionEventMatcherOptions | MonsterDropEventMatcherOptions | PlayerAttackEventMatcherOptions | EnemyAttackEventMatcherOptions | FoodEatenEventMatcherOptions | PrayerPointConsumptionEventMatcherOptions | PlayerHitpointsRegenerationEventMatcherOptions | PlayerSummonAttackEventMatcherOptions | RuneConsumptionEventMatcherOptions | PotionUsedEventMatcherOptions | PotionChargeUsedEventMatcherOptions | MonsterKilledEventMatcherOptions | MonsterSpawnedEventMatcherOptions | ItemEquippedEventMatcherOptions | FoodEquippedEventMatcherOptions | ShopPurchaseMadeEventMatcherOptions | SummonTabletUsedEventMatcherOptions | CartographySurveyEventMatcherOptions | CartographyPaperMakingEventMatcherOptions | CartographyMapUpgradeEventMatcherOptions | CartographyMapRefinementEventMatcherOptions | CartographyTravelEventMatcherOptions | ArchaeologyActionEventMatcherOptions | TownshipTaskCompletedEventMatcherOptions;
 declare type AnyGameEventMatcher = EventMatcherMap[keyof EventMatcherMap];
 declare class IntervaledGameEvent extends GameEvent {
     /** The interval of the timer that triggered this event */
@@ -1073,6 +1074,30 @@ declare class CartographySurveyEventMatcher extends SkillActionEventMatcher<Cart
     doesEventMatch(event: CartographySurveyEvent): boolean;
     _assignNonRaidHandler(handler: Handler<CartographySurveyEvent>): void;
     _unassignNonRaidHandler(handler: Handler<CartographySurveyEvent>): void;
+}
+declare class CartographyTravelEvent extends SkillActionEvent {
+    /** The source skill for the event */
+    skill: Cartography;
+    /** The hex that was travelled to */
+    hex: Hex;
+    constructor(
+    /** The source skill for the event */
+    skill: Cartography, 
+    /** The hex that was travelled to */
+    hex: Hex);
+}
+interface CartographyTravelEventMatcherOptions extends SkillActionEventMatcherOptions {
+    type: 'CartographyTravel';
+    worldMaps?: string[];
+}
+declare class CartographyTravelEventMatcher extends SkillActionEventMatcher<CartographyTravelEvent> {
+    readonly type = "CartographyTravel";
+    /** If present, the CartographyTravelEvent's hex must belong to one of the world maps */
+    worldMaps?: Set<WorldMap>;
+    constructor(options: CartographyTravelEventMatcherOptions, game: Game);
+    doesEventMatch(event: CartographyTravelEvent): boolean;
+    _assignNonRaidHandler(handler: Handler<CartographyTravelEvent>): void;
+    _unassignNonRaidHandler(handler: Handler<CartographyTravelEvent>): void;
 }
 declare class CartographyPaperMakingEvent extends SkillActionEvent {
     /** The source skill for the event */

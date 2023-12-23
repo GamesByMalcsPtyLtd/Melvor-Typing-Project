@@ -81,4 +81,6 @@ interface ManagerRenderQueue {
     spellBook: boolean;
     /** Updates dungeon completions remaining for next ancient relic skill unlock */
     dungeonRelicCount: boolean;
+    /** Updates the Monster HP & Barrier values after loading depending on gamemode (Specifically for number multiplier) */
+    areaMonsterStats: boolean;
 }

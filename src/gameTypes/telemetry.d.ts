@@ -66,10 +66,6 @@ declare class Telemetry {
     getExistingTelemetryEvent(eventType: TelemetryEventID, eventID: string): TelemetryEvents | undefined;
     /** Returns the Event Body required to send a Telemetry Event via PlayFab API Call */
     getTelemetryEventBody(event: TelemetryEvents): TelemetryData;
-    /** Fire a single telemetry event immediately
-     * @param event The event to fire
-     */
-    fireSingle(event: TelemetryEvents): void;
     /** Fires all events within an Event Type
      * @param eventType The type of event to fire
      */

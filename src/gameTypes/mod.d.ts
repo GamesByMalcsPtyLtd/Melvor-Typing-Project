@@ -4,17 +4,20 @@
  */
 declare const mod: {
     manager: {
+        readonly activeProfile: Modding.Profile | null;
+        hasProfile(id: string): boolean;
+        currentProfileName(id: string): string | null;
         init: () => Promise<void>;
-        isHidden: () => boolean;
+        isLoggedIn: () => boolean;
         isEnabled: () => boolean;
-        open: (goToMyMods?: boolean, query?: string) => Promise<void>;
-        isProcessing: () => boolean;
-        hasChanges: () => boolean;
-        promptToEnable: () => Promise<boolean>;
-        promptToDisable: () => Promise<boolean>;
+        open: (openToMyMods?: boolean, query?: string) => Promise<void>;
+        isProcessing(): any;
+        hasChanges(): boolean;
+        showPromptForProfileMismatch: (profile: Omit<Modding.Profile, 'autoEnable'> | null) => Promise<boolean>;
+        showPromptForProfileButNotLoggedIn: () => Promise<boolean>;
         showPromptForReload: (canDefer?: boolean) => Promise<void>;
         showPromptForInProgress: () => Promise<void>;
-        getLoadedModList: () => string[];
+        getLoadedModList(): string[];
     };
     register: (setup: (ctx: Modding.ModContext) => Promise<unknown>) => Promise<unknown>;
     trigger: {

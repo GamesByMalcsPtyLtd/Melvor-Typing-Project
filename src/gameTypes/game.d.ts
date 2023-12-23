@@ -260,6 +260,8 @@ declare class Game extends GameEventEmitter<GameEvents> implements Serializable,
     renderSidebarSkillUnlock(): void;
     /** Renders which skills are active in the sidebar */
     renderActiveSkills(): void;
+    /** The last time the game loop ran */
+    _previousLoopTime: number;
     loop(): void;
     getErrorLog(error: unknown, title: string, modError: Modding.ModError): string;
     showBrokenGame(error: unknown, title: string): void;
@@ -277,7 +279,6 @@ declare class Game extends GameEventEmitter<GameEvents> implements Serializable,
     resetOfflineTracking(): void;
     /** Puts the game in a state where offline will progress the amount specified */
     testForOffline(timeToGoBack: number): Promise<void>;
-    testCombatInitializationStatParity(): void;
     /** If a save is scheduled to happen outside of the auto-save interval */
     _isSaveScheduled: boolean;
     /** Schedules a save to occur after the next game loop */
@@ -287,6 +288,14 @@ declare class Game extends GameEventEmitter<GameEvents> implements Serializable,
     /** The last timestamp when rich presence was updated */
     _lastRichPresenceUpdate: number;
     updateRichPresence(time: number): void;
+    /** The time interval when the game is determined to be inactive (currently 5 mins) */
+    readonly INACTIVITY_INTERVAL: number;
+    /** The last timestamp of when activity to the game was detected. (Keyboard, Touch or mous interaction) */
+    _inactivityTime: number;
+    _frameRateThrottled: boolean;
+    /** Controls the throttling of the PIXI.js framerate when the player is inactive */
+    gameInteractionUpdate(time: number): void;
+    onGameInteraction(): void;
     /** The last timestamp when the cloud was updated */
     _lastCloudUpdate: number;
     cloudUpdate(time: number): void;
@@ -306,7 +315,7 @@ declare class Game extends GameEventEmitter<GameEvents> implements Serializable,
     /** Checks a single skill requirement and optionally displays an error message to the player */
     checkSkillRequirement(requirement: SkillLevelRequirement, notifyOnFailure?: boolean): boolean;
     /** Checks a requirement for all skill levels, and optionally displays an error message to the player */
-    checkAllSkillLevelRequirement(requirement: AllSkillLevelRequirement, notifyOnFailure?: boolean): boolean;
+    checkAllSkillLevelRequirement(req: AllSkillLevelRequirement, notifyOnFailure?: boolean): boolean;
     /** Checks a single dungeon completion requirement and optionally displays an error message to the player */
     checkDungeonRequirement(requirement: DungeonRequirement, notifyOnFailure?: boolean): boolean;
     /** Checks a completion requirement and optionally displays an error message to the player */
@@ -345,6 +354,7 @@ declare class Game extends GameEventEmitter<GameEvents> implements Serializable,
     convertFromOldFormat(save: NewSaveGame, idMap: NumericIDMap): void;
     /** Takes the old offline variable and converts it to the new skill format */
     convertOldOffline(offline: OldOffline, idMap: NumericIDMap): void;
+    readonly steamAchievementNames: string[];
 }
 /** Time between auto-saves in [ms] */
 declare const AUTO_SAVE_INTERVAL = 10000;

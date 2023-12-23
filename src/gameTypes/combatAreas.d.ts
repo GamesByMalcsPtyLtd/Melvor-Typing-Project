@@ -80,6 +80,7 @@ declare class CombatAreaMenuElement extends HTMLElement {
     updateUnlockMessage(area: AnyCombatArea): void;
     isDungeonUnlocked(dungeon: Dungeon): boolean;
     updateEvent(isActive: boolean): void;
+    removeEvent(): void;
     updateAreaEffect(area: AnyCombatArea): void;
     updateRelicSkillUnlock(area: AnyCombatArea): void;
     static difficulty: AreaDifficulty[];
@@ -91,6 +92,29 @@ declare class MonsterSelectTableElement extends HTMLElement {
     connectedCallback(): void;
     setArea(area: AnyCombatArea): void;
     createRow(monster: Monster, area: AnyCombatArea): void;
+    static attackTypeMedia: {
+        melee: string;
+        ranged: string;
+        magic: string;
+        random: string;
+    };
+}
+declare class MonsterSelectTableRowElement extends HTMLElement {
+    _content: DocumentFragment;
+    monsterImage: HTMLImageElement;
+    monsterName: HTMLSpanElement;
+    combatLevel: HTMLSpanElement;
+    barrier: HTMLSpanElement;
+    barrierIcon: HTMLImageElement;
+    hitpoints: HTMLSpanElement;
+    attackType: HTMLImageElement;
+    fightButton: HTMLButtonElement;
+    dropsButton: HTMLButtonElement;
+    constructor();
+    connectedCallback(): void;
+    setRow(monster: Monster, area: AnyCombatArea): void;
+    setHitpoints(monster: Monster): void;
+    setBarrier(monster: Monster): void;
     static attackTypeMedia: {
         melee: string;
         ranged: string;

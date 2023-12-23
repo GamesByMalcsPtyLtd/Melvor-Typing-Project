@@ -36,7 +36,7 @@ declare class TownshipBiome extends NamespacedObject {
     addBuildings(building: TownshipBuilding, count: number): void;
     getBuildingEfficiency(building: TownshipBuilding): number;
     reduceBuildingEfficiency(building: TownshipBuilding, amount: number, game: Game): void;
-    setBuildingEfficiency(building: TownshipBuilding, amount: number): void;
+    setBuildingEfficiency(building: TownshipBuilding, amount: number): boolean;
 }
 declare class DummyTownshipBiome extends TownshipBiome {
     constructor(namespace: DataNamespace, id: string, game: Game);
@@ -399,6 +399,7 @@ declare class Township extends Skill<TownshipSkillData> implements StatProvider,
     get currentHappiness(): number;
     get nightfallSeasonEnabled(): boolean;
     get solarEclipseSeasonEnabled(): boolean;
+    get lemonSeasonEnabled(): boolean;
     /** Callback function for the Repair All in this Biome button */
     repairAllBuildingsInCurrentBiome(): void;
     /** Callback function for the Repair All button */

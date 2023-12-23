@@ -20,13 +20,16 @@ declare class ItemChargeDisplay extends HTMLElement {
 }
 declare class SettingsCheckboxElement extends HTMLElement {
     _content: DocumentFragment;
+    container: HTMLDivElement;
     label: HTMLLabelElement;
     input: HTMLInputElement;
     constructor();
     connectedCallback(): void;
+    attributeChangedCallback(name: string, oldValue: string | null, newValue: string | null): void;
     initialize(data: SettingData<boolean>, onChange: VoidFunction): void;
     setChecked(isChecked: boolean): void;
     static elementCount: number;
+    static observedAttributes: string[];
 }
 declare class SettingsSwitchElement extends HTMLElement {
     _content: DocumentFragment;

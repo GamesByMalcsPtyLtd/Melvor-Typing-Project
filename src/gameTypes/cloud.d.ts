@@ -44,13 +44,6 @@ declare function updateEmailMelvorCloud(): void;
 declare function updatePasswordMelvorCloud(): void;
 /** Links the user's Steam ID to their PlayFab account which can be used alongside Steam Web API */
 declare const linkSteamAccountToPlayFab: (forceLink: boolean) => void;
-declare const getPlayFabInfo: () => void;
-/** Promise that uses Playfab to check active purchase status of Steam version. Utilises Steam's Web API */
-declare const getSteamPurchaseStatus: () => Promise<SteamPurchaseResult>;
-/** Redirects user based on value returned of promise */
-declare const checkSteamPurchase: () => void;
-declare const getMobilePurchaseStatus: () => Promise<unknown>;
-declare const checkMobilePurchase: () => void;
 /** Genereates a UUID for active user tracking */
 declare function generateUUID(length: number): string;
 declare function failMobilePurchase(): void;

@@ -1,4 +1,5 @@
 declare class ClueHunt {
+    ifYouAreReadingThisCodeThenYouAreRuiningTheFunForEveryoneAndYouShouldBeAshamedOfYourself: boolean;
     clueProgress: ({
         id: string;
         progress: number;

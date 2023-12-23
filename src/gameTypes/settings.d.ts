@@ -154,6 +154,16 @@ interface BooleanSettings {
     useCompactNotifications: boolean;
     /** Whether to use the legacy notifications system */
     useLegacyNotifications: boolean;
+    /** Whether to display the cat image for hidden dig sites */
+    useCat: boolean;
+    /** Whether to throttle the framerate of the cartography map when game inactivity is detected */
+    throttleFrameRateOnInactivity: boolean;
+    /** Enable/Disable Birthday Event during active time period */
+    toggleBirthdayEvent: boolean;
+    /** Enable/Disable Discord RPC on Steam */
+    toggleDiscordRPC: boolean;
+    /** Enable All but 1 donation for generic artefacts */
+    genericArtefactAllButOne: boolean;
 }
 interface ChoiceSettings {
     /** If special attack modifiers should use neutral colours */
@@ -174,6 +184,8 @@ interface ChoiceSettings {
     mapTextureQuality: MapTextureQuality;
     /** Determine what background image to use for the game. Image file is bg_${num}.jpg */
     backgroundImage: number;
+    /** Determines the maximum framerate to run the cartography map at. -1 indicates native screen refreshrate */
+    cartographyFrameRateCap: number;
 }
 interface SettingData<T> {
     /** The current value of the setting */
@@ -290,6 +302,14 @@ declare class Settings implements EncodableObject, BooleanSettings, ChoiceSettin
     get showCombatAreaWarnings(): boolean;
     get useCompactNotifications(): boolean;
     get useLegacyNotifications(): boolean;
+    get useCat(): boolean;
+    get throttleFrameRateOnInactivity(): boolean;
+    get cartographyFrameRateCap(): number;
+    get toggleBirthdayEvent(): boolean;
+    get toggleDiscordRPC(): boolean;
+    get genericArtefactAllButOne(): boolean;
+    /** The set of mastery namespaces that should be hidden in the spend mastery modal */
+    hiddenMasteryNamespaces: Set<string>;
     constructor(game: Game);
     postDataRegistration(): void;
     encode(writer: SaveWriter): SaveWriter;

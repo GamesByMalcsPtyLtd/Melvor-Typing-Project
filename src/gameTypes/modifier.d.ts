@@ -361,6 +361,9 @@ declare class CombatModifiers implements CombatModifierObject<number> {
     decreasedGlobalFreezeChance: number;
     increasedRegenPerDamageTaken: number;
     convertBoneDropsIntoCake: number;
+    decreasedSummoningAttackIntervalPercent: number;
+    barrierRegenTurns: number;
+    increasedMinElementalSpellDmg: number;
     constructor();
     reset(): void;
     getActiveModifiers(): NameValuePair[];
@@ -1298,9 +1301,9 @@ interface CombatModifierObject<Standard> {
     increasedChanceToApplyPoison: Standard;
     /** Chance to apply frostburn when hitting with an attack */
     increasedChanceToApplyFrostburn: Standard;
-    /** Chance to stun when hitting with a Melee attack (once per turn) */
+    /** Chance to stun when hitting with a Melee attack */
     increasedMeleeStunChance: Standard;
-    /** Chance to apply Burn, Frostburn or Freeze when hitting with a Magic attack (once per turn) */
+    /** Chance to apply Burn, Frostburn or Freeze when hitting with a Magic attack */
     increasedElementalEffectChance: Standard;
     /** Provides character with immunity to Frostburn */
     frostBurnImmunity: Standard;
@@ -1584,6 +1587,9 @@ interface CombatModifierObject<Standard> {
     decreasedGlobalFreezeChance: Standard;
     increasedRegenPerDamageTaken: Standard;
     convertBoneDropsIntoCake: Standard;
+    decreasedSummoningAttackIntervalPercent: Standard;
+    barrierRegenTurns: Standard;
+    increasedMinElementalSpellDmg: Standard;
 }
 /** Modifiers that are only common to the player */
 interface StandardModifierObject<Standard> extends CombatModifierObject<Standard> {
@@ -2371,6 +2377,7 @@ interface SkillModifierObject<Skill> {
     increasedHiddenSkillLevelPer2Levels: Skill;
     increasedHiddenSkillLevelBasedOnLevels: Skill;
     increasedMeleeStrengthBonusBasedOnSkillLevel: Skill;
+    increasedHiddenSkillLevelPer3Levels: Skill;
 }
 interface SkillModifierData {
     skillID: string;

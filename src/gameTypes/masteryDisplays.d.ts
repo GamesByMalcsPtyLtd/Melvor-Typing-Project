@@ -65,6 +65,13 @@ declare class SpendMasteryMenu extends HTMLElement {
     setLevel1Button: HTMLButtonElement;
     setLevel5Button: HTMLButtonElement;
     setLevel10Button: HTMLButtonElement;
+    filterContainer: HTMLDivElement;
+    level99Filter: SettingsCheckboxElement;
+    filterOptions: {
+        container: HTMLDivElement;
+        input: HTMLInputElement;
+        label: HTMLLabelElement;
+    }[];
     get curentSkill(): SkillWithMastery<MasteryAction, MasterySkillData> | undefined;
     get currentToken(): TokenItem | undefined;
     _currentSkill?: SkillWithMastery<MasteryAction, MasterySkillData>;
@@ -75,8 +82,10 @@ declare class SpendMasteryMenu extends HTMLElement {
     connectedCallback(): void;
     setSkill(skill: SkillWithMastery<MasteryAction, MasterySkillData>, game: Game): void;
     unsetSkill(): void;
+    shouldHideMastery(skill: SkillWithMastery<MasteryAction, MasterySkillData>, action: MasteryAction): boolean;
     updateAllActions(): void;
-    toggleHideLevel99(): void;
+    updateFilterOptions(namespaces: Set<string>): void;
+    onFilterChange(): void;
     updateAction(skill: SkillWithMastery<MasteryAction, MasterySkillData>, action: MasteryAction): void;
     updateTokenQuantity(amount: number): void;
     changeLevelUpAmount(newAmount: number): void;

@@ -6,6 +6,7 @@ declare abstract class Character implements EncodableObject, Serializable {
     manager: BaseManager;
     game: Game;
     abstract _events: Pick<Emitter<CharacterCombatEvents>, 'emit'>;
+    abstract readonly type: string;
     hitpoints: number;
     stun: ActiveStun;
     sleep: ActiveSleep;
@@ -29,7 +30,8 @@ declare abstract class Character implements EncodableObject, Serializable {
     barrier: number;
     /** The amount of Barrier remaining */
     maxBarrierPercent: number;
-    barrierRegenTurns: number;
+    get barrierRegenTurns(): number;
+    get hasBarrierRegen(): boolean;
     barrierTurns: number;
     hasBarrier: boolean;
     /** Currently active curse. Undefined if no curse is active */
@@ -40,6 +42,8 @@ declare abstract class Character implements EncodableObject, Serializable {
     get isStunned(): boolean;
     /** Returns if the character has a stun effect active. Regardless of flavour */
     get isCrystallized(): boolean;
+    /** Returns if the character has a stun effect active. Regardless of flavour */
+    get isFrozen(): boolean;
     /** Returns if the character has a slow effect active */
     get isSlowed(): boolean;
     timers: CharacterTimers;
@@ -57,7 +61,7 @@ declare abstract class Character implements EncodableObject, Serializable {
     equipmentStats: EquipmentStats;
     /** Combat levels of character including hidden levels */
     levels: CombatLevels;
-    /** Current Combat Stats **/
+    /** Current Combat Stats */
     stats: CharacterStats;
     attackType: AttackType;
     hitchance: number;
@@ -147,7 +151,6 @@ declare abstract class Character implements EncodableObject, Serializable {
     /** Applies modifiers to max hit */
     modifyMaxHit(maxHit: number): number;
     getMaxHitModifier(): number;
-    getMaxHitMultiplierBasedOnEnemyAttackType(): number;
     /** Applies modifiers to min hit */
     modifyMinHit(minHit: number): number;
     /** Applies modifiers to max hp */
@@ -172,6 +175,8 @@ declare abstract class Character implements EncodableObject, Serializable {
     addBarrier(amount: number): void;
     /** Actions to perform when Barrier is removed */
     onBarrierRemoval(): void;
+    /** Actions to perform when Barrier is regenerated */
+    onBarrierRegeneration(): void;
     /** Sets hitpoints to a given value */
     setHitpoints(value: number): void;
     isImmuneTo(attackType: AttackType): boolean;

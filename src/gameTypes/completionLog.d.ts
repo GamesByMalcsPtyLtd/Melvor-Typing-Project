@@ -81,6 +81,7 @@ declare class SkillCompletionElement extends HTMLElement {
     connectedCallback(): void;
     setSkill(skill: AnySkill): void;
     updateProgress(skill: AnySkill): void;
+    updateVisibility(skill: AnySkill): void;
 }
 declare class MasteryCompletionElement extends HTMLElement {
     _content: DocumentFragment;

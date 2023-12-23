@@ -122,6 +122,7 @@ declare class CombatManager extends BaseManager implements PassiveAction, IGameE
     renderEventMenu(): void;
     renderAreaRequirements(): void;
     renderDungeonRelicCount(): void;
+    renderAreaMonsterStats(): void;
     onPlayerDeath(): void;
     /** Called on enemy death, returns if combat should be stopped as a result */
     onEnemyDeath(): boolean;
@@ -130,9 +131,13 @@ declare class CombatManager extends BaseManager implements PassiveAction, IGameE
     retroactivelyAddOneTimeRewards(): void;
     rewardForEnemyDeath(monster: Monster): void;
     dropEnemyLoot(monster: Monster): void;
+    dropBarrierDust(monster: Monster): void;
     dropSignetHalfB(monster: Monster): void;
     dropBirthdayPresent(): void;
     dropEnemyBones(monster: Monster): void;
+    gpAdjustEventTimer: number;
+    gpAdjustEventTimerMax: number;
+    gpToAddTelemetry: number;
     dropEnemyGP(monster: Monster): void;
     /** Callback function for starting event */
     startEvent(event: CombatEvent): void;
@@ -179,12 +184,16 @@ declare class CombatManager extends BaseManager implements PassiveAction, IGameE
     /** Sets properties based on the old save file variables */
     convertFromOldSaveFormat(saveGame: NewSaveGame, idMap: NumericIDMap): void;
     convertDungeonCompletion(dungeonCompletion: number[], idMap: NumericIDMap): void;
-    getStatsLog(): StatsLog;
+    enableStatParityCheck: boolean;
+    getCombatStatsLog(): CombatStatsLog;
     /** Logs player and enemy combat stats to console */
     saveStats(): void;
-    compareStatsWithSavedStats(): void;
+    getSavedStats(): CombatStatsLog | undefined;
+    compareSavedStats(): void;
+    compareCombatStatLogs(oldStats: CombatStatsLog): boolean;
+    testInitializationStatParity(): void;
 }
-declare type StatsLog = {
+declare type CombatStatsLog = {
     player: {
         stats: NameValuePair[];
         modifiers: NameValuePair[];

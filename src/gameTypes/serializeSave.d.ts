@@ -174,7 +174,11 @@ declare type PackagedSave = {
     cd: number[];
 };
 declare const saveFormat2Version = 21;
-declare const currentSaveVersion = 76;
+declare const currentSaveVersion = SaveVersion.MasteryModalFilter;
+declare const enum SaveVersion {
+    ModProfiles = 83,
+    MasteryModalFilter = 84
+}
 interface AddRemove<T> {
     add: T[];
     remove: T[];
@@ -361,7 +365,9 @@ declare const enum AttackEffectType {
     AttackMasterRelicEffect = 30,
     StrengthMasterRelicEffect = 31,
     MagicMasterRelicEffect = 32,
-    FrostBurnReflectEffect = 33
+    FrostBurnReflectEffect = 33,
+    BarrierRegenDebuffEffect = 34,
+    AttackMasterRelicEffect2 = 35
 }
 declare enum DotTypeIDs {
     Burn = 0,

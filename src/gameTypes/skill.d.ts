@@ -126,6 +126,8 @@ declare abstract class Skill<DataType extends BaseSkillData> extends NamespacedO
     ancientRelicsFound: Map<AncientRelic, number>;
     /** Number of relics found in this Skill. Max of 5 */
     numberOfRelicsFound: number;
+    /** Returns if this skill has ancient relics */
+    get hasAncientRelics(): boolean;
     increasedLevelCap: number;
     minibarOptions: MinibarOptions;
     milestones: MilestoneLike[];
@@ -239,6 +241,7 @@ declare abstract class Skill<DataType extends BaseSkillData> extends NamespacedO
     /** Gets the number of times an ancient relic has been found */
     getAncientRelicCount(ancientRelic: AncientRelic): number;
     locateAncientRelic(ancientRelic: AncientRelic): void;
+    get hasMasterRelic(): boolean;
     onAncientRelicUnlock(): void;
     queueAncientRelicFoundModal(ancientRelic: AncientRelic): void;
 }

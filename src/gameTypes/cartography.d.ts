@@ -79,6 +79,8 @@ declare class CartographyRenderQueue extends SkillRenderQueue {
     poiDiscoveryOptions: boolean;
     /** Updates the POI discovery button in the top overlay */
     poiDiscoveryBtn: boolean;
+    /** Updates the total Hex Mastered count */
+    hexMasteryCount: boolean;
     constructor();
 }
 declare const enum CartographyActionMode {
@@ -107,6 +109,7 @@ declare type CartographyEvents = {
     madePaper: CartographyPaperMakingEvent;
     upgradeMap: CartographyMapUpgradeEvent;
     mapRefinement: CartographyMapRefinementEvent;
+    travel: CartographyTravelEvent;
 };
 declare class Cartography extends Skill<CartographySkillData> implements ActiveAction, StatProvider, IGameEventEmitter<CartographyEvents> {
     _events: import("mitt").Emitter<CartographyEvents>;
@@ -146,6 +149,8 @@ declare class Cartography extends Skill<CartographySkillData> implements ActiveA
     surveyQueue: LinkQueue<Hex>;
     isHexFirstInQueue(hex: Hex): boolean;
     isHexInQueue(hex: Hex): boolean;
+    /** Returns the position of a hex in the survey queue. Returns -1 if hex is not in queue. */
+    getHexQueuePosition(hex: Hex): number;
     /** Returns true if the hex is currently being autosurveyed */
     isAutoSurveyingHex(hex: Hex): boolean;
     /** Hex that is currently being automatically surveyed */
@@ -197,6 +202,8 @@ declare class Cartography extends Skill<CartographySkillData> implements ActiveA
     poiModalsQueued: number;
     /** If the go to discovery modal has been queued or is visible */
     goToModalQueued: boolean;
+    /** Should the player receive retroactive POI rewards from balance changes */
+    shouldReceiveRetroactivePOIRewards1: boolean;
     hiddenPOIRenderHandler: VoidFunction;
     hiddenPOIDiscoveryHandler?: VoidFunction;
     constructor(namespace: DataNamespace, game: Game);
@@ -236,6 +243,7 @@ declare class Cartography extends Skill<CartographySkillData> implements ActiveA
     renderMasteryButton(): void;
     renderPOIDiscoveryOptions(): void;
     renderPOIDiscoveryBtn(): void;
+    renderHexMasteryCount(): void;
     /** Queues up hidden pois that are set to show a marker for rendering when requirements change */
     queueHiddenPoiRenders(): void;
     updateHiddenPOIDiscoveryHandler(): void;
@@ -434,6 +442,8 @@ declare class Cartography extends Skill<CartographySkillData> implements ActiveA
     /** Utility function for exporting the survey levels for each cartography level */
     exportActiveMapLevels(): void;
     getObtainableItems(): Set<AnyItem>;
+    /** Provide discovery rewards retroactively for POIs where new rewards have been added after someone has disovered it */
+    grantRetroactivePOIDiscoveryRewards(): void;
 }
 interface RandomTravelEventData extends IDData {
     /** Weight of event occuring relative to other events */

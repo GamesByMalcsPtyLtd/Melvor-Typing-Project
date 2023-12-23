@@ -12,6 +12,9 @@ declare class CharacterDisplayElement extends HTMLElement {
     offlineActionTime: HTMLSpanElement;
     saveTimestamp: HTMLSpanElement;
     timestampComparison: HTMLHeadingElement;
+    modProfileContainer: HTMLHeadingElement;
+    modProfileIcon: HTMLElement;
+    modProfileName: HTMLSpanElement;
     constructor();
     connectedCallback(): void;
     toggleTestWarning(isTest: boolean): void;

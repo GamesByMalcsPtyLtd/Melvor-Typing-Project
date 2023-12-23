@@ -49,6 +49,8 @@ declare class DoublyLinkedList<T> {
     forEachForward(callbackFn: (obj: T, i: number) => void): void;
     /** Travereses each object, from the end to the start */
     forEachReverse(callbackFn: (obj: T, i: number) => void): void;
+    /** Traverses forward in the list looking for the first index of an object that matches predicate. Returns -1 if no match found. */
+    findIndex(predicate: (obj: T, i: number) => boolean): number;
     /** Inserts a node after the given node */
     _insertAfter(node: DLLNode<T>, newNode: DLLNode<T>): void;
     /** Inserts node before the given node */

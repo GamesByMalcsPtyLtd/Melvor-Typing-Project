@@ -2974,7 +2974,11 @@ declare enum ModifierID {
     doubleConsumablesArchaeology = 935,
     convertBoneDropsIntoCake = 936,
     doubleActiveModifiersCartography = 937,
-    increasedTownshipRepairCost = 938
+    increasedTownshipRepairCost = 938,
+    increasedHiddenSkillLevelPer3Levels = 939,
+    decreasedSummoningAttackIntervalPercent = 940,
+    barrierRegenTurns = 941,
+    increasedMinElementalSpellDmg = 942
 }
 declare enum AmmoTypeID {
     Arrows = 0,

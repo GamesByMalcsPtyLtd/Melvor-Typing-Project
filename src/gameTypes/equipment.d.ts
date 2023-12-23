@@ -154,6 +154,7 @@ declare class EquipmentTooltipElement extends HTMLElement {
     _content: DocumentFragment;
     itemName: HTMLSpanElement;
     itemDescription: HTMLElement;
+    itemSpec: HTMLElement;
     statContainer: HTMLElement;
     unset: boolean;
     lastItem?: EquipmentItem;
