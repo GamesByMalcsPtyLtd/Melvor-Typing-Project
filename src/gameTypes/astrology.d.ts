@@ -73,7 +73,7 @@ declare class Astrology extends GatheringSkill<AstrologyRecipe, AstrologySkillDa
         <Key extends "action">(type: Key, handler?: import("mitt").Handler<AstrologyEvents[Key]> | undefined): void;
         (type: "*", handler: import("mitt").WildcardHandler<AstrologyEvents>): void;
     };
-    readonly _media = "assets/media/skills/astrology/astrology.svg";
+    readonly _media = Assets.Astrology;
     getTotalUnlockedMasteryActions(): number;
     isConstellationComplete(constellation: AstrologyRecipe): boolean;
     renderQueue: AstrologyRenderQueue;

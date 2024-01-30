@@ -94,9 +94,9 @@ declare class MonsterSelectTableElement extends HTMLElement {
     createRow(monster: Monster, area: AnyCombatArea): void;
     static attackTypeMedia: {
         melee: string;
-        ranged: string;
-        magic: string;
-        random: string;
+        ranged: Assets;
+        magic: Assets;
+        random: Assets;
     };
 }
 declare class MonsterSelectTableRowElement extends HTMLElement {

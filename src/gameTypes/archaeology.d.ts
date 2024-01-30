@@ -165,7 +165,7 @@ declare class Archaeology extends GatheringSkill<ArchaeologyDigSite, Archaeology
         <Key extends "action">(type: Key, handler?: import("mitt").Handler<ArchaeologyEvents[Key]> | undefined): void;
         (type: "*", handler: import("mitt").WildcardHandler<ArchaeologyEvents>): void;
     };
-    readonly _media = "assets/media/skills/archaeology/archaeology.svg";
+    readonly _media = Assets.Archaeology;
     museum: ArchaeologyMuseum;
     get levelCap(): 99 | 120;
     getTotalUnlockedMasteryActions(): number;

@@ -70,7 +70,7 @@ declare class SlowEffect implements ModifierEffect {
     countsOn: CharacterType;
     maxStacks: number;
     stacksToAdd: number;
-    media: string;
+    get media(): string;
     langName: string;
     constructor(magnitude: number, turns?: number);
 }
@@ -82,7 +82,7 @@ declare class StickyWebs implements ModifierEffect {
     countsOn: CharacterType;
     maxStacks: number;
     stacksToAdd: number;
-    media: string;
+    get media(): string;
     turns: number;
     constructor(chance?: number);
 }
@@ -95,7 +95,7 @@ declare class EndOfTurnEvasionEffect implements ModifierEffect {
     countsOn: CharacterType;
     maxStacks: number;
     stacksToAdd: number;
-    media: string;
+    get media(): string;
     langName: string;
     constructor(turns: number, maxValue: number, atMax?: boolean);
 }
@@ -278,6 +278,7 @@ interface ReductiveEffect {
     /** Number of turns the effect lasts */
     turns: number;
     name: string;
+    langName?: string;
 }
 declare type ReductiveEffectData = Omit<ReductiveEffect, 'turns'> & EffectTurnData;
 interface IncrementalEffect {

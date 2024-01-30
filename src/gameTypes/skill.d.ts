@@ -624,14 +624,22 @@ declare class Costs {
     checkIfOwned(): boolean;
     /** Consumes all the stored costs from the player */
     consumeCosts(): void;
+    /** Creates a clone of this costs object */
+    clone(): Costs;
+    /** Adds another costs object's costs to this one */
+    addCosts(costs: Costs): void;
+}
+interface RewardsXP {
+    noAction: number;
+    action: Map<NamespacedObject, number>;
 }
 /** Class to manage the gain of rewards from crafting skills */
 declare class Rewards extends Costs {
     source: string;
     actionInterval: number;
-    _xp: Map<AnySkill, number>;
-    addXP(skill: AnySkill, amount: number): void;
-    getXP(skill: AnySkill): number;
+    _xp: Map<AnySkill, RewardsXP>;
+    addXP(skill: AnySkill, amount: number, action?: NamespacedObject): void;
+    getXP(skill: AnySkill, action?: NamespacedObject): number;
     setActionInterval(interval: number): void;
     /** Gives the currently set rewards to the player, returns true if not all items were given */
     giveRewards(ignoreBankSpace?: boolean): boolean;

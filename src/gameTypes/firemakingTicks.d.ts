@@ -39,7 +39,7 @@ declare class Firemaking extends CraftingSkill<FiremakingLog, FiremakingSkillDat
     readonly baseAshChance = 20;
     readonly baseStardustChance = 1;
     readonly baseCharcoalChance = 1;
-    readonly _media = "assets/media/skills/firemaking/firemaking.svg";
+    readonly _media = Assets.Firemaking;
     modifiers: MappedModifiers;
     getTotalUnlockedMasteryActions(): number;
     renderQueue: FiremakingRenderQueue;

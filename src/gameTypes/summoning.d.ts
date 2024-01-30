@@ -57,7 +57,7 @@ declare class Summoning extends ArtisanSkill<SummoningRecipe, SummoningSkillData
         <Key extends "action">(type: Key, handler?: import("mitt").Handler<SummoningEvents[Key]> | undefined): void;
         (type: "*", handler: import("mitt").WildcardHandler<SummoningEvents>): void;
     };
-    readonly _media = "assets/media/skills/summoning/summoning.svg";
+    readonly _media = Assets.Summoning;
     getTotalUnlockedMasteryActions(): number;
     /** Returns the total number of synergies unlocked */
     get totalSynergiesUnlocked(): number;

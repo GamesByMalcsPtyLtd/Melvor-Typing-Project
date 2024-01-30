@@ -121,7 +121,7 @@ declare class Cartography extends Skill<CartographySkillData> implements ActiveA
         <Key extends keyof CartographyEvents>(type: Key, handler?: import("mitt").Handler<CartographyEvents[Key]> | undefined): void;
         (type: "*", handler: import("mitt").WildcardHandler<CartographyEvents>): void;
     };
-    readonly _media = "assets/media/skills/cartography/cartography.svg";
+    readonly _media = Assets.Cartography;
     renderQueue: CartographyRenderQueue;
     worldMaps: NamespaceRegistry<WorldMap>;
     travelEventRegistry: NamespaceRegistry<RandomTravelEvent>;
@@ -246,6 +246,8 @@ declare class Cartography extends Skill<CartographySkillData> implements ActiveA
     renderHexMasteryCount(): void;
     /** Queues up hidden pois that are set to show a marker for rendering when requirements change */
     queueHiddenPoiRenders(): void;
+    removeHiddenPOIDiscoverHandler(): void;
+    addHiddenPOIDiscoveryHandler(): void;
     updateHiddenPOIDiscoveryHandler(): void;
     getPercentageIntervalModifier(action: PaperMakingRecipe | ArchaeologyDigSite | undefined): number;
     /** Returns the multiplier for all hex travel costs to apply */

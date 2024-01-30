@@ -16,7 +16,7 @@ declare class Crafting extends ArtisanSkill<CraftingRecipe, CraftingSkillData, A
         <Key extends "action">(type: Key, handler?: import("mitt").Handler<CraftingEvents[Key]> | undefined): void;
         (type: "*", handler: import("mitt").WildcardHandler<CraftingEvents>): void;
     };
-    readonly _media = "assets/media/skills/crafting/crafting.svg";
+    readonly _media = Assets.Crafting;
     getTotalUnlockedMasteryActions(): number;
     readonly baseInterval: number;
     get menu(): ArtisanMenu<AnyItem>;

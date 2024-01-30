@@ -47,7 +47,7 @@ declare class Cooking extends CraftingSkill<CookingRecipe, CookingSkillData> imp
         <Key extends "action">(type: Key, handler?: import("mitt").Handler<CookingEvents[Key]> | undefined): void;
         (type: "*", handler: import("mitt").WildcardHandler<CookingEvents>): void;
     };
-    readonly _media = "assets/media/skills/cooking/cooking.svg";
+    readonly _media = Assets.Cooking;
     computeTotalMasteryActions(): void;
     getTotalUnlockedMasteryActions(): number;
     renderQueue: CookingRenderQueue;

@@ -66,7 +66,7 @@ declare class AltMagic extends CraftingSkill<AltMagicSpell, MagicSkillData> impl
     };
     get hasMastery(): boolean;
     get isCombat(): boolean;
-    readonly _media = "assets/media/skills/magic/magic.svg";
+    readonly _media = Assets.Magic;
     computeTotalMasteryActions(): void;
     getTotalUnlockedMasteryActions(): number;
     renderQueue: AltMagicRenderQueue;

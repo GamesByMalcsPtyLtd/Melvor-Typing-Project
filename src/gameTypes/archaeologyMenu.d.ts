@@ -107,11 +107,6 @@ declare class ArchaeologyMuseumItemElement extends HTMLElement {
     hideInBank(): void;
     getItemTooltipHTML(item: AnyItem, game: Game): string;
 }
-declare const enum MapImage {
-    BLANK = "assets/media/skills/archaeology/map_blank.png",
-    COLOUR = "assets/media/skills/archaeology/map_colour.svg",
-    LOCKED = "assets/media/skills/archaeology/map_locked.png"
-}
 declare enum WeightBadgeClass {
     COMMON = "font-size-xs badge badge-success ml-2",
     UNCOMMON = "font-size-xs badge badge-warning ml-2",

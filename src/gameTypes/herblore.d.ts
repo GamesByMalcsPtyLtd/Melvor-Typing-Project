@@ -28,7 +28,7 @@ declare class Herblore extends ArtisanSkill<HerbloreRecipe, HerbloreSkillData, P
         <Key extends "action">(type: Key, handler?: import("mitt").Handler<HerbloreEvents[Key]> | undefined): void;
         (type: "*", handler: import("mitt").WildcardHandler<HerbloreEvents>): void;
     };
-    readonly _media = "assets/media/skills/herblore/herblore.svg";
+    readonly _media = Assets.Herblore;
     getTotalUnlockedMasteryActions(): number;
     readonly baseInterval: number;
     get menu(): HerbloreArtisanMenu;

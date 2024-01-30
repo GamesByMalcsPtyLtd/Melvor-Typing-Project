@@ -3015,4 +3015,4 @@ declare const enum Colours {
     WhiteSmoke = 16119285,
     Amethyst = 8671702
 }
-declare const TODO_REPLACE_MEDIA = "assets/media/main/missing_artwork.png";
+declare const TODO_REPLACE_MEDIA = Assets.Missing;

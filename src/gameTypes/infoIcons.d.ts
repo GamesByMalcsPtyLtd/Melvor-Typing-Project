@@ -22,14 +22,14 @@ declare abstract class InfoIcon extends ContainedComponent {
     show(): void;
     static readonly media: {
         skillXP: string;
-        strXP: string;
-        masteryXP: string;
-        poolXP: string;
+        strXP: Assets;
+        masteryXP: Assets;
+        poolXP: Assets;
         preserveChance: string;
         doublingChance: string;
         interval: string;
-        gp: string;
-        slayerCoins: string;
+        gp: Assets;
+        slayerCoins: Assets;
         shopIcon: string;
         perfectCook: string;
         successfulCook: string;

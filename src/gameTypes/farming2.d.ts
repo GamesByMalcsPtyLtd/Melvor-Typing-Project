@@ -120,7 +120,7 @@ declare class Farming extends SkillWithMastery<FarmingRecipe, FarmingSkillData> 
         <Key extends keyof FarmingEvents>(type: Key, handler?: import("mitt").Handler<FarmingEvents[Key]> | undefined): void;
         (type: "*", handler: import("mitt").WildcardHandler<FarmingEvents>): void;
     };
-    readonly _media = "assets/media/skills/farming/farming.svg";
+    readonly _media = Assets.Farming;
     get isPotionActive(): boolean;
     get activePotion(): PotionItem | undefined;
     categories: NamespaceRegistry<FarmingCategory>;

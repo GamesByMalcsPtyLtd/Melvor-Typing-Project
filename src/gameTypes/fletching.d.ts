@@ -15,7 +15,7 @@ declare class Fletching extends ArtisanSkill<FletchingRecipe, FletchingSkillData
         <Key extends "action">(type: Key, handler?: import("mitt").Handler<FletchingEvents[Key]> | undefined): void;
         (type: "*", handler: import("mitt").WildcardHandler<FletchingEvents>): void;
     };
-    readonly _media = "assets/media/skills/fletching/fletching.svg";
+    readonly _media = Assets.Fletching;
     getTotalUnlockedMasteryActions(): number;
     readonly baseInterval: number;
     get menu(): ArtisanMenu<AnyItem>;

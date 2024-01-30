@@ -68,7 +68,7 @@ declare class Mining extends GatheringSkill<MiningRock, MiningSkillData> impleme
         <Key extends "action">(type: Key, handler?: import("mitt").Handler<MiningEvents[Key]> | undefined): void;
         (type: "*", handler: import("mitt").WildcardHandler<MiningEvents>): void;
     };
-    readonly _media = "assets/media/skills/mining/mining.svg";
+    readonly _media = Assets.Mining;
     getTotalUnlockedMasteryActions(): number;
     renderQueue: MiningRenderQueue;
     readonly baseInterval = 3000;

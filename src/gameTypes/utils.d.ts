@@ -208,7 +208,6 @@ declare function getItemBaseStatsBreakdown(item: EquipmentItem): string;
 declare function lockedSkillAlert(skill: AnySkill, messageTemplate: string): void;
 declare function showStunnedNotification(): void;
 declare function showSleepNotification(): void;
-declare function cdnMedia(media: string): string;
 declare function compareNameValuePairs(currentPairs: NameValuePair[], oldPairs: NameValuePair[], onFirstDiff: string): boolean;
 declare function convertNameValuePairToMap(pairs: NameValuePair[]): Map<string, number>;
 /**

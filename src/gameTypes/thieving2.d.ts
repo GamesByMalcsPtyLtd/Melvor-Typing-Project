@@ -89,7 +89,7 @@ declare class Thieving extends GatheringSkill<ThievingNPC, ThievingSkillData> im
         (type: "*", handler: import("mitt").WildcardHandler<ThievingEvents>): void;
     };
     stunTimer: Timer;
-    readonly _media = "assets/media/skills/thieving/thieving.svg";
+    readonly _media = Assets.Thieving;
     getTotalUnlockedMasteryActions(): number;
     readonly baseInterval = 3000;
     readonly baseStunInterval = 3000;

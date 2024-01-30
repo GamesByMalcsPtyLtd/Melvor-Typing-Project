@@ -16,7 +16,7 @@ declare class Smithing extends ArtisanSkill<SmithingRecipe, SmithingSkillData, A
         <Key extends "action">(type: Key, handler?: import("mitt").Handler<SmithingEvents[Key]> | undefined): void;
         (type: "*", handler: import("mitt").WildcardHandler<SmithingEvents>): void;
     };
-    readonly _media = "assets/media/skills/smithing/smithing.svg";
+    readonly _media = Assets.Smithing;
     getTotalUnlockedMasteryActions(): number;
     readonly baseInterval: number;
     get menu(): ArtisanMenu<AnyItem>;

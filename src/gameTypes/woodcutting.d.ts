@@ -38,7 +38,7 @@ declare class Woodcutting extends GatheringSkill<WoodcuttingTree, WoodcuttingSki
         <Key extends "action">(type: Key, handler?: import("mitt").Handler<WoodcuttingEvents[Key]> | undefined): void;
         (type: "*", handler: import("mitt").WildcardHandler<WoodcuttingEvents>): void;
     };
-    readonly _media = "assets/media/skills/woodcutting/woodcutting.svg";
+    readonly _media = Assets.Woodcutting;
     getTotalUnlockedMasteryActions(): number;
     /** Trees that are currently being cut */
     activeTrees: Set<WoodcuttingTree>;

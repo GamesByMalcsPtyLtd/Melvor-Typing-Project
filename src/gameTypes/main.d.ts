@@ -1,12 +1,6 @@
-declare const useCDN = true;
-declare const CDNVersion = "v018";
-declare const CDNEndpoint = "https://cdn.melvor.net/core";
 declare const DEBUGENABLED = false;
 declare const releaseDate = 1637258400000;
 declare const DEBUG_REPORTER: string[];
-declare const CDNDIR_ORIGINAL: string;
-declare const CDNDIR: () => string;
-declare function getPathWithoutFile(): string;
 declare const gameTitle = "Melvor Idle :: v1.2.2";
 declare let currentTitleNewsID: string[];
 declare let playFabEventQueue: {

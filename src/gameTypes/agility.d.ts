@@ -67,7 +67,7 @@ declare class Agility extends GatheringSkill<AgilityObstacle, AgilitySkillData> 
         <Key extends "action">(type: Key, handler?: import("mitt").Handler<AgilityEvents[Key]> | undefined): void;
         (type: "*", handler: import("mitt").WildcardHandler<AgilityEvents>): void;
     };
-    readonly _media = "assets/media/skills/agility/agility.svg";
+    readonly _media = Assets.Agility;
     getTotalUnlockedMasteryActions(): number;
     readonly obstacleUnlockLevels: number[];
     readonly maxBlueprints = 5;

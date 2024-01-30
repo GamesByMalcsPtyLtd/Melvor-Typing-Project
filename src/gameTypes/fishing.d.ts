@@ -85,7 +85,7 @@ declare class Fishing extends GatheringSkill<Fish, FishingSkillData> implements 
         <Key extends "action">(type: Key, handler?: import("mitt").Handler<FishingEvents[Key]> | undefined): void;
         (type: "*", handler: import("mitt").WildcardHandler<FishingEvents>): void;
     };
-    readonly _media = "assets/media/skills/fishing/fishing.svg";
+    readonly _media = Assets.Fishing;
     getTotalUnlockedMasteryActions(): number;
     renderQueue: FishingRenderQueue;
     get chanceForLostChest(): number;

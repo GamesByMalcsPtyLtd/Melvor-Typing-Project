@@ -19,7 +19,7 @@ declare class Runecrafting extends ArtisanSkill<RunecraftingRecipe, Runecrafting
         <Key extends "action">(type: Key, handler?: import("mitt").Handler<RunecraftingEvents[Key]> | undefined): void;
         (type: "*", handler: import("mitt").WildcardHandler<RunecraftingEvents>): void;
     };
-    readonly _media = "assets/media/skills/runecrafting/runecrafting.svg";
+    readonly _media = Assets.Runecrafting;
     getTotalUnlockedMasteryActions(): number;
     readonly baseInterval: number;
     get menu(): ArtisanMenu<AnyItem>;
