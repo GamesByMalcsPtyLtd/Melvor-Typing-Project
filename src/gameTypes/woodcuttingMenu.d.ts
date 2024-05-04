@@ -1,23 +1,21 @@
 declare class WoodcuttingTreeElement extends HTMLElement {
     _content: DocumentFragment;
     button: HTMLAnchorElement;
-    unlockedText: HTMLDivElement;
     treeName: HTMLSpanElement;
     xpText: HTMLSpanElement;
     intervalText: HTMLSpanElement;
-    lockedText: HTMLDivElement;
     treeImage: HTMLImageElement;
-    progressContainer: HTMLDivElement;
     progressBar: HTMLDivElement;
     requirements: HTMLDivElement;
     requirementElements: HTMLElement[];
-    levelRequired: HTMLDivElement;
-    shopPurchaseRequired: HTMLElement;
-    masteryContainer: HTMLDivElement;
+    levelRequired: HTMLSpanElement;
     mastery: MasteryDisplay;
+    lockedContainer: HTMLDivElement;
     constructor();
     connectedCallback(): void;
-    setTreeUnlocked(tree: WoodcuttingTree, woodcutting: Woodcutting): void;
+    setMastery(woodcutting: Woodcutting, tree: WoodcuttingTree): void;
+    setTree(tree: WoodcuttingTree, woodcutting: Woodcutting): void;
+    setTreeUnlocked(): void;
     setTreeLocked(tree: WoodcuttingTree, game: Game): void;
     updateLockedRequirements(tree: WoodcuttingTree, game: Game): void;
     updateRates(tree: WoodcuttingTree, woodcutting: Woodcutting): void;

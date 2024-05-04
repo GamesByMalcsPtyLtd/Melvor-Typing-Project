@@ -278,9 +278,13 @@ interface ReductiveEffect {
     /** Number of turns the effect lasts */
     turns: number;
     name: string;
+    /** Controls when this effects is reduced */
+    reducesOn: 'HitByAttack' | 'HitWithAttack';
     langName?: string;
 }
-declare type ReductiveEffectData = Omit<ReductiveEffect, 'turns'> & EffectTurnData;
+declare type ReductiveEffectData = Omit<ReductiveEffect, 'turns' | 'reducesOn'> & EffectTurnData & {
+    reducesOn?: 'HitByAttack' | 'HitWithAttack';
+};
 interface IncrementalEffect {
     type: 'Incremental';
     modifiers: CombatModifierData;

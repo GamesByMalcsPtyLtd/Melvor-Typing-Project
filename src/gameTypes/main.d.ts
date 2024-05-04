@@ -87,3 +87,8 @@ declare function updateAllGameMedia(): void;
 declare function updateGameMedia(media: string): void;
 declare function viewExpansion2Details(): void;
 declare function resetClient(): void;
+declare let shamedThisSession: boolean;
+declare function showActionsRunOutSwal(): void;
+declare function giveShameToken(): void;
+declare function showShameSwal(): void;
+declare function showToggleExpansionsModal(): void;

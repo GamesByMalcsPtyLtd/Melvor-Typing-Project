@@ -150,6 +150,10 @@ interface BaseEquipmentItemModificationData extends BaseItemModificationData {
         add?: SlotTypes[];
         remove?: SlotTypes[];
     };
+    consumesOn?: {
+        add?: GameEventMatcherData[];
+        remove?: string[];
+    };
 }
 interface EquipmentItemData extends BaseEquipmentItemData {
     itemType: 'Equipment';

@@ -2,6 +2,7 @@ interface ShopCategoryData extends IDData {
     name: string;
     media: string;
     isGolbinRaid?: boolean;
+    allowedGamemodeIDs?: string[];
 }
 declare class ShopCategory extends NamespacedObject {
     get name(): string;
@@ -9,6 +10,7 @@ declare class ShopCategory extends NamespacedObject {
     _name: string;
     _media: string;
     isGolbinRaid: boolean;
+    allowedGamemodes: Set<Gamemode>;
     constructor(namespace: DataNamespace, data: ShopCategoryData, game: Game);
 }
 declare type OldShopCategory = 'General' | 'SkillUpgrades' | 'Slayer' | 'Gloves' | 'Skillcapes' | 'SuperiorSkillcapes' | 'Materials' | 'GolbinRaid' | 'Township';
@@ -66,6 +68,7 @@ interface ShopPurchaseData extends IDData {
     }[];
     showBuyLimit: boolean;
     currentDescription?: CurrentShopDescription;
+    allowedGamemodeIDs?: string[];
 }
 interface ShopCostData {
     gp: ShopCostAmount;
@@ -127,6 +130,7 @@ declare class ShopPurchase extends NamespacedObject implements SoftDataDependant
     showBuyLimit: boolean;
     _customName?: string;
     _customDescription?: string;
+    allowedGamemodes: Set<Gamemode>;
     constructor(namespace: DataNamespace, data: ShopPurchaseData, game: Game);
     registerSoftDependencies(data: ShopPurchaseData, game: Game): void;
     applyDataModification(modData: ShopPurchaseModificationData, game: Game): void;

@@ -174,10 +174,12 @@ declare type PackagedSave = {
     cd: number[];
 };
 declare const saveFormat2Version = 21;
-declare const currentSaveVersion = SaveVersion.MasteryModalFilter;
+declare const currentSaveVersion = SaveVersion.DoubleClickItemSettings;
 declare const enum SaveVersion {
     ModProfiles = 83,
-    MasteryModalFilter = 84
+    MasteryModalFilter = 84,
+    ReductiveEffects = 85,
+    DoubleClickItemSettings = 86
 }
 interface AddRemove<T> {
     add: T[];

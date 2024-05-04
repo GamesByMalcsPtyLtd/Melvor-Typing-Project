@@ -3998,7 +3998,10 @@ declare const enum GameModeIDs {
     HardcoreAdventureSpeedrun = "melvorF:HardcoreAdventureSpeedrun",
     InternalSuffering = "melvorF:InternalSuffering",
     HCCOSpeedrun = "melvorF:HCCOSpeedrun",
-    AncientRelics = "melvorAoD:AncientRelics"
+    AncientRelics = "melvorAoD:AncientRelics",
+    MelvorClicker = "melvorAprilFools2024:MelvorClicker",
+    HardcoreAncientRelicsSpeedrun = "melvorAoD:HardcoreAncientRelicsSpeedrun",
+    HCCOARSpeedrun = "melvorAoD:HCCOARSpeedrun"
 }
 declare const enum StandardSpellIDs {
     WindStrike = "melvorD:WindStrike",

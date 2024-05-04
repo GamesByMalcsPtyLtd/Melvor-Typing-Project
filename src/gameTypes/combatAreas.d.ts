@@ -160,6 +160,7 @@ interface CombatAreaData extends IDData {
     entryRequirements: AnyRequirementData[];
     requiredLanguages?: string[];
     gamemodeEntryRequirements?: AnyGamemodeRequirementData[];
+    allowedGamemodeIDs?: string[];
 }
 interface CombatAreaModificationData extends IDData {
     difficulty?: number[];
@@ -257,10 +258,12 @@ declare class CombatArea extends NamespacedObject implements SoftDataDependant<C
     _requiredLanguages?: string[];
     _media: string;
     _name: string;
+    allowedGamemodes: Set<Gamemode>;
     constructor(namespace: DataNamespace, data: CombatAreaData, game: Game);
     registerSoftDependencies(data: CombatAreaData, game: Game): void;
     applyDataModification(modData: CombatAreaModificationData, game: Game): void;
     overrideMedia(media: string): void;
+    isRequiredGamemode(gamemode: Gamemode): boolean;
 }
 declare class SlayerArea extends CombatArea {
     areaEffect?: AreaEffect;

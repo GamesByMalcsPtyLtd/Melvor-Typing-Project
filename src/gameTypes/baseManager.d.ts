@@ -30,6 +30,7 @@ declare abstract class BaseManager extends NamespacedObject implements Serializa
     abstract readonly ignoreSpellRequirements: boolean;
     constructor(game: Game, namespace: DataNamespace, id: string);
     initialize(): void;
+    setButtonVisibility(): void;
     setCallbacks(): void;
     minibarEatCallback(): void;
     minibarRunCallback(): void;

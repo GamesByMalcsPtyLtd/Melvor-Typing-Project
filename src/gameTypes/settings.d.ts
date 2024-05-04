@@ -164,6 +164,12 @@ interface BooleanSettings {
     toggleDiscordRPC: boolean;
     /** Enable All but 1 donation for generic artefacts */
     genericArtefactAllButOne: boolean;
+    /** Enable double click to equip items from Bank */
+    enableDoubleClickEquip: boolean;
+    /** Enable double click to open items from Bank */
+    enableDoubleClickOpen: boolean;
+    /** Enable double click to bury items from Bank */
+    enableDoubleClickBury: boolean;
 }
 interface ChoiceSettings {
     /** If special attack modifiers should use neutral colours */
@@ -308,6 +314,9 @@ declare class Settings implements EncodableObject, BooleanSettings, ChoiceSettin
     get toggleBirthdayEvent(): boolean;
     get toggleDiscordRPC(): boolean;
     get genericArtefactAllButOne(): boolean;
+    get enableDoubleClickEquip(): boolean;
+    get enableDoubleClickOpen(): boolean;
+    get enableDoubleClickBury(): boolean;
     /** The set of mastery namespaces that should be hidden in the spend mastery modal */
     hiddenMasteryNamespaces: Set<string>;
     constructor(game: Game);

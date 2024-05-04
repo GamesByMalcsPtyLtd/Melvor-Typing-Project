@@ -432,6 +432,7 @@ declare class Township extends Skill<TownshipSkillData> implements StatProvider,
     getBuildingCountRemainingForLevelUp(building: TownshipBuilding, biome: TownshipBiome): number;
     isBuildingAvailable(building: TownshipBuilding, biome: TownshipBiome): boolean;
     hasBuildingBeenUpgraded(building: TownshipBuilding, biome: TownshipBiome | undefined): boolean;
+    isBuildingUpgradedButNotBuiltd(building: TownshipBuilding, biome: TownshipBiome | undefined): boolean;
     isBuildingMaxed(building: TownshipBuilding, biome: TownshipBiome | undefined): boolean;
     getIncreaseHealthCost(resource: TownshipResource): number;
     /**
@@ -502,6 +503,8 @@ declare class Township extends Skill<TownshipSkillData> implements StatProvider,
     startTickTimer(): void;
     /** Method called each time the tick timer completes */
     onTickTimer(): void;
+    /** Method used to tick the timer manually based on defined amount. For Clicker gamemode. */
+    tickTimerOnClick(): void;
     /** Callback function for the "All" button for spending legacy ticks */
     spendAllLegacyTicks(): void;
     /** Callback function for spending legacy ticks */

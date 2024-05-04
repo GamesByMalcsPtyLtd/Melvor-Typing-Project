@@ -49,7 +49,10 @@ declare abstract class Character implements EncodableObject, Serializable {
     timers: CharacterTimers;
     modifierEffects: ModifierEffects;
     reflexiveEffects: Map<ReflexiveEffect, ActiveReflexiveEffect>;
-    reductiveEffects: Map<ReductiveEffect, ActiveReductiveEffect>;
+    /** The reductive effects that are reduced when this character is hit by an attack */
+    hitByReductiveEffects: Map<ReductiveEffect, ActiveReductiveEffect>;
+    /** The reductive effects that are reduced when this character hits with an attack */
+    hitWithReductiveEffects: Map<ReductiveEffect, ActiveReductiveEffect>;
     incrementalEffects: Map<IncrementalEffect, ActiveIncrementalEffect>;
     stackingEffect: Map<StackingEffect, ActiveStackingEffect>;
     comboEffects: Map<ComboEffect, ActiveComboEffect>;
@@ -105,6 +108,7 @@ declare abstract class Character implements EncodableObject, Serializable {
     setDefaultSpells(): void;
     /** Sets all renders required to true */
     setRenderAll(): void;
+    actOnClick(): void;
     /** Performs unique spawn effects (Like random curse application) */
     applyUniqueSpawnEffects(): void;
     /** Performs stat updates for when an enemy spawns, or a fight ends */
@@ -194,6 +198,15 @@ declare abstract class Character implements EncodableObject, Serializable {
     getAttackMaxDamage(attack: SpecialAttack): number;
     /** Performs lifesteal from attack damage. Returns the true amount healed. */
     lifesteal(attack: SpecialAttack, damage: number, flatBonus: number): number;
+    getReductiveEffectMap(effect: ReductiveEffect): Map<ReductiveEffect, ActiveReductiveEffect>;
+    /** Reduces the stacks of reductive effects in the given map by 1, removing the effect if they reach 0 */
+    reduceReductiveEffects(effectMap: Map<ReductiveEffect, ActiveReductiveEffect>): void;
+    /**
+     * Counts down the turns of reductive effects in the given map by 1, removing th effect if the turns reach 0
+     * @param effectMap
+     * @returns If an effect was removed from the map
+     */
+    countReductiveEffects(effectMap: Map<ReductiveEffect, ActiveReductiveEffect>): boolean;
     removeReductiveEffect(effect: ReductiveEffect): void;
     removeIncrementalEffect(effect: IncrementalEffect): void;
     /** Removes the specified stacking effect from this character */
@@ -350,7 +363,7 @@ declare abstract class Character implements EncodableObject, Serializable {
     decodeModifierEffects(reader: SaveWriter, version: number): Map<SpecialAttack, Map<ModifierEffect, ActiveModifierEffect>>;
     encodeReflexiveEffects(writer: SaveWriter): void;
     decodeReflexiveEffects(reader: SaveWriter, version: number): Map<ReflexiveEffect, ActiveReflexiveEffect>;
-    encodeReductiveEffects(writer: SaveWriter): void;
+    encodeReductiveEffects(writer: SaveWriter, effectMap: Map<ReductiveEffect, ActiveReductiveEffect>): void;
     decodeReductiveEffects(reader: SaveWriter, version: number): Map<ReductiveEffect, ActiveReductiveEffect>;
     encodeIncrementalEffects(writer: SaveWriter): void;
     decodeIncrementalEffects(reader: SaveWriter, version: number): Map<IncrementalEffect, ActiveIncrementalEffect>;

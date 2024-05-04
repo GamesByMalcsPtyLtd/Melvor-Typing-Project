@@ -966,6 +966,9 @@ declare class PlayerModifiers extends CombatModifiers implements StandardModifie
     doubleConsumablesArchaeology: number;
     doubleActiveModifiersCartography: number;
     increasedTownshipRepairCost: number;
+    increasedActionsPerClick: number;
+    increasedChanceToDoubleActionsPerClick: number;
+    increasedChanceForExtraActionPerClick: number;
     skillModifiers: Map<SkillModifierKeys, Map<AnySkill, number>>;
     constructor();
     get combatLootDoubleChance(): number;
@@ -987,6 +990,7 @@ declare class PlayerModifiers extends CombatModifiers implements StandardModifie
     get rangedStrengthBonusModifier(): number;
     get magicDamageModifier(): number;
     getHiddenSkillLevels(skill: AnySkill): number;
+    getInstantActionsToPerform(): number;
     getActiveModifierDescriptions(): [string, string][];
 }
 declare type NameValuePair = {
@@ -2323,6 +2327,9 @@ interface StandardModifierObject<Standard> extends CombatModifierObject<Standard
     doubleConsumablesArchaeology: Standard;
     doubleActiveModifiersCartography: Standard;
     increasedTownshipRepairCost: Standard;
+    increasedActionsPerClick: Standard;
+    increasedChanceToDoubleActionsPerClick: Standard;
+    increasedChanceForExtraActionPerClick: Standard;
 }
 interface SkillModifierObject<Skill> {
     /** Increases the skill level used to compute combat stats by value: Implemented */

@@ -1,5 +1,5 @@
 declare type QuickEquipIcon = {
-    button: HTMLButtonElement;
+    button: HTMLDivElement;
     tooltip: TippyTooltip;
     equippedTick: HTMLImageElement;
 };
@@ -21,6 +21,7 @@ declare class Minibar implements EncodableObject {
     };
     quickEquipIcons: Map<EquipmentItem, QuickEquipIcon>;
     minibar: MinibarItem[];
+    toggleDeleteItems: boolean;
     constructor(game: Game);
     /** Appends the minibar items to the DOM */
     initialize(): void;
@@ -41,6 +42,8 @@ declare class Minibar implements EncodableObject {
     destroyQuickEquipIcons(): void;
     createQuickEquipIcons(skill: AnySkill): void;
     createQuickEquipIcon(item: EquipmentItem, skill: AnySkill): void;
+    removeItemFromQuickEquip(skill: AnySkill, item: EquipmentItem): void;
+    toggleRemoveItemsQuickEquip(skill: AnySkill): void;
     createPetItem(pet: Pet): MinibarItem;
     createUpgradeItem(upgrade: ShopPurchase): MinibarItem;
     createMinibarItem(elementID: string, media: string, tooltipContent: string, options: MinibarOption): MinibarItem;

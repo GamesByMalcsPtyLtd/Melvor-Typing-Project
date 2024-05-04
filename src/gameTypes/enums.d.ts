@@ -2978,7 +2978,10 @@ declare enum ModifierID {
     increasedHiddenSkillLevelPer3Levels = 939,
     decreasedSummoningAttackIntervalPercent = 940,
     barrierRegenTurns = 941,
-    increasedMinElementalSpellDmg = 942
+    increasedMinElementalSpellDmg = 942,
+    increasedActionsPerClick = 943,
+    increasedChanceToDoubleActionsPerClick = 944,
+    increasedChanceForExtraActionPerClick = 945
 }
 declare enum AmmoTypeID {
     Arrows = 0,

@@ -154,14 +154,14 @@ declare let inFocus: boolean;
 declare const onloadEvent: (accessCheck?: boolean) => void;
 declare function confirmedAuthenticated(): void;
 declare function checkIfAuthenticated(): Promise<void>;
-declare const INTERFACE_VERSION = 103;
+declare const INTERFACE_VERSION = 114;
 declare function loadGameInterface(accessCheck?: boolean): Promise<void>;
-declare const DATA_VERSION = 258;
+declare const DATA_VERSION = 274;
 declare function changePageCharacterSelection(page: CharacterSelectPage): void;
 /** Future announcement handler that will occur dynamically. For now this is hard coded. */
 declare function updateUIForAnnouncements(): void;
 declare function hideUIForAnnouncement(id: number): void;
-declare const maxSaveSlots = 6;
+declare const maxSaveSlots = 8;
 declare const enum SaveLoadError {
     Empty = 0,
     Corrupt = 1,

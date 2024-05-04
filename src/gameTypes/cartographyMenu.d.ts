@@ -740,6 +740,7 @@ declare class MapUpgradeMenuElement extends HTMLElement {
     upgradeHaves: HavesBox;
     grants: GrantsBox;
     upgradeButton: HTMLButtonElement;
+    deleteMap: HTMLAnchorElement;
     intervalIcon: IntervalIcon;
     preserveIcon: PreservationIcon;
     progressBar: ProgressBar;

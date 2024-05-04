@@ -87,8 +87,12 @@ declare const levelUnlockSum: (skill: AnySkill) => (previous: number, current: B
 declare function fireBottomToast(text: string, duration?: number): void;
 declare function fireTopToast(text: string, duration?: number): void;
 declare function imageNotify(media: string, message: string, messageTheme?: StandardTheme): void;
-declare let itemNotifyTimer: number;
 declare let itemNotifyToProcess: AnyItemQuantity[];
+/** If a save is scheduled to happen outside of the auto-save interval */
+declare let isItemNotificationScheduled: boolean;
+/** Schedules a save to occur after the next game loop */
+declare function scheduleItemNotification(): void;
+declare function processScheduledItemNotifications(): void;
 /** Queues up an item gain notifiaction for the specified item and quantity */
 declare function itemNotify(item: AnyItem, quantity: number): void;
 /** Fires an item gain notifiaction for the specified item and quantity */
@@ -132,10 +136,12 @@ declare function startPyroInterval(): void;
 declare class NotificationQueue {
     maxNotifiactions: number;
     queue: QueuedNotify[];
+    disableQueueLimit: boolean;
     constructor(maxNotifiactions: number);
     notify(): void;
     add(notification: QueuedNotify): void;
     clear(): void;
+    disableMaxQueue(): void;
 }
 /** Utility class for computing experience and levels */
 declare class ExperienceCalculator {

@@ -362,6 +362,8 @@ declare class Cartography extends Skill<CartographySkillData> implements ActiveA
     selectDigSiteOnClick(digSite: ArchaeologyDigSite): void;
     /** Callback function for selecting a digsite map */
     selectDigSiteMapOnClick(mapIndex: number): void;
+    /** Callback function for deleting a digsite map */
+    deleteDigSiteMapOnClick(map: DigSiteMap, confirmed?: boolean): void;
     /** Callback function for starting/stoping upgrading a map */
     startMapUpgradeOnClick(): void;
     /** Starts upgrading a map with the interval for the given dig site */

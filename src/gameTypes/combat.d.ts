@@ -108,6 +108,7 @@ interface CombatMenus {
     minibarRunButton: HTMLButtonElement;
     minibarEatButton: HTMLButtonElement;
     viewDropsButton: HTMLButtonElement;
+    attackMonsterButton: HTMLButtonElement;
     locationElements: {
         image: HTMLImageElement;
         name: HTMLSpanElement;

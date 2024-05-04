@@ -39,6 +39,8 @@ interface GamemodeData extends IDData {
     enemyPassives?: string[];
     enemySpecialAttacks?: string[];
     requireLocalStorageKey?: string;
+    enableInstantActions?: boolean;
+    enabledLangs?: SupportedLanguage[];
 }
 interface SkillIDValue {
     skillID: string;
@@ -121,12 +123,17 @@ declare class Gamemode extends NamespacedObject {
     enemySpecialAttacks: AttackSelection[];
     /** Determines if the Gamemode should be hidden until the local storage key is defined (any value) */
     requireLocalStorageKey?: string;
+    /** Determines if the gamemode should enable instant actions on a click */
+    enableInstantActions: boolean;
+    /** If set, gamemode will only display if using these languages */
+    enabledLangs: SupportedLanguage[];
     _media: string;
     _name: string;
     _description?: string;
     _rules: string[];
     _combatTriangle: CombatTriangles;
     constructor(namespace: DataNamespace, data: GamemodeData, game: Game);
+    get isUsingRequiredLang(): boolean;
 }
 declare class DummyGamemode extends Gamemode {
     get name(): string;
