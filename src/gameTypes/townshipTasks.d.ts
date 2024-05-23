@@ -1,8 +1,36 @@
+interface TownshipTaskCategoryData extends IDData {
+    name: string;
+    nameLang?: string;
+    media: string;
+    bgClass: string;
+}
+declare class TownshipTaskCategory extends NamespacedObject {
+    get name(): string;
+    get media(): string;
+    bgClass: string;
+    _name: string;
+    _nameLang?: string;
+    _media: string;
+    /** The total number of tasks in this category */
+    totalTasks: number;
+    /** The number of tasks that have been completed in this category */
+    completedTasks: number;
+    get isComplete(): boolean;
+    /** The number of tasks that are currently ready in this category */
+    tasksReady: number;
+    constructor(namespace: DataNamespace, data: TownshipTaskCategoryData, game: Game);
+}
 interface TownshipTaskRewardsData {
-    /** GP awarded upon completion of the task */
-    gp: number;
-    /** Slayer coins awarded upon completion of the task */
-    slayerCoins: number;
+    /**
+     * @deprecated use currencies instead
+     * GP awarded upon completion of the task */
+    gp?: number;
+    /**
+     * @deprecated Use currencies instead
+     * Slayer coins awarded upon completion of the task */
+    slayerCoins?: number;
+    /** Currencies awarded upon completion of the task */
+    currencies?: IDQuantity[];
     /** Items awarded upon completion of the task */
     items: IDQuantity[];
     /** Skill experience awarded upon completion of the task */
@@ -37,14 +65,13 @@ interface TownshipTaskTrackingData {
     currentCount: number;
 }
 interface TownshipTaskTracker {
-    monsters: Array<TownshipTaskTrackingData>;
-    skillXP: Array<TownshipTaskTrackingData>;
-    buildings: Array<TownshipTaskTrackingData>;
-    monsterWithItems: Array<TownshipTaskTrackingData>;
+    monsters: TownshipTaskTrackingData[];
+    skillXP: TownshipTaskTrackingData[];
+    buildings: TownshipTaskTrackingData[];
+    monsterWithItems: TownshipTaskTrackingData[];
 }
 declare class TownshipTaskRewards {
-    gp: number;
-    slayerCoins: number;
+    currencies: CurrencyQuantity[];
     items: AnyItemQuantity[];
     skillXP: {
         skill: AnySkill;
@@ -52,22 +79,6 @@ declare class TownshipTaskRewards {
     }[];
     townshipResources: ResourceQuantity[];
     constructor(data: TownshipTaskRewardsData, game: Game);
-}
-interface TownshipTaskGoalsData {
-    /** Items that must be handed in to complete the task */
-    items: IDQuantity[];
-    /** Monsters that must be killed to complete the task */
-    monsters: IDQuantity[];
-    /** Skill XP that must be earned to complete the task */
-    skillXP: IDQuantity[];
-    /** Township Buildings that must be actively built to complete the task */
-    buildings: IDQuantity[];
-    /** Monsters that must be killed while the specified items are equipped to complete the task */
-    monsterWithItems?: MonsterItemIDQuantity[];
-    /** AoD Only. Number of Points of Interest discovered in Cartography per Map ID. */
-    numPOIs?: WorldMapIDQuantity[];
-    /** AoD Only. Number of times a Map has been refined in Cartography. */
-    numRefinements?: number;
 }
 interface MonsterItemIDQuantity {
     /** The ID of the Monster that must be killed */
@@ -83,288 +94,359 @@ interface WorldMapIDQuantity {
     /** The number of Points of Interest to Discover */
     quantity: number;
 }
-declare class TownshipTaskGoals {
-    items: AnyItemQuantity[];
-    monsters: MonsterQuantity[];
-    monsterWithItems: MonsterWithItemQuantity[];
-    skillXP: SkillQuantity[];
-    buildings: BuildingQuantity[];
-    numPOIs: WorldMapQuantity[];
-    numRefinements: number;
+declare type TownshipTaskGoalEvents = {
+    metChanged: boolean;
+    progressChanged: void;
+};
+declare type TownshipTaskGoalCallback = (isMet: boolean) => void;
+interface ITownshipTaskGoal {
+    checkIfMet(): boolean;
+    onMetChanged(callback: TownshipTaskGoalCallback): void;
+    offMetChanged(callback: TownshipTaskGoalCallback): void;
+    onProgressChanged(callback: VoidFunction): void;
+    offProgressChanged(callback: VoidFunction): void;
+    getDescriptionHTML(): string;
+}
+interface ITownshipCasualTaskGoal extends ITownshipTaskGoal {
+    progress: number;
+    resetProgress(): void;
+    setProgress(progress: number): void;
+}
+declare abstract class TownshipTaskGoal<Event extends GameEvent> implements ITownshipTaskGoal {
+    game: Game;
+    /** If this goal can become un-met */
+    abstract readonly isReversible: boolean;
+    _events: import("mitt").Emitter<TownshipTaskGoalEvents>;
+    get noEventsHandled(): boolean;
+    isMet: boolean;
+    constructor(game: Game);
+    /** Checks if this goal is currently met */
+    abstract checkIfMet(): boolean;
+    /** Assigns an event handler for when this goal being met changes */
+    onMetChanged(callback: TownshipTaskGoalCallback): void;
+    /** Unassigns an event handler for when this goal being met changes */
+    offMetChanged(callback: TownshipTaskGoalCallback): void;
+    /** Assigns an event handler for when this goals progress changes */
+    onProgressChanged(callback: VoidFunction): void;
+    /** Unassigns an event handler for when this goals progress changes */
+    offProgressChanged(callback: VoidFunction): void;
+    abstract getDescriptionHTML(): string;
+    /** Checks if an event is valid to increase progress */
+    _isEventValid(e: Event): boolean;
+    _eventHandler: (e: Event) => void;
+    _preSubscribe(): void;
+    _postUnsubscribe(): void;
+    /** Checks if this goal has been met using event data */
+    abstract _metWithEvent(e: Event): boolean;
+    /** Assigns the internal event handler of this goal to game events */
+    abstract _assignHandler(handler: Handler<Event>): void;
+    /** Unassigns the internal event handler of this goal to game events */
+    abstract _unassignHandler(handler: Handler<Event>): void;
+}
+declare class TownshipItemGoal extends TownshipTaskGoal<ItemQuantityChangedEvent> implements ITownshipCasualTaskGoal {
+    item: AnyItem;
+    quantity: number;
+    readonly isReversible = true;
+    get progress(): number;
+    constructor(data: IDQuantity, game: Game);
+    resetProgress(): void;
+    setProgress(progress: number): void;
+    checkIfMet(): boolean;
+    getDescriptionHTML(): string;
+    _metWithEvent(e: ItemQuantityChangedEvent): boolean;
+    _assignHandler(handler: Handler<ItemQuantityChangedEvent>): void;
+    _unassignHandler(handler: Handler<ItemQuantityChangedEvent>): void;
+}
+declare class TownshipMonsterGoal extends TownshipTaskGoal<MonsterKilledEvent> {
+    monster: Monster;
+    quantity: number;
+    readonly isReversible = false;
+    constructor(data: IDQuantity, game: Game);
+    checkIfMet(): boolean;
+    getDescriptionHTML(): string;
+    _metWithEvent(e: MonsterKilledEvent): boolean;
+    _assignHandler(handler: Handler<MonsterKilledEvent>): void;
+    _unassignHandler(handler: Handler<MonsterKilledEvent>): void;
+}
+declare class TownshipCasualMonsterGoal extends TownshipMonsterGoal implements ITownshipCasualTaskGoal {
+    get progress(): number;
+    _progress: number;
+    resetProgress(): void;
+    setProgress(progress: number): void;
+    checkIfMet(): boolean;
+    getDescriptionHTML(): string;
+    _metWithEvent(e: MonsterKilledEvent): boolean;
+}
+declare class TownshipMonsterWithItemsGoal extends TownshipTaskGoal<MonsterKilledEvent> implements ITownshipCasualTaskGoal {
+    monster: Monster;
+    quantity: number;
+    items: EquipmentItem[];
+    readonly isReversible = false;
+    get progress(): number;
+    _progress: number;
+    constructor(data: MonsterItemIDQuantity, game: Game);
+    resetProgress(): void;
+    setProgress(progress: number): void;
+    checkIfMet(): boolean;
+    getDescriptionHTML(): string;
+    _isEventValid(e: MonsterKilledEvent): boolean;
+    _metWithEvent(e: MonsterKilledEvent): boolean;
+    _assignHandler(handler: Handler<MonsterKilledEvent>): void;
+    _unassignHandler(handler: Handler<MonsterKilledEvent>): void;
+}
+declare class TownshipSkillXPGoal extends TownshipTaskGoal<SkillXPEarnedEvent> {
+    skill: AnySkill;
+    quantity: number;
+    readonly isReversible = false;
+    constructor(data: IDQuantity, game: Game);
+    checkIfMet(): boolean;
+    getDescriptionHTML(): string;
+    _metWithEvent(e: SkillXPEarnedEvent): boolean;
+    _assignHandler(handler: Handler<SkillXPEarnedEvent>): void;
+    _unassignHandler(handler: Handler<SkillXPEarnedEvent>): void;
+}
+declare class TownshipCasualSkillXPGoal extends TownshipSkillXPGoal implements ITownshipCasualTaskGoal {
+    get progress(): number;
+    _progress: number;
+    resetProgress(): void;
+    checkIfMet(): boolean;
+    setProgress(progress: number): void;
+    getDescriptionHTML(): string;
+    _metWithEvent(e: SkillXPEarnedEvent): boolean;
+}
+declare class TownshipPoiDiscoveryGoal extends TownshipTaskGoal<CartographyPOIDiscoveredEvent> {
+    worldMap: WorldMap;
+    quantity: number;
+    readonly isReversible = false;
+    cartography: Cartography;
+    constructor(data: WorldMapIDQuantity, game: Game);
+    checkIfMet(): boolean;
+    getDescriptionHTML(): string;
+    _isEventValid(e: CartographyPOIDiscoveredEvent): boolean;
+    _metWithEvent(e: CartographyPOIDiscoveredEvent): boolean;
+    _assignHandler(handler: Handler<CartographyPOIDiscoveredEvent>): void;
+    _unassignHandler(handler: Handler<CartographyPOIDiscoveredEvent>): void;
+}
+declare class TownshipMapRefinementGoal extends TownshipTaskGoal<CartographyMapRefinementEvent> {
+    quantity: number;
+    readonly isReversible = false;
+    cartography: Cartography;
+    constructor(data: number, game: Game);
+    checkIfMet(): boolean;
+    getDescriptionHTML(): string;
+    _metWithEvent(e: CartographyMapRefinementEvent): boolean;
+    _assignHandler(handler: Handler<CartographyMapRefinementEvent>): void;
+    _unassignHandler(handler: Handler<CartographyMapRefinementEvent>): void;
+}
+declare class BaseTownshipTaskGoals<GoalType extends ITownshipTaskGoal> {
+    itemGoals: TownshipItemGoal[];
+    allGoals: GoalType[];
+    _events: import("mitt").Emitter<TownshipTaskGoalEvents>;
+    _goalsMet: number;
+    get noMetEventsHandled(): boolean;
+    get noProgressEventsHandled(): boolean;
+    checkIfMet(): boolean;
+    /** Assigns an event handler for when all goals being met changes */
+    onMetChanged(callback: TownshipTaskGoalCallback): void;
+    /** Unassigns an event handler for when all goals being met changes */
+    offMetChanged(callback: TownshipTaskGoalCallback): void;
+    /** Assigns an event handler for when any of the goals progress */
+    onGoalProgress(callback: VoidFunction): void;
+    /** Unassigns an event handler for when any of the goals progress */
+    offGoalProgress(callback: VoidFunction): void;
+    _onGoalMet: TownshipTaskGoalCallback;
+    _onGoalProgress: VoidFunction;
+    removeItemsFromBank(game: Game): void;
+}
+interface TownshipTaskGoalsData {
+    items?: IDQuantity[];
+    monsters?: IDQuantity[];
+    skillXP?: IDQuantity[];
+    numPOIs?: WorldMapIDQuantity[];
+    numRefinements?: number;
+}
+declare class TownshipTaskGoals extends BaseTownshipTaskGoals<ITownshipTaskGoal> {
     constructor(data: TownshipTaskGoalsData, game: Game);
 }
-/** Data for constructing a TownshipTask object */
-interface TownshipTaskData extends IDData {
-    /** The display name of the task */
-    name: string;
-    /** A description of the task */
+interface CasualTaskGoalsData {
+    items?: IDQuantity[];
+    monsters?: IDQuantity[];
+    monsterWithItems?: MonsterItemIDQuantity[];
+    skillXP?: IDQuantity[];
+}
+declare class TownshipCasualTaskGoals extends BaseTownshipTaskGoals<ITownshipCasualTaskGoal> {
+    constructor(data: CasualTaskGoalsData, game: Game);
+    resetProgress(): void;
+}
+interface BaseTownshipTaskData extends IDData {
+    /** Optional description of the tasks */
     description?: string;
-    /** The category of the task. This is used to group tasks together */
-    category: TownshipTaskCategory;
-    /** The requirements for completing the task */
-    goals: TownshipTaskGoalsData;
     /** The rewards given for completing the task */
     rewards: TownshipTaskRewardsData;
-    /** Requirements the player must meet before starting the task */
-    requirements: AnyRequirementData[];
 }
-declare class TownshipTask extends NamespacedObject {
-    get name(): string;
+declare abstract class BaseTownshipTask extends NamespacedObject {
+    abstract readonly name: string;
     get description(): string;
     get hasDescription(): boolean;
-    category: TownshipTaskCategory;
-    goals: TownshipTaskGoals;
     rewards: TownshipTaskRewards;
-    requirements: AnyRequirement[];
     _description?: string;
-    _name: string;
+    constructor(namespace: DataNamespace, data: BaseTownshipTaskData, game: Game);
+}
+/** Data for constructing a TownshipTask object */
+interface TownshipTaskData extends BaseTownshipTaskData, RealmedObjectData {
+    /** The requirements for completing the task */
+    goals: TownshipTaskGoalsData;
+    /** The category of the task. This is used to group tasks together */
+    category: string;
+}
+declare class TownshipTask extends BaseTownshipTask {
+    get name(): string;
+    goals: TownshipTaskGoals;
+    category: TownshipTaskCategory;
+    realm: Realm;
     constructor(namespace: DataNamespace, data: TownshipTaskData, game: Game);
 }
 declare class DummyTownshipTask extends TownshipTask {
     constructor(namespace: DataNamespace, id: string, game: Game);
 }
-declare class TownshipCasualTask extends TownshipTask {
+interface TownshipCasualTaskData extends BaseTownshipTaskData {
+    /** The requirements for completing the task */
+    goals: CasualTaskGoalsData;
+    /** Requirements the player must meet before starting the task */
+    requirements?: AnyRequirementData[];
+}
+declare class TownshipCasualTask extends BaseTownshipTask {
     get name(): string;
-    constructor(namespace: DataNamespace, data: TownshipTaskData, game: Game);
+    goals: TownshipCasualTaskGoals;
+    /** Requirements that must be met before this task is available to the player */
+    requirements: AnyRequirement[];
+    constructor(namespace: DataNamespace, data: TownshipCasualTaskData, game: Game);
 }
 declare class DummyTownshipCasualTask extends TownshipCasualTask {
     constructor(namespace: DataNamespace, id: string, game: Game);
+}
+declare class TownshipCasualTaskRenderQueue {
+    taskTimer: boolean;
+    tasksRemaining: boolean;
+    tasksCompleted: boolean;
+    currentTasks: boolean;
+    tasksReady: boolean;
+    taskGoals: Set<TownshipCasualTask>;
 }
 declare class TownshipCasualTasks implements EncodableObject {
     game: Game;
     readonly MAX_CASUAL_TASKS = 5;
     readonly NEW_TASK_INTERVAL: number;
     readonly GP_COST_TO_SKIP = 10000000;
-    currentCasualTasks: Array<TownshipCasualTask>;
-    casualTaskTracker: Array<TownshipTaskTracker>;
-    completedCasualTasks: Array<TownshipCasualTask>;
+    currentCasualTasks: TownshipCasualTask[];
     allCasualTasks: NamespaceRegistry<TownshipCasualTask>;
     casualTasksCompleted: number;
     newTaskTimer: Timer;
-    constructor(game: Game);
-    registerData(namespace: DataNamespace, taskData: TownshipTaskData[]): void;
+    get timeToNextTask(): number;
     get availableDailyTasks(): TownshipCasualTask[];
+    renderQueue: TownshipCasualTaskRenderQueue;
+    _totalTasksReady: number;
+    _taskUnlisteners: Map<TownshipCasualTask, VoidFunction>;
+    _progressUnlisteners: Map<TownshipCasualTask, VoidFunction>;
+    /** If any casual task is ready to be completed */
+    get isAnyTaskReady(): boolean;
+    constructor(game: Game);
+    registerTasks(namespace: DataNamespace, taskData: TownshipCasualTaskData[]): void;
     get gpCostToSkip(): number;
     get xpReward(): number;
-    get gpReward(): number;
-    get slayerCoinReward(): number;
-    get blankDailyTaskTracker(): TownshipTaskTracker;
+    /** Remaps the quantities of casual task currency rewards to scaling values */
+    mapCurrencyRewards(currencies: CurrencyQuantity[]): CurrencyQuantity[];
     onLoad(): void;
+    setupTaskHandlers(): void;
+    addTaskHandler(task: TownshipCasualTask): void;
+    onTaskMet(task: TownshipCasualTask, isMet: boolean): void;
     tick(): void;
+    render(): void;
+    renderTaskTimer(): void;
+    renderTasksRemaining(): void;
+    renderTasksCompleted(): void;
+    renderCurrentTasks(): void;
+    renderTasksReady(): void;
+    renderTaskGoals(): void;
+    assignProgressListeners(): void;
+    unassignProgressListeners(): void;
     skipTask(task: TownshipCasualTask): void;
-    removeTask(task: TownshipCasualTask): void;
-    resetAllDailyTasks(): void;
-    get timeToNextTask(): number;
-    selectNewDailyTask(): void;
-    addDailyTask(task: TownshipCasualTask): void;
-    addDailyTaskToTracker(task: TownshipCasualTask, index: number): void;
-    addMonsterGoalToTrackedTask(goal: MonsterQuantity, id: number): void;
-    addSkillXPGoalToTrackedTask(goal: SkillQuantity, id: number): void;
-    addMonsterWithItemsGoalToTrackedTask(goal: MonsterWithItemQuantity, id: number): void;
-    getCompletedDailyTaskCount(): number;
-    areMonsterGoalsComplete(task: TownshipCasualTask): boolean;
-    isMonsterGoalComplete(goal: MonsterQuantity, index: number, monsterGoalID: number): boolean;
-    areMonsterWithItemsGoalsComplete(task: TownshipCasualTask): boolean;
-    isMonsterWithItemsGoalComplete(goal: MonsterQuantity, index: number, monsterGoalID: number): boolean;
-    areSkillXPGoalsComplete(task: TownshipCasualTask): boolean;
-    completeDailyTask(task: TownshipCasualTask): void;
-    checkForDailyTaskComplete(): boolean;
-    updateForValidMonsterWithItemsKill(monster: Monster): void;
+    addTask(task: TownshipCasualTask): void;
+    removeTask(task: TownshipCasualTask, wasReady: boolean): void;
+    addNewDailyTask(): void;
+    isTaskComplete(task: TownshipCasualTask): boolean;
+    completeTask(task: TownshipCasualTask): void;
+    giveTaskRewards(task: TownshipCasualTask): void;
     startTaskTimer(): void;
     addNewTask(): void;
     encode(writer: SaveWriter): SaveWriter;
     decode(reader: SaveWriter, version: number): void;
 }
+declare class TownshipTasksRenderQueue {
+    /** Updates the total tasks completed in a realm */
+    realmTaskCompletion: Set<Realm>;
+    /** Updates the total tasks completed in a category */
+    categoryTaskCompletion: Set<TownshipTaskCategory>;
+    /** Updates the goals/claim button for a task */
+    taskGoals: Set<TownshipTask>;
+    /** Updates the task ready icon for a task category */
+    taskCategoryReady: Set<TownshipTaskCategory>;
+}
 declare type TownshipTaskEvents = {
     townshipTaskCompleted: TownshipTaskCompletedEvent;
 };
-declare class TownshipTasks implements IGameEventEmitter<TownshipTaskEvents> {
+declare class TownshipTasks extends GameEventEmitter<TownshipTaskEvents> {
     game: Game;
     completedTasks: Set<TownshipTask>;
-    activeTaskCategory: TownshipTaskCategory | 'None';
+    categories: NamespaceRegistry<TownshipTaskCategory>;
     tasks: NamespaceRegistry<TownshipTask>;
-    taskReadyIcon: boolean;
+    _totalTasksReady: number;
     _tasksCompleted: number;
-    _events: import("mitt").Emitter<TownshipTaskEvents>;
-    on: {
-        <Key extends "townshipTaskCompleted">(type: Key, handler: import("mitt").Handler<TownshipTaskEvents[Key]>): void;
-        (type: "*", handler: import("mitt").WildcardHandler<TownshipTaskEvents>): void;
-    };
-    off: {
-        <Key extends "townshipTaskCompleted">(type: Key, handler?: import("mitt").Handler<TownshipTaskEvents[Key]> | undefined): void;
-        (type: "*", handler: import("mitt").WildcardHandler<TownshipTaskEvents>): void;
-    };
     get tasksCompleted(): number;
-    get tutorialTasksCompleted(): number;
-    get allTasksComplete(): boolean;
+    _totalTasksPerRealm: SparseNumericMap<Realm>;
+    _tasksCompletedPerRealm: SparseNumericMap<Realm>;
+    /** The number of different realms that have tasks belonging to them */
+    get numberOfTaskRealms(): number;
+    /** If any task is ready to be completed */
+    get isAnyTaskReady(): boolean;
+    renderQueue: TownshipTasksRenderQueue;
     constructor(game: Game);
-    registerData(namespace: DataNamespace, taskData: TownshipTaskData[]): void;
+    registerCategories(namespace: DataNamespace, data: TownshipTaskCategoryData[]): void;
+    registerTasks(namespace: DataNamespace, taskData: TownshipTaskData[]): void;
+    postDataRegistration(): void;
     /**
      * Initialization function for Township tasks on game load
      */
     onLoad(): void;
-    computeTaskTotal(): void;
-    onPageChange(): void;
-    skipTownshipTutorial(): void;
-    getTaskCountInCategory(category: TownshipTaskCategory): number;
-    getCompletedTaskCountInCategory(category: TownshipTaskCategory): number;
+    computeTasksCompleted(): void;
+    _taskUnlisteners: Map<TownshipTask, VoidFunction>;
+    _progressUnlisteners: Map<TownshipTask, VoidFunction>;
+    setupTaskHandlers(): void;
+    onTaskMet(task: TownshipTask, isMet: boolean): void;
+    render(): void;
+    renderRealmTaskCompletion(): void;
+    renderCategoryTaskCompletion(): void;
+    renderTaskGoals(): void;
+    renderCategoryReady(): void;
+    assignProgressListeners(tasks: TownshipTask[]): void;
+    unassignProgressListeners(): void;
+    /**
+     * Gets the number of tasks that have been completed that belong to a given realm
+     * @param realm The realm the tasks belong to
+     * @returns The number of tasks completed
+     */
+    getTasksCompletedInRealm(realm: Realm): number;
+    /**
+     * Gets the total number of tasks that belong to a given realm
+     * @param realm The realm the tasks belong to
+     * @returns The total number of tasks
+     */
+    getNumberOfTasksInRealm(realm: Realm): number;
     /**
      * Function to perform task completion and checks
      * @param task
      */
-    completeTask(task: TownshipTask | TownshipCasualTask, giveRewards?: boolean, forceComplete?: boolean): void;
-    showTaskComplete(): void;
-    checkForTaskReady(forceCheck?: boolean): void;
-    checkForTaskReadyInCategory(category: TownshipTaskCategory): boolean;
-    /**
-     * Determines if the task is actually complete
-     * @param taskTracker
-     * @returns
-     */
-    checkTaskCompletion(task: TownshipTask | TownshipCasualTask): boolean;
-    isItemTaskComplete(itemGoal: AnyItemQuantity): boolean;
-    isMonsterTaskComplete(monsterGoal: MonsterQuantity): boolean;
-    isSkillTaskComplete(skillTask: SkillQuantity): boolean;
-    isTownshipBuildingTaskComplete(buildingTask: BuildingQuantity): boolean;
-    isNumPOIsComplete(numPOIsTask: WorldMapQuantity): boolean;
-    isNumRefinementsComplete(count: number): boolean;
-    updateAllTasks(): void;
-    isTaskCategoryComplete(category: TownshipTaskCategory): boolean;
-    get cartographyMapsRefined(): number;
-    updateTaskCategory(): void;
-    /**
-     * Removes the task items from bank when turning in task completion
-     * @param task
-     */
-    removeTaskItemsFromBank(task: TownshipTask | TownshipCasualTask): void;
-    /**
-     * Creates a task element to display
-     * TODO: REPLACE WITH TEMPLATES
-     */
-    createTaskCompletedBreakdown(): HTMLElement;
-    getTaskCompletedBreakdownText(): string;
-    getDailyTasksCompletedBreakdownText(): string;
-    getNextDailyTaskTimerText(): string;
-    updateTaskCompletedBreakdownText(): void;
-    updateNextDailyTaskTimerText(): void;
-    /**
-     * Creates a task element to display
-     * TODO: REPLACE WITH TEMPLATES
-     */
-    createTaskButtonHeader(): HTMLElement;
-    /**
-     * Creates a task element to display
-     * TODO: REPLACE WITH TEMPLATES
-     */
-    createTaskElement(task: TownshipTask | TownshipCasualTask): HTMLElement;
-    createTaskDescription(task: TownshipTask | TownshipCasualTask): HTMLElement;
-    /**
-     * Creates task tasks element to display
-     */
-    createTaskTasks(task: TownshipTask | TownshipCasualTask): HTMLElement;
-    /**
-     * Creates task item task element to display
-     */
-    createTaskItemTask(task: TownshipTask | TownshipCasualTask): HTMLElement;
-    /**
-     * Creates task monster task element to display
-     * @param task
-     */
-    createTaskMonsterTask(task: TownshipTask | TownshipCasualTask): HTMLElement;
-    /**
-     * Creates task skill xp task element to display
-     * @param task
-     */
-    createTaskSkillTask(task: TownshipTask | TownshipCasualTask): HTMLElement;
-    /**
-     * Creates task skill xp task element to display
-     * @param task
-     */
-    createTaskTownshipBuildingTask(task: TownshipTask | TownshipCasualTask): HTMLElement;
-    /**
-     * Creates task monster task element to display
-     * @param task
-     */
-    createTaskMonsterWithItemTask(task: TownshipTask | TownshipCasualTask): HTMLElement;
-    /**
-     * Creates number of POIs discovered task in Cart element to display
-     * @param task
-     */
-    createTaskNumPOIsTask(task: TownshipTask | TownshipCasualTask): HTMLElement;
-    /**
-     * Creates number of POIs discovered task in Cart element to display
-     * @param task
-     */
-    createTaskNumRefinementsTask(task: TownshipTask | TownshipCasualTask): HTMLElement;
-    /**
-     * Creates task rewards element to display
-     * @param task
-     */
-    createTaskRewards(task: TownshipTask | TownshipCasualTask): HTMLElement;
-    /**
-     * Creates the task GP reward element to display
-     */
-    createTaskGPReward(task: TownshipTask | TownshipCasualTask): HTMLElement;
-    /**
-     * Creates the task Slayer Coin reward element to display
-     */
-    createTaskSlayerCoinReward(task: TownshipTask | TownshipCasualTask): HTMLElement;
-    /**
-     * Creates the task Item reward element to display
-     */
-    createTaskItemsReward(item: AnyItem, quantity: number): HTMLElement;
-    /**
-     * Creates the task Skill XP reward element to display
-     */
-    createTaskSkillXPReward(skill: AnySkill, quantity: number): HTMLElement;
-    /**
-     * Creates the task Township resource reward element to display
-     */
-    createTaskTownshipResourceReward(resource: TownshipResource, quantity: number): HTMLElement;
-    getTaskGPReward(task: TownshipTask | TownshipCasualTask): number;
-    getTaskSCReward(task: TownshipTask | TownshipCasualTask): number;
-    getTaskSkillXPReward(task: TownshipTask | TownshipCasualTask, skill: AnySkill): number;
-    claimTaskRewards(task: TownshipTask | TownshipCasualTask): void;
-    /**
-     * Displays all Township Task categories and their progress
-     */
-    showAllTaskCategories(): void;
-    /**
-     * Displays a Township Tasks for specified category
-     * @param category The Task Category
-     */
-    showTaskCategory(category: TownshipTaskCategory): void;
-    /**
-     * Creates a task category element
-     * @param category The Task Category
-     */
-    createTaskCategory(category: TownshipTaskCategory): HTMLElement;
-    /**
-     * Creates a task category link element
-     * @param category The Task Category
-     */
-    createTaskLinkCategory(category: TownshipTaskCategory): HTMLElement;
-    updateAllTaskProgress(): void;
-    updateTaskProgress(category: TownshipTaskCategory): void;
-    getTownshipTaskCategoryIcon(category: TownshipTaskCategory): string;
-    getTownshipTaskCategoryName(category: TownshipTaskCategory): string;
-    getTownshipTaskCategoryBG(category: TownshipTaskCategory): string;
-    countTotalTasksInCategory(category: TownshipTaskCategory): number;
-    isPlayerLookingAtTask(task: TownshipTask): boolean;
+    completeTask(task: TownshipTask, giveRewards?: boolean, forceComplete?: boolean): void;
+    notifyTaskComplete(): void;
+    giveTaskRewards(task: TownshipTask | TownshipCasualTask): void;
 }
-declare type TaskTrackingData = {
-    task: TownshipTask;
-    monsters: {
-        monster: Monster;
-        quantity: number;
-    }[];
-    skills: {
-        skill: AnySkill;
-        quantity: number;
-    }[];
-    townshipBuildings: {
-        building: TownshipBuilding;
-        quantity: number;
-    }[];
-};
-declare type TownshipTaskCategory = 'Easy' | 'Normal' | 'Hard' | 'VeryHard' | 'Elite' | 'TownshipTutorial' | 'Daily' | 'TotH' | 'AoD' | 'Birthday2023';

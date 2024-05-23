@@ -1,4 +1,4 @@
-interface PetData extends IDData {
+interface PetData extends IDData, IStatObjectData {
     /** Display name of the pet */
     name: string;
     /** Media string for pet */
@@ -6,15 +6,13 @@ interface PetData extends IDData {
     /** Optional custom hint for the pet */
     hint?: string;
     /** Language string for pet hint */
-    langHint?: LangStringData;
+    langHint?: string;
     /** Optional skill this pet is obtained from */
     skillID?: string;
     /** If the chance to recieve the pet should scale with the skill's mastery pool progress */
     scaleChanceWithMasteryPool: boolean;
     /** True if pet does not count towards game completion */
     ignoreCompletion: boolean;
-    modifiers: PlayerModifierData;
-    enemyModifiers?: CombatModifierData;
     /** True if pets bonus should only apply to Golbin Raid */
     activeInRaid: boolean;
     /** Optional, name of patreon who created this pet */
@@ -22,7 +20,7 @@ interface PetData extends IDData {
     /** Custom description for the pet. Appended to custom modifier description. */
     customDescription?: string;
     /** Optional, Language string for custom description */
-    langCustomDescription?: LangStringData;
+    langCustomDescription?: string;
 }
 declare class Pet extends NamespacedObject {
     get name(): string;
@@ -32,26 +30,23 @@ declare class Pet extends NamespacedObject {
     skill?: AnySkill;
     scaleChanceWithMasteryPool: boolean;
     ignoreCompletion: boolean;
-    modifiers: PlayerModifierObject;
-    enemyModifiers?: CombatModifierData;
+    stats: StatObject;
     activeInRaid: boolean;
     _name: string;
     _media: string;
     _hint?: string;
-    _langHint?: LangStringData;
+    _langHint?: string;
     _patreonName?: string;
     _customDescription?: string;
-    _langCustomDescription?: LangStringData;
+    _langCustomDescription?: string;
     constructor(namespace: DataNamespace, data: PetData, game: Game);
 }
 declare class DummyPet extends Pet {
     constructor(namespace: DataNamespace, id: string, game: Game);
 }
-declare class PetManager implements StatProvider, RaidStatProvider, EncodableObject {
+declare class PetManager extends StatProvider implements IRaidStatProvider, EncodableObject {
     game: Game;
-    modifiers: MappedModifiers;
-    enemyModifiers: TargetModifiers;
-    raidStats: Required<Pick<StatProvider, 'modifiers' | 'enemyModifiers'>>;
+    raidStats: StatProvider;
     unlocked: Set<Pet>;
     constructor(game: Game);
     onLoad(): void;

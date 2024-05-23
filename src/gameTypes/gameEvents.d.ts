@@ -1,4 +1,17 @@
 declare type IGameEventEmitter<Events extends Record<EventType, GameEvent>> = Omit<Emitter<Events>, 'all' | 'emit'>;
+/** An object that emits GameEvents, but cannot have wildcard handlers assigned. Used for base classes that implement events. */
+declare type INoWildCardGameEventEmitter<Events extends Record<EventType, GameEvent>> = {
+    on<Key extends keyof Events>(type: Key, handler: Handler<Events[Key]>): void;
+    off<Key extends keyof Events>(type: Key, handler: Handler<Events[Key]>): void;
+};
+declare type NoWildcardEventHandlerMap<Events extends Record<EventType, unknown>> = Map<keyof Event, Handler<Events[keyof Events]>[]>;
+interface NoWildcardEmitter<Events extends Record<EventType, unknown>> {
+    all: NoWildcardEventHandlerMap<Events>;
+    on<Key extends keyof Events>(type: Key, handler: Handler<Events[Key]>): void;
+    off<Key extends keyof Events>(type: Key, handler?: Handler<Events[Key]>): void;
+    emit<Key extends keyof Events>(type: Key, event: Events[Key]): void;
+    emit<Key extends keyof Events>(type: undefined extends Events[Key] ? Key : never): void;
+}
 declare class GameEventEmitter<Events extends Record<EventType, GameEvent>> implements IGameEventEmitter<Events> {
     _events: import("mitt").Emitter<Events>;
     on: {
@@ -90,8 +103,11 @@ declare type EventMatcherMap = {
     CartographyTravel: CartographyTravelEventMatcher;
     ArchaeologyAction: ArchaeologyActionEventMatcher;
     TownshipTaskCompleted: TownshipTaskCompletedEventMatcher;
+    HarvestingAction: HarvestingActionEventMatcher;
+    SoulPointConsumption: SoulPointConsumptionEventMatcher;
+    BoneDrop: BoneDropEventMatcher;
 };
-declare type GameEventMatcherData = WoodcuttingEventMatcherOptions | FishingActionEventMatcherOptions | FiremakingActionEventMatcherOptions | BonfireLitEventMatcherOptions | CookingActionEventMatcherOptions | MiningActionEventMatcherOptions | SmithingActionEventMatcherOptions | ThievingActionEventMatcherOptions | FarmingPlantActionEventMatcherOptions | FarmingHarvestActionEventMatcherOptions | FletchingActionEventMatcherOptions | CraftingActionEventMatcherOptions | RunecraftingActionEventMatcherOptions | HerbloreActionEventMatcherOptions | AgilityActionEventMatcherOptions | SummoningActionEventMatcherOptions | AstrologyActionEventMatcherOptions | AltMagicActionEventMatcherOptions | MonsterDropEventMatcherOptions | PlayerAttackEventMatcherOptions | EnemyAttackEventMatcherOptions | FoodEatenEventMatcherOptions | PrayerPointConsumptionEventMatcherOptions | PlayerHitpointsRegenerationEventMatcherOptions | PlayerSummonAttackEventMatcherOptions | RuneConsumptionEventMatcherOptions | PotionUsedEventMatcherOptions | PotionChargeUsedEventMatcherOptions | MonsterKilledEventMatcherOptions | MonsterSpawnedEventMatcherOptions | ItemEquippedEventMatcherOptions | FoodEquippedEventMatcherOptions | ShopPurchaseMadeEventMatcherOptions | SummonTabletUsedEventMatcherOptions | CartographySurveyEventMatcherOptions | CartographyPaperMakingEventMatcherOptions | CartographyMapUpgradeEventMatcherOptions | CartographyMapRefinementEventMatcherOptions | CartographyTravelEventMatcherOptions | ArchaeologyActionEventMatcherOptions | TownshipTaskCompletedEventMatcherOptions;
+declare type GameEventMatcherData = WoodcuttingEventMatcherOptions | FishingActionEventMatcherOptions | FiremakingActionEventMatcherOptions | BonfireLitEventMatcherOptions | CookingActionEventMatcherOptions | MiningActionEventMatcherOptions | SmithingActionEventMatcherOptions | ThievingActionEventMatcherOptions | FarmingPlantActionEventMatcherOptions | FarmingHarvestActionEventMatcherOptions | FletchingActionEventMatcherOptions | CraftingActionEventMatcherOptions | RunecraftingActionEventMatcherOptions | HerbloreActionEventMatcherOptions | AgilityActionEventMatcherOptions | SummoningActionEventMatcherOptions | AstrologyActionEventMatcherOptions | AltMagicActionEventMatcherOptions | MonsterDropEventMatcherOptions | PlayerAttackEventMatcherOptions | EnemyAttackEventMatcherOptions | FoodEatenEventMatcherOptions | PrayerPointConsumptionEventMatcherOptions | PlayerHitpointsRegenerationEventMatcherOptions | PlayerSummonAttackEventMatcherOptions | RuneConsumptionEventMatcherOptions | PotionUsedEventMatcherOptions | PotionChargeUsedEventMatcherOptions | MonsterKilledEventMatcherOptions | MonsterSpawnedEventMatcherOptions | ItemEquippedEventMatcherOptions | FoodEquippedEventMatcherOptions | ShopPurchaseMadeEventMatcherOptions | SummonTabletUsedEventMatcherOptions | CartographySurveyEventMatcherOptions | CartographyPaperMakingEventMatcherOptions | CartographyMapUpgradeEventMatcherOptions | CartographyMapRefinementEventMatcherOptions | CartographyTravelEventMatcherOptions | ArchaeologyActionEventMatcherOptions | TownshipTaskCompletedEventMatcherOptions | HarvestingActionEventMatcherOptions | SoulPointConsumptionEventMatcherOptions | BoneDropEventMatcherOptions;
 declare type AnyGameEventMatcher = EventMatcherMap[keyof EventMatcherMap];
 declare class IntervaledGameEvent extends GameEvent {
     /** The interval of the timer that triggered this event */
@@ -108,11 +124,15 @@ declare class SkillActionEvent extends IntervaledGameEvent {
     productQuantity: number;
     /** The potion that was currently active during the action. Undefined if none active */
     activePotion?: PotionItem;
+    /** The realm associated with the given action. Undefined if no realm. */
+    realm?: Realm;
 }
 interface SkillActionEventMatcherOptions {
     isPotionActive?: boolean;
     succesful?: boolean;
     activePotionIDs?: string[];
+    /** Optional. If present the realm of the action must match an element of the array */
+    realms?: string[];
 }
 /** Matches any skill action */
 declare abstract class SkillActionEventMatcher<Event extends SkillActionEvent> extends NonRaidGameEventMatcher<Event> {
@@ -122,6 +142,7 @@ declare abstract class SkillActionEventMatcher<Event extends SkillActionEvent> e
     succesful?: boolean;
     /** If present, the player must be using one of the specified potions during the Events firing */
     activePotions?: Set<PotionItem>;
+    realms?: Set<Realm>;
     constructor(options: SkillActionEventMatcherOptions, game: Game);
     doesEventMatch(event: SkillActionEvent): boolean;
 }
@@ -167,6 +188,8 @@ declare class FishingActionEvent extends SkillActionEvent {
     gemGiven: boolean;
     /** If a cooked version exists for the primary reward */
     cookedVersionExists: boolean;
+    /** If a special item was given as the primary reward */
+    specialItemGiven: boolean;
     /** The primary item that was rewarded for the event */
     rewardItem: AnyItem;
     constructor(
@@ -183,6 +206,7 @@ interface FishingActionEventMatcherOptions extends SkillActionEventMatcherOption
     areaIDs?: string[];
     gemGiven?: boolean;
     cookedVersionExists?: boolean;
+    specialItemGiven?: boolean;
 }
 declare class FishingActionEventMatcher extends SkillActionEventMatcher<FishingActionEvent> {
     readonly type = "FishingAction";
@@ -194,6 +218,8 @@ declare class FishingActionEventMatcher extends SkillActionEventMatcher<FishingA
     gemGiven?: boolean;
     /** If present, the FishingActionEvent's property must match this */
     cookedVersionExists?: boolean;
+    /** If present, the FishingActionEvent's property must match this */
+    specialItemGiven?: boolean;
     constructor(options: FishingActionEventMatcherOptions, game: Game);
     doesEventMatch(event: FishingActionEvent): boolean;
     _assignNonRaidHandler(handler: Handler<FishingActionEvent>): void;
@@ -236,11 +262,15 @@ declare class BonfireLitEvent extends GameEvent {
 interface BonfireLitEventMatcherOptions {
     type: 'BonfireLit';
     logIDs?: string[];
+    /** Optional. If present, the ID of the realm the log belongs to must match an element of the array */
+    realms?: string[];
 }
 declare class BonfireLitEventMatcher extends NonRaidGameEventMatcher<BonfireLitEvent> {
     readonly type = "BonfireLit";
     /** If present, the log of the BonfireLitEvent must match a member */
     logs?: Set<FiremakingLog>;
+    /** If present, the log used must belong to one of these realms */
+    realms?: Set<Realm>;
     constructor(options: BonfireLitEventMatcherOptions, game: Game);
     doesEventMatch(event: BonfireLitEvent): boolean;
     _assignNonRaidHandler(handler: Handler<BonfireLitEvent>): void;
@@ -304,7 +334,10 @@ interface MiningActionEventMatcherOptions extends SkillActionEventMatcherOptions
     smithedVersionExists?: boolean;
     actionGivesGems?: boolean;
     actionGivesSuperiorGems?: boolean;
-    oreTypes?: MiningRockType[];
+    actionGivesAbyssalGems?: boolean;
+    /** @deprecated Use categories instead */
+    oreTypes?: string[];
+    categories?: string[];
 }
 declare class MiningActionEventMatcher extends SkillActionEventMatcher<MiningActionEvent> {
     readonly type = "MiningAction";
@@ -318,8 +351,10 @@ declare class MiningActionEventMatcher extends SkillActionEventMatcher<MiningAct
     actionGivesGems?: boolean;
     /** If present, the actions ability to give superior gems must match */
     actionGivesSuperiorGems?: boolean;
-    /** If present, the action must be one of the specified ore types */
-    oreTypes?: Set<MiningRockType>;
+    /** If present, the actions ability to give abyssal gems must match */
+    actionGivesAbyssalGems?: boolean;
+    /** If present, the action must be one of the specified categories */
+    categories?: Set<MiningCategory>;
     constructor(options: MiningActionEventMatcherOptions, game: Game);
     doesEventMatch(event: MiningActionEvent): boolean;
     _assignNonRaidHandler(handler: Handler<MiningActionEvent>): void;
@@ -485,6 +520,8 @@ declare class CraftingActionEvent extends SkillActionEvent {
     skill: Crafting;
     /** The crafting recipe being made */
     action: CraftingRecipe;
+    /** If the item being made is a consumable */
+    isConsumable: boolean;
     constructor(
     /** The source skill for the event */
     skill: Crafting, 
@@ -495,6 +532,8 @@ interface CraftingActionEventMatcherOptions extends SkillActionEventMatcherOptio
     type: 'CraftingAction';
     actionIDs?: string[];
     categoryIDs?: string[];
+    /** Optional. If present, the item being crafted must match being a consumable item or not */
+    isConsumable?: boolean;
 }
 declare class CraftingActionEventMatcher extends SkillActionEventMatcher<CraftingActionEvent> {
     readonly type = "CraftingAction";
@@ -502,6 +541,8 @@ declare class CraftingActionEventMatcher extends SkillActionEventMatcher<Craftin
     actions?: Set<CraftingRecipe>;
     /** If present, the category of the recipe must match a member */
     categories?: Set<SkillCategory>;
+    /** If present, the product of the recipe must match being a consumble item or not */
+    isConsumable?: boolean;
     constructor(options: CraftingActionEventMatcherOptions, game: Game);
     doesEventMatch(event: CraftingActionEvent): boolean;
     _assignNonRaidHandler(handler: Handler<CraftingActionEvent>): void;
@@ -518,13 +559,14 @@ declare class RunecraftingActionEvent extends SkillActionEvent {
     /** The runecrafting recipe being made */
     action: RunecraftingRecipe);
 }
-declare type RunecraftingSubCategory = 'ElementalRunes' | 'Staff' | 'None';
 interface RunecraftingActionEventMatcherOptions extends SkillActionEventMatcherOptions {
     type: 'RunecraftingAction';
     actionIDs?: string[];
     categoryIDs?: string[];
     consumedItemIDs?: string[];
-    subCategories?: RunecraftingSubCategory[];
+    subcategoryIDs?: string[];
+    /** @deprecated Use subcategoryIDs instead */
+    subCategories?: string[];
 }
 declare class RunecraftingActionEventMatcher extends SkillActionEventMatcher<RunecraftingActionEvent> {
     readonly type = "RunecraftingAction";
@@ -535,7 +577,7 @@ declare class RunecraftingActionEventMatcher extends SkillActionEventMatcher<Run
     /** If present, the recipe of the action must consume one of the items in the set */
     consumedItems?: Set<AnyItem>;
     /** If present the recipe of the action must belong to one of the sub categories */
-    subCategories?: Set<RunecraftingSubCategory>;
+    subCategories?: Set<SkillSubcategory>;
     constructor(options: RunecraftingActionEventMatcherOptions, game: Game);
     doesEventMatch(event: RunecraftingActionEvent): boolean;
     _assignNonRaidHandler(handler: Handler<RunecraftingActionEvent>): void;
@@ -600,12 +642,12 @@ declare class SummoningActionEvent extends SkillActionEvent {
     skill: Summoning;
     /** The summoning recipe being made */
     action: SummoningRecipe;
-    altRecipeID: number;
+    nonShardCost: Item;
     constructor(
     /** The source skill for the event */
     skill: Summoning, 
     /** The summoning recipe being made */
-    action: SummoningRecipe);
+    action: SummoningRecipe, nonShardCost: Item);
 }
 interface SummoningActionEventMatcherOptions extends SkillActionEventMatcherOptions {
     type: 'SummoningAction';
@@ -711,7 +753,38 @@ declare class MonsterDropEventMatcher extends NonRaidGameEventMatcher<MonsterDro
     _assignNonRaidHandler(handler: Handler<MonsterDropEvent>): void;
     _unassignNonRaidHandler(handler: Handler<MonsterDropEvent>): void;
 }
-declare class CharacterAttackEvent extends IntervaledGameEvent {
+declare class BoneDropEvent extends GameEvent {
+    /** The monster that dropped a bone */
+    monster: Monster;
+    /** The bone item that dropped */
+    item: AnyItem;
+    /** The quantity of the item that dropped */
+    quantity: number;
+    constructor(
+    /** The monster that dropped a bone */
+    monster: Monster, 
+    /** The bone item that dropped */
+    item: AnyItem, 
+    /** The quantity of the item that dropped */
+    quantity: number);
+}
+interface BoneDropEventMatcherOptions {
+    type: 'BoneDrop';
+    /** Optional. If present the bone item that drops must match being a BoneItem */
+    isBone?: boolean;
+    /** Optional. If present the bone item that drops must match being a SoulItem */
+    isSoul?: boolean;
+}
+declare class BoneDropEventMatcher extends NonRaidGameEventMatcher<BoneDropEvent> {
+    readonly type = "BoneDrop";
+    isBone?: boolean;
+    isSoul?: boolean;
+    constructor(options: BoneDropEventMatcherOptions, game: Game);
+    doesEventMatch(event: BoneDropEvent): boolean;
+    _assignNonRaidHandler(handler: Handler<BoneDropEvent>): void;
+    _unassignNonRaidHandler(handler: Handler<BoneDropEvent>): void;
+}
+interface CharacterAttackEventProps {
     /** The character that attacked */
     attacker: Character;
     /** The attack that was used */
@@ -720,17 +793,31 @@ declare class CharacterAttackEvent extends IntervaledGameEvent {
     attackType: AttackType;
     /** The number of times this attack has occured on the turn */
     attackCount: number;
+    /** If this was the first time the attack hit */
+    firstHit: boolean;
+    /** If the attack was a critical hit */
+    isCritical: boolean;
+    /** The damage dealt by the attack before modification */
+    rawDamage?: number;
+    /** The damage dealt by the attack */
+    damage?: number;
+}
+declare class CharacterAttackEvent extends IntervaledGameEvent implements Required<CharacterAttackEventProps> {
+    /** The type of attack event */
+    type: 'Pre' | 'Hit' | 'Miss' | 'Post';
+    attacker: Character;
+    attack: SpecialAttack;
+    attackType: AttackType;
+    attackCount: number;
+    firstHit: boolean;
+    isCritical: boolean;
+    rawDamage: number;
+    damage: number;
     /** Returns true if this is a subsequent hit of a multi-attack special, originating from the player */
     get isPlayerMulti(): boolean;
     constructor(
-    /** The character that attacked */
-    attacker: Character, 
-    /** The attack that was used */
-    attack: SpecialAttack, 
-    /** The attack type of the attacking character */
-    attackType: AttackType, 
-    /** The number of times this attack has occured on the turn */
-    attackCount: number);
+    /** The type of attack event */
+    type: 'Pre' | 'Hit' | 'Miss' | 'Post', props: CharacterAttackEventProps);
 }
 interface PlayerAttackEventMatcherOptions {
     type: 'PlayerAttack';
@@ -810,6 +897,76 @@ declare class PrayerPointConsumptionEventMatcher extends CharacterGameEventMatch
 declare class HitpointRegenerationEvent extends GameEvent {
     hitpointsGained: number;
     constructor(hitpointsGained: number);
+}
+/** Event that occurs when either the maximum or current hitpoints of a character changes */
+declare class HitpointsChangedEvent extends GameEvent {
+    oldCurrent: number;
+    oldMax: number;
+    newCurrent: number;
+    newMax: number;
+    get oldPercent(): number;
+    get newPercent(): number;
+    constructor(oldCurrent: number, oldMax: number, newCurrent: number, newMax: number);
+}
+/** Event that occurs when either the maximum or current barrier of a character changes */
+declare class BarrierChangedEvent extends GameEvent {
+    oldCurrent: number;
+    oldMax: number;
+    newCurrent: number;
+    newMax: number;
+    get oldPercent(): number;
+    get newPercent(): number;
+    constructor(oldCurrent: number, oldMax: number, newCurrent: number, newMax: number);
+}
+/** Event that is fired at the end of a Character's turn */
+declare class CharacterEndOfTurnEvent extends GameEvent {
+    constructor();
+}
+interface CharacterAttackedEventProps {
+    /** The attack used */
+    attack: SpecialAttack;
+    /** If this was the first time the attack hit */
+    firstHit: boolean;
+    /** The raw damage taken from the attack */
+    rawDamage?: number;
+    /** The damage taken from the attack */
+    damage?: number;
+}
+declare class CharacterAttackedEvent extends GameEvent implements Required<CharacterAttackedEventProps> {
+    type: 'Being' | 'Hit' | 'Evaded' | 'Was';
+    attack: SpecialAttack;
+    firstHit: boolean;
+    rawDamage: number;
+    damage: number;
+    constructor(type: 'Being' | 'Hit' | 'Evaded' | 'Was', props: CharacterAttackedEventProps);
+}
+/** Event that occurs when an effect that belongs to the group is added to a character */
+declare class CharacterEffectGroupAppliedEvent extends GameEvent {
+    group: CombatEffectGroup;
+    constructor(group: CombatEffectGroup);
+}
+/** Event that occurs when all effects that belong to the group are removed from a character */
+declare class CharacterEffectGroupRemovedEvent extends GameEvent {
+    group: CombatEffectGroup;
+    constructor(group: CombatEffectGroup);
+}
+/** Event that occurs when the given effect is applied to a character */
+declare class CharacterEffectAppliedEvent extends GameEvent {
+    effect: CombatEffect;
+    constructor(effect: CombatEffect);
+}
+/** Event that occurs when the given effect is removed from a character */
+declare class CharacterEffectRemovedEvent extends GameEvent {
+    effect: CombatEffect;
+    constructor(effect: CombatEffect);
+}
+/** Event that occurs at the start of a fight in combat */
+declare class StartOfFightEvent extends GameEvent {
+    constructor();
+}
+/** Event that occurs at the end of a fight in combat */
+declare class EndOfFightEvent extends GameEvent {
+    constructor();
 }
 interface PlayerHitpointsRegenerationEventMatcherOptions {
     type: 'PlayerHitpointRegeneration';
@@ -895,21 +1052,50 @@ declare class PotionChargeUsedEventMatcher extends NonRaidGameEventMatcher<Potio
     _assignNonRaidHandler(handler: Handler<PotionChargeUsedEvent>): void;
     _unassignNonRaidHandler(handler: Handler<PotionChargeUsedEvent>): void;
 }
+declare class PotionChangedEvent extends GameEvent {
+    /** The action whose potion changed */
+    action: Action;
+    /** The previous potion being used. Undefined if none. */
+    oldPotion: PotionItem | undefined;
+    /** The new potion being used. Undefined if none. */
+    newPotion: PotionItem | undefined;
+    constructor(
+    /** The action whose potion changed */
+    action: Action, 
+    /** The previous potion being used. Undefined if none. */
+    oldPotion: PotionItem | undefined, 
+    /** The new potion being used. Undefined if none. */
+    newPotion: PotionItem | undefined);
+}
 declare class MonsterKilledEvent extends GameEvent {
     /** The monster that was killed */
     monster: Monster;
     /** The attack type that the player was using when the monster was killed */
     killedByType: AttackType;
+    /** The player class that killed the monster */
+    player: Player;
+    /** If the monster killed was corrupted */
+    wasCorrupted: boolean;
     constructor(
     /** The monster that was killed */
     monster: Monster, 
     /** The attack type that the player was using when the monster was killed */
-    killedByType: AttackType);
+    killedByType: AttackType, 
+    /** The player class that killed the monster */
+    player: Player, 
+    /** If the monster killed was corrupted */
+    wasCorrupted: boolean);
 }
 interface MonsterKilledEventMatcherOptions {
     type: 'MonsterKilled';
     monsterIDs?: string[];
     killedWithType?: AttackType;
+    /** Optional. If present, the monster killed must drop one of these currencies */
+    droppedCurrencies?: string[];
+    /** Optional. If present, the monster dropping a SoulItem must match. */
+    droppedSoul?: boolean;
+    /** Optional. If present, the monster killed must match being Corrupted */
+    isCorrupted?: boolean;
 }
 declare class MonsterKilledEventMatcher extends NonRaidGameEventMatcher<MonsterKilledEvent> {
     readonly type = "MonsterKilled";
@@ -918,6 +1104,12 @@ declare class MonsterKilledEventMatcher extends NonRaidGameEventMatcher<MonsterK
     monsters?: Set<Monster>;
     /** If present, monster must be killed with the specified attack type */
     killedWithType?: AttackType;
+    /** If present, monster must drop one of these currencies */
+    droppedCurrencies?: Set<Currency>;
+    /** If present, monster dropping a SoulItem must match */
+    droppedSoul?: boolean;
+    /** If present, monster being killed must match being Corrupted */
+    isCorrupted?: boolean;
     constructor(options: MonsterKilledEventMatcherOptions, game: Game);
     doesEventMatch(event: MonsterKilledEvent): boolean;
     _assignNonRaidHandler(handler: Handler<MonsterKilledEvent>): void;
@@ -943,6 +1135,15 @@ declare class MonsterSpawnedEventMatcher extends NonRaidGameEventMatcher<Monster
     doesEventMatch(event: MonsterSpawnedEvent): boolean;
     _assignNonRaidHandler(handler: Handler<MonsterSpawnedEvent>): void;
     _unassignNonRaidHandler(handler: Handler<MonsterSpawnedEvent>): void;
+}
+/** Triggers when a character "Respwans" from the increasedRebirthChance modifier */
+declare class CharacterRebirthEvent extends GameEvent {
+    constructor();
+}
+/** Fires when the player changes their currently equipped items. Occurs before stats are computed. */
+declare class EquipmentChangedEvent extends GameEvent {
+    player: Player;
+    constructor(player: Player);
 }
 declare class ItemEquippedEvent extends GameEvent {
     /** The item that was equipped */
@@ -1017,19 +1218,27 @@ declare class ShopPurchaseMadeEventMatcher extends NonRaidGameEventMatcher<ShopP
     _unassignNonRaidHandler(handler: Handler<ShopPurchaseMadeEvent>): void;
 }
 declare class SummonTabletUsedEvent extends GameEvent {
-    /** The table that was used */
+    /** The tablet that was used */
     tablet: EquipmentItem;
+    /** The summoning recipe associated with the tablet */
+    recipe?: SummoningRecipe | undefined;
     constructor(
-    /** The table that was used */
-    tablet: EquipmentItem);
+    /** The tablet that was used */
+    tablet: EquipmentItem, 
+    /** The summoning recipe associated with the tablet */
+    recipe?: SummoningRecipe | undefined);
 }
 interface SummonTabletUsedEventMatcherOptions {
     type: 'SummonTabletUsed';
     tabletIDs?: string[];
+    /** Optional. If present, the ID of the realm the tablet's recipe belongs to must match an element of the array */
+    realms?: string[];
 }
 declare class SummonTabletUsedEventMatcher extends CharacterGameEventMatcher<SummonTabletUsedEvent> {
     readonly type = "SummonTabletUsed";
     tablets?: Set<EquipmentItem>;
+    /** If present, the tablet used must belong to one of these realms */
+    realms?: Set<Realm>;
     constructor(options: SummonTabletUsedEventMatcherOptions, game: Game);
     doesEventMatch(event: SummonTabletUsedEvent): boolean;
     _assignCharacterHandler(handler: Handler<SummonTabletUsedEvent>, combat: BaseManager): void;
@@ -1206,10 +1415,10 @@ declare class RequirementChangedEvent extends GameEvent {
 }
 declare class TownshipTaskCompletedEvent extends SkillActionEvent {
     /** The task that was completed */
-    task: TownshipTask | TownshipCasualTask;
+    task: TownshipTask;
     constructor(
     /** The task that was completed */
-    task: TownshipTask | TownshipCasualTask);
+    task: TownshipTask);
 }
 interface TownshipTaskCompletedEventMatcherOptions extends SkillActionEventMatcherOptions {
     type: 'TownshipTaskCompleted';
@@ -1217,7 +1426,6 @@ interface TownshipTaskCompletedEventMatcherOptions extends SkillActionEventMatch
 }
 declare class TownshipTaskCompletedEventMatcher extends SkillActionEventMatcher<TownshipTaskCompletedEvent> {
     readonly type = "TownshipTaskCompleted";
-    get monsterList(): TownshipTask[] | TownshipCasualTask[];
     /** If present, set task completed must match a member */
     tasks?: Set<TownshipTask>;
     constructor(options: TownshipTaskCompletedEventMatcherOptions, game: Game);
@@ -1225,44 +1433,67 @@ declare class TownshipTaskCompletedEventMatcher extends SkillActionEventMatcher<
     _assignNonRaidHandler(handler: Handler<TownshipTaskCompletedEvent>): void;
     _unassignNonRaidHandler(handler: Handler<TownshipTaskCompletedEvent>): void;
 }
-declare class MonsterKilledWithEquipmentEvent extends GameEvent {
-    /** The monster that was killed */
-    monster: Monster;
-    /** The attack type that the player was using when the monster was killed */
-    killedByType: AttackType;
-    /** The items equipped at the time of monster kill */
-    equipment: Equipment;
-    /** The food equipped at the time of monster kill */
-    equippedFood: EquippedFood;
-    constructor(
-    /** The monster that was killed */
-    monster: Monster, 
-    /** The attack type that the player was using when the monster was killed */
-    killedByType: AttackType, 
-    /** The items equipped at the time of monster kill */
-    equipment: Equipment, 
-    /** The food equipped at the time of monster kill */
-    equippedFood: EquippedFood);
-}
-declare class MonsterKilledWithPlayerRequirementsEvent extends GameEvent {
-    /** The monster that was killed */
-    monster: Monster;
-    /** The attack type that the player was using when the monster was killed */
-    killedByType: AttackType;
-    /** The items equipped at the time of monster kill */
-    player: Player;
-    constructor(
-    /** The monster that was killed */
-    monster: Monster, 
-    /** The attack type that the player was using when the monster was killed */
-    killedByType: AttackType, 
-    /** The items equipped at the time of monster kill */
-    player: Player);
-}
 declare class DungeonCompletedEvent extends GameEvent {
     /** The dungeon that was completed */
     dungeon: Dungeon;
     constructor(
     /** The dungeon that was completed */
     dungeon: Dungeon);
+}
+declare class AbyssDepthCompletedEvent extends GameEvent {
+    /** The depth of The Abyss that was completed */
+    depth: AbyssDepth;
+    constructor(
+    /** The depth of The Abyss that was completed */
+    depth: AbyssDepth);
+}
+declare class StrongholdCompletedEvent extends GameEvent {
+    /** The Stronghold that was completed */
+    stronghold: Stronghold;
+    constructor(
+    /** The Stronghold that was completed */
+    stronghold: Stronghold);
+}
+declare class HarvestingActionEvent extends SkillActionEvent {
+    /** The source skill for the event */
+    skill: Harvesting;
+    /** The current vein being harvested */
+    action: HarvestingVein;
+    constructor(
+    /** The source skill for the event */
+    skill: Harvesting, 
+    /** The current vein being harvested */
+    action: HarvestingVein);
+}
+interface HarvestingActionEventMatcherOptions extends SkillActionEventMatcherOptions {
+    type: 'HarvestingAction';
+    actionIDs?: string[];
+}
+declare class HarvestingActionEventMatcher extends SkillActionEventMatcher<HarvestingActionEvent> {
+    readonly type = "HarvestingAction";
+    /** If present, the HarvestingActionEvent's action must match a member */
+    actions?: Set<HarvestingVein>;
+    constructor(options: HarvestingActionEventMatcherOptions, game: Game);
+    doesEventMatch(event: HarvestingActionEvent): boolean;
+    _assignNonRaidHandler(handler: Handler<HarvestingActionEvent>): void;
+    _unassignNonRaidHandler(handler: Handler<HarvestingActionEvent>): void;
+}
+declare class SoulPointConsumptionEvent extends GameEvent {
+    /** The amount of points used */
+    pointsUsed: number;
+    constructor(
+    /** The amount of points used */
+    pointsUsed: number);
+}
+interface SoulPointConsumptionEventMatcherOptions {
+    type: 'SoulPointConsumption';
+    /** Optional. If present the prayer the points were consumed for must have a matching property */
+    isUnholy?: boolean;
+}
+declare class SoulPointConsumptionEventMatcher extends CharacterGameEventMatcher<SoulPointConsumptionEvent> {
+    readonly type = "SoulPointConsumption";
+    constructor(options: SoulPointConsumptionEventMatcherOptions, game: Game);
+    doesEventMatch(event: SoulPointConsumptionEvent): boolean;
+    _assignCharacterHandler(handler: Handler<SoulPointConsumptionEvent>, combat: BaseManager): void;
+    _unassignCharacterHandler(handler: Handler<SoulPointConsumptionEvent>, combat: BaseManager): void;
 }

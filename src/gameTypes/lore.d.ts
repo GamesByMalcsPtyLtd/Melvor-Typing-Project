@@ -29,7 +29,7 @@ declare class Lore {
     readLore(book: LoreBook): void;
     static readonly LORE: LoreText[];
 }
-declare class LoreBookButtonElement extends HTMLElement {
+declare class LoreBookButtonElement extends HTMLElement implements CustomElement {
     _content: DocumentFragment;
     bookImage: HTMLImageElement;
     bookTitle: HTMLHeadingElement;

@@ -1,50 +1,48 @@
 interface RunecraftingSkillData extends MasterySkillData {
     categories?: SkillCategoryData[];
-    recipes?: SingleProductArtisanSkillRecipeData[];
+    subcategories?: SkillSubcategoryData[];
+    recipes?: RunecraftingRecipeData[];
     elementalRuneIDs?: string[];
     comboRuneIDs?: string[];
-    crowDevilItem?: string;
+}
+interface RunecraftingModificationData extends MasterySkillModificationData {
+    recipes?: RunecraftingRecipeModificationData[];
 }
 declare type RunecraftingEvents = {
     action: RunecraftingActionEvent;
-};
-declare type RunecraftingRecipe = SingleProductArtisanSkillRecipe<SkillCategory>;
-declare class Runecrafting extends ArtisanSkill<RunecraftingRecipe, RunecraftingSkillData, AnyItem> implements SkillCategoryObject<SkillCategory>, IGameEventEmitter<RunecraftingEvents> {
-    _events: import("mitt").Emitter<RunecraftingEvents>;
-    on: {
-        <Key extends "action">(type: Key, handler: import("mitt").Handler<RunecraftingEvents[Key]>): void;
-        (type: "*", handler: import("mitt").WildcardHandler<RunecraftingEvents>): void;
-    };
-    off: {
-        <Key extends "action">(type: Key, handler?: import("mitt").Handler<RunecraftingEvents[Key]> | undefined): void;
-        (type: "*", handler: import("mitt").WildcardHandler<RunecraftingEvents>): void;
-    };
+} & SkillWithMasteryEvents;
+declare class Runecrafting extends ArtisanSkill<RunecraftingRecipe, RunecraftingSkillData, AnyItem, RunecraftingEvents, RunecraftingModificationData> implements SkillCategoryObject<SkillCategory> {
     readonly _media = Assets.Runecrafting;
-    getTotalUnlockedMasteryActions(): number;
+    get levelCompletionBreakdown(): LevelCompletionBreakdown[];
+    isMasteryActionUnlocked(action: RunecraftingRecipe): boolean;
     readonly baseInterval: number;
-    get menu(): ArtisanMenu<AnyItem>;
-    selectionTabs: Map<SkillCategory, RunecraftingSelectionTab>;
+    get menu(): ArtisanMenuElement<Item>;
+    selectionTabs: Map<SkillCategory, RecipeSelectionTabElement<RunecraftingRecipe, RunecraftingRecipeOptionElement>>;
+    get categoryMenu(): RealmedCategoryMenuElement;
     renderQueue: ArtisanSkillRenderQueue<RunecraftingRecipe>;
     categories: NamespaceRegistry<SkillCategory>;
+    subcategories: NamespaceRegistry<SkillSubcategory>;
     elementalRunes: AnyItem[];
     comboRunes: AnyItem[];
-    crowDevilItem?: AnyItem;
     get noCostsMessage(): string;
     get actionXP(): number;
+    get actionAbyssalXP(): number;
     get actionItem(): AnyItem;
-    get actionItemQuantity(): number;
+    get unmodifiedActionQuantity(): number;
     get activeRecipe(): RunecraftingRecipe;
     get masteryModifiedInterval(): number;
     get isMakingRunes(): boolean;
-    get isOctoActive(): boolean;
     constructor(namespace: DataNamespace, game: Game);
     registerData(namespace: DataNamespace, data: RunecraftingSkillData): void;
+    modifyData(data: RunecraftingModificationData): void;
     postDataRegistration(): void;
-    getRecipeSubCategory(recipe: RunecraftingRecipe): RunecraftingSubCategory;
-    modifyItemCost(item: AnyItem, quantity: number, recipe: RunecraftingRecipe): number;
-    getPreservationChance(action: RunecraftingRecipe, chance: number): number;
-    getMasteryXPModifier(action: RunecraftingRecipe): number;
+    /** Determines if a recipe makes combo runes that use water runes as an ingredient */
+    doesRecipeMakeWaterComboRunes(recipe: RunecraftingRecipe): boolean;
+    getRecipeAutoSubcategory(recipe: RunecraftingRecipe): SkillSubcategory | undefined;
+    getUncappedCostReduction(recipe?: RunecraftingRecipe, item?: AnyItem): number;
+    getActionModifierQueryParams(action?: NamedObject): SkillModifierQueryParams;
     onMasteryLevelUp(action: RunecraftingRecipe, oldLevel: number, newLevel: number): void;
+    checkMasteryLevelBonusFilter(action: RunecraftingRecipe, filter: string): boolean;
     recordCostPreservationStats(costs: Costs): void;
     recordCostConsumptionStats(costs: Costs): void;
     preAction(): void;
@@ -54,4 +52,20 @@ declare class Runecrafting extends ArtisanSkill<RunecraftingRecipe, Runecrafting
     setFromOldOffline(offline: OfflineSkill, idMap: NumericIDMap): void;
     testTranslations(): void;
     getObtainableItems(): Set<AnyItem>;
+    getRegistry(type: ScopeSourceType): NamespaceRegistry<NamedObject> | undefined;
+    getPkgObjects(pkg: GameDataPackage, type: ScopeSourceType): IDData[] | undefined;
+}
+interface RunecraftingRecipeData extends SingleProductArtisanSkillRecipeData {
+    subcategories?: string[];
+}
+interface RunecraftingRecipeModificationData extends SingleProductArtisanSkillRecipeModificationData {
+    subcategories?: {
+        add?: string[];
+        remove?: string[];
+    };
+}
+declare class RunecraftingRecipe extends SingleProductArtisanSkillRecipe<SkillCategory> {
+    subcategories: SkillSubcategory[];
+    constructor(namespace: DataNamespace, data: RunecraftingRecipeData, game: Game, skill: Runecrafting);
+    applyDataModification(data: RunecraftingRecipeModificationData, game: Game): void;
 }

@@ -10,15 +10,31 @@ interface GolbinRaidData {
     startingFood?: string;
     startingAmmo?: IDQuantity;
     startingRunes?: IDQuantity[];
+    randomModifiers?: {
+        key: string;
+        multiplier?: number;
+    }[];
+    playerModifiers?: ModifierValuesRecordData;
 }
 /** Combat Management class for golbin raid */
 declare class RaidManager extends BaseManager {
+    _events: import("mitt").Emitter<BaseCombatEvents>;
+    on: {
+        <Key extends keyof BaseCombatEvents>(type: Key, handler: import("mitt").Handler<BaseCombatEvents[Key]>): void;
+        (type: "*", handler: import("mitt").WildcardHandler<BaseCombatEvents>): void;
+    };
+    off: {
+        <Key extends keyof BaseCombatEvents>(type: Key, handler?: import("mitt").Handler<BaseCombatEvents[Key]> | undefined): void;
+        (type: "*", handler: import("mitt").WildcardHandler<BaseCombatEvents>): void;
+    };
     get media(): string;
     get name(): string;
     activeSkills: AnySkill[];
     get canStop(): boolean;
-    randomPlayerModifiers: CombatModifierArray;
-    randomEnemyModifiers: CombatModifierArray;
+    randomModifierSource: ModifierSource;
+    staticPlayerModifiers: ModifierValue[];
+    randomPlayerModifiers: ModifierValue[];
+    randomEnemyModifiers: ModifierValue[];
     player: RaidPlayer;
     get areaType(): CombatAreaType;
     state: RaidState;
@@ -29,6 +45,8 @@ declare class RaidManager extends BaseManager {
     _setDifficulty: RaidDifficulty;
     enemy: Golbin;
     bank: Bank;
+    itemCharges: ItemCharges;
+    potions: PotionManager;
     bannedItems: Set<AnyItem>;
     bannedPassiveItems: Set<AnyItem>;
     crateItems: {
@@ -40,6 +58,7 @@ declare class RaidManager extends BaseManager {
     startingFood?: FoodItem;
     startingAmmo?: EquipmentQuantity;
     startingRunes: AnyItemQuantity[];
+    possibleModifiers: ModifierValue[];
     itemSelection: RaidItemSelection;
     exclusiveItemSelection: RaidItemSelection;
     itemLevelBrackets: number[];
@@ -51,18 +70,19 @@ declare class RaidManager extends BaseManager {
     get waveSkipCost(): number;
     get coinsEarned(): number;
     get canInteruptAttacks(): boolean;
-    get areaRequirements(): AnyRequirement[];
-    get slayerAreaLevelReq(): number;
-    get enemyAreaModifiers(): CombatModifierData;
+    get areaRequirementsMet(): boolean;
+    get enemyAreaModifiers(): ModifierValue[];
     killCount: number;
     specialAttackSelection: SpecialAttack[];
     isFightingITMBoss: boolean;
     onSlayerTask: boolean;
     get ignoreSpellRequirements(): boolean;
+    get combatTriangle(): CombatTriangle;
+    get combatTriangleSet(): CombatTriangleSet;
     startTimestamp: number;
     endTimestamp: number;
     ownedCrateItems: Set<AnyItem>;
-    randomModifiersBeingSelected: CombatModifierArray;
+    randomModifiersBeingSelected: ModifierValue[];
     isSelectingPositiveModifier: boolean;
     itemsBeingSelected: CreateArrayType<CreateRaidItemBeingSelected<RaidItemTypeMap>>;
     itemCategoryBeingSelected: keyof RaidItemSelection;
@@ -132,6 +152,7 @@ declare class RaidManager extends BaseManager {
     renderStartMenu(): void;
     addMonsterStat(statID: MonsterStats, amount?: number): void;
     addCombatStat(statID: CombatStats, amount?: number): void;
+    addCurrency(currency: Currency, baseAmount: number, source: string, modifier?: number): void;
     setDefaultEquipment(): void;
     changeDifficulty(newDifficulty: RaidDifficulty): void;
     renderDifficulty(): void;
@@ -158,7 +179,6 @@ declare class RaidManager extends BaseManager {
     /** Loads golbin raid history into the DOM */
     loadHistory(): void;
     static difficulties: Record<RaidDifficulty, RaidDifficultyData>;
-    static possibleModifiers: RaidRandomModifierList[];
 }
 interface RaidHistory {
     skillLevels: number[];
@@ -206,7 +226,7 @@ declare type CreateArrayType<Type> = {
 };
 declare type RaidItemSelection = CreateArrayType<CreateArrayType<RaidItemTypeMap>>;
 declare type RaidDifficultyData = {
-    combatTriangle: CombatTriangles;
+    combatTriangle: CombatTriangleType;
     coinMultiplier: number;
     enemyHPModifier: number;
     enemyEvasionModifier: number;
@@ -220,14 +240,11 @@ declare type RaidDifficultyData = {
     name: string;
 };
 declare type RaidRandomModifierList = {
-    key: CombatModifierKey;
+    /** The key of the modifier to give */
+    key: string;
     /** Multiplies the random roll from 1-5 by this number */
     multiplier?: number;
 };
-declare type CombatModifierArray = {
-    key: CombatModifierKey;
-    value: number;
-}[];
 declare enum RaidItemSelectionID {
     weapons = 0,
     armour = 1,

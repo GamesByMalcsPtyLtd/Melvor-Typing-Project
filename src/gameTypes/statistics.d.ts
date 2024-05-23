@@ -27,6 +27,8 @@ declare class Statistics implements SkillObject<StatTracker>, Serializable, Enco
     readonly Township: StatTracker;
     readonly Archaeology: StatTracker;
     readonly Cartography: StatTracker;
+    readonly Corruption: StatTracker;
+    readonly Harvesting: StatTracker;
     /** Map of itemID to item stat tracker */
     readonly Items: MappedStatTracker<AnyItem>;
     /** Map of monsterID to monster stat tracker */
@@ -47,19 +49,36 @@ declare class Statistics implements SkillObject<StatTracker>, Serializable, Enco
     getFilteredItemStatsDiff(predicate: (item: AnyItem) => boolean, statAdd: ItemStats, statSub: ItemStats): number;
     /** Convenience method for offline meteorites located */
     meteoriteSnapshot(): MiningNodeSnapshot;
+    /** Convenience method for offline abycite located */
+    abyciteSnapshot(): MiningNodeSnapshot;
+    /** Convenience method for offline mysticite located */
+    mysticiteSnapshot(): MiningNodeSnapshot;
+    /** Convenience method for offline echocite located */
+    echociteSnapshot(): MiningNodeSnapshot;
     /** Convenience method for offline onyx nodes found */
     onyxSnapshot(): MiningNodeSnapshot;
     /** Convenience method for offline oricha nodes found */
     orichaSnapshot(): MiningNodeSnapshot;
     /** Convenience method for offline cerulean nodes found */
     ceruleanSnapshot(): MiningNodeSnapshot;
+    /** Convenience method for offline nightopal nodes found */
+    nightopalSnapshot(): MiningNodeSnapshot;
+    /** Convenience method for offline shadowpearl nodes found */
+    shadowpearlSnapshot(): MiningNodeSnapshot;
+    /** Convenience method for offline moonstone nodes found */
+    moonstoneSnapshot(): MiningNodeSnapshot;
+    /** Convenience method for offline voidheart nodes found */
+    voidheartSnapshot(): MiningNodeSnapshot;
     encode(writer: SaveWriter): SaveWriter;
     decode(reader: SaveWriter, version: number): void;
     deserialize(reader: DataReader, version: number, idMap: NumericIDMap): void;
     convertFromOldFormat(savegame: SaveGame, idMap: NumericIDMap): void;
     renderMutatedStats(): void;
+    /** Converts the currency stats prior to the currenct rework */
+    convertCurrencyStats(): void;
 }
 declare enum GeneralStats {
+    /** @deprecated Use CurrencyStats.TotalEarned instead */
     TotalGPEarned = 0,
     TotalItemsSold = 1,
     UsernameChanges = 2,
@@ -70,9 +89,14 @@ declare enum PrayerStats {
     BonesBuried = 0,
     PrayerPointsEarned = 1,
     PrayerPointsSpent = 2,
-    PrayerPointsPreserved = 3
+    PrayerPointsPreserved = 3,
+    SoulsReleased = 4,
+    SoulPointsEarned = 5,
+    SoulPointsSpent = 6,
+    SoulPointsPreserved = 7
 }
 declare enum SlayerStats {
+    /** @deprecated Use CurrencyStats.TotalEarned instead */
     SlayerCoinsEarned = 0,
     MonstersKilledOnTask = 1
 }
@@ -88,16 +112,19 @@ declare enum FishingStats {
     SpecialItemsCaught = 2,
     TimeSpent = 3,
     Actions = 4,
+    /** @deprecated Use SkillCurrencyStats.Earned instead */
     GPEarned = 5
 }
 declare enum FiremakingStats {
     LogsBurnt = 0,
+    /** @deprecated Use SkillCurrencyStats.Burnt instead */
     GPBurnt = 1,
     TimeSpent = 2,
     BonusBonfireXP = 3,
     TotalActions = 4,
     BonfiresLit = 5,
     ItemsPreserved = 6,
+    /** @deprecated Use SkillCurrencyStats.Earned instead */
     GPEarned = 7,
     CoalGained = 8
 }
@@ -124,7 +151,15 @@ declare enum MiningStats {
     OrichaGemNodesFound = 9,
     TotalOrichaGemNodeHPFound = 10,
     CeruleanGemNodesFound = 11,
-    TotalCeruleanGemNodeHPFound = 12
+    TotalCeruleanGemNodeHPFound = 12,
+    NightopalGemNodesFound = 13,
+    TotalNightopalGemNodeHPFound = 14,
+    ShadowpearlGemNodesFound = 15,
+    TotalShadowpearlGemNodeHPFound = 16,
+    MoonstoneGemNodesFound = 17,
+    TotalMoonstoneGemNodeHPFound = 18,
+    VoidheartGemNodesFound = 19,
+    TotalVoidheartGemNodeHPFound = 20
 }
 declare enum SmithingStats {
     SmeltingActions = 0,
@@ -143,6 +178,7 @@ declare enum ThievingStats {
     DamageTakenFromNPCs = 2,
     TimeSpentStunned = 3,
     TimeSpent = 4,
+    /** @deprecated Use SkillCurrencyStats.Earned instead */
     GPStolen = 5,
     CommonDrops = 6,
     RareDrops = 7,
@@ -177,7 +213,9 @@ declare enum CraftingStats {
     ItemsUsed = 2,
     ItemsPreserved = 3,
     Actions = 4,
+    /** @deprecated Use SkillCurrencyStats.Spent instead */
     GPUsed = 5,
+    /** @deprecated Use SkillCurrencyStats.Preserved instead */
     GPPreserved = 6
 }
 declare enum RunecraftingStats {
@@ -199,8 +237,10 @@ declare enum HerbloreStats {
 declare enum AgilityStats {
     ObstaclesCompleted = 0,
     CoursesCompleted = 1,
+    /** @deprecated Use SkillCurrencyStats.Earned instead */
     GPEarned = 2,
     TimeSpent = 3,
+    /** @deprecated Use SkillCurrencyStats.Earned instead */
     SlayerCoinsEarned = 4,
     ItemsEarned = 5
 }
@@ -210,9 +250,13 @@ declare enum SummoningStats {
     ItemsMade = 2,
     ItemsUsed = 3,
     ItemsPreserved = 4,
+    /** @deprecated Use SkillCurrencyStats.Spent instead */
     GPUsed = 5,
+    /** @deprecated Use SkillCurrencyStats.Preserved instead */
     GPPreserved = 6,
+    /** @deprecated Use SkillCurrencyStats.Spent instead */
     SCUsed = 7,
+    /** @deprecated Use SkillCurrencyStats.Preserved instead */
     SCPreserved = 8,
     TabletsUsed = 9
 }
@@ -222,6 +266,7 @@ declare enum AltMagicStats {
     BarsMade = 2,
     BonesMade = 3,
     GemsMade = 4,
+    /** @deprecated Use SkillCurrencyStats.Earned instead */
     GPGained = 5,
     ItemsUsed = 6,
     RunesUsed = 7
@@ -234,7 +279,13 @@ declare enum AstrologyStats {
     MinRollsHit = 4,
     Actions = 5,
     MeteoritesLocated = 6,
-    TotalMeteoriteHP = 7
+    TotalMeteoriteHP = 7,
+    AbyciteLocated = 8,
+    TotalAbyciteHP = 9,
+    MysticiteLoated = 10,
+    TotalMysticiteHP = 11,
+    EchociteLocated = 12,
+    TotalEchociteHP = 13
 }
 declare enum TownshipStats {
 }
@@ -261,21 +312,38 @@ declare const enum CartographyStats {
     TimeSpentUpgradingMaps = 9,
     /** Total items used upgrading maps */
     MapUpgradeItemsUsed = 10,
-    /** Total GP used upgrading maps */
+    /**
+     * @deprecated Use SkillCurrencyStats.SpentMapUpgrading instead
+     * Total GP used upgrading maps
+     */
     MapUpgradeGPUsed = 11,
-    /** Total SC used upgrading maps */
+    /**
+     * @deprecated Use SkillCurrencyStats.SpentMapUpgrading instead
+     * Total SC used upgrading maps
+     */
     MapUpgradeSCUsed = 12,
     /** Total items preserved upgrading maps */
     MapUpgradeItemsPreserved = 13,
-    /** Total GP preserved upgrading maps */
+    /**
+     * @deprecated Use SkillCurrencyStats.PreservedMapUpgrading instead
+     * Total GP preserved upgrading maps */
     MapUpgradeGPPreserved = 14,
-    /** Total SC preserved upgrading maps */
+    /**
+     * @deprecated Use SkillCurrencyStats.PreservedMapUpgrading instead
+     * Total SC preserved upgrading maps
+     */
     MapUpgradeSCPreserved = 15,
     /** Total number of items used to travel */
     TravelItemsUsed = 16,
-    /** Total amount of GP used to travel */
+    /**
+     * @deprecated Use SkillCurrencyStats.SpentTravelling instead
+     * Total amount of GP used to travel
+     */
     TravelGPUsed = 17,
-    /** Total amount of SC used to travel */
+    /**
+     * @deprecated Use SkillCurrencyStats.SpentTravelling instead
+     * Total amount of SC used to travel
+     */
     TravelSCUsed = 18,
     /** Total number of hexes the player has traversed */
     HexesTravelled = 19,
@@ -306,11 +374,26 @@ declare const enum ArchaeologyStats {
     /** Total number of dig site maps that have been completely used */
     DigSiteMapsDepleted = 9
 }
+declare const enum CorruptionStats {
+    TimesCorrupted = 0,
+    TimesEnemyCorrupted = 1,
+    MonstersAutoCorrupted = 2,
+    SoulPointsSpent = 3
+}
+declare const enum HarvestingStats {
+    Actions = 0,
+    TimeSpent = 1,
+    PrimaryItemsGained = 2,
+    UniqueItemsGained = 3
+}
 declare enum ShopStats {
     PurchasesMade = 0,
     ItemsPurchased = 1,
+    /** @deprecated Use CurrencyStats.SpentInShop */
     GPSpent = 2,
+    /** @deprecated Use CurrencyStats.SpentInShop */
     SCSpent = 3,
+    /** @deprecated Use CurrencyStats.SpentInShop */
     RCSpent = 4,
     ItemsSpent = 5,
     GloveChargesPurchased = 6
@@ -339,6 +422,7 @@ declare enum CombatStats {
     TimeSpentFighting = 8,
     TimeSpentPaused = 9,
     ItemsLooted = 10,
+    /** @deprecated Use CurrencyStats.EarnedFromCombat */
     GPEarned = 11,
     DungeonRewards = 12
 }
@@ -389,7 +473,9 @@ declare enum ItemStats {
     /** Transformed by alt magic */
     TimesTransformed = 17,
     /** Stat for bones */
-    TimesBuried = 18
+    TimesBuried = 18,
+    /** Stat for soul items */
+    TimesReleased = 19
 }
 declare enum StatCategories {
     General = 0,
@@ -419,15 +505,17 @@ declare enum StatCategories {
     Prayer = 24,
     Township = 25,
     Archaeology = 26,
-    Cartography = 27
+    Cartography = 27,
+    Corruption = 28,
+    Harvesting = 29
 }
 declare const statsData: StatsTableData[];
 declare type KeysMatching<T, V> = {
     [K in keyof T]-?: T[K] extends V ? K : never;
 }[keyof T];
 declare const statisticCategories: OldCategoryData<StatCategories>[];
-declare const statTables: StatsTable[];
-declare let statCategoryMenu: CategoryMenu<OldCategoryData<StatCategories>>;
+declare const statTables: StatTableElement[];
+declare let statCategoryMenu: CategoryMenuElement;
 declare function initializeStatTables(): void;
 declare let selectedStatCategory: StatCategories;
 declare function selectStatsCategory(category: OldCategoryData<StatCategories>): void;

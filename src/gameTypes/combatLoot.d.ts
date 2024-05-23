@@ -25,7 +25,7 @@ declare type LootElements = {
     qty: HTMLDivElement;
     tooltip: TippyTooltip;
 };
-declare class CombatLootMenuElement extends HTMLElement {
+declare class CombatLootMenuElement extends HTMLElement implements CustomElement {
     _content: DocumentFragment;
     lootQuantity: HTMLHeadingElement;
     lootAllButton: HTMLButtonElement;

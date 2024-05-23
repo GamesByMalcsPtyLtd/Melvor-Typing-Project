@@ -1,20 +1,23 @@
-declare class TownshipResourceDisplayElement extends HTMLElement {
+declare class TownshipResourceDisplayElement extends HTMLElement implements CustomElement {
     _content: DocumentFragment;
     setPriorityButton: HTMLLIElement;
     resourceIcon: HTMLImageElement;
     resourceAmount: HTMLElement;
     resourceRate: HTMLSpanElement;
+    storageOverlayDIv: HTMLDivElement;
+    storageOverlayImg: HTMLImageElement;
     tooltip?: TippyTooltip;
     constructor();
     connectedCallback(): void;
     disconnectedCallback(): void;
     setResource(resource: TownshipResource, township: Township): void;
+    updateStorageIcon(resource: TownshipResource): void;
     updateResourceAmount(resource: TownshipResource, township: Township): void;
     updateResourceTextColour(resource: TownshipResource, township: Township): void;
     updateResourceRate(resource: TownshipResource): void;
     getTooltipContent(resource: TownshipResource, township: Township): string;
 }
-declare class TownshipTownBiomeSelectElement extends HTMLElement {
+declare class TownshipTownBiomeSelectElement extends HTMLElement implements CustomElement {
     _content: DocumentFragment;
     selectButton: HTMLElement;
     biomeName: HTMLSpanElement;
@@ -23,6 +26,8 @@ declare class TownshipTownBiomeSelectElement extends HTMLElement {
     biomeProgressBar: HTMLDivElement;
     levelRequirement: HTMLDivElement;
     popRequirement: HTMLDivElement;
+    abyssalLevelRequirement: HTMLDivElement;
+    publicRequirement: HTMLDivElement;
     buildAvailable: HTMLSpanElement;
     constructor();
     connectedCallback(): void;
@@ -36,7 +41,7 @@ declare class TownshipTownBiomeSelectElement extends HTMLElement {
     showBuildAvailable(): void;
     hideBuildAvailable(): void;
 }
-declare class TownshipBuildingSummaryElement extends HTMLElement {
+declare class TownshipBuildingSummaryElement extends HTMLElement implements CustomElement {
     _content: DocumentFragment;
     image: HTMLImageElement;
     name: HTMLSpanElement;
@@ -47,6 +52,8 @@ declare class TownshipBuildingSummaryElement extends HTMLElement {
     extraRequirements: HTMLDivElement;
     levelRequirement: HTMLDivElement;
     popRequirement: HTMLDivElement;
+    abyssalLevelRequirement: HTMLDivElement;
+    publicRequirement: HTMLDivElement;
     constructor();
     connectedCallback(): void;
     setBuilding(building: TownshipBuilding, township: Township): void;
@@ -60,17 +67,19 @@ declare class TownshipBuildingSummaryElement extends HTMLElement {
     updateExtraRequirements(building: TownshipBuilding, township: Township): void;
     updateForBaseBuildQty(building: TownshipBuilding, township: Township): void;
 }
-declare class BuildingRequirementsElement extends HTMLElement {
+declare class BuildingRequirementsElement extends HTMLElement implements CustomElement {
     _content: DocumentFragment;
     otherRequirements: HTMLUListElement;
     levelRequirement: HTMLLIElement;
     popRequirement: HTMLLIElement;
+    abyssalLevelRequirement: HTMLLIElement;
+    publicRequirement: HTMLLIElement;
     constructor();
     connectedCallback(): void;
     applyReqFormatting(req: HTMLElement, isMet: boolean): void;
     updateRequirements(building: TownshipBuilding, township: Township): void;
 }
-declare class BuildingInTownElement extends HTMLElement {
+declare class BuildingInTownElement extends HTMLElement implements CustomElement {
     _content: DocumentFragment;
     buildingDiv: HTMLDivElement;
     buildingImage: HTMLImageElement;
@@ -78,7 +87,7 @@ declare class BuildingInTownElement extends HTMLElement {
     buildingTaskIcon: HTMLImageElement;
     buildingTotals: HTMLUListElement;
     resourceOutput: HTMLDivElement;
-    buildingModifiers: HTMLDivElement;
+    buildingStats: HTMLDivElement;
     requirementsContainer: HTMLDivElement;
     upgradesToContainer: HTMLDivElement;
     upgradesToName: HTMLLIElement;
@@ -124,14 +133,14 @@ declare class BuildingInTownElement extends HTMLElement {
     createTotalElement(media: string, total: number): string;
     updateBuildingTotals(building: TownshipBuilding, township: Township): void;
     updateResourceTotals(building: TownshipBuilding, township: Township): void;
-    updateModifierTotals(building: TownshipBuilding): void;
+    updateStatsTotals(building: TownshipBuilding): void;
     updateBuildingProgress(building: TownshipBuilding, biome: TownshipBiome | undefined, township: Township): void;
     updateBuildingProgressText(building: TownshipBuilding, biome: TownshipBiome | undefined): void;
     updateBuildingEfficiency(building: TownshipBuilding, township: Township): void;
     addGlow(): void;
     removeGlow(): void;
 }
-declare class TownshipYeetElement extends HTMLElement {
+declare class TownshipYeetElement extends HTMLElement implements CustomElement {
     _content: DocumentFragment;
     yeetButton: HTMLAnchorElement;
     resourceImage: HTMLImageElement;
@@ -140,7 +149,7 @@ declare class TownshipYeetElement extends HTMLElement {
     connectedCallback(): void;
     setResource(resource: TownshipResource, amount: number, township: Township): void;
 }
-declare class TownshipCapResourceElement extends HTMLElement {
+declare class TownshipCapResourceElement extends HTMLElement implements CustomElement {
     _content: DocumentFragment;
     resourceImage: HTMLImageElement;
     resourceName: HTMLSpanElement;
@@ -152,7 +161,7 @@ declare class TownshipCapResourceElement extends HTMLElement {
     setCap(resource: TownshipResource): void;
     initQtyDropdowns(resource: TownshipResource, township: Township): void;
 }
-declare class TownshipConversionElement extends HTMLElement {
+declare class TownshipConversionElement extends HTMLElement implements CustomElement {
     _content: DocumentFragment;
     convertButton: HTMLAnchorElement;
     convertFromImage: HTMLImageElement;
@@ -171,10 +180,10 @@ declare class TownshipConversionElement extends HTMLElement {
     createConvertFromSwal(resource: TownshipResource, conversion: TownshipItemConversion, township: Township): void;
     setItemToResource(resource: TownshipResource, conversion: TownshipItemConversion, township: Township): void;
     updateConvertRatio(resource: TownshipResource, conversion: TownshipItemConversion, township: Township): void;
-    updateConvertToRatio(resource: TownshipResource, item: AnyItem, township: Township): void;
+    updateConvertToRatio(resource: TownshipResource, conversion: TownshipItemConversion, township: Township): void;
     updateConvertFromRatio(resource: TownshipResource, conversion: TownshipItemConversion, township: Township): void;
 }
-declare class TownshipConversionSwalTemplate extends HTMLElement {
+declare class TownshipConversionSwalElement extends HTMLElement implements CustomElement {
     _content: DocumentFragment;
     convertFromImage: HTMLImageElement;
     convertFromQuantity: HTMLSpanElement;
@@ -201,15 +210,15 @@ declare class TownshipConversionSwalTemplate extends HTMLElement {
     setConvertFromQuantity(ratio: number, qty: number): void;
     setConvertToRatioQuantity(qty: number): void;
     setConvertFromRatioQuantity(qty: number): void;
-    setConvertButtons(resource: TownshipResource, item: AnyItem, type: TownshipConvertType): void;
-    setConvertToQuantityInput(value: number, resource: TownshipResource, item: AnyItem): void;
-    setConvertFromQuantityInput(value: number, resource: TownshipResource, item: AnyItem): void;
+    setConvertButtons(resource: TownshipResource, conversion: TownshipItemConversion, type: TownshipConvertType): void;
+    setConvertToQuantityInput(value: number, resource: TownshipResource, conversion: TownshipItemConversion): void;
+    setConvertFromQuantityInput(value: number, resource: TownshipResource, conversion: TownshipItemConversion): void;
     updateInputValue(): void;
     setItemContents(contents: string): void;
     showItemContents(): void;
     hideItemContents(): void;
 }
-declare class TownshipWorshipSelectButtonElement extends HTMLElement {
+declare class TownshipWorshipSelectButtonElement extends HTMLElement implements CustomElement {
     _content: DocumentFragment;
     selectButton: HTMLButtonElement;
     worshipName: HTMLSpanElement;
@@ -223,7 +232,7 @@ declare class TownshipWorshipSelectButtonElement extends HTMLElement {
     setLocked(worship: TownshipWorship): void;
     setUnlocked(worship: TownshipWorship): void;
 }
-declare class TownshipWorshipSelectElement extends HTMLElement {
+declare class TownshipWorshipSelectElement extends HTMLElement implements CustomElement {
     _content: DocumentFragment;
     modifierDiv: HTMLElement;
     modifierContainer: HTMLElement;
@@ -231,11 +240,134 @@ declare class TownshipWorshipSelectElement extends HTMLElement {
     connectedCallback(): void;
     setWorship(worship: TownshipWorship, township: Township): void;
 }
-declare class TownshipConversionJumpToElement extends HTMLElement {
+declare class TownshipConversionJumpToElement extends HTMLElement implements CustomElement {
     _content: DocumentFragment;
     resourceIcon: HTMLImageElement;
     resourceList: HTMLLIElement;
     constructor();
     connectedCallback(): void;
     setIcon(resource: TownshipResource): void;
+}
+declare class TownshipTaskCategoryElement extends HTMLElement implements CustomElement {
+    _content: DocumentFragment;
+    button: HTMLAnchorElement;
+    container: HTMLDivElement;
+    categoryImage: HTMLImageElement;
+    categoryName: HTMLSpanElement;
+    completionIcon: HTMLElement;
+    completionCount: HTMLHeadingElement;
+    progressBar: HTMLDivElement;
+    constructor();
+    connectedCallback(): void;
+    setCategory(category: TownshipTaskCategory, callback: VoidFunction): void;
+    updateTaskReady(category: TownshipTaskCategory): void;
+    updateCompletedTasks(tasks: TownshipTasks, category: TownshipTaskCategory): void;
+}
+declare class TownshipCasualTaskCategoryElement extends HTMLElement implements CustomElement {
+    _content: DocumentFragment;
+    button: HTMLAnchorElement;
+    completionIcon: HTMLElement;
+    tasksRemaining: HTMLHeadingElement;
+    constructor();
+    connectedCallback(): void;
+    setCallback(callback: VoidFunction): void;
+    updateTaskReady(casualTasks: TownshipCasualTasks): void;
+    updateTasksRemaining(casualTasks: TownshipCasualTasks): void;
+}
+declare class TownshipTaskGoalElement extends HTMLElement implements CustomElement {
+    _content: DocumentFragment;
+    container: HTMLDivElement;
+    description: HTMLSpanElement;
+    constructor();
+    connectedCallback(): void;
+    setComplete(isComplete: boolean): void;
+    setGoal(goal: ITownshipTaskGoal): void;
+}
+declare class TownshipTaskRewardElement extends HTMLElement implements CustomElement {
+    _content: DocumentFragment;
+    container: HTMLDivElement;
+    constructor();
+    connectedCallback(): void;
+    setCurrencyReward(currency: Currency, quantity: number): void;
+    setItemReward(item: Item, quantity: number): void;
+    setSkillXPReward(skill: AnySkill, quantity: number): void;
+    setTownshipResourceReward(resource: TownshipResource, quantity: number): void;
+}
+declare class TownshipTaskElement extends HTMLElement implements CustomElement {
+    _content: DocumentFragment;
+    header: HTMLDivElement;
+    taskName: HTMLHeadingElement;
+    realmContainer: HTMLDivElement;
+    realmImage: HTMLImageElement;
+    taskDescription: HTMLHeadingElement;
+    goalContainer: HTMLDivElement;
+    rewardsContainer: HTMLDivElement;
+    completeButton: HTMLButtonElement;
+    goals: TownshipTaskGoalElement[];
+    rewards: TownshipTaskRewardElement[];
+    bgClass?: string;
+    constructor();
+    connectedCallback(): void;
+    setTask(game: Game, task: TownshipTask): void;
+    updateGoals(task: TownshipTask): void;
+    createTaskGoals(goals: ITownshipTaskGoal[]): void;
+    createTaskRewards(task: TownshipTask): void;
+}
+declare class TownshipCasualTaskElement extends HTMLElement implements CustomElement {
+    _content: DocumentFragment;
+    skipButton: HTMLAnchorElement;
+    taskDescription: HTMLHeadingElement;
+    goalContainer: HTMLDivElement;
+    rewardsContainer: HTMLDivElement;
+    completeButton: HTMLButtonElement;
+    goals: TownshipTaskGoalElement[];
+    rewards: TownshipTaskRewardElement[];
+    constructor();
+    connectedCallback(): void;
+    setTask(casualTasks: TownshipCasualTasks, task: TownshipCasualTask): void;
+    updateGoals(task: TownshipCasualTask): void;
+    createTaskGoals(goals: ITownshipTaskGoal[]): void;
+    createTaskRewards(casualTasks: TownshipCasualTasks, task: TownshipCasualTask): void;
+}
+declare const enum TownshipTasksMenuElementMode {
+    AllCategories = 0,
+    TaskCategory = 1,
+    CasualTasks = 2
+}
+declare class TownshipTasksMenuElement extends HTMLElement implements CustomElement {
+    _content: DocumentFragment;
+    casualTasksCompleted: HTMLLIElement;
+    nextCasualTaskTimer: HTMLLIElement;
+    buttonContainer: HTMLDivElement;
+    viewAllButton: HTMLButtonElement;
+    casualTaskButton: HTMLButtonElement;
+    categoryContainer: HTMLDivElement;
+    casualTaskCategory: TownshipCasualTaskCategoryElement;
+    taskContainer: HTMLDivElement;
+    casualTaskContainer: HTMLDivElement;
+    realmCounts: Map<Realm, HTMLSpanElement>;
+    categoryMap: Map<TownshipTaskCategory, TownshipTaskCategoryElement>;
+    taskElems: TownshipTaskElement[];
+    taskMap: Map<TownshipTask, TownshipTaskElement>;
+    casualTaskElems: TownshipCasualTaskElement[];
+    casualTaskMap: Map<TownshipCasualTask, TownshipCasualTaskElement>;
+    mode: TownshipTasksMenuElementMode;
+    constructor();
+    connectedCallback(): void;
+    initialize(game: Game, tasks: TownshipTasks): void;
+    showAllCategories(): void;
+    showCategoryTasks(game: Game, tasks: TownshipTasks, category: TownshipTaskCategory): void;
+    showCasualTasks(tasks: TownshipTasks, casualTasks: TownshipCasualTasks): void;
+    updateCasualTaskTimer(casualTasks: TownshipCasualTasks): void;
+    updateCasualTasksCompleted(casualTasks: TownshipCasualTasks): void;
+    updateCasualTasksRemaining(casualTasks: TownshipCasualTasks): void;
+    setCasualTasks(casualTasks: TownshipCasualTasks): void;
+    updateRealmCompletion(tasks: TownshipTasks, realm: Realm): void;
+    updateCategoryCompletion(tasks: TownshipTasks, category: TownshipTaskCategory): void;
+    updateTaskGoals(task: TownshipTask): void;
+    updateCategoryReady(category: TownshipTaskCategory): void;
+    updateCasualTaskGoals(task: TownshipCasualTask): void;
+    updateCasualReady(casualTasks: TownshipCasualTasks): void;
+    removeTask(task: TownshipTask): void;
+    removeCasualTask(task: TownshipCasualTask): void;
 }

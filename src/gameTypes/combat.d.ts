@@ -1,9 +1,11 @@
 /** Global Game Object */
 declare let game: Game;
-declare let showCombatArea: (areaType: 'Combat' | 'Slayer' | 'Dungeon') => void;
 declare let skillNav: SkillNav;
 declare let skillProgressDisplay: SkillProgressDisplay;
-declare let spendMasteryMenu: SpendMasteryMenu;
+declare let combatSkillProgressTable: CombatSkillProgressTableElement;
+declare let spendMasteryMenu: SpendMasteryMenuElement;
+declare let skillMilestoneDisplay: SkillMilestoneDisplayElement;
+declare let skillTreeMenu: SkillTreeMenuElement;
 /** Cache of elements required to render the enemy */
 declare let enemyHTMLElements: EnemyRenderHTMLElements;
 /** Cache of elements required to render the player */
@@ -12,40 +14,40 @@ declare let thievingMenu: ThievingMenu;
 declare let firemakingMenu: FiremakingMenu;
 declare let woodcuttingMenu: WoodcuttingMenu;
 declare let eventManager: EventManager;
-declare let herbloreArtisanMenu: HerbloreArtisanMenu;
-declare let herbloreCategoryMenu: CategoryMenu<SkillCategory>;
-declare const herbloreSelectionTabs: Map<SkillCategory, HerbloreSelectionTab>;
-declare let potionSelectMenu: PotionSelectMenu;
-declare let smithingArtisanMenu: ArtisanMenu<AnyItem>;
-declare const smithingSelectionTabs: Map<SkillCategory, SmithingSelectionTab>;
-declare let smithingCategoryMenu: CategoryMenu<SkillCategory>;
-declare let altMagicMenu: AltMagicMenu;
-declare let altMagicItemMenu: AltMagicItemMenu;
-declare let altMagicSelection: AltMagicSelectionTab;
-declare let runecraftingCategoryMenu: CategoryMenu<SkillCategory>;
-declare let runecraftingArtisanMenu: ArtisanMenu<AnyItem>;
-declare const runecraftingSelectionTabs: Map<SkillCategory, RunecraftingSelectionTab>;
-declare let craftingCategoryMenu: CategoryMenu<SkillCategory>;
-declare let craftingArtisanMenu: ArtisanMenu<AnyItem>;
-declare const craftingSelectionTabs: Map<SkillCategory, CraftingSelectionTab>;
-declare let fletchingCategoryMenu: CategoryMenu<SkillCategory>;
-declare let fletchingArtisanMenu: ArtisanMenu<AnyItem>;
-declare const fletchingSelectionTabs: Map<SkillCategory, FletchingSelectionTab>;
-declare let summoningArtisanMenu: ArtisanMenu<AnyItem>;
-declare const summoningSelectionTabs: Map<SkillCategory, SummoningSelectionTab>;
-declare let summoningCategoryMenu: CategoryMenu<SkillCategory>;
-declare const markDiscoveryMenus: Map<SummoningRecipe, SummoningMarkDiscovery>;
-declare let summoningSearchMenu: SynergySearchMenu;
-declare const fishingAreaMenus: Map<FishingArea, FishingAreaMenu>;
-declare const cookingMenus: Map<CookingCategory, CookingMenu>;
-declare const agilityObstacleMenus: BuiltAgilityObstacle[];
-declare let agilityPassivePillarMenu: PassivePillarMenu;
-declare let agilityElitePassivePillarMenu: ElitePassivePillarMenu;
-declare const agilityObstacleSelectMenus: AgilityObstacleSelection[];
+declare let herbloreArtisanMenu: HerbloreArtisanMenuElement;
+declare let herbloreCategoryMenu: RealmedCategoryMenuElement;
+declare const herbloreSelectionTabs: Map<SkillCategory, RecipeSelectionTabElement<HerbloreRecipe, HerbloreRecipeOptionElement>>;
+declare let potionSelectMenu: PotionSelectMenuElement;
+declare let smithingArtisanMenu: ArtisanMenuElement;
+declare const smithingSelectionTabs: Map<SkillCategory, RecipeSelectionTabElement<SmithingRecipe, SmithingRecipeOptionElement>>;
+declare let smithingCategoryMenu: RealmedCategoryMenuElement;
+declare let altMagicMenu: AltMagicMenuElement;
+declare let altMagicItemMenu: AltMagicItemMenuElement;
+declare let altMagicSelection: RecipeSelectionTabElement<AltMagicSpell, AltMagicSpellOptionElement>;
+declare let runecraftingCategoryMenu: RealmedCategoryMenuElement;
+declare let runecraftingArtisanMenu: ArtisanMenuElement;
+declare const runecraftingSelectionTabs: Map<SkillCategory, RecipeSelectionTabElement<RunecraftingRecipe, RunecraftingRecipeOptionElement>>;
+declare let craftingCategoryMenu: RealmedCategoryMenuElement;
+declare let craftingArtisanMenu: ArtisanMenuElement;
+declare const craftingSelectionTabs: Map<SkillCategory, RecipeSelectionTabElement<CraftingRecipe, CraftingRecipeOptionElement>>;
+declare let fletchingCategoryMenu: RealmedCategoryMenuElement;
+declare let fletchingArtisanMenu: ArtisanMenuElement;
+declare const fletchingSelectionTabs: Map<SkillCategory, RecipeSelectionTabElement<FletchingRecipe, FletchingRecipeOptionElement>>;
+declare let summoningArtisanMenu: ArtisanMenuElement;
+declare const summoningSelectionTabs: Map<SkillCategory, SummoningSelectionTabElement>;
+declare let summoningCategoryMenu: RealmedCategoryMenuElement;
+declare const markDiscoveryMenus: Map<SummoningRecipe, SummoningMarkDiscoveryElement>;
+declare let summoningSearchMenu: SynergySearchMenuElement;
+declare const fishingAreaMenus: Map<FishingArea, FishingAreaMenuElement>;
+declare const cookingMenus: Map<CookingCategory, CookingMenuElement>;
+declare const agilityObstacleMenus: BuiltAgilityObstacleElement[];
+declare const agilityPillarMenus: PassivePillarMenuElement[];
+declare const agilityObstacleSelectMenus: AgilityObstacleSelectionElement[];
+declare let agilityBreakdownMenu: AgilityBreakdownElement;
 declare let astrologyMenus: {
-    constellations: Map<AstrologyRecipe, ConstellationMenu>;
-    infoPanel: AstrologyInformationPanel;
-    explorePanel: AstrologyExplorationPanel;
+    constellations: Map<AstrologyRecipe, ConstellationMenuElement>;
+    infoPanel: AstrologyInformationPanelElement;
+    explorePanel: AstrologyExplorationPanelElement;
 };
 declare let farmingMenus: {
     categoryOptions: FarmingCategoryOptionsElement;
@@ -56,37 +58,36 @@ declare let farmingMenus: {
     lockedPlotMap: Map<FarmingPlot, LockedFarmingPlotElement>;
     lockedPlots: LockedFarmingPlotElement[];
     seedSelect: FarmingSeedSelectElement;
-    compostIcons: ItemCurrentIcon[];
+    compostIcons: ItemCurrentIconElement[];
 };
 declare let townshipUI: TownshipUI;
 declare let archaeologyMenus: {
     digSites: Map<ArchaeologyDigSite, ArchaeologyDigSiteContainerElement>;
 };
 declare let archaeologyUI: ArchaeologyUI;
-declare let ancientRelicsMenu: AncientRelicsMenu;
-declare let bankTabMenu: BankTabMenu;
-declare let bankOptionsMenu: BankOptionsMenu;
-declare let bankMoveModeMenu: BankMoveModeMenu;
-declare let bankSellModeMenu: BankSellModeMenu;
-declare let bankSideBarMenu: BankSideBarMenu;
-declare let bankItemSettingsMenu: BankItemSettingsMenu;
+declare let ancientRelicsMenu: AncientRelicsMenuElement;
+declare let bankTabMenu: BankTabMenuElement;
+declare let bankOptionsMenu: BankOptionsMenuElement;
+declare let bankMoveModeMenu: BankMoveModeMenuElement;
+declare let bankSellModeMenu: BankSellModeMenuElement;
+declare let bankSideBarMenu: BankSidebarMenuElement;
+declare let bankItemSettingsMenu: BankItemSettingsMenuElement;
 declare let itemUpgradeMenu: ItemUpgradeMenuElement;
 declare let cartographyMap: WorldMapDisplayElement;
 declare let cartographyMapCreateMenu: CreateMapMenuElement;
 declare let cartographyMapMasteryMenu: MapMasteryMenuElement;
-declare const combatSkills: (keyof CombatLevels)[];
+declare let browseCorruptionMenu: CorruptionMenuElement;
+declare let levelCapIncreaseModal: SkillCapIncreaseModalElement;
+/** Monster Stats Component used in the view stats modal */
+declare let monsterStatsModal: MonsterStatsElement;
+declare const COMBAT_LEVEL_KEYS: CombatLevelKey[];
 declare let shopMenu: ShopMenu;
-declare const synergyElements: SynergyElements;
 declare let tutorialMenus: {
     headerStage: TutorialStageDisplayElement;
     progress: TutorialProgressDisplayElement;
     stageContainer: HTMLDivElement;
     stages: TutorialStageDisplayElement[];
 };
-interface SynergyElements {
-    icons: HTMLImageElement[];
-    tooltips: TippyTooltip[];
-}
 declare let combatMenus: CombatMenus;
 interface CombatMenus {
     progressBars: ProgressBars;
@@ -94,14 +95,14 @@ interface CombatMenus {
     enemyEffectRenderer: EffectRenderer;
     playerSplashManager: SplashManager;
     enemySplashManager: SplashManager;
-    spells: SpellMenus;
-    prayer: PrayerMenu;
-    runes: RuneMenu;
+    spells: SpellbookMenuElement;
+    prayer: PrayerBookMenuElement;
+    runes: RuneMenuElement;
     equipSets: EquipmentSetMenu[];
-    combatFood: FoodMenu;
-    thievingFood: FoodMenu;
-    enemyAttackPassive: EnemyAttackPassiveMenu;
-    eventMenu: CombatEventMenu;
+    combatFood: FoodSelectMenuElement;
+    thievingFood: FoodSelectMenuElement;
+    equipment: EquipmentGridElement[];
+    eventMenu: CombatEventMenuElement;
     loot: CombatLootMenuElement;
     slayerTask: SlayerTaskMenuElement;
     runButton: HTMLButtonElement;
@@ -117,27 +118,30 @@ interface CombatMenus {
         areaEffect: HTMLSpanElement;
     };
     equipmentMenuIcons: HTMLImageElement[];
-}
-interface SpellMenus {
-    standard: StandardSpellMenu;
-    curse: CurseSpellMenu;
-    aurora: AuroraSpellMenu;
-    ancient: AncientSpellMenu;
-    archaic: ArchaicSpellMenu;
+    corruptionSettings: HTMLDivElement;
+    menuTabs: HTMLImageElement[];
+    menuPanels: HTMLElement[];
+    enemyOffensiveStats: OffensiveStatsElement;
+    enemyDefensiveStats: DefensiveStatsElement;
+    playerStats: PlayerStatsElement;
+    enemyPassives: EnemyPassivesElement;
+    enemySpecialAttacks: EnemySpecialAttacksElement;
+    enemyLevels: CombatLevelsElement;
 }
 interface ProgressBars {
-    playerAttack: ProgressBar;
-    playerAttackMinibar: ProgressBar;
-    playerSummon: ProgressBar;
-    playerSummonMinibar: ProgressBar;
-    enemyAttack: ProgressBar;
-    enemyAttackMinibar: ProgressBar;
+    playerAttack: ProgressBarElement;
+    playerAttackMinibar: ProgressBarElement;
+    playerSummon: ProgressBarElement;
+    playerSummonMinibar: ProgressBarElement;
+    enemyAttack: ProgressBarElement;
+    enemyAttackMinibar: ProgressBarElement;
 }
-declare let areaMenus: AreaMenus;
-interface AreaMenus {
-    combat: CombatAreaMenu;
-    slayer: CombatAreaMenu;
-    dungeon: CombatAreaMenu;
+declare const combatAreaMenus: CombatAreaMenuManager;
+declare const resistanceMenus: ResistanceMenus;
+interface ResistanceMenus {
+    viewItemStats: Map<DamageType, CharacterResistanceElement>;
+    viewEquipmentStats: Map<DamageType, CharacterResistanceElement>;
+    itemUpgrade: Map<DamageType, CharacterResistanceElement>;
 }
 /** Constructs game object, sets global callbacks + references derived from it */
 declare function initGameClass(): void;

@@ -1,4 +1,4 @@
-declare class DigSiteMapSelectElement extends HTMLElement {
+declare class DigSiteMapSelectElement extends HTMLElement implements CustomElement {
     _content: DocumentFragment;
     mapContainer: HTMLDivElement;
     mapElements: {
@@ -15,7 +15,7 @@ declare class DigSiteMapSelectElement extends HTMLElement {
     getTooltipContent(digSite: ArchaeologyDigSite, mapIndex: number): string;
     getLockedMapSlotTooltipContent(): string;
 }
-declare class ArchaeologyDigSiteContainerElement extends HTMLElement {
+declare class ArchaeologyDigSiteContainerElement extends HTMLElement implements CustomElement {
     _content: DocumentFragment;
     container: HTMLDivElement;
     name: HTMLSpanElement;
@@ -32,23 +32,22 @@ declare class ArchaeologyDigSiteContainerElement extends HTMLElement {
     toolInfoContainer: HTMLDivElement;
     toolName: HTMLSpanElement;
     chanceToFind: HTMLDivElement;
-    progressBarElement: HTMLDivElement;
     excavateBtn: HTMLButtonElement;
     showArtefactsBtn: HTMLButtonElement;
-    masteryDisplay: MasteryDisplay;
+    masteryDisplay: MasteryDisplayElement;
     blankMapImage: HTMLImageElement;
     selectedMapBorder: string[];
     toolElements: Map<ArchaeologyTool, HTMLImageElement>;
     toolTooltips: Map<ArchaeologyTool, TippyTooltip>;
     toolImage: HTMLImageElement;
-    progressBar: ProgressBar;
+    progressBar: ProgressBarElement;
     unlockContainer: HTMLDivElement;
     unlockRequirements: HTMLDivElement;
-    xpIcon: XPIcon;
-    masteryIcon: MasteryXPIcon;
-    masteryPoolIcon: MasteryPoolIcon;
-    intervalIcon: IntervalIcon;
-    doublingIcon: DoublingIcon;
+    xpIcon: XpIconElement;
+    masteryIcon: MasteryXpIconElement;
+    masteryPoolIcon: MasteryPoolIconElement;
+    intervalIcon: IntervalIconElement;
+    doublingIcon: DoublingIconElement;
     hasDigSiteRequirement: HTMLElement;
     itemReqTooltip?: TippyTooltip;
     areaContainer: HTMLDivElement;
@@ -72,15 +71,15 @@ declare class ArchaeologyDigSiteContainerElement extends HTMLElement {
     setChanceToFindArtefacts(digSite: ArchaeologyDigSite, archaeology: Archaeology): void;
     setDefaultTool(): void;
     removeActiveMap(): void;
-    getProgressBar(): ProgressBar;
+    getProgressBar(): ProgressBarElement;
     /** Updates the XP, Mastery XP, Mastery Pool XP and interval icons */
-    updateGrants(xp: number, baseXP: number, masteryXP: number, baseMasteryXP: number, masteryPoolXP: number, interval: number, doubling: number): void;
+    updateGrants(xp: number, baseXP: number, masteryXP: number, baseMasteryXP: number, masteryPoolXP: number, interval: number, doubling: number, doublingSources: HTMLSpanElement[], digSite: ArchaeologyDigSite): void;
     disableExcavateButton(): void;
     enableExcavateButton(): void;
     hideArea(): void;
     showArea(): void;
 }
-declare class ArtefactDropList extends HTMLElement {
+declare class ArtefactDropListElement extends HTMLElement implements CustomElement {
     _content: DocumentFragment;
     artefactsTiny: HTMLDivElement;
     artefactsSmall: HTMLDivElement;
@@ -94,7 +93,7 @@ declare class ArtefactDropList extends HTMLElement {
     getWeightBadge(weight: number): string;
     formatSpecialDrop(item: AnyItem, qty?: number): string;
 }
-declare class ArchaeologyMuseumItemElement extends HTMLElement {
+declare class ArchaeologyMuseumItemElement extends HTMLElement implements CustomElement {
     _content: DocumentFragment;
     itemImage: HTMLImageElement;
     inBank: HTMLDivElement;

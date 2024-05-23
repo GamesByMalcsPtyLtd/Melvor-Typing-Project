@@ -53,8 +53,11 @@ interface TutorialStageData extends IDData {
     skillUnlocks: string[];
     /** Rewards given upon completion of the stage */
     rewards: {
-        gp: number;
-        slayerCoins: number;
+        currencies: IDQuantity[];
+        /** @deprecated use currencies instead */
+        gp?: number;
+        /** @deprecated use currencies instead */
+        slayerCoins?: number;
         items: IDQuantity[];
     };
     /** Purchases that may be made from the shop during the stage */
@@ -77,8 +80,7 @@ declare class TutorialStage extends NamespacedObject implements EncodableObject 
     taskPage: Page;
     skillUnlocks: AnySkill[];
     rewards: {
-        gp: number;
-        slayerCoins: number;
+        currencies: CurrencyQuantity[];
         items: AnyItemQuantity[];
     };
     allowedShopPurchases: Set<ShopPurchase>;

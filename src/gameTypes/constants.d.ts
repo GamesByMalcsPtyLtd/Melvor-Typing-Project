@@ -6,7 +6,8 @@ declare const enum Namespaces {
     True = "melvorTrue",
     AtlasOfDiscovery = "melvorAoD",
     Birthday2023 = "melvorBirthday2023",
-    AprilFools2024 = "melvorAprilFools2024"
+    AprilFools2024 = "melvorAprilFools2024",
+    IntoTheAbyss = "melvorItA"
 }
 declare const enum CharacterSelectPage {
     SelectCharacter = 0,

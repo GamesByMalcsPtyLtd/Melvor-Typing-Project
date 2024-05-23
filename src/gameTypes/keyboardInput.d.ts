@@ -110,7 +110,7 @@ declare type KeyBindingEditOption = {
     binding: HTMLButtonElement;
     clear: HTMLButtonElement;
 };
-declare class KeyBindingEditElement extends HTMLElement {
+declare class KeyBindingEditElement extends HTMLElement implements CustomElement {
     _content: DocumentFragment;
     name: HTMLSpanElement;
     bindingOptions: KeyBindingEditOption[];

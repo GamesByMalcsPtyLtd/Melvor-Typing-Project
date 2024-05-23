@@ -22,7 +22,7 @@ declare type StatsTableData = {
     readonly trackerKey: KeysMatching<Statistics, StatTracker>;
 };
 /** Tables for displaying statistics. Must be initialized with setData method. */
-declare class StatsTable extends HTMLElement {
+declare class StatTableElement extends HTMLElement implements CustomElement {
     _content: DocumentFragment;
     _title: HTMLHeadingElement;
     _body: HTMLTableSectionElement;

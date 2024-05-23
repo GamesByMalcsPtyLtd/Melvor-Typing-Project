@@ -2,7 +2,9 @@ declare enum CombatAreaType {
     Combat = 0,
     Slayer = 1,
     Dungeon = 2,
-    None = 3
+    None = 3,
+    AbyssDepth = 4,
+    Stronghold = 5
 }
 /** Interval between combat ticks in ms */
 declare const TICK_INTERVAL = 50;
@@ -42,19 +44,20 @@ declare class CombatEvent extends NamespacedObject {
 declare type CombatEvents = {
     monsterKilled: MonsterKilledEvent;
     monsterDrop: MonsterDropEvent;
+    boneDrop: BoneDropEvent;
     monsterSpawned: MonsterSpawnedEvent;
-    monsterKilledWithEquipment: MonsterKilledWithEquipmentEvent;
-    monsterKilledWithPlayerRequirements: MonsterKilledWithPlayerRequirementsEvent;
     dungeonCompleted: DungeonCompletedEvent;
-};
+    abyssDepthCompleted: AbyssDepthCompletedEvent;
+    strongholdCompleted: StrongholdCompletedEvent;
+} & BaseCombatEvents;
 declare class CombatManager extends BaseManager implements PassiveAction, IGameEventEmitter<CombatEvents> {
     _events: import("mitt").Emitter<CombatEvents>;
     on: {
-        <Key extends keyof CombatEvents>(type: Key, handler: import("mitt").Handler<CombatEvents[Key]>): void;
+        <Key extends keyof BaseCombatEvents | "monsterKilled" | "monsterDrop" | "boneDrop" | "monsterSpawned" | "dungeonCompleted" | "abyssDepthCompleted" | "strongholdCompleted">(type: Key, handler: import("mitt").Handler<CombatEvents[Key]>): void;
         (type: "*", handler: import("mitt").WildcardHandler<CombatEvents>): void;
     };
     off: {
-        <Key extends keyof CombatEvents>(type: Key, handler?: import("mitt").Handler<CombatEvents[Key]> | undefined): void;
+        <Key extends keyof BaseCombatEvents | "monsterKilled" | "monsterDrop" | "boneDrop" | "monsterSpawned" | "dungeonCompleted" | "abyssDepthCompleted" | "strongholdCompleted">(type: Key, handler?: import("mitt").Handler<CombatEvents[Key]> | undefined): void;
         (type: "*", handler: import("mitt").WildcardHandler<CombatEvents>): void;
     };
     player: Player;
@@ -63,15 +66,21 @@ declare class CombatManager extends BaseManager implements PassiveAction, IGameE
     get name(): string;
     get activeSkills(): AnySkill[];
     get canStop(): boolean;
-    /** Currently selected combat area. undefined if none is selected. */
-    selectedArea?: CombatArea | SlayerArea | Dungeon;
-    get areaType(): CombatAreaType;
+    get areaRealm(): Realm;
+    get inAbyssalArea(): boolean;
+    get combatTriangle(): CombatTriangle;
+    get combatTriangleSet(): CombatTriangleSet;
     /** Stores the number of times a dungeon has been completed */
     dungeonCompletion: Map<Dungeon, number>;
-    dungeonProgress: number;
+    /** Stores the current progress the player has made in a combat area */
+    areaProgress: number;
     /** Currently selected monster. undefined if none is selected. */
     selectedMonster?: Monster;
+    /** The current tier of stronghold the player is fighting in. */
+    strongholdTier: StrongholdTierName;
     bank: Bank;
+    itemCharges: ItemCharges;
+    potions: PotionManager;
     loot: CombatLoot;
     slayerTask: SlayerTask;
     paused: boolean;
@@ -89,23 +98,16 @@ declare class CombatManager extends BaseManager implements PassiveAction, IGameE
     itmMonsters: Monster[];
     spiderLairMonsters: Monster[];
     get isFightingITMBoss(): boolean;
-    /** Currently open area menu */
-    openCombatAreaMenu: 'None' | 'Combat' | 'Slayer' | 'Dungeon';
     get onSlayerTask(): boolean;
     get ignoreSpellRequirements(): boolean;
     get canInteruptAttacks(): boolean;
-    get areaRequirements(): AnyRequirement[];
-    get slayerAreaLevelReq(): number;
-    get enemyAreaModifiers(): CombatModifierData;
-    /** Recomputes the modifiers currently provided by the selected area to the player */
-    computePlayerAreaModifiers(updatePlayer?: boolean): void;
+    get areaRequirementsMet(): boolean;
     addDungeonCompletion(dungeon: Dungeon): void;
     getDungeonCompleteCount(dungeon: Dungeon): number;
-    getDungeonCompletionsRemainingForSkillUnlock(dungeon: Dungeon): number;
     getDungeonCompletionSnapshot(): Map<Dungeon, number>;
     setDungeonCompleteCount(dungeon: Dungeon, count: number): void;
     getMonsterDropsHTML(monster: Monster, respectArea: boolean): string;
-    getAreaEffectMagnitude(areaEffect: AreaEffect): number;
+    getAreaEffectMagnitude(areaEffect: CombatAreaEffect, realm: Realm): number;
     get atLastEventDungeon(): boolean;
     /** Management class for combat */
     constructor(game: Game, namespace: DataNamespace);
@@ -121,24 +123,52 @@ declare class CombatManager extends BaseManager implements PassiveAction, IGameE
     renderSlayerAreaEffects(): void;
     renderEventMenu(): void;
     renderAreaRequirements(): void;
-    renderDungeonRelicCount(): void;
-    renderAreaMonsterStats(): void;
+    renderCompletionCount(): void;
+    renderPetStatus(): void;
+    renderResistanceMenus(): void;
+    updateResistanceMenuVisibility(damageType: DamageType): void;
+    renderCorruptionMenus(): void;
+    renderAreaSkillUnlockCounts(): void;
     onPlayerDeath(): void;
     /** Called on enemy death, returns if combat should be stopped as a result */
     onEnemyDeath(): boolean;
-    awardSkillLevelCapIncreaseForDungeonCompletion(dungeon: Dungeon): void;
     /** Checks to add one time rewards from dungeon completion that were added after completion */
     retroactivelyAddOneTimeRewards(): void;
-    rewardForEnemyDeath(monster: Monster): void;
+    rewardForEnemyDeath(monster: Monster, area: AnyCombatArea): void;
+    /** Gets the chance to double loot against a certain monster */
+    getLootDoublingChance(monster: Monster): number;
     dropEnemyLoot(monster: Monster): void;
     dropBarrierDust(monster: Monster): void;
     dropSignetHalfB(monster: Monster): void;
     dropBirthdayPresent(): void;
     dropEnemyBones(monster: Monster): void;
-    gpAdjustEventTimer: number;
-    gpAdjustEventTimerMax: number;
-    gpToAddTelemetry: number;
-    dropEnemyGP(monster: Monster): void;
+    /** Rolls for each currency that a monster can drop, and rewards it to the player */
+    dropEnemyCurrency(monster: Monster): void;
+    /** Stores debouncing for gp telemetry events */
+    gpTelemetryDebouncing: Map<string, {
+        timeoutID: number;
+        quantity: number;
+    }>;
+    /** The interval between GP Telemetry events */
+    readonly GP_TELEMETRY_DEBOUNCE_INTERVAL = 500;
+    /** Gets the base currency modifier to apply to all gains */
+    getCurrencyModifier(currency: Currency): number;
+    addCurrency(currency: Currency, baseAmount: number, source: string, modifier?: number): void;
+    /** Gives currency rewards for killing a slayer task monster */
+    rewardSlayerTaskCurrency(category: SlayerTaskCategory): void;
+    /** Temporary flag that prevents the next dungeon/abyss depth from automatically restarting */
+    preventAutoRestart: boolean;
+    /**
+     * Increments the progress through a Dungeon by 1
+     * @param dungeon The dungeon to progress through
+     * @param monster The monster that was killed
+     * @returns If combat should be stopped as a result
+     */
+    increaseDungeonProgress(dungeon: Dungeon, monster: Monster): boolean;
+    /** Increases the progress through The Abyss by 1 */
+    increaseAbyssProgress(depth: AbyssDepth, monster: Monster): boolean;
+    /** Increases the progress through a Stronghold by 1 */
+    increaseStrongholdProgress(stronghold: Stronghold, monster: Monster): boolean;
     /** Callback function for starting event */
     startEvent(event: CombatEvent): void;
     computeAvailableEventPassives(event: CombatEvent): void;
@@ -153,10 +183,18 @@ declare class CombatManager extends BaseManager implements PassiveAction, IGameE
     stopEvent(): void;
     renderEventAreas(): void;
     checkAreaEntryRequirements(area: AnyCombatArea): boolean;
+    checkDamageTypeRequirementsForMonster(monster: Monster, notify?: boolean): boolean;
+    isCurrentDamageTypeDisallowed(area: AnyCombatArea, notify?: boolean): boolean;
     /** Callback function for selecting a monster */
     selectMonster(monster: Monster, area: CombatArea | SlayerArea): void;
     /** Callback function for selecting a dungeon */
     selectDungeon(dungeon: Dungeon): void;
+    /** Callback function for selecting a dungeon */
+    selectAbyssDepth(depth: AbyssDepth): void;
+    /** Returns if the player currently meets the requirements to fight a stronghold at the given tier */
+    canFightInStrongholdTier(stronghold: Stronghold, tier: StrongholdTierName): boolean;
+    /** Callback function for selecting a stronghold */
+    selectStronghold(stronghold: Stronghold, tier: StrongholdTierName): void;
     /** Callback function for selecting an event area */
     selectEventArea(area: SlayerArea): void;
     preSelection(): boolean;
@@ -164,17 +202,22 @@ declare class CombatManager extends BaseManager implements PassiveAction, IGameE
     stop(fled?: boolean, areaChange?: boolean): boolean;
     loadNextEnemy(): void;
     createNewEnemy(): void;
-    statUpdateOnEnemySpawn(): void;
+    getPassivesForMonster(monster: Monster, area?: CombatArea): ActiveCombatPassive[];
+    computeUnsavedPassives(): ActiveCombatPassive[];
+    computePassivesForEnemy(monster: Monster): ActiveCombatPassive[];
+    /**
+     * Applies permanent coruption to an enemy when they spawn
+     * @param monster The monster to attempt to apply perma-corruption to
+     */
+    applyAutoCorruption(monster: Monster, passives: ActiveCombatPassive[]): void;
+    /** Gets the amount of soul points it costs to permanently corrupt a monster */
+    getAutoCorruptionCost(monster: Monster): number;
     onPageChange(): void;
     renderModifierChange(): void;
     spawnEnemy(): void;
     pauseDungeon(): void;
     resumeDungeon(): void;
     onSelection(): void;
-    /** Callback function for opening combat area */
-    openAreaMenu(areaType: 'Combat' | 'Slayer' | 'Dungeon'): void;
-    /** Closes the currently open combat area menu */
-    closeAreaMenu(): void;
     resetActionState(): void;
     resetEventState(): void;
     encode(writer: SaveWriter): SaveWriter;
@@ -188,7 +231,7 @@ declare class CombatManager extends BaseManager implements PassiveAction, IGameE
     getCombatStatsLog(): CombatStatsLog;
     /** Logs player and enemy combat stats to console */
     saveStats(): void;
-    getSavedStats(): CombatStatsLog | undefined;
+    getSavedStats(): CombatStatsLog | null;
     compareSavedStats(): void;
     compareCombatStatLogs(oldStats: CombatStatsLog): boolean;
     testInitializationStatParity(): void;
@@ -216,7 +259,9 @@ declare class Timer implements EncodableObject {
     get isActive(): boolean;
     get maxTicks(): number;
     get ticksLeft(): number;
+    get progress(): number;
     encode(writer: SaveWriter): SaveWriter;
     decode(reader: SaveWriter, version: number): void;
     deserialize(sData: number[], version: number): void;
+    static skipData(reader: SaveWriter, version: number): void;
 }

@@ -1,4 +1,4 @@
-declare class FishingAreaMenu extends HTMLElement {
+declare class FishingAreaMenuElement extends HTMLElement implements CustomElement {
     _content: DocumentFragment;
     areaBlock: HTMLDivElement;
     areaHeader: HTMLDivElement;
@@ -9,19 +9,20 @@ declare class FishingAreaMenu extends HTMLElement {
     specialChance: HTMLSpanElement;
     buttonContainer: HTMLDivElement;
     infoContainer: HTMLDivElement;
-    fishButtons: FishingAreaMenuButton[];
+    fishButtons: FishingAreaMenuButtonElement[];
     fishName: HTMLSpanElement;
     fishImage: HTMLImageElement;
     fishInfoContainer: HTMLDivElement;
     fishInterval: HTMLSpanElement;
-    masteryDisplay: MasteryDisplay;
+    masteryDisplay: MasteryDisplayElement;
     startButton: HTMLButtonElement;
     statusSpinner: HTMLDivElement;
     statusText: HTMLSpanElement;
-    xpIcon: XPIcon;
-    strXPIcon: STRXPIcon;
-    masteryIcon: MasteryXPIcon;
-    masteryPoolIcon: MasteryPoolIcon;
+    xpIcon: XpIconElement;
+    abyssalXPIcon: AbyssalXpIconElement;
+    strXPIcon: SkillXpIconElement;
+    masteryIcon: MasteryXpIconElement;
+    masteryPoolIcon: MasteryPoolIconElement;
     constructor();
     connectedCallback(): void;
     /** Sets the chances of the menu */
@@ -29,7 +30,9 @@ declare class FishingAreaMenu extends HTMLElement {
     /** Intializes the menu with the provided fishing data. Also performs localization */
     setAreaData(area: FishingArea): void;
     /** Updates the XP, Mastery XP, Mastery Pool XP */
-    updateGrants(xp: number, baseXP: number, masteryXP: number, baseMasteryXP: number, masteryPoolXP: number, strengthXP: number, baseStrengthXP: number): void;
+    updateGrants(xp: number, baseXP: number, masteryXP: number, baseMasteryXP: number, masteryPoolXP: number, strengthXP: number, baseStrengthXP: number, fish: Fish): void;
+    /** Updates the XP, Mastery XP, Mastery Pool XP */
+    updateAbyssalGrants(xp: number, baseXP: number): void;
     hideAreaPanel(): void;
     showAreaPanel(): void;
     /** Sets the current fish information */
@@ -38,23 +41,29 @@ declare class FishingAreaMenu extends HTMLElement {
     setUnselected(): void;
     /** Updates the current information on the selected fish */
     updateSelectedFishRates(fish: Fish): void;
-    updateButtons(area: FishingArea): void;
+    updateButtons(area: FishingArea, fishing: Fishing): void;
     /** Turn the status spinner on and change the start button to stop */
     setActionActive(): void;
     /** Turns the status spinner off and change the start button to start */
     setActionInactive(): void;
 }
-declare class FishingAreaMenuButton extends HTMLElement {
+declare class FishingAreaMenuButtonElement extends HTMLElement implements CustomElement {
     _content: DocumentFragment;
     link: HTMLAnchorElement;
     fishImage: HTMLImageElement;
-    fishName: HTMLElement;
+    fishName: HTMLSpanElement;
+    level: HTMLSpanElement;
+    abyssalLevel: HTMLSpanElement;
+    xpText: HTMLSpanElement;
+    fishRatesCont: HTMLDivElement;
+    intervalText: HTMLSpanElement;
     constructor();
     connectedCallback(): void;
     setFishUnlocked(fish: Fish, area: FishingArea): void;
-    setFishLocked(fish: Fish): void;
+    updateRates(fish: Fish, fishing: Fishing): void;
+    setFishLocked(fish: Fish, fishing: Fishing): void;
 }
-declare class FishingContestMenu extends HTMLElement {
+declare class FishingContestMenuElement extends HTMLElement implements CustomElement {
     _content: DocumentFragment;
     blockTitle: HTMLHeadingElement;
     btnStopContest: HTMLButtonElement;

@@ -91,6 +91,7 @@ declare class ArchaeologyDigSite extends BasicSkillRecipe implements EncodableOb
     encode(writer: SaveWriter): SaveWriter;
     decode(reader: SaveWriter, version: number): void;
     getActiveDropTable(type: ArtefactType): DropTable;
+    getMaxMaps(): number;
 }
 declare class DummyArchaeologyDigSite extends ArchaeologyDigSite {
     constructor(namespace: DataNamespace, id: string, game: Game);
@@ -120,17 +121,23 @@ interface ArchaeologySkillData extends MasterySkillData {
     tools: ArchaeologyToolData[];
     museumRewards: ArchaeologyMuseumRewardData[];
 }
-interface ArchaeologyMuseumRewardData extends IDData {
+interface ArchaeologyModificationData extends MasterySkillModificationData {
+}
+interface ArchaeologyMuseumRewardData extends IDData, IStatObjectData {
     /** The number of items that must be donated to the museum to receive the reward */
     museumCount: number;
-    /** Optional. Permanent modifiers granted to the player when reaching this reward */
-    modifiers?: PlayerModifierData;
     /** Optional. The IDs of pets that are unlocked when reaching this reward */
     pets?: string[];
-    /** Optional. GP to give to the player when reaching this reward */
+    /**
+     *  @deprecated use currencies prop instead
+     *  Optional. GP to give to the player when reaching this reward */
     gp?: number;
-    /** Optional. Slayer Coins to give to the player when reaching this reward */
+    /**
+     * @deprecated use currencies prop instead
+     * Optional. Slayer Coins to give to the player when reaching this reward */
     sc?: number;
+    /** Optional. Currencies to give to the player when reaching this reward */
+    currencies?: IDQuantity[];
     /** Optional. Items to give to the player when reaching this reward */
     items?: IDQuantity[];
 }
@@ -139,38 +146,33 @@ declare class ArchaeologyMuseumReward extends NamespacedObject {
     awarded: boolean;
     /** The number of items that must be donated to the museum to receive the reward */
     museumCount: number;
-    /** Modifiers given to the player when this reward is active */
-    modifiers?: PlayerModifierObject;
+    stats: StatObject;
     /** Pets unlocked when this reward is unlocked */
     pets?: Pet[];
-    gp?: number;
-    sc?: number;
+    currencies?: CurrencyQuantity[];
     items?: AnyItemQuantity[];
     constructor(namepsace: DataNamespace, data: ArchaeologyMuseumRewardData, game: Game);
 }
+declare class ArchaeologyItemDonatedEvent extends GameEvent {
+    item: AnyItem;
+    oldCount: number;
+    newCount: number;
+    constructor(item: AnyItem, oldCount: number, newCount: number);
+}
 declare type ArchaeologyEvents = {
     action: ArchaeologyActionEvent;
-};
+    itemDonated: ArchaeologyItemDonatedEvent;
+} & SkillWithMasteryEvents;
 interface ArtefactTypeLocation {
     size: ArtefactType;
     digSite: ArchaeologyDigSite;
 }
-declare class Archaeology extends GatheringSkill<ArchaeologyDigSite, ArchaeologySkillData> implements StatProvider, IGameEventEmitter<ArchaeologyEvents> {
-    _events: import("mitt").Emitter<ArchaeologyEvents>;
-    on: {
-        <Key extends "action">(type: Key, handler: import("mitt").Handler<ArchaeologyEvents[Key]>): void;
-        (type: "*", handler: import("mitt").WildcardHandler<ArchaeologyEvents>): void;
-    };
-    off: {
-        <Key extends "action">(type: Key, handler?: import("mitt").Handler<ArchaeologyEvents[Key]> | undefined): void;
-        (type: "*", handler: import("mitt").WildcardHandler<ArchaeologyEvents>): void;
-    };
+declare class Archaeology extends GatheringSkill<ArchaeologyDigSite, ArchaeologySkillData, ArchaeologyEvents, ArchaeologyModificationData> {
     readonly _media = Assets.Archaeology;
     museum: ArchaeologyMuseum;
-    get levelCap(): 99 | 120;
-    getTotalUnlockedMasteryActions(): number;
+    get maxLevelCap(): 99 | 120;
+    isMasteryActionUnlocked(action: ArchaeologyDigSite): boolean;
     readonly baseInterval = 4000;
-    getMaxDigSiteMaps(digSite: ArchaeologyDigSite): number;
     lastRarityLocated: ArtefactWeightRange;
     tools: NamespaceRegistry<ArchaeologyTool>;
     currentDigSite?: ArchaeologyDigSite;
@@ -193,11 +195,11 @@ declare class Archaeology extends GatheringSkill<ArchaeologyDigSite, Archaeology
     get defaultTool(): ArchaeologyTool;
     getBaseSkillXPForDigSite(digSite: ArchaeologyDigSite): number;
     getArtefactSkillXPForDigSite(digSite: ArchaeologyDigSite): number;
-    modifiers: MappedModifiers;
     constructor(namespace: DataNamespace, game: Game);
     registerData(namespace: DataNamespace, data: ArchaeologySkillData): void;
+    modifyData(data: ArchaeologyModificationData): void;
     postDataRegistration(): void;
-    onLevelUp(oldLevel: number, newLevel: number): void;
+    onAnyLevelUp(): void;
     render(): void;
     renderMuseumArtefacts(): void;
     renderProgressBar(): void;
@@ -215,7 +217,8 @@ declare class Archaeology extends GatheringSkill<ArchaeologyDigSite, Archaeology
     postLoad(): void;
     onModifierChange(): void;
     onAncientRelicUnlock(): void;
-    computeProvidedStats(updatePlayer?: boolean): void;
+    museumRewardSource: ModifierSource;
+    addProvidedStats(): void;
     canExcavate(digSite: ArchaeologyDigSite | undefined): boolean;
     /** Flag used to determine if provided stats should update when stopped. Prevents duplicate stat recalculation */
     updateModifiersOnStop: boolean;
@@ -225,10 +228,9 @@ declare class Archaeology extends GatheringSkill<ArchaeologyDigSite, Archaeology
     onStop(): void;
     /** Returns the interval an npc in ms */
     getDigSiteInterval(digSite: ArchaeologyDigSite): number;
+    applyPrimaryProductMultipliers(item: Item, quantity: number, action: NamedObject, query: ModifierQuery): number;
     get actionRewards(): Rewards;
     getXPModifier(masteryAction?: ArchaeologyDigSite): number;
-    getDoublingChance(action: ArchaeologyDigSite): number;
-    getMasteryXPModifier(action: ArchaeologyDigSite): number;
     getArtefactValue(type: ArtefactType, digsite: ArchaeologyDigSite, map: DigSiteMap): number;
     get actionInterval(): number;
     get masteryModifiedInterval(): number;
@@ -269,6 +271,8 @@ declare class Archaeology extends GatheringSkill<ArchaeologyDigSite, Archaeology
     getArtefactTypeAndLocationFromCache(item: AnyItem): ArtefactTypeLocation;
     cleanupDonatedMuseumArtefacts(): void;
     getObtainableItems(): Set<AnyItem>;
+    getRegistry(type: ScopeSourceType): NamespaceRegistry<NamedObject> | undefined;
+    getPkgObjects(pkg: GameDataPackage, type: ScopeSourceType): IDData[] | undefined;
 }
 declare const enum ArchaeologyPage {
     DigSites = 0,
@@ -312,7 +316,7 @@ declare class ArchaeologyMuseum {
     cacheMuseumData(): void;
     getMuseumTokenGainInfo(): {
         tokenGain: number;
-        gpValue: number;
+        currencyValue: SparseNumericMap<Currency>;
         itemCount: number;
     };
     loadMuseumArtefacts(archaeology: Archaeology, game: Game): void;

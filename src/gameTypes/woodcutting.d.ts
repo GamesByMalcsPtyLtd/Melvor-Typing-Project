@@ -1,70 +1,74 @@
 interface WoodcuttingSkillData extends MasterySkillData {
     trees?: WoodcuttingTreeData[];
-    nestItemID?: string;
+    defaultRandomProducts?: string[];
+    randomProducts?: RandomWoodcuttingProductData[];
     bannedJewleryIDs?: string[];
-    ashItemID?: string;
-    mushroomItemID?: string;
-    ravenNestItemID?: string;
+}
+interface WoodcuttingModificationData extends MasterySkillModificationData {
+    trees?: WoodcuttingTreeModificationData[];
 }
 declare type WoodcuttingEvents = {
     action: WoodcuttingActionEvent;
-};
+} & SkillWithMasteryEvents;
 interface WoodcuttingTreeData extends SingleProductRecipeData {
     name: string;
     media: string;
     baseInterval: number;
-    canDropRavenNest?: boolean;
+    randomProducts?: string[];
     /** Optional. If present, these requirements must also be met to cut to tree, in addition to Woodcutting level. */
     requirements?: AnyRequirementData[];
+}
+interface WoodcuttingTreeModificationData extends SingleProductRecipeModificationData {
+    baseInterval?: number;
+    randomProducts?: {
+        add?: string[];
+        remove?: string[];
+    };
+    requirements?: RequirementsModificationData;
+}
+interface RandomWoodcuttingProductData extends ItemChanceData {
+    quantity: number;
+    minChance?: number;
+}
+declare class RandomWoodcuttingProduct {
+    item: Item;
+    chance: number;
+    quantity: number;
+    minChance: number;
+    constructor(data: RandomWoodcuttingProductData, game: Game);
 }
 declare class WoodcuttingTree extends SingleProductRecipe implements SoftDataDependant<WoodcuttingTreeData> {
     get media(): string;
     get name(): string;
     baseInterval: number;
+    randomProducts: AnyItem[];
     _name: string;
     _media: string;
-    canDropRavenNest: boolean;
     requirements: AnyRequirement[];
     constructor(namespace: DataNamespace, data: WoodcuttingTreeData, game: Game);
     registerSoftDependencies(data: WoodcuttingTreeData, game: Game): void;
+    applyDataModification(data: WoodcuttingTreeModificationData, game: Game): void;
 }
-declare class Woodcutting extends GatheringSkill<WoodcuttingTree, WoodcuttingSkillData> implements IGameEventEmitter<WoodcuttingEvents> {
-    _events: import("mitt").Emitter<WoodcuttingEvents>;
-    on: {
-        <Key extends "action">(type: Key, handler: import("mitt").Handler<WoodcuttingEvents[Key]>): void;
-        (type: "*", handler: import("mitt").WildcardHandler<WoodcuttingEvents>): void;
-    };
-    off: {
-        <Key extends "action">(type: Key, handler?: import("mitt").Handler<WoodcuttingEvents[Key]> | undefined): void;
-        (type: "*", handler: import("mitt").WildcardHandler<WoodcuttingEvents>): void;
-    };
+declare class Woodcutting extends GatheringSkill<WoodcuttingTree, WoodcuttingSkillData, WoodcuttingEvents, WoodcuttingModificationData> {
     readonly _media = Assets.Woodcutting;
-    getTotalUnlockedMasteryActions(): number;
+    get levelCompletionBreakdown(): LevelCompletionBreakdown[];
+    isMasteryActionUnlocked(action: WoodcuttingTree): boolean;
     /** Trees that are currently being cut */
     activeTrees: Set<WoodcuttingTree>;
     renderQueue: WoodcuttingRenderQueue;
-    get mushroomChance(): number;
-    addArrowShaftReward(tree: WoodcuttingTree, rewards: Rewards): void;
-    nestItem?: AnyItem;
-    bannedJewelry: Set<AnyItem>;
-    randomJewelry: AnyItem[];
-    ashItem?: AnyItem;
-    mushroomItem?: AnyItem;
-    ravenNestItem?: AnyItem;
+    readonly bannedJewelry: Set<AnyItem>;
+    readonly randomJewelry: AnyItem[];
+    readonly randomProducts: Map<Item, RandomWoodcuttingProduct>;
+    readonly defaultRandomProducts: Item[];
     constructor(namespace: DataNamespace, game: Game);
-    get chestOfGemsItem(): AnyItem | undefined;
     registerData(namespace: DataNamespace, data: WoodcuttingSkillData): void;
+    modifyData(data: WoodcuttingModificationData): void;
     postDataRegistration(): void;
-    getFlatIntervalModifier(action: WoodcuttingTree): number;
     getUncappedDoublingChance(action: WoodcuttingTree): number;
     getTreeInterval(tree: WoodcuttingTree): number;
     getTreeMultiplier(tree: WoodcuttingTree): number;
     getTreeMasteryXP(tree: WoodcuttingTree): number;
     getBaseTreeMasteryXP(tree: WoodcuttingTree): number;
-    getBirdNestChance(): number;
-    getRavenNestChance(): number;
-    getBirdNestQuantity(): number;
-    getMasteryXPModifier(action: WoodcuttingTree): number;
     get treeCutLimit(): number;
     onStop(): void;
     /** Returns if all requirements to cut the tree have been met */
@@ -77,22 +81,31 @@ declare class Woodcutting extends GatheringSkill<WoodcuttingTree, WoodcuttingSki
     /** Woodcutting xp to add per action inclusive of modifiers */
     get totalXPToAdd(): number;
     get totalPoolXPToAdd(): number;
+    /** Woodcutting xp to add per action inclusive of modifiers */
+    get baseAbyssalXPToAdd(): number;
+    /** Woodcutting xp to add per action inclusive of modifiers */
+    get totalAbyssalXPToAdd(): number;
     get actionLevel(): number;
-    get stardustChance(): number;
     getWCXPtoFMXP(): number;
-    get ashChance(): number;
+    getWCAXPtoFMAXP(): number;
     get masteryAction(): WoodcuttingTree;
     get masteryModifiedInterval(): number;
+    getRandomProductInfo(item: Item): {
+        chance: number;
+        quantity: number;
+    };
+    addArrowShaftReward(tree: WoodcuttingTree, rewards: Rewards): void;
     preAction(): void;
     get actionRewards(): Rewards;
     /** Adds mastery XP for all active trees */
     addMasteryXPReward(): void;
     postAction(): void;
     onLoad(): void;
+    onRealmChange(): void;
     onMasteryLevelUp(action: WoodcuttingTree, oldLevel: number, newLevel: number): void;
     onModifierChange(): void;
     onEquipmentChange(): void;
-    onLevelUp(oldLevel: number, newLevel: number): void;
+    onAnyLevelUp(): void;
     onAncientRelicUnlock(): void;
     getErrorLog(): string;
     render(): void;
@@ -107,6 +120,8 @@ declare class Woodcutting extends GatheringSkill<WoodcuttingTree, WoodcuttingSki
     encode(writer: SaveWriter): SaveWriter;
     decode(reader: SaveWriter, version: number): void;
     deserialize(reader: DataReader, version: number, idMap: NumericIDMap): void;
+    getRegistry(type: ScopeSourceType): NamespaceRegistry<NamedObject> | undefined;
+    getPkgObjects(pkg: GameDataPackage, type: ScopeSourceType): IDData[] | undefined;
     getActionIDFromOldID(oldActionID: number, idMap: NumericIDMap): string;
     setFromOldOffline(offline: OfflineWoodcut, idMap: NumericIDMap): void;
     testTranslations(): void;

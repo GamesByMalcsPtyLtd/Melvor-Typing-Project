@@ -1,4 +1,4 @@
-declare class TutorialStageDisplayElement extends HTMLElement {
+declare class TutorialStageDisplayElement extends HTMLElement implements CustomElement {
     _content: DocumentFragment;
     header: HTMLDivElement;
     stageStatus: HTMLSpanElement;
@@ -30,7 +30,7 @@ declare class TutorialStageDisplayElement extends HTMLElement {
     setClaimed(): void;
     setHeaderClass(className: 'bg-tutorial-claimed' | 'bg-primary'): void;
 }
-declare class TutorialProgressDisplayElement extends HTMLElement {
+declare class TutorialProgressDisplayElement extends HTMLElement implements CustomElement {
     _content: DocumentFragment;
     skipButton: HTMLButtonElement;
     stagesCompleted: HTMLSpanElement;

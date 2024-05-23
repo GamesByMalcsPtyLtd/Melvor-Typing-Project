@@ -1,15 +1,17 @@
 declare type PotionEvents = {
     potionUsed: PotionUsedEvent;
     chargeUsed: PotionChargeUsedEvent;
+    /** Fired whenever the potion for an action changes */
+    potionChanged: PotionChangedEvent;
 };
 /** Management class for potion consumption and charges */
-declare class PotionManager extends GameEventEmitter<PotionEvents> implements StatProvider, EncodableObject {
+declare class PotionManager extends GameEventEmitter<PotionEvents> implements EncodableObject {
     game: Game;
     activePotions: Map<Action, ActivePotion>;
     /** Actions for which potions should not be automatically re-used */
     autoReuseActions: Set<Action>;
     renderRequired: boolean;
-    modifiers: MappedModifiers;
+    providedStats: StatProvider;
     constructor(game: Game);
     isPotionActiveForAction(action: Action): boolean;
     getActivePotionForAction(action: Action): PotionItem | undefined;
@@ -38,7 +40,7 @@ interface ActivePotion {
     charges: number;
     unassigners: VoidFunction[];
 }
-declare class PotionSelectMenuItem extends HTMLElement {
+declare class PotionSelectMenuItemElement extends HTMLElement implements CustomElement {
     _content: DocumentFragment;
     potionImage: HTMLImageElement;
     potionQuantity: HTMLHeadingElement;
@@ -50,11 +52,11 @@ declare class PotionSelectMenuItem extends HTMLElement {
     connectedCallback(): void;
     setPotion(potion: PotionItem, game: Game): void;
 }
-declare class PotionSelectMenu extends HTMLElement {
+declare class PotionSelectMenuElement extends HTMLElement implements CustomElement {
     _content: DocumentFragment;
     potionContainer: HTMLDivElement;
     autoReuseCheckBox: HTMLInputElement;
-    menuItems: PotionSelectMenuItem[];
+    menuItems: PotionSelectMenuItemElement[];
     constructor();
     connectedCallback(): void;
     showPotionSelection(potions: PotionItem[], action: Action, game: Game): void;

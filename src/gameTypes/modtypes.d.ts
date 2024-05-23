@@ -738,8 +738,7 @@ declare namespace Modding {
     skills: {
       add(_class: new (namespace: DataNamespace, game: Game) => T &
       Partial<PassiveAction> &
-      Partial<ActiveAction> &
-      Partial<StatProvider>): void;
+      Partial<ActiveAction>): void;
     }
   }
 }

@@ -95,8 +95,8 @@ interface PointOfInterestData extends IDData {
     description: string;
     /** URI of POIs image (unsure if this is to be displayed on the map, or the hex overview) */
     media: string;
-    /** Modifiers provided to the player if they are currently located at the hex */
-    activeModifiers?: PlayerModifierData;
+    /** Optional. Stats provided to the player when they are currently located at the hex */
+    activeStats?: IStatObjectData;
     /** Determines if the hex can be fast travelled to */
     fastTravel?: {
         groupID: string;
@@ -109,7 +109,7 @@ interface PointOfInterestData extends IDData {
         /** The number of moves on the world map the player must make until these modifiers expire */
         moves: number;
         /** The modifiers that are temporarily given to the player */
-        modifiers: PlayerModifierData;
+        modifiers: ModifierValuesRecordData;
     };
     /** Optional. If present, the POI will be hidden from the player until they meet the requirements and are located at the hex and are wearing the specified items. */
     hidden?: {
@@ -142,7 +142,7 @@ declare type POIFastTravel = {
 };
 interface POIDiscoveryModifiers {
     moves: number;
-    modifiers: PlayerModifierObject;
+    modifiers: ModifierValue[];
     /** Save State Property. Stores the number of moves remaining until these modifiers expire */
     movesLeft: number;
 }
@@ -163,14 +163,16 @@ declare class PointOfInterest extends NamespacedObject implements SoftDataDepend
     get description(): string;
     /** Full URI for POI's image */
     get media(): string;
+    /** If this poi has any active modifiers or combat effects */
+    get hasActiveEffect(): boolean;
+    /** Stats provided to the player when they are located at the hex */
+    activeStats: StatObject;
     /** English name */
     _name: string;
     /** English description */
     _description: string;
     /** Base URI for POI */
     _media: string;
-    /** Optional. If present the player gains these modifiers when they are located at the hex */
-    activeModifiers?: PlayerModifierObject;
     /** Optional. If present the player may travel between other POIs with the same fast travel group for free */
     fastTravel?: POIFastTravel;
     /** Optional. If present the player is given these when the POI is discovered */
@@ -358,17 +360,21 @@ interface WorldMapTileData {
     /** The path to the root folder that contains each map tile. Files should be .png, and named as tile_${i}_${j}@1x.png for full resolution tiles and tile_${i}_${j}@0.5x.png for half resolution tiles */
     tilePath: string;
 }
-interface WorldMapMasteryBonusData extends IDData {
+interface WorldMapMasteryBonusData extends IDData, IStatObjectData {
     /** The number of hexes that must be mastered to receive the bonus */
     masteredHexes: number;
-    /** Optional. Permanent modifiers granted to the player when reaching this bonus */
-    modifiers?: PlayerModifierData;
     /** Optional. The IDs of pets that are unlocked when reaching this bonus */
     pets?: string[];
-    /** Optional. GP to give to the player when reaching this bonus */
+    /**
+     * @deprecated Use currencies prop instead
+     * Optional. GP to give to the player when reaching this bonus */
     gp?: number;
-    /** Optional. Slayer Coins to give to the player when reaching this bonus */
+    /**
+     * @deprecated Use currencies prop instead
+     * Optional. Slayer Coins to give to the player when reaching this bonus */
     sc?: number;
+    /** Optional. Currencies to give to the player when reaching this bonus */
+    currencies?: IDQuantity[];
     /** Optional. Items to give to the player when reaching this bonus */
     items?: IDQuantity[];
 }
@@ -377,12 +383,11 @@ declare class WorldMapMasteryBonus extends NamespacedObject {
     awarded: boolean;
     /** The number of hexes that must be mastered to receive this bonus */
     masteredHexes: number;
-    /** Modifiers given to the player when this bonus is active */
-    modifiers?: PlayerModifierObject;
+    /** Stats provided by this bonus when active */
+    stats: StatObject;
     /** Pets unlocked when this bonus is unlocked */
     pets?: Pet[];
-    gp?: number;
-    sc?: number;
+    currencies?: CurrencyQuantity[];
     items?: AnyItemQuantity[];
     constructor(namepsace: DataNamespace, data: WorldMapMasteryBonusData, game: Game);
 }

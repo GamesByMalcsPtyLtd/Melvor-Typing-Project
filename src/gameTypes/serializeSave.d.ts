@@ -111,7 +111,7 @@ interface OtherSaveGame {
     randomModifiers?: any;
     summoningData?: OldPlayerSummoningData;
     cookingStockpiles?: OldItemQuantity2[];
-    activeAstrologyModifiers?: NumberDictionary<OldPlayerModifierData>[];
+    activeAstrologyModifiers?: NumberDictionary<unknown>[];
     completedTasks: number[];
     activeTasks: NumberDictionary<OldActiveTutorialTask>;
     plantAllSelected: NumberDictionary<number[]>;
@@ -154,16 +154,6 @@ declare type MinCombatData = {
         hitpoints: number;
     };
 };
-declare type SerializerVar<Key extends NewSaveKey> = {
-    saveKey: Key;
-    serialize: Serializer<NewSaveGame[Key]>;
-    deserialize: Deserializer<NewSaveGame[Key]>;
-};
-declare type NestedSerializerVar<Key extends NewSaveKey> = {
-    saveKey: Key;
-    serialize: NestedSerializer<NewSaveGame[Key]>;
-    deserialize: NestedDeserializer<NewSaveGame[Key]>;
-};
 declare type PackagedSave = {
     v: number;
     n: number[];
@@ -174,12 +164,32 @@ declare type PackagedSave = {
     cd: number[];
 };
 declare const saveFormat2Version = 21;
-declare const currentSaveVersion = SaveVersion.DoubleClickItemSettings;
+declare const currentSaveVersion = SaveVersion.CombatEffectStatGroups;
 declare const enum SaveVersion {
     ModProfiles = 83,
     MasteryModalFilter = 84,
     ReductiveEffects = 85,
-    DoubleClickItemSettings = 86
+    DoubleClickItemSettings = 86,
+    IntoTheAbyss = 100,
+    AbyssalSpells = 101,
+    PermaCorruption = 102,
+    MasteryPool = 103,
+    ITASettings = 104,
+    ModifierRework = 105,
+    ITANotificationSettings = 106,
+    SkillDataModifications = 107,
+    RealmSaving = 108,
+    CombatStatRework = 109,
+    AprilFoolsMerge = 110,
+    AbyssalRelics = 111,
+    AttackSpellbooks = 112,
+    GamemodeLevelCaps = 113,
+    PurchasableLevelCaps = 114,
+    ITAStatistics = 115,
+    TownshipTaskRefactor = 116,
+    OilYourLogs = 117,
+    FiremakingSelectedOil = 118,
+    CombatEffectStatGroups = 119
 }
 interface AddRemove<T> {
     add: T[];
@@ -309,22 +319,22 @@ declare class DataReader {
     getBool(): boolean;
     getNumber(): number;
     nextValue(): number;
+    skipValue(): void;
+    skipValues(count: number): void;
     getChunk(length: number): number[];
     getVariableLengthChunk(): DataReader;
+    skipVariableLengthChunk(): void;
     getBoolArray(): boolean[];
-    getStunFlavour(): StunFlavour;
     getActionType(): ActionType;
     getAttack(game: Game, idMap: NumericIDMap): SpecialAttack | undefined;
-    getAttackEffect(attack: SpecialAttack | undefined): AnyEffect | undefined;
-    getDOTType(): DOTType;
     getLocation(game: Game, idMap: NumericIDMap): CombatArea | SlayerArea | Dungeon | undefined;
     getRandomAttackType(): AttackType | 'unset';
     getMonsterAttackType(): AttackType | 'random';
     getString(): string;
-    getCombatModifierArray(): CombatModifierArray;
-    getModifierArray(game: Game, idMap: NumericIDMap): ModifierArray;
+    getCombatModifierArray(): ModifierValue[];
+    getModifierArray(game: Game, idMap: NumericIDMap): ModifierValue[];
     getTownshipBuildingDataMap(game: Game, idMap: NumericIDMap): Map<TownshipBuilding, number>;
-    getAstrologyModifierArray(game: Game, idMap: NumericIDMap): ModifierArray[];
+    getAstrologyModifierArray(game: Game, idMap: NumericIDMap): ModifierValue[][];
     getRaidSelectionArray(): {
         itemID: number;
         quantity: number;
@@ -334,42 +344,7 @@ declare class DataReader {
     getRawData(): number[];
 }
 declare const enum AttackEffectType {
-    OnHitEffect = 0,
-    PreHitEffect = 1,
-    Affliction = 2,
-    Frostburn = 3,
-    SlowEffect = 4,
-    AbsorbingSkin = 5,
-    Duality = 6,
-    Rage = 7,
-    DarkBlade = 8,
-    EndOfTurnEvasion = 9,
-    Shock = 10,
-    Assassin = 11,
-    DecreasedEvasionStackingEffect = 12,
-    GrowingMadness = 13,
-    MomentInTime = 14,
-    ReignOverTime = 15,
-    Leviathan = 16,
-    ShadowCloak = 17,
-    ItemEffect = 18,
-    Increased5DR = 19,
-    Elusive = 20,
-    Crystallization = 21,
-    CrystalSanction = 22,
-    WeakeningTouch = 23,
-    UnderwaterSlowEffect = 24,
-    UnderwaterAttackSpeedEffect = 25,
-    CleansedEffect = 26,
-    NulledEffect = 27,
-    MaxHitpointsEffect = 28,
-    BlindEffect = 29,
-    AttackMasterRelicEffect = 30,
-    StrengthMasterRelicEffect = 31,
-    MagicMasterRelicEffect = 32,
-    FrostBurnReflectEffect = 33,
-    BarrierRegenDebuffEffect = 34,
-    AttackMasterRelicEffect2 = 35
+    ItemEffect = 18
 }
 declare enum DotTypeIDs {
     Burn = 0,

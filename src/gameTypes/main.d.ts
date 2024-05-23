@@ -1,7 +1,7 @@
 declare const DEBUGENABLED = false;
 declare const releaseDate = 1637258400000;
 declare const DEBUG_REPORTER: string[];
-declare const gameTitle = "Melvor Idle :: v1.2.2";
+declare const gameTitle = "Melvor Idle :: v1.3";
 declare let currentTitleNewsID: string[];
 declare let playFabEventQueue: {
     eventName: string;
@@ -29,7 +29,6 @@ declare function updateWindow(): Promise<void>;
 declare function showGameLoadError(e: unknown): void;
 /** Loads the lore book modal text */
 declare function loadLore(): void;
-declare let offlineModalID: number;
 /** Removes old variables from localstorage, and fixes invalid bank tabs */
 declare function cleanSaveFile(): void;
 declare function getCloudSaveHeartbeatInterval(): number;
@@ -80,6 +79,7 @@ declare function showPageLoader(): void;
 declare function initTooltips(): void;
 declare function generateLoreModals(): string;
 declare function resetSkillsTo99(confirmed?: boolean): void;
+declare function resetAbyssalSkills(): void;
 declare function setBackground(id: number): void;
 declare function initChangelog(): void;
 /** CORE GAME FUNCTIONS */

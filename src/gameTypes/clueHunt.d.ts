@@ -109,8 +109,8 @@ declare class ClueHunt {
     giveReward(id: number): void;
     updateClue1Progress: (event: GameEvent) => void;
     updateClue2Progress: (event: GameEvent) => void;
-    updateClue3Progress: (event: GameEvent) => void;
-    updateClue4Progress: (event: GameEvent) => void;
+    updateClue3Progress: (event: MonsterKilledEvent) => void;
+    updateClue4Progress: (event: MonsterKilledEvent) => void;
     updateClue5Progress: (event: GameEvent) => void;
     resetClue6(): void;
     updateClue6Progress: (event: GameEvent) => void;

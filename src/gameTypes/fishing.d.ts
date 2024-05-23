@@ -3,13 +3,20 @@ interface FishData extends SingleProductRecipeData {
     baseMinInterval: number;
     baseMaxInterval: number;
 }
+interface FishModificationData extends SingleProductRecipeModificationData {
+    strengthXP?: number;
+    baseMinInterval?: number;
+    baseMaxInterval?: number;
+}
 declare class Fish extends SingleProductRecipe {
     strengthXP: number;
     baseMinInterval: number;
     baseMaxInterval: number;
+    area?: FishingArea;
     constructor(namespace: DataNamespace, data: FishData, game: Game);
+    applyDataModification(data: FishModificationData, game: Game): void;
 }
-interface FishingAreaData extends IDData {
+interface FishingAreaData extends RealmedObjectData {
     name: string;
     description?: string;
     fishChance: number;
@@ -23,7 +30,7 @@ interface FishingAreaData extends IDData {
     /** Optional. If present the Cartography Point of Interest requirement that must be met to to access the area. */
     poiRequirement?: CartographyPOIDiscoveryRequirementData;
 }
-declare class FishingArea extends NamespacedObject implements SoftDataDependant<FishingAreaData> {
+declare class FishingArea extends RealmedObject implements SoftDataDependant<FishingAreaData> {
     get name(): string;
     get description(): string | undefined;
     fishChance: number;
@@ -42,14 +49,19 @@ interface FishingSkillData extends MasterySkillData {
     fish?: FishData[];
     areas?: FishingAreaData[];
     junkItemIDs?: string[];
-    specialItems?: DropTableData[];
+    specialItems?: {
+        realmID: string;
+        drops: DropTableData[];
+    }[];
     easterEgg?: {
         originalID: string;
         equippedID: string;
         rewardID: string;
     };
-    lostChestItem?: string;
     fishingContestFish?: FishingContestFishData[];
+}
+interface FishingModificationData extends MasterySkillModificationData {
+    fish?: FishModificationData[];
 }
 interface FishingContestFishData {
     fishID: string;
@@ -74,25 +86,15 @@ interface FishingContestLeaderboardEntry {
 }
 declare type FishingEvents = {
     action: FishingActionEvent;
-};
-declare class Fishing extends GatheringSkill<Fish, FishingSkillData> implements IGameEventEmitter<FishingEvents> {
-    _events: import("mitt").Emitter<FishingEvents>;
-    on: {
-        <Key extends "action">(type: Key, handler: import("mitt").Handler<FishingEvents[Key]>): void;
-        (type: "*", handler: import("mitt").WildcardHandler<FishingEvents>): void;
-    };
-    off: {
-        <Key extends "action">(type: Key, handler?: import("mitt").Handler<FishingEvents[Key]> | undefined): void;
-        (type: "*", handler: import("mitt").WildcardHandler<FishingEvents>): void;
-    };
+} & SkillWithMasteryEvents;
+declare class Fishing extends GatheringSkill<Fish, FishingSkillData, FishingEvents, FishingModificationData> {
     readonly _media = Assets.Fishing;
-    getTotalUnlockedMasteryActions(): number;
+    get levelCompletionBreakdown(): LevelCompletionBreakdown[];
+    isMasteryActionUnlocked(action: Fish): boolean;
     renderQueue: FishingRenderQueue;
-    get chanceForLostChest(): number;
     get actionInterval(): number;
     get actionLevel(): number;
     get masteryAction(): Fish;
-    get chanceForOneExtraFish(): number;
     /** If the player has read the message in a bottle */
     secretAreaUnlocked: boolean;
     /** The fish that are currently selected in each area */
@@ -105,35 +107,36 @@ declare class Fishing extends GatheringSkill<Fish, FishingSkillData> implements 
     get activeFish(): Fish;
     areas: NamespaceRegistry<FishingArea>;
     junkItems: AnyItem[];
-    specialItems: DropTable;
+    specialItemTables: Map<Realm, DropTable>;
     easterEgg?: {
         original: AnyItem;
         equipped: EquipmentItem;
         reward: AnyItem;
     };
-    lostChestItem?: AnyItem;
     constructor(namespace: DataNamespace, game: Game);
     registerData(namespace: DataNamespace, data: FishingSkillData): void;
+    modifyData(data: FishingModificationData): void;
     postDataRegistration(): void;
     unlockSecretArea(): void;
+    getActionModifierQueryParams(action?: NamedObject): SkillModifierQueryParams;
     /** Gets the minimum interval of a fish */
     getMinFishInterval(fish: Fish): number;
     /** Gets the maximum interval of a fish */
     getMaxFishInterval(fish: Fish): number;
-    getUncappedDoublingChance(action: Fish): number;
-    getMasteryXPModifier(action: Fish): number;
     getAreaChances(area: FishingArea): FishingAreaChances;
+    applyPrimaryProductMultipliers(item: Item, quantity: number, action: NamedObject, query: ModifierQuery): number;
     preAction(): void;
     get actionRewards(): Rewards;
     postAction(): void;
     get masteryModifiedInterval(): number;
     onModifierChange(): void;
     onEquipmentChange(): void;
-    onLevelUp(oldLevel: number, newLevel: number): void;
+    onAnyLevelUp(): void;
     getErrorLog(): string;
     onLoad(): void;
     onStop(): void;
     onAncientRelicUnlock(): void;
+    onRealmChange(): void;
     /** Callback function for when the start button of an area is clicked */
     onAreaStartButtonClick(area: FishingArea): void;
     renderHiddenAreas(): void;
@@ -159,6 +162,8 @@ declare class Fishing extends GatheringSkill<Fish, FishingSkillData> implements 
     setFromOldOffline(offline: OfflineTuple, idMap: NumericIDMap): void;
     testTranslations(): void;
     getObtainableItems(): Set<AnyItem>;
+    getRegistry(type: ScopeSourceType): NamespaceRegistry<NamedObject> | undefined;
+    getPkgObjects(pkg: GameDataPackage, type: ScopeSourceType): IDData[] | undefined;
 }
 declare class FishingAreaChances {
     fish: number;
@@ -177,7 +182,7 @@ declare class FishingContest implements EncodableObject {
     /** Fishing Contest Data. If not undefined - contest is available */
     availableFish: FishingContestFish[];
     /** Fishing contest data variables */
-    menu?: FishingContestMenu;
+    menu?: FishingContestMenuElement;
     isActive: boolean;
     activeFish?: FishingContestFish;
     playerResults: FishingContestResult[];

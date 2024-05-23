@@ -1,123 +1,165 @@
-declare enum SpellTiers {
-    Strike = 0,
-    Bolt = 1,
-    Blast = 2,
-    Wave = 3,
-    Surge = 4,
-    Other = 5
-}
-declare enum ArchaicSpellTypeID {
-    Poison = 0,
-    Infernal = 1,
-    Lightning = 2,
-    Other = 3
-}
-declare class RuneMenu {
-    container: HTMLElement;
-    runes: Map<AnyItem, RuneMenuElement>;
-    highlighted: Set<AnyItem>;
+declare class RuneMenuElement extends HTMLElement implements CustomElement {
+    _content: DocumentFragment;
+    rowContainer: HTMLDivElement;
+    realmSelect: RealmTabSelectElement;
+    realmContainers: Map<Realm, HTMLDivElement>;
+    runeIcons: Map<RuneItem, ItemCurrentIconElement>;
+    highlighted: Set<RuneItem>;
+    visibleContainer?: HTMLDivElement;
     constructor();
-    init(): void;
-    createMenuElement(item: AnyItem): RuneMenuElement;
-    createTooltip(image: HTMLImageElement, item: AnyItem): TippyTooltip;
-    updateCounts(): void;
+    connectedCallback(): void;
+    init(game: Game): void;
+    updateCounts(bank: Bank): void;
     updateHighlights(spellSelection: SpellSelection, useAltRunes: boolean): void;
+    selectRealm(realm: Realm): void;
     addBordersForSpell(spell: BaseSpell, useAltRunes: boolean): void;
-    removeBorder(item: AnyItem): void;
-    addBorder(item: AnyItem): void;
+    removeBorder(item: RuneItem): void;
+    addBorder(item: RuneItem): void;
 }
-interface RuneMenuElement {
-    tooltip: TippyTooltip;
-    count: HTMLElement;
-    border: HTMLElement;
+declare class LockedSpellTooltipElement extends HTMLElement implements CustomElement {
+    _content: DocumentFragment;
+    levelRequired: HTMLSpanElement;
+    abyssalLevelRequired: HTMLSpanElement;
+    itemRequired: HTMLSpanElement;
+    requirements: HTMLSpanElement[];
+    pratsIdea: HTMLElement;
+    constructor();
+    connectedCallback(): void;
+    setSpell(spell: CombatSpell, game: Game, player: Player, ignoreReqs: boolean): void;
+    removeRequirements(): void;
+    setRequirements(spell: CombatSpell): void;
+    addRequirement(met: boolean, text: string): void;
 }
-declare abstract class SpellMenu<T extends CombatSpell> {
-    abstract menuContainer: HTMLDivElement;
-    spellElements: Map<T, CombatMenuElement>;
-    abstract book: T[];
-    abstract bookData: BookData;
-    abstract selectButton: HTMLAnchorElement;
-    selection?: T;
-    updateForUnlock(level: number, player: Player, ignoreReqs: boolean): void;
+declare class SpellTooltipRunesElement extends HTMLElement implements CustomElement {
+    _content: DocumentFragment;
+    runeCosts: HTMLDivElement;
+    orText: HTMLElement;
+    altRuneText: HTMLElement;
+    altRuneCosts: HTMLDivElement;
+    constructor();
+    connectedCallback(): void;
+    setSpell(spell: CombatSpell): void;
+    setRuneCosts(container: HTMLDivElement, runes: RuneQuantity[]): void;
+}
+declare class AttackSpellTooltipElement extends HTMLElement implements CustomElement {
+    _content: DocumentFragment;
+    spellName: HTMLSpanElement;
+    spellDamage: HTMLSpanElement;
+    combatEffects: HTMLSpanElement;
+    specialAttack: HTMLSpanElement;
+    runeCosts: SpellTooltipRunesElement;
+    constructor();
+    connectedCallback(): void;
+    setSpell(spell: AttackSpell): void;
+}
+declare class CurseSpellTooltipElement extends HTMLElement implements CustomElement {
+    _content: DocumentFragment;
+    spellName: HTMLSpanElement;
+    enemyModifiers: HTMLSpanElement;
+    enemyTurns: HTMLSpanElement;
+    runeCosts: SpellTooltipRunesElement;
+    constructor();
+    connectedCallback(): void;
+    setSpell(spell: CurseSpell): void;
+}
+declare class AuroraSpellTooltipElement extends HTMLElement implements CustomElement {
+    _content: DocumentFragment;
+    spellName: HTMLSpanElement;
+    description: HTMLSpanElement;
+    runeCosts: SpellTooltipRunesElement;
+    constructor();
+    connectedCallback(): void;
+    setSpell(spell: AuroraSpell): void;
+}
+declare class SpellButtonElement extends HTMLElement implements CustomElement {
+    _content: DocumentFragment;
+    link: HTMLAnchorElement;
+    spellImage: HTMLImageElement;
+    tooltip?: TippyTooltip;
+    constructor();
+    connectedCallback(): void;
+    disconnectedCallback(): void;
+    setAttackSpell(spell: AttackSpell): void;
+    setCurseSpell(spell: CurseSpell): void;
+    setAuroraSpell(spell: AuroraSpell): void;
+    setLockedSpell(spell: CombatSpell, game: Game, player: Player, ignoreReqs: boolean): void;
+    setCallback(callback: VoidFunction): void;
+    removeCallback(): void;
+    highlight(): void;
+    unhighlight(): void;
+    static readonly borderClasses: string[];
+}
+declare abstract class SpellMenuElement<SpellType extends CombatSpell> extends HTMLElement {
+    abstract spellContainer: HTMLDivElement;
+    spells: SpellButtonElement[];
+    spellMap: Map<SpellType, SpellButtonElement>;
+    highlightedSpell?: SpellButtonElement;
+    abstract getToggleCallback(spell: SpellType, player: Player): VoidFunction;
+    abstract setSpellButton(spell: SpellType, spellElem: SpellButtonElement): void;
+    updateForUnlock(game: Game, player: Player, ignoreReqs: boolean): void;
     setMenuCallbacks(player: Player): void;
-    abstract getMenuCallback(id: T, player: Player): VoidFunction;
-    setSelection(spell: T | undefined): void;
-    createMenu(): void;
-    createSpell(spell: T): HTMLDivElement;
-    createTooltip(element: HTMLElement, tooltipHTML: string): TippyTooltip;
-    getLockedTooltipHTML(spell: T, player: Player, magicLevel: number, ignoreReqs: boolean): string;
-    getRuneHTML(spell: T): string;
-    getRuneCostHTML(costs: AnyItemQuantity[]): string;
-    abstract getTooltipHTML(spell: T): string;
-    getUnlockHTML(spell: T, player: Player, magicLevel: number, ignoreReqs: boolean): string;
-    itemRequirement(spell: T, player: Player): boolean;
-    checkUnlocked(spell: T, level: number, player: Player, ignoreReqs: boolean): boolean;
+    setSpells(spells: SpellType[]): void;
+    appendSpellMenu(spellElem: SpellButtonElement): void;
+    highlightSpell(spell?: SpellType): void;
 }
-declare class StandardSpellMenu extends SpellMenu<StandardSpell> {
-    menuContainer: HTMLDivElement;
-    selectButton: HTMLAnchorElement;
-    book: StandardSpell[];
-    bookData: {
-        readonly name: string;
-        readonly description: string;
-    };
+declare class AttackSpellMenuElement extends SpellMenuElement<AttackSpell> implements CustomElement {
+    _content: DocumentFragment;
+    spellContainer: HTMLDivElement;
+    bookName: HTMLSpanElement;
+    curseAuroraInfo: HTMLSpanElement;
+    noDamageModifiersContainer: HTMLDivElement;
+    noDamageModifiersMessage: HTMLSpanElement;
+    noSpecialAttacksContainer: HTMLDivElement;
+    noSpecialAttacksMessage: HTMLSpanElement;
     constructor();
-    getMenuCallback(spell: StandardSpell, player: Player): VoidFunction;
-    getTooltipHTML(spell: StandardSpell): string;
+    connectedCallback(): void;
+    setBook(book: AttackSpellbook): void;
+    appendSpellMenu(spellElem: SpellButtonElement): void;
+    getToggleCallback(spell: AttackSpell, player: Player): VoidFunction;
+    setSpellButton(spell: AttackSpell, spellElem: SpellButtonElement): void;
 }
-declare class CurseSpellMenu extends SpellMenu<CurseSpell> {
-    menuContainer: HTMLDivElement;
-    selectButton: HTMLAnchorElement;
-    book: CurseSpell[];
-    bookData: {
-        readonly name: string;
-        readonly description: string;
-    };
+declare class CurseSpellMenuElement extends SpellMenuElement<CurseSpell> implements CustomElement {
+    _content: DocumentFragment;
+    spellContainer: HTMLDivElement;
     constructor();
-    getMenuCallback(spell: CurseSpell, player: Player): VoidFunction;
-    getTooltipHTML(curse: CurseSpell): string;
+    connectedCallback(): void;
+    init(game: Game): void;
+    getToggleCallback(spell: CurseSpell, player: Player): VoidFunction;
+    setSpellButton(spell: CurseSpell, spellElem: SpellButtonElement): void;
 }
-declare class AuroraSpellMenu extends SpellMenu<AuroraSpell> {
-    menuContainer: HTMLDivElement;
-    selectButton: HTMLAnchorElement;
-    book: AuroraSpell[];
-    bookData: {
-        readonly name: string;
-        readonly description: string;
-    };
+declare class AuroraSpellMenuElement extends SpellMenuElement<AuroraSpell> implements CustomElement {
+    _content: DocumentFragment;
+    spellContainer: HTMLDivElement;
     constructor();
-    getMenuCallback(spell: AuroraSpell, player: Player): VoidFunction;
-    getTooltipHTML(aurora: AuroraSpell): string;
+    connectedCallback(): void;
+    init(game: Game): void;
+    getToggleCallback(spell: AuroraSpell, player: Player): VoidFunction;
+    setSpellButton(spell: AuroraSpell, spellElem: SpellButtonElement): void;
 }
-declare class AncientSpellMenu extends SpellMenu<AncientSpell> {
-    menuContainer: HTMLDivElement;
-    selectButton: HTMLAnchorElement;
-    book: AncientSpell[];
-    bookData: {
-        readonly name: string;
-        readonly description: string;
-    };
+declare class SpellbookMenuElement extends HTMLElement implements CustomElement {
+    _content: DocumentFragment;
+    weaponNotice: HTMLElement;
+    attackButtonGroup: HTMLDivElement;
+    curseButton: HTMLButtonElement;
+    auroraButton: HTMLButtonElement;
+    attackSpellMenu: AttackSpellMenuElement;
+    curseSpellMenu: CurseSpellMenuElement;
+    auroraSpellMenu: AuroraSpellMenuElement;
+    combatRunesOption: HTMLDivElement;
+    selectedAttackBook?: AttackSpellbook;
+    selectedButton: HTMLButtonElement;
+    selectedMenu: SpellMenuElement<CombatSpell>;
+    tooltips: TippyTooltip[];
     constructor();
-    getMenuCallback(spell: AncientSpell, player: Player): VoidFunction;
-    createMenu(): void;
-    getTooltipHTML(ancient: AncientSpell): string;
+    connectedCallback(): void;
+    disconnectedCallback(): void;
+    init(game: Game): void;
+    updateRequirements(game: Game, player: Player, ignoreReqs: boolean): void;
+    selectAttack(game: Game, book: AttackSpellbook, button: HTMLButtonElement): void;
+    selectCurse(game: Game): void;
+    selectAurora(game: Game): void;
+    changeSelectedButton(button: HTMLButtonElement): void;
+    changeSelectedMenu(menu: SpellMenuElement<CombatSpell>): void;
+    onBookChange(game: Game): void;
+    addTooltip(button: HTMLButtonElement, bookName: string): void;
 }
-declare class ArchaicSpellMenu extends SpellMenu<ArchaicSpell> {
-    menuContainer: HTMLDivElement;
-    selectButton: HTMLAnchorElement;
-    book: ArchaicSpell[];
-    bookData: {
-        readonly name: string;
-        readonly description: string;
-    };
-    constructor();
-    getMenuCallback(spell: ArchaicSpell, player: Player): VoidFunction;
-    createMenu(): void;
-    getTooltipHTML(spell: ArchaicSpell): string;
-}
-declare type BookData = {
-    name: string;
-    description: string;
-};
-declare type CombatSpellBook = 'standard' | 'curse' | 'aurora' | 'ancient' | 'archaic';
-declare function updateSpellbook(book: CombatSpellBook, player: Player, magicLevel: number, ignoreReqs: boolean): void;

@@ -5,8 +5,11 @@ declare const enum BankSelectionMode {
 }
 interface ItemUpgradeData {
     itemCosts: IDQuantity[];
-    gpCost: number;
-    scCost: number;
+    currencyCosts?: IDQuantity[];
+    /** @deprecated Use currencyCosts instead */
+    gpCost?: number;
+    /** @deprecated Use currencyCosts instead */
+    scCost?: number;
     rootItemIDs: string[];
     upgradedItemID: string;
     isDowngrade: boolean;
@@ -16,9 +19,8 @@ declare class ItemUpgrade {
     upgradedItem: AnyItem;
     upgradedQuantity: number;
     itemCosts: AnyItemQuantity[];
+    currencyCosts: CurrencyQuantity[];
     rootItems: AnyItem[];
-    gpCost: number;
-    scCost: number;
     isDowngrade: boolean;
     constructor(data: ItemUpgradeData, game: Game);
 }
@@ -34,8 +36,22 @@ declare class BankRenderQueue {
     /** If the space used in the bank requires an update */
     space: boolean;
 }
+declare class ItemFoundEvent extends GameEvent {
+    item: AnyItem;
+    constructor(item: AnyItem);
+}
+declare class ItemQuantityChangedEvent extends GameEvent {
+    item: AnyItem;
+    oldQuantity: number;
+    newQuantity: number;
+    constructor(item: AnyItem, oldQuantity: number, newQuantity: number);
+}
+declare type BankEvents = {
+    itemChanged: ItemQuantityChangedEvent;
+    itemFound: ItemFoundEvent;
+};
 /** Class for the bank */
-declare class Bank implements EncodableObject {
+declare class Bank extends GameEventEmitter<BankEvents> implements EncodableObject {
     game: Game;
     baseSlots: number;
     renderQueue: BankRenderQueue;
@@ -78,18 +94,19 @@ declare class Bank implements EncodableObject {
     /** Dummy items that are force added to the bank post save load */
     postLoadItems: Map<DummyItem, number>;
     get slotsSelected(): number;
-    get itemCountSelected(): number;
-    get selectedItemValue(): number;
     /** Returns an array of all items present in the bank that are currently unlocked */
     get unlockedItemArray(): AnyItem[];
     /** Readonly. Returns the number of tabs in the bank. */
     get tabCount(): number;
+    /** If this bank should emit events on the Item class */
+    get emitItemEvents(): boolean;
     constructor(game: Game, initialTabs?: number, baseSlots?: number);
     registerSortOrder(order: InsertOrder[]): void;
     encode(writer: SaveWriter): SaveWriter;
     decode(reader: SaveWriter, version: number): void;
     /** Converts old global save variables to object properties */
     convertFromOldFormat(save: NewSaveGame, idMap: NumericIDMap): void;
+    addItemOnLoad(item: AnyItem, quantity: number): void;
     addDummyItemOnLoad(itemID: string, quantity: number): void;
     /** Method called on save file load */
     onLoad(): void;
@@ -115,8 +132,8 @@ declare class Bank implements EncodableObject {
     getItemDefaultTab(item: AnyItem): number;
     /** Returns the sale price of an item inclusive of modifiers */
     getItemSalePrice(item: AnyItem, quantity?: number): number;
-    getTabValue(tabID: number): number;
-    getBankValue(): number;
+    getTabValue(tabID: number): SparseNumericMap<Currency>;
+    getBankValue(): SparseNumericMap<Currency>;
     getSnapShot(): Map<AnyItem, number>;
     getHistory(): AnyItemQuantity[];
     /** Adds the given quantity to all items currently in the bank */
@@ -204,6 +221,10 @@ declare class Bank implements EncodableObject {
     /** Disables the current item selection mode if any */
     disableItemSelectionMode(): void;
     moveSelectedItemsToTab(newTabID: number): void;
+    getSelectedItemInfo(): {
+        count: number;
+        value: SparseNumericMap<Currency>;
+    };
     /** Callback function for selling all selected items */
     sellAllSelectedItems(): void;
     /** Processes the sale of all selected items */
@@ -217,7 +238,7 @@ declare class Bank implements EncodableObject {
     setLockOfAllItemsOnClick(locked: boolean): void;
     /** Callback function for setting all items in the bank to match the locked input */
     setLockOfAllItems(locked: boolean): void;
-    fireBulkItemSaleConfirmation(totalGP: number, count: number, onConfirm: VoidFunction): void;
+    fireBulkItemSaleConfirmation(totalCurrency: SparseNumericMap<Currency>, count: number, onConfirm: VoidFunction): void;
     /** Callback function for when the sort button is clicked */
     sortButtonOnClick(): void;
     storeCustomSortOrder(): void;
@@ -225,8 +246,14 @@ declare class Bank implements EncodableObject {
     processItemSale(item: AnyItem, quantity: number): void;
     /** Callback function for when the sell button is clicked */
     sellItemOnClick(item: AnyItem, quantity: number): void;
+    /** Gets the number of prayer points to give when burying a bone */
+    getPrayerPointsPerBone(item: BoneItem): number;
     /** Callback function for when the bury item button is clicked */
     buryItemOnClick(item: BoneItem, quantity: number): void;
+    /** Gets the number of soul points to give when releasing a soul */
+    getSoulPointsPerSoul(item: SoulItem): number;
+    /** Callback function for when the excercize item button is clicked. */
+    releaseSoulItemOnClick(item: SoulItem, quantity: number): void;
     /** Callback function for when the open item button is clicked */
     openItemOnClick(item: OpenableItem, quantity: number): void;
     /** Processes the actual opening of an item */
@@ -235,6 +262,8 @@ declare class Bank implements EncodableObject {
     readItemOnClick(item: ReadableItem): void;
     /** Callback function for when the claim token button is clicked */
     claimItemOnClick(item: TokenItem, quantity: number): void;
+    /** Callback function for when the claim token button is clicked for a Mastery Token */
+    claimMasteryTokenOnClick(item: MasteryTokenItem, quantity: number): void;
     getMaxUpgradeQuantity(upgrade: ItemUpgrade): number;
     checkUpgradePotionRequirement(upgrade: ItemUpgrade): boolean;
     /** Displays the item upgrade modal and sets it to display the upgrade */
@@ -275,9 +304,9 @@ declare class BankItem {
     /** The current position of the item in it's tab */
     tabPosition: number;
     /** Returns the sale value of a single item */
-    get itemSellValue(): number;
+    get itemSellValue(): CurrencyQuantity;
     /** Returns the total stack value of the item */
-    get stackValue(): number;
+    get stackValue(): CurrencyQuantity;
     /** Returns if the item is currently locked */
     get locked(): boolean;
     /** Returns if the item should have a green glovw in the bank */
@@ -296,5 +325,6 @@ declare class BankItem {
 }
 /** Special variant of the bank with stripped down rendering for golbin raid */
 declare class GolbinRaidBank extends Bank {
+    get emitItemEvents(): boolean;
     render(): void;
 }

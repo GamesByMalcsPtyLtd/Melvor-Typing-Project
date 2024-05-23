@@ -1,6 +1,7 @@
-declare const gameVersion = "v1.2.2";
-declare const previousGameVersion = "v1.2.1";
+declare const gameVersion = "v1.3";
+declare const previousGameVersion = "v1.3";
 declare const characterSelectAnnouncementVersion = 4;
+/** Locks/Unlocks Base Game skills based on full version entitlement */
 declare const setupSkillLock: (game: Game) => void;
 /** Callback function for the "Change Character Name" button in the account menu */
 declare function showUsernameChange(): void;

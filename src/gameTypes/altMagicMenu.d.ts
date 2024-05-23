@@ -1,34 +1,34 @@
-declare class AltMagicMenu extends HTMLElement {
+declare class AltMagicMenuElement extends HTMLElement implements CustomElement {
     _content: DocumentFragment;
     spellImage: HTMLImageElement;
     clickImageInfo: HTMLDivElement;
     spellName: HTMLSpanElement;
     spellDescription: HTMLElement;
-    runeRequirements: RequiresBox;
-    itemRequirements: RequiresBox;
-    runeHaves: HavesBox;
-    itemHaves: HavesBox;
-    producesSingle: ProducesBox;
-    producesCurrent: HavesBox;
-    grants: GrantsBox;
-    interval: IntervalIcon;
-    progressBar: ProgressBar;
+    runeRequirements: RequiresBoxElement;
+    itemRequirements: QuantityIconsElement;
+    runeHaves: HavesBoxElement;
+    itemHaves: CurrentQuantityIconsElement;
+    producesSingle: ProducesBoxElement;
+    producesCurrent: HavesBoxElement;
+    grants: GrantsBoxElement;
+    interval: IntervalIconElement;
+    progressBar: ProgressBarElement;
     castButton: HTMLButtonElement;
-    doublingIcon: DoublingIcon;
+    doublingIcon: DoublingIconElement;
     doublingCont: HTMLDivElement;
     constructor();
     connectedCallback(): void;
     setCastCallback(altMagic: AltMagic): void;
     setSpell(altMagic: AltMagic, spell: AltMagicSpell): void;
     setSpellImage(altMagic: AltMagic): void;
-    setSpellQuantities(altMagic: AltMagic): void;
+    setSpellQuantities(altMagic: AltMagic, game: Game): void;
     resetSpellQuantities(): void;
-    updateQuantities(): void;
+    updateQuantities(game: Game): void;
     updateRates(altMagic: AltMagic): void;
     unsetSpell(): void;
     renderProgress(altMagic: AltMagic, timer: Timer): void;
 }
-declare class AltMagicItemMenu extends HTMLElement {
+declare class AltMagicItemMenuElement extends HTMLElement implements CustomElement {
     _content: DocumentFragment;
     buttonContainer: HTMLDivElement;
     selectItemFragment: DocumentFragment;

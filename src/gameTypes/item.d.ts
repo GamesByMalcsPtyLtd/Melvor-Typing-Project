@@ -14,6 +14,8 @@ interface BaseItemData extends IDData {
     golbinRaidExclusive: boolean;
     customDescription?: string;
     sellsFor: number;
+    /** Optional. Sets the currency that this item sells for. Defaults to GP. */
+    sellsForCurrency?: string;
     isArtefact?: boolean;
     isGenericArtefact?: boolean;
 }
@@ -26,25 +28,33 @@ interface BaseItemModificationData extends IDData {
 interface ItemData extends BaseItemData {
     itemType: 'Item';
 }
-declare type AnyItemData = ItemData | EquipmentItemData | WeaponItemData | FoodItemData | BoneItemData | PotionItemData | ReadableItemData | OpenableItemData | TokenItemData | CompostItemData;
-declare type AnyItemModificationData = BaseItemModificationData | BaseEquipmentItemModificationData | WeaponItemModificationData | FoodItemModificationData | BoneItemModificationData | PotionItemModificationData | OpenableItemModificationData | TokenItemModificationData | CompostItemModificationData;
-declare type AnyItem = Item | EquipmentItem | WeaponItem | FoodItem | BoneItem | PotionItem | ReadableItem | OpenableItem | TokenItem | CompostItem;
+declare type AnyItemData = ItemData | EquipmentItemData | WeaponItemData | FoodItemData | BoneItemData | PotionItemData | ReadableItemData | OpenableItemData | TokenItemData | MasteryTokenItemData | CompostItemData | SoulItemData | RuneItemData | FiremakingOilItemData;
+declare type AnyItemModificationData = BaseItemModificationData | BaseEquipmentItemModificationData | WeaponItemModificationData | FoodItemModificationData | BoneItemModificationData | PotionItemModificationData | OpenableItemModificationData | TokenItemModificationData | CompostItemModificationData | SoulItemModificationData;
+declare type AnyItem = Item | EquipmentItem | WeaponItem | FoodItem | BoneItem | PotionItem | ReadableItem | OpenableItem | TokenItem | MasteryTokenItem | CompostItem | SoulItem | RuneItem | FiremakingOilItem;
+declare type ItemEvents = {
+    /** Fired when the quantity of this item changes in the bank */
+    bankQuantityChanged: ItemQuantityChangedEvent;
+    /** Fired when this item is obtained for the first time */
+    found: ItemFoundEvent;
+};
 /** Base class for items in the game */
-declare class Item extends NamespacedObject {
+declare class Item extends NamespacedObject implements IGameEventEmitter<ItemEvents> {
     category: string;
     type: string;
     get nameFromData(): string;
     get descriptionFromData(): string;
     get name(): string;
+    get englishName(): string;
     get wikiName(): string;
     /** Image URL*/
     get media(): string;
     /** Alternative image URL, if one is present, otherwise defaults to media */
     get altMedia(): string;
     get description(): string;
+    _modifiedDescription: string | undefined;
     get modifiedDescription(): string;
     get artefactSizeAndLocation(): string;
-    sellsFor: number;
+    sellsFor: CurrencyQuantity;
     _name: string;
     _media: string;
     get hasDescription(): boolean;
@@ -58,7 +68,21 @@ declare class Item extends NamespacedObject {
     _customDescription?: string;
     _mediaAnimation?: string;
     _altMedia?: string;
-    constructor(namespace: DataNamespace, data: BaseItemData);
+    readonly modQuery: ModifierQuery;
+    _events: import("mitt").Emitter<ItemEvents>;
+    on: {
+        <Key extends keyof ItemEvents>(type: Key, handler: import("mitt").Handler<ItemEvents[Key]>): void;
+        (type: "*", handler: import("mitt").WildcardHandler<ItemEvents>): void;
+    };
+    off: {
+        <Key extends keyof ItemEvents>(type: Key, handler?: import("mitt").Handler<ItemEvents[Key]> | undefined): void;
+        (type: "*", handler: import("mitt").WildcardHandler<ItemEvents>): void;
+    };
+    emit: {
+        <Key extends keyof ItemEvents>(type: Key, event: ItemEvents[Key]): void;
+        <Key_1 extends keyof ItemEvents>(type: undefined extends ItemEvents[Key_1] ? Key_1 : never): void;
+    };
+    constructor(namespace: DataNamespace, data: BaseItemData, game: Game);
     applyDataModification(modData: BaseItemModificationData, game: Game): void;
     overrideMedia(media: string): void;
 }
@@ -66,7 +90,7 @@ declare class Item extends NamespacedObject {
 declare class DummyItem extends Item {
     get name(): string;
     get description(): string;
-    constructor(namespace: DataNamespace, id: string);
+    constructor(namespace: DataNamespace, id: string, game: Game);
 }
 interface ItemQuantity<T> {
     item: T;
@@ -77,23 +101,46 @@ interface ItemQuantityRarity<T> extends ItemQuantity<T> {
 }
 declare type AnyItemQuantity = ItemQuantity<AnyItem>;
 declare type EquipmentQuantity = ItemQuantity<EquipmentItem>;
+declare type RuneQuantity = ItemQuantity<RuneItem>;
 interface IDQuantity {
     id: string;
     quantity: number;
 }
-declare type AmmoType = 'Arrows' | 'Bolts' | 'Javelins' | 'ThrowingKnives' | 'None';
+interface ItemQuantitiesModificationData {
+    add?: IDQuantity[];
+    remove?: string[];
+}
+interface ItemChanceData {
+    itemID: string;
+    chance: number;
+}
+interface ItemChance {
+    item: Item;
+    chance: number;
+}
+declare type AmmoType = 'Arrows' | 'Bolts' | 'Javelins' | 'ThrowingKnives' | 'None' | 'AbyssalArrows' | 'AbyssalBolts';
+interface ResistanceStatData {
+    /** The ID of the damage type resistance should be given to */
+    id: string;
+    /** The amount of resistance */
+    value: number;
+}
 interface BaseEquipmentItemData extends BaseItemData {
     tier: string;
-    validSlots: SlotTypes[];
-    occupiesSlots: SlotTypes[];
+    /** The IDs of the EquipmentSlots this item can be equipped to */
+    validSlots: string[];
+    /** The IDs of the EquipmentSlots this item occupies when it is equipped */
+    occupiesSlots: string[];
+    /** Optional. The IDs of Equipment Items that this item cannot be equipped with at the same time */
+    cantEquipWith?: string[];
     equipRequirements: AnyRequirementData[];
     equipmentStats: EquipStatPair[];
-    modifiers?: PlayerModifierData;
-    enemyModifiers?: CombatModifierData;
+    modifiers?: ModifierValuesRecordData;
+    enemyModifiers?: ModifierValuesRecordData;
     conditionalModifiers?: ConditionalModifierData[];
     specialAttacks?: string[];
     overrideSpecialChances?: number[];
-    fightEffects?: string[];
+    combatEffects?: TriggeredCombatEffectApplicatorData[];
     providedRunes?: IDQuantity[];
     ammoType?: AmmoType;
     consumesChargesOn?: GameEventMatcherData[];
@@ -105,6 +152,8 @@ interface BaseEquipmentItemData extends BaseItemData {
     };
     /** Optional. If present sets the priority of losing this item when dying. Lower priority indicates the item will be lost sooner. Defaults to 0. */
     deathPenaltyPriority?: number;
+    /** Optional. DamageType resistances provided by this item. Do not apply if item is in the Passive slot. */
+    resistanceStats?: ResistanceStatData[];
 }
 interface BaseEquipmentItemModificationData extends BaseItemModificationData {
     ammoType?: AmmoType | null;
@@ -112,10 +161,7 @@ interface BaseEquipmentItemModificationData extends BaseItemModificationData {
         add?: ConditionalModifierData[];
         remove?: string[];
     };
-    enemyModifiers?: {
-        add?: CombatModifierData;
-        remove?: (keyof CombatModifierData)[];
-    };
+    enemyModifiers?: ModifierValuesModificationData;
     equipRequirements?: {
         add?: AnyRequirementData[];
         remove?: string[];
@@ -124,31 +170,26 @@ interface BaseEquipmentItemModificationData extends BaseItemModificationData {
         add?: EquipStatPair[];
         remove?: EquipStatKey[];
     };
-    fightEffects?: {
+    combatEffects?: CombatEffectApplicatorModificationData;
+    modifiers?: ModifierValuesModificationData;
+    occupiesSlots?: {
         add?: string[];
         remove?: string[];
     };
-    modifiers?: {
-        add?: PlayerModifierData;
-        remove?: (keyof PlayerModifierData)[];
-    };
-    occupiesSlots?: {
-        add?: SlotTypes[];
-        remove?: SlotTypes[];
-    };
     overrideSpecialChances?: number[] | null;
-    providedRunes?: {
-        add?: IDQuantity[];
-        remove?: string[];
-    };
+    providedRunes?: ItemQuantitiesModificationData;
     specialAttacks?: {
         add?: string[];
         remove?: string[];
     };
     tier?: string;
     validSlots?: {
-        add?: SlotTypes[];
-        remove?: SlotTypes[];
+        add?: string[];
+        remove?: string[];
+    };
+    resistanceStats?: {
+        add?: ResistanceStatData[];
+        remove?: string[];
     };
     consumesOn?: {
         add?: GameEventMatcherData[];
@@ -164,29 +205,31 @@ declare type BankItemConsumption = {
     matchers: AnyGameEventMatcher[];
 };
 /** Item which can be equipped to the player */
-declare class EquipmentItem extends Item implements SoftDataDependant<EquipmentItemData> {
+declare class EquipmentItem extends Item implements SoftDataDependant<EquipmentItemData>, IStatObject {
     /** Used to classify the item */
     tier: string;
     /** Valid slots the equipment can go in. First element is the default slot to use. */
-    validSlots: SlotTypes[];
+    validSlots: EquipmentSlot[];
     /** Additional equipment slots that are also taken up */
-    occupiesSlots: SlotTypes[];
+    occupiesSlots: EquipmentSlot[];
+    /** Items that this item is not allowed to be equipped with. */
+    cantEquipWith: EquipmentItem[];
     /** Requirements for equipping the item */
     equipRequirements: AnyRequirement[];
     /** Equipment stats provided by item */
     equipmentStats: EquipStatPair[];
     /** Modifiers provided by the item */
-    modifiers?: PlayerModifierObject;
+    modifiers?: ModifierValue[];
     /** Enemy modifiers provided by the item */
-    enemyModifiers?: CombatModifierData;
+    enemyModifiers?: ModifierValue[];
     /** Conditional modifiers provided by the item */
     conditionalModifiers: ConditionalModifier[];
+    /** If present, this item will provide CombatEffects */
+    combatEffects?: CombatEffectApplicator[];
     /** Special attacks provided by the item */
     specialAttacks: SpecialAttack[];
     /** If present with specialAttacks, will override their default chances */
     overrideSpecialChances?: number[];
-    /** Effects that apply at the start of a fight */
-    fightEffects: ItemEffect[];
     /** Runes that are provided by the item */
     providedRunes: AnyItemQuantity[];
     /** Property exclusive to ammo */
@@ -199,12 +242,18 @@ declare class EquipmentItem extends Item implements SoftDataDependant<EquipmentI
     consumesItemOn?: BankItemConsumption;
     /** Determines the priority of losing this item to the death penalty. Lower priority is lost before other items. */
     deathPenaltyPriority: number;
+    /** Resistance stats provided by item */
+    resistanceStats: Map<DamageType, number>;
     get hasDescription(): boolean;
     get description(): string;
     get modifiedDescription(): string;
     constructor(namespace: DataNamespace, data: BaseEquipmentItemData, game: Game);
     registerSoftDependencies(data: EquipmentItemData, game: Game): void;
     applyDataModification(modData: BaseEquipmentItemModificationData, game: Game): void;
+    /** If this item fits in an equipment slot with the given ID */
+    fitsInSlot(slotID: string): boolean;
+    /** If this item occupies an equipment slot with the given ID */
+    occupiesSlot(slotID: string): boolean;
 }
 declare class DummyEquipmentItem extends EquipmentItem {
     constructor(namespace: DataNamespace, id: string, game: Game);
@@ -213,6 +262,7 @@ interface WeaponItemData extends BaseEquipmentItemData {
     itemType: 'Weapon';
     attackType: AttackType;
     ammoTypeRequired?: AmmoType;
+    damageType?: string;
 }
 interface WeaponItemModificationData extends BaseEquipmentItemModificationData {
     attackType?: AttackType;
@@ -223,19 +273,28 @@ declare class WeaponItem extends EquipmentItem {
     attackType: AttackType;
     /** The ammo type this weapon requires for each attack */
     ammoTypeRequired?: AmmoTypeID;
+    /** The type of damage this weapon deals. Defaults to Normal if not set */
+    damageType: DamageType;
     constructor(namespace: DataNamespace, itemData: WeaponItemData, game: Game);
     applyDataModification(modData: WeaponItemModificationData, game: Game): void;
 }
-interface FoodItemData extends BaseItemData {
+interface FoodItemData extends BaseItemData, IStatObjectData {
     itemType: 'Food';
     healsFor: number;
 }
 interface FoodItemModificationData extends BaseItemModificationData {
     healsFor?: number;
+    modifiers?: ModifierValuesModificationData;
+    combatEffects?: CombatEffectApplicatorModificationData;
 }
 declare class FoodItem extends Item {
     healsFor: number;
-    constructor(namespace: DataNamespace, itemData: FoodItemData);
+    /** Stats that are applied when this item is equipped and selected */
+    stats: StatObject;
+    get hasDescription(): boolean;
+    get description(): string;
+    get modifiedDescription(): string;
+    constructor(namespace: DataNamespace, data: FoodItemData, game: Game);
     applyDataModification(modData: FoodItemModificationData, game: Game): void;
 }
 interface BoneItemData extends BaseItemData {
@@ -247,12 +306,24 @@ interface BoneItemModificationData extends BaseItemModificationData {
 }
 declare class BoneItem extends Item {
     prayerPoints: number;
-    constructor(namespace: DataNamespace, itemData: BoneItemData);
+    constructor(namespace: DataNamespace, itemData: BoneItemData, game: Game);
     applyDataModification(modData: BoneItemModificationData, game: Game): void;
 }
-interface PotionItemData extends BaseItemData {
+interface SoulItemData extends BaseItemData {
+    itemType: 'Soul';
+    soulPoints: number;
+}
+interface SoulItemModificationData extends BaseItemModificationData {
+    soulPoints?: number;
+}
+/** Item that provides soul points that can be claimed in the bank. Functions similarly to bones. */
+declare class SoulItem extends Item {
+    soulPoints: number;
+    constructor(namespace: DataNamespace, itemData: SoulItemData, game: Game);
+    applyDataModification(modData: SoulItemModificationData, game: Game): void;
+}
+interface PotionItemData extends BaseItemData, IStatObjectData {
     itemType: 'Potion';
-    modifiers: PlayerModifierData;
     charges: number;
     tier: HerbloreTier;
     action: string;
@@ -260,19 +331,21 @@ interface PotionItemData extends BaseItemData {
 }
 interface PotionItemModificationData extends BaseItemModificationData {
     charges?: number;
-    modifiers?: {
-        add?: PlayerModifierData;
-        remove?: (keyof PlayerModifierData)[];
-    };
+    modifiers?: ModifierValuesModificationData;
+    combatEffects?: CombatEffectApplicatorModificationData;
 }
 declare class PotionItem extends Item implements SoftDataDependant<PotionItemData> {
-    /** Modifiers for the potion */
-    modifiers: PlayerModifierObject;
+    /** Stat provided by this potion */
+    stats: StatObject;
     /** Base charges the potion has */
     charges: number;
     /** Action the potion applies to */
     action: Action;
     tier: HerbloreTier;
+    /** The recipe this potion can be made from. Undefined if none */
+    get recipe(): HerbloreRecipe | undefined;
+    set recipe(value: HerbloreRecipe | undefined);
+    _recipe?: HerbloreRecipe;
     /** When a single charge of the potion should be consumed */
     consumesOn: AnyGameEventMatcher[];
     get hasDescription(): boolean;
@@ -283,7 +356,7 @@ declare class PotionItem extends Item implements SoftDataDependant<PotionItemDat
     applyDataModification(modData: PotionItemModificationData, game: Game): void;
 }
 declare type ReadableItemSwalData = {
-    title: LangStringData;
+    title: string;
     htmlTemplateID: string;
 };
 interface ReadableItemData extends BaseItemData {
@@ -294,7 +367,7 @@ interface ReadableItemData extends BaseItemData {
 declare class ReadableItem extends Item {
     modalID?: string;
     swalData?: ReadableItemSwalData;
-    constructor(namespace: DataNamespace, itemData: ReadableItemData);
+    constructor(namespace: DataNamespace, itemData: ReadableItemData, game: Game);
     /** Fire the modal for reading the item */
     showContents(): void;
 }
@@ -316,24 +389,44 @@ declare class OpenableItem extends Item {
     constructor(namespace: DataNamespace, itemData: OpenableItemData, game: Game);
     applyDataModification(modData: OpenableItemModificationData, game: Game): void;
 }
-interface TokenItemData extends BaseItemData {
+interface TokenItemData extends BaseItemData, IStatObjectData {
     itemType: 'Token';
-    /** Modifiers provided by claiming the token */
-    modifiers: PlayerModifierData;
 }
 interface TokenItemModificationData extends BaseItemModificationData {
-    modifiers?: {
-        add?: PlayerModifierData;
-        remove?: (keyof PlayerModifierData)[];
-    };
+    modifiers?: ModifierValuesModificationData;
+    combatEffects?: CombatEffectApplicatorModificationData;
 }
 declare class TokenItem extends Item {
-    /** Modifiers that are given to the player based on amount of tokens claimed */
-    modifiers: PlayerModifierObject;
+    game: Game;
+    /** Stats provided based on the amount of tokens claimed */
+    stats: StatObject;
     get hasDescription(): boolean;
     get description(): string;
-    constructor(namespace: DataNamespace, itemData: TokenItemData, game: Game);
+    constructor(namespace: DataNamespace, data: TokenItemData, game: Game);
+    /** Computes the number of times the player has claimed this token */
+    getTimesClaimed(): number;
     applyDataModification(modData: TokenItemModificationData, game: Game): void;
+}
+interface MasteryTokenItemData extends BaseItemData {
+    itemType: 'MasteryToken';
+    /** The skill to provide mastery XP for */
+    skill: string;
+    /** The realm that mastery XP is provided to */
+    realm: string;
+    /** The percentage of the mastery pool this item fills */
+    percent: number;
+    /** Optional. If this item should be rolled for when the corresponding skill completes an action. Defaults to true. */
+    rollInSkill?: boolean;
+}
+declare class MasteryTokenItem extends Item {
+    skill: SkillWithMastery<MasteryAction, MasterySkillData>;
+    realm: Realm;
+    percent: number;
+    /** If this item should be rolled for when a skill action is completed */
+    rollInSkill: boolean;
+    get hasDescription(): boolean;
+    get description(): string;
+    constructor(namespace: DataNamespace, data: MasteryTokenItemData, game: Game);
 }
 interface CompostItemData extends BaseItemData {
     itemType: 'Compost';
@@ -341,22 +434,53 @@ interface CompostItemData extends BaseItemData {
     harvestBonus: number;
     buttonStyle: string;
     barStyle: string;
+    disableSeedRefund?: boolean;
 }
 interface CompostItemModificationData extends BaseItemModificationData {
     barStyle?: string;
     buttonStyle?: string;
     compostValue?: number;
     harvestBonus?: number;
+    disableSeedRefund?: boolean;
 }
 declare class CompostItem extends Item {
     compostValue: number;
     harvestBonus: number;
+    disableSeedRefund: boolean;
     buttonStyle: string;
     barStyle: string;
-    constructor(namespace: DataNamespace, itemData: CompostItemData);
+    constructor(namespace: DataNamespace, itemData: CompostItemData, game: Game);
     applyDataModification(modData: CompostItemModificationData, game: Game): void;
+}
+interface RuneItemData extends BaseItemData {
+    itemType: 'Rune';
+    subRunes?: string[];
+    realm?: string;
+}
+declare class RuneItem extends Item {
+    get isComboRune(): boolean;
+    subRunes: RuneItem[];
+    realm: Realm;
+    constructor(namespace: DataNamespace, data: RuneItemData, game: Game);
+}
+interface FiremakingOilItemData extends BaseItemData {
+    itemType: 'FiremakingOil';
+    oilInterval: number;
+    modifiers: ModifierValuesRecordData;
+}
+declare class FiremakingOilItem extends Item {
+    /** Modifiers provided by the Oil for Firemaking */
+    oilInterval: number;
+    modifiers: ModifierValue[];
+    constructor(namespace: DataNamespace, data: FiremakingOilItemData, game: Game);
+    registerSoftDependencies(data: FiremakingOilItemData, game: Game): void;
+    get description(): string;
+    get hasDescription(): boolean;
 }
 /** Returns the HTML that describes an items special attacks if it has any, else returns an empty string */
 declare function getItemSpecialAttackInformation(item: EquipmentItem): string;
 /** Returns the HTML for a tooltip that provides information on an item */
 declare function createItemInformationTooltip(item: AnyItem, showStats?: boolean): string;
+declare function getAmmoTypeDescription(item: EquipmentItem): string;
+declare function getAmmoTypeRequiredDescription(item: WeaponItem): string;
+declare function getItemBaseStatsBreakdown(item: EquipmentItem): string;

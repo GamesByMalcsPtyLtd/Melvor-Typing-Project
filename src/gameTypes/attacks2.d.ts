@@ -4,10 +4,12 @@ interface AttackData extends IDData {
     defaultChance: number;
     /** Damage dealt by attack */
     damage: DamageData[];
-    /** Effect Data for effects that occur before the attack hits*/
-    prehitEffects: EffectData[];
-    /** Effect Data for effects that occur when the attack hits */
-    onhitEffects: EffectData[];
+    /** Effect/EffectTable applicators that are processed before the attack hits */
+    prehitEffects: AnyCombatEffectApplicatorData[];
+    /** Effect/EffectTable applicators that are processed only when the attack hits */
+    onhitEffects: AnyCombatEffectApplicatorData[];
+    /** Optional. If true, this attack will be replaced by a normal attack if any of its pre-hit or on-hit effects are active */
+    canNormalAttack?: boolean;
     /** If the attack cant miss target */
     cantMiss: boolean;
     /** Number of attacks */
@@ -16,8 +18,11 @@ interface AttackData extends IDData {
     attackInterval: number;
     /** Portion of damage dealt healed */
     lifesteal: number;
-    /** ID of stacking effect to consume runes from */
-    consumesStacks?: string;
+    /** Optional. If present this attack will remove the given effect from the target character, and increase its attack count by the effects paremeter value */
+    consumesEffect?: {
+        effectID: string;
+        paramName: string;
+    };
     /** Attack consumes Runes per hit */
     usesRunesPerProc?: boolean;
     /** Attack consumes Prayer Points per hit */
@@ -51,62 +56,25 @@ interface NormalDamageData {
 declare type CustomDamageData = Damage & {
     damageType: 'Custom';
 };
-/** Defines data for the construction of an effect */
-declare type EffectData = SlowEffectData | BurnEffectData | PoisonEffectData | FrostBurnEffectData | AttackStackingEffectData | AfflictionEffectData | CustomEffectData | CurseEffectData | DeadlyPoisonEffectData;
-/** Data definition for a slow effect */
-interface SlowEffectData {
-    effectType: 'Slow';
-    /** Percentage value that effect should icnrease attack interval by */
-    magnitude: number;
-    /** Number of target turns the effect should last for */
-    turns: number;
-}
-/** Data definition for a standard burn effect */
-interface BurnEffectData {
-    effectType: 'Burn';
-    chance: number;
-}
-/** Data definition for a standard poison effect */
-interface PoisonEffectData {
-    effectType: 'Poison';
-    chance: number;
-}
-interface DeadlyPoisonEffectData {
-    effectType: 'DeadlyPoison';
-    chance: number;
-}
-/** Data definition for a standard frostburn effect */
-interface FrostBurnEffectData {
-    effectType: 'Frostburn';
-}
-/** Data definition for a stacking effect. Pulls from stacking effect registry. */
-interface AttackStackingEffectData {
-    effectType: 'Stacking';
-    id: string;
-}
-/** Data definition for a standard affliction effect */
-interface AfflictionEffectData {
-    effectType: 'Affliction';
-}
-declare type CustomEffectData = AnyEffectData & {
-    effectType: 'Custom';
-};
 declare class SpecialAttack extends NamespacedObject implements SoftDataDependant<AttackData> {
     /** Localized name of the attack */
     get name(): string;
+    get englishName(): string;
+    get englishDescription(): string;
     /** Localized description of the attack */
     get description(): string;
+    _modifiedDescription: string | undefined;
     get modifiedDescription(): string;
-    get canNormalAttack(): boolean;
+    canNormalAttack: boolean;
     get descriptionTemplateData(): StringDictionary<string>;
     /** Default chance for attack to happen in %*/
     defaultChance: number;
     /** Damage dealt by attack */
     damage: Damage[];
     /** Effects of attack before it hits*/
-    prehitEffects: AnyEffect[];
+    prehitEffects: AnyCombatEffectApplicator[];
     /** Efects of attack when it hits */
-    onhitEffects: AnyEffect[];
+    onhitEffects: AnyCombatEffectApplicator[];
     /** If the attack cant miss target */
     cantMiss: boolean;
     /** Number of attacks */
@@ -115,8 +83,11 @@ declare class SpecialAttack extends NamespacedObject implements SoftDataDependan
     attackInterval: number;
     /** Portion of damage dealt healed */
     lifesteal: number;
-    /** Attack consumes stacks of this to gain increased attack count */
-    consumeStacks?: StackingEffect;
+    /** Attack will remove an effect from the target character, and increase its attack count by the effects parameter value */
+    consumesEffect?: {
+        effect: CombatEffect;
+        paramName: string;
+    };
     /** Attack consumes Runes per hit */
     usesRunesPerProc: boolean;
     /** Attack consumes Prayer Points per hit */
@@ -137,57 +108,4 @@ declare class SpecialAttack extends NamespacedObject implements SoftDataDependan
     constructor(namespace: DataNamespace, data: AttackData, game: Game);
     registerSoftDependencies(data: AttackData, game: Game): void;
 }
-interface ItemEffectData extends IDData {
-    effectData: EffectData;
-    /** Optional. Specifies which character the effect should apply to. Defaults to Player */
-    target?: 'Player' | 'Enemy';
-}
-declare class ItemEffect extends NamespacedObject {
-    effect: AnyEffect;
-    /** Determines whether the player or enemy should recieve the effect at the start of combat */
-    target: 'Player' | 'Enemy';
-    constructor(namespace: DataNamespace, data: ItemEffectData, game: Game);
-}
-declare class ItemEffectAttack extends SpecialAttack {
-    /** Effects that have been registered */
-    itemEffects: NamespaceRegistry<ItemEffect>;
-    effectToItemEffectMap: Map<AnyEffect, ItemEffect>;
-    constructor(namespace: DataNamespace, game: Game);
-    registerItemEffects(namespace: DataNamespace, data: ItemEffectData[], game: Game): void;
-    getItemEffectFromEffect(effect: AnyEffect): ItemEffect;
-}
-interface StackingEffectData extends IDData {
-    stacksToAdd: number;
-    modifiers: CombatModifierData;
-    maxStacks: number;
-    name: string;
-    langName?: LangStringData;
-    media: string;
-}
-declare class StackingEffect extends NamespacedObject {
-    type: 'Stacking';
-    stacksToAdd: number;
-    modifiers: CombatModifierData;
-    maxStacks: number;
-    get name(): string;
-    get media(): string;
-    _media: string;
-    _name: string;
-    _langName?: LangStringData;
-    constructor(namespace: DataNamespace, data: StackingEffectData);
-}
 declare function constructDamageFromData(data: DamageData[]): Damage[];
-declare function constructEffectFromData(effectData: EffectData, game: Game, namespace?: DataNamespace | string): AnyEffect;
-interface CurseEffectData {
-    effectType: 'Curse';
-    curse: string;
-    chance?: number;
-    isRandom?: boolean;
-}
-declare class CurseEffect {
-    type: 'Curse';
-    curse: CurseSpell;
-    chance: number;
-    isRandom: boolean;
-    constructor(data: CurseEffectData, game: Game);
-}

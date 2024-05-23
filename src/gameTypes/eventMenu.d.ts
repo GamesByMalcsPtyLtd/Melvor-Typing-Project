@@ -1,4 +1,4 @@
-declare class CombatEventMenu extends HTMLElement {
+declare class CombatEventMenuElement extends HTMLElement implements CustomElement {
     _content: DocumentFragment;
     _title: HTMLHeadingElement;
     _startButton: HTMLButtonElement;

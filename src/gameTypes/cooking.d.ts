@@ -1,17 +1,27 @@
 interface CookingRecipeData extends SingleProductArtisanSkillRecipeData {
     perfectCookID: string;
     baseInterval: number;
+    subcategoryID?: string;
     noMastery?: boolean;
     discoveredItems?: string[];
+}
+interface CookingRecipeModificationData extends SingleProductArtisanSkillRecipeModificationData {
+    perfectCookID?: string;
+    baseInterval?: number;
+    subcategoryID?: string;
 }
 declare class CookingRecipe extends SingleProductArtisanSkillRecipe<CookingCategory> {
     perfectItem: AnyItem;
     baseInterval: number;
+    subcategory?: SkillSubcategory;
     hasMastery: boolean;
     discoveredItems: AnyItem[];
     constructor(namespace: DataNamespace, data: CookingRecipeData, game: Game, cooking: Cooking);
+    applyDataModification(data: CookingRecipeModificationData, game: Game): void;
 }
 interface CookingCategoryData extends SkillCategoryData {
+    modifierName: string;
+    modifierNameLang?: string;
     shopUpgradeIDs: string[];
     upgradeRequired: boolean;
 }
@@ -23,8 +33,11 @@ declare class CookingCategory extends SkillCategory {
     skill: Cooking;
     get media(): string;
     get name(): string;
+    get upgradeName(): string;
     get upgradeOwned(): boolean;
     get highestUpgrade(): ShopPurchase | undefined;
+    _modifierName: string;
+    _modifierNameLang?: string;
     shopUpgrades: ShopPurchase[];
     upgradeRequired: boolean;
     constructor(namespace: DataNamespace, data: CookingCategoryData, game: Game, skill: Cooking);
@@ -32,26 +45,24 @@ declare class CookingCategory extends SkillCategory {
 }
 interface CookingSkillData extends MasterySkillData {
     categories?: CookingCategoryData[];
+    subcategories?: SkillSubcategoryData[];
     recipes?: CookingRecipeData[];
+}
+interface CookingModificationData extends MasterySkillModificationData {
+    categories?: CookingCategoryModificationData[];
+    recipes?: CookingRecipeModificationData[];
 }
 declare type CookingEvents = {
     action: CookingActionEvent;
-};
-declare class Cooking extends CraftingSkill<CookingRecipe, CookingSkillData> implements IGameEventEmitter<CookingEvents> {
-    _events: import("mitt").Emitter<CookingEvents>;
-    on: {
-        <Key extends "action">(type: Key, handler: import("mitt").Handler<CookingEvents[Key]>): void;
-        (type: "*", handler: import("mitt").WildcardHandler<CookingEvents>): void;
-    };
-    off: {
-        <Key extends "action">(type: Key, handler?: import("mitt").Handler<CookingEvents[Key]> | undefined): void;
-        (type: "*", handler: import("mitt").WildcardHandler<CookingEvents>): void;
-    };
+} & SkillWithMasteryEvents;
+declare class Cooking extends CraftingSkill<CookingRecipe, CookingSkillData, CookingEvents, CookingModificationData> {
     readonly _media = Assets.Cooking;
+    get levelCompletionBreakdown(): LevelCompletionBreakdown[];
     computeTotalMasteryActions(): void;
-    getTotalUnlockedMasteryActions(): number;
+    isMasteryActionUnlocked(action: CookingRecipe): boolean;
     renderQueue: CookingRenderQueue;
     categories: NamespaceRegistry<CookingCategory>;
+    subcategories: NamespaceRegistry<SkillSubcategory>;
     get actionInterval(): number;
     get actionLevel(): number;
     get masteryAction(): CookingRecipe;
@@ -73,24 +84,24 @@ declare class Cooking extends CraftingSkill<CookingRecipe, CookingSkillData> imp
     ingredientRecipeMap: Map<AnyItem, CookingRecipe>;
     constructor(namespace: DataNamespace, game: Game);
     registerData(namespace: DataNamespace, data: CookingSkillData): void;
+    modifyData(data: CookingModificationData): void;
     postDataRegistration(): void;
     getIngredientCookedVersion(item: AnyItem): AnyItem | undefined;
     activeTick(): void;
     getStockpileSnapshot(): Map<CookingCategory, AnyItemQuantity>;
-    getMasteryHealingBonus(foodItem: FoodItem): number;
+    getActionForFood(foodItem: FoodItem): CookingRecipe | undefined;
     getRecipeMasteryModifiedInterval(recipe: CookingRecipe): number;
-    getMasteryXPModifier(action: CookingRecipe): number;
     /** Gets the interval for performing a normal cook with a recipe */
     getRecipeCookingInterval(recipe: CookingRecipe): number;
     /** Gets the interval for performing a passive cook with a recipe */
     getRecipePassiveCookingInterval(recipe: CookingRecipe): number;
-    getPercentageIntervalModifier(action: CookingRecipe): number;
     getRecipeSuccessChance(recipe: CookingRecipe): number;
+    getRecipeSuccessChanceSources(recipe: CookingRecipe): HTMLSpanElement[];
     getRecipePerfectChance(recipe: CookingRecipe): number;
+    getRecipePerfectChanceSources(recipe: CookingRecipe): HTMLSpanElement[];
     getRecipeCosts(recipe: CookingRecipe): Costs;
     getCurrentRecipeCosts(): Costs;
-    getPreservationChance(action: CookingRecipe, chance: number): number;
-    getUncappedDoublingChance(action: CookingRecipe): number;
+    getRandomFlatAdditionalPrimaryProductQuantity(item: Item, action: NamedObject, query: ModifierQuery): number;
     recordCostConsumptionStats(costs: Costs): void;
     recordCostPreservationStats(costs: Costs): void;
     preAction(): void;
@@ -113,14 +124,15 @@ declare class Cooking extends CraftingSkill<CookingRecipe, CookingSkillData> imp
     /** Callback function for when the recipe select button is pressed */
     onRecipeSelectionClick(recipe: CookingRecipe): void;
     /** Callback function for when the recipe selection open button is pressed */
-    onRecipeSelectionOpenClick(category: CookingCategory): void;
+    onRecipeSelectionOpenClick(category: CookingCategory, realm: Realm): void;
     /** Callback function for when the collect from stockpile button is pressed */
     onCollectStockpileClick(category: CookingCategory): void;
     renderModifierChange(): void;
     onModifierChange(): void;
     onEquipmentChange(): void;
-    onLevelUp(oldLevel: number, newLevel: number): void;
+    onAnyLevelUp(): void;
     getErrorLog(): string;
+    initMenus(): void;
     onLoad(): void;
     onPageChange(): void;
     onAncientRelicUnlock(): void;
@@ -132,6 +144,9 @@ declare class Cooking extends CraftingSkill<CookingRecipe, CookingSkillData> imp
     renderProgressBars(): void;
     renderStockpile(): void;
     renderUpgrades(): void;
+    getActionModifierQueryParams(action?: NamedObject): SkillModifierQueryParams;
+    getRegistry(type: ScopeSourceType): NamespaceRegistry<NamedObject> | undefined;
+    getPkgObjects(pkg: GameDataPackage, type: ScopeSourceType): IDData[] | undefined;
     resetActionState(): void;
     encode(writer: SaveWriter): SaveWriter;
     decode(reader: SaveWriter, version: number): void;

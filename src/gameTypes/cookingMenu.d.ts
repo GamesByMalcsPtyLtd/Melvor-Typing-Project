@@ -1,49 +1,44 @@
-declare class CookingMenu extends ContainedComponent {
-    category: CookingCategory;
-    container: HTMLDivElement;
-    contentRow: HTMLDivElement;
+declare class CookingMenuElement extends HTMLElement implements CustomElement {
+    _content: DocumentFragment;
     upgradeImage: HTMLImageElement;
-    upgradeName: HTMLHeadElement;
+    upgradeName: HTMLHeadingElement;
     selectRecipeButton: HTMLButtonElement;
-    selectedRecipeCont: HTMLDivElement;
-    productQty: number;
+    selectedRecipeContainer: HTMLDivElement;
     productImage: HTMLImageElement;
-    productName: HTMLHeadElement;
-    productHealing: HTMLSpanElement;
-    productHP: HTMLSpanElement;
     productCount: HTMLElement;
-    productTooltip: TippyTooltip;
-    requires: RequiresBox;
-    grants: GrantsBox;
-    haves: HavesBox;
-    mastery: MasteryDisplay;
-    bonuses: CookingBonusBox;
+    productName: HTMLHeadingElement;
+    productHealing: HTMLSpanElement;
+    requires: RequiresBoxElement;
+    grants: GrantsBoxElement;
+    mastery: MasteryDisplayElement;
+    haves: HavesBoxElement;
+    bonuses: CookingBonusBoxElement;
     activeCookButton: HTMLButtonElement;
     activeCookInterval: HTMLElement;
     passiveCookButton: HTMLButtonElement;
     passiveCookInterval: HTMLElement;
-    progressBar: ProgressBar;
+    stockPileIcon: CookingStockpileIconElement;
     stockPileButton: HTMLButtonElement;
-    stockPileIcon: CookingStockpileIcon;
-    constructor(category: CookingCategory, parentID: string);
-    activeCookCallback(): void;
-    passiveCookCallback(): void;
-    stockPileCallback(): void;
-    localize(): void;
+    productQty: number;
+    productTooltip?: TippyTooltip;
+    progressBar: ProgressBarElement;
+    constructor();
+    connectedCallback(): void;
+    disconnectedCallback(): void;
+    init(category: CookingCategory, game: Game): void;
     setStockPile(item: AnyItemQuantity | undefined): void;
-    updateUpgrade(): void;
-    setRecipeSelectButtonDisabled(disable: boolean): void;
-    setSelected(): void;
+    updateUpgrade(category: CookingCategory): void;
+    setSelected(recipe: CookingRecipe): void;
     getOwnedTooltipContent(normalQty: number, percectQty: number): string;
-    setSelectedRecipe(recipe: CookingRecipe | undefined, cooking: Cooking): void;
+    setSelectedRecipe(recipe: CookingRecipe | undefined, cooking: Cooking, game: Game): void;
     setRecipeRates(recipe: CookingRecipe, cooking: Cooking): void;
-    setBonusValues(preservation: number, doubling: number, perfectCook: number, success: number): void;
-    updateQuantities(recipe: CookingRecipe): void;
+    setBonusValues(values: CookingBonusValues, costReduction: number, costReductionSources: HTMLSpanElement[], additionalPrimaryQuantity: number, additionalPrimaryQuantitySources: HTMLSpanElement[]): void;
+    updateQuantities(recipe: CookingRecipe, game: Game): void;
     setProgressPassive(): void;
     renderActiveProgress(timer: Timer): void;
     stopProgressBar(): void;
 }
-declare class CookingRecipeSelection extends HTMLElement {
+declare class CookingRecipeSelectionElement extends HTMLElement implements CustomElement {
     _content: DocumentFragment;
     productImage: HTMLImageElement;
     masteryLevel: HTMLSpanElement;
@@ -53,20 +48,25 @@ declare class CookingRecipeSelection extends HTMLElement {
     iconContainer: HTMLDivElement;
     cookingXP: HTMLSpanElement;
     healingAmount: HTMLSpanElement;
-    intervalIcon: IntervalIcon;
-    quantityIcons: ItemQtyIcon[];
+    intervalIcon: IntervalIconElement;
+    foodModifiersCont: HTMLDivElement;
+    foodModifiers: HTMLDivElement;
+    perfectFoodModifiersCont: HTMLDivElement;
+    perfectFoodModifiers: HTMLDivElement;
+    quantityIcons: ItemQuantityIconElement[];
     constructor();
     connectedCallback(): void;
-    disconnectedCallback(): void;
-    setRecipe(recipe: CookingRecipe, cooking: Cooking): void;
+    setRecipe(recipe: CookingRecipe, cooking: Cooking, game: Game): void;
     /** Updates the interval, XP, hitpoints */
     updateRates(recipe: CookingRecipe): void;
+    /** Updates the modifiers provided by the food */
+    updateModifiers(recipe: CookingRecipe): void;
     /** Updates the mastery level and percent */
     updateMastery(recipe: CookingRecipe, cooking: Cooking): void;
     /** Updates the quanties of the recipe costs */
-    updateQuantities(recipe: CookingRecipe): void;
+    updateQuantities(game: Game): void;
 }
-declare class LockedCookingRecipe extends HTMLElement {
+declare class LockedCookingRecipeElement extends HTMLElement implements CustomElement {
     _content: DocumentFragment;
     lockedText: HTMLHeadingElement;
     constructor();

@@ -1,4 +1,4 @@
-declare class SummoningMarkDiscovery extends HTMLElement {
+declare class SummoningMarkDiscoveryElement extends HTMLElement implements CustomElement {
     _content: DocumentFragment;
     status: HTMLElement;
     name: HTMLSpanElement;
@@ -31,7 +31,7 @@ interface SynergySearchMarkElements {
     quantity: HTMLElement;
     skillImage: HTMLImageElement;
 }
-declare class SummoningSynergySearch extends HTMLElement {
+declare class SummoningSynergySearchElement extends HTMLElement implements CustomElement {
     _content: DocumentFragment;
     flexContainer: HTMLDivElement;
     markElements0: SynergySearchMarkElements;
@@ -61,7 +61,7 @@ interface SynergySearchOptionElements {
     name: HTMLSpanElement;
 }
 /** Menu for searching for summoning synergies */
-declare class SynergySearchMenu extends HTMLElement {
+declare class SynergySearchMenuElement extends HTMLElement implements CustomElement {
     _content: DocumentFragment;
     showAllButton: HTMLButtonElement;
     showUnlockedButton: HTMLButtonElement;
@@ -69,8 +69,8 @@ declare class SynergySearchMenu extends HTMLElement {
     filterOptionsContainer: HTMLDivElement;
     filterOptions: Map<SummoningRecipe, SynergySearchOptionElements>;
     searchBar: HTMLInputElement;
-    searchElements: Map<SummoningSynergy, SummoningSynergySearch>;
-    visibleSynergies: Set<SummoningSynergySearch>;
+    searchElements: Map<SummoningSynergy, SummoningSynergySearchElement>;
+    visibleSynergies: Set<SummoningSynergySearchElement>;
     constructor();
     connectedCallback(): void;
     /** Initializes the display of each synergy */

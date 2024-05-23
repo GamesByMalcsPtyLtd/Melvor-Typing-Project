@@ -1,4 +1,4 @@
-declare class CharacterDisplayElement extends HTMLElement {
+declare class CharacterDisplayElement extends HTMLElement implements CustomElement {
     _content: DocumentFragment;
     selectCharacterButton: HTMLButtonElement;
     gamemodeBackground: HTMLDivElement;
@@ -25,7 +25,7 @@ declare class CharacterDisplayElement extends HTMLElement {
     setCharacter(slotID: number, headerInfo: SaveGameHeader, isCloud: boolean, disableCallbacks?: boolean): void;
     updateTimestampComparison(viewedInfo: SaveGameHeader, comparedInfo?: SaveGameHeader): void;
 }
-declare class SaveSlotDisplayElement extends HTMLElement {
+declare class SaveSlotDisplayElement extends HTMLElement implements CustomElement {
     _content: DocumentFragment;
     slotTitle: HTMLHeadingElement;
     settingsButton: HTMLButtonElement;
@@ -59,7 +59,7 @@ declare class SaveSlotDisplayElement extends HTMLElement {
     setSaveLoading(): void;
     setDisabled(): void;
 }
-declare class GamemodeSelectionElement extends HTMLElement {
+declare class GamemodeSelectionElement extends HTMLElement implements CustomElement {
     _content: DocumentFragment;
     selectButton: HTMLButtonElement;
     backgroundDiv: HTMLDivElement;
@@ -69,7 +69,8 @@ declare class GamemodeSelectionElement extends HTMLElement {
     safety: HTMLHeadingElement;
     activeNotice: HTMLHeadingElement;
     description: HTMLHeadingElement;
-    rules: HTMLHeadingElement[];
+    rulesContainer: HTMLUListElement;
+    rules: HTMLLIElement[];
     constructor();
     connectedCallback(): void;
     setGamemode(gamemode: Gamemode): void;

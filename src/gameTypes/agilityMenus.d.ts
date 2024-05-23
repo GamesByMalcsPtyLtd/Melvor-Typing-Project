@@ -1,5 +1,5 @@
 /** Component for the built obstacles on the agility page */
-declare class BuiltAgilityObstacle extends HTMLElement {
+declare class BuiltAgilityObstacleElement extends HTMLElement implements CustomElement {
     _content: DocumentFragment;
     blockContainer: HTMLDivElement;
     builtContent: HTMLDivElement;
@@ -7,9 +7,12 @@ declare class BuiltAgilityObstacle extends HTMLElement {
     inactiveText: HTMLHeadingElement;
     name: HTMLSpanElement;
     interval: HTMLSpanElement;
-    xpGrants: HTMLSpanElement;
-    gpGrants: HTMLSpanElement;
-    masteryDisplay: MasteryDisplay;
+    xpContainer: HTMLSpanElement;
+    xpAmount: HTMLSpanElement;
+    axpContainer: HTMLSpanElement;
+    axpAmount: HTMLSpanElement;
+    itemCurrencyContainer: HTMLSpanElement;
+    masteryDisplay: MasteryDisplayElement;
     bonusContainer: HTMLDivElement;
     selectObstacleButton: HTMLButtonElement;
     destroyObstacleButton: HTMLButtonElement;
@@ -23,13 +26,13 @@ declare class BuiltAgilityObstacle extends HTMLElement {
     setBuiltObstacle(obstacle: AgilityObstacle): void;
     setTier(tier: number): void;
     /** Sets the unbuilt obstacle to being locked */
-    setLevelLocked(level: number): void;
+    setLevelLocked(slot: AgilityObstacleSlot, agility: Agility): void;
     /** Sets the unbuilt obstacle to beng unlocked */
     setUnlocked(): void;
-    /** Updates the interval, xp and gp of the built obstacle */
-    updateRates(interval: number, xp: number, gp: number): void;
+    /** Updates the interval, xp, items and currencies of the built obstacle */
+    updateRates(interval: number, xp: number, axp: number, items: AnyItemQuantity[], currencies: CurrencyQuantity[]): void;
     /** Updates the modifiers provided by the built obstacle */
-    updatePassives(passives: MappedModifiers): void;
+    updatePassives(obstacle: AgilityObstacle, negMult: number): void;
     /** Turns the background highlight on or off */
     setHighlight(on: boolean): void;
     /** Sets the obstacle to being active */
@@ -37,10 +40,11 @@ declare class BuiltAgilityObstacle extends HTMLElement {
     /** Sets the obstacle to being inactive */
     setInactive(): void;
 }
-declare class PassivePillarMenu extends HTMLElement {
+declare class PassivePillarMenuElement extends HTMLElement implements CustomElement {
     _content: DocumentFragment;
     blockContainer: HTMLDivElement;
     unbuiltContent: HTMLDivElement;
+    createText: HTMLHeadingElement;
     builtContent: HTMLDivElement;
     activeText: HTMLHeadingElement;
     name: HTMLHeadingElement;
@@ -49,34 +53,15 @@ declare class PassivePillarMenu extends HTMLElement {
     pillarDestroyButton: HTMLButtonElement;
     constructor();
     connectedCallback(): void;
-    setUnbuilt(): void;
+    setUnbuilt(slot: AgilityPillarSlot, slotID: number): void;
     setBuilt(pillar: AgilityPillar): void;
     /** Updates the modifiers provided by the pillar */
-    updatePassives(passives: MappedModifiers): void;
-    setActive(): void;
-    setInactive(): void;
-}
-declare class ElitePassivePillarMenu extends HTMLElement {
-    _content: DocumentFragment;
-    blockContainer: HTMLDivElement;
-    unbuiltContent: HTMLDivElement;
-    builtContent: HTMLDivElement;
-    activeText: HTMLHeadingElement;
-    name: HTMLHeadingElement;
-    passiveContainer: HTMLDivElement;
-    pillarSelectButton: HTMLButtonElement;
-    pillarDestroyButton: HTMLButtonElement;
-    constructor();
-    connectedCallback(): void;
-    setUnbuilt(): void;
-    setBuilt(pillar: AgilityPillar): void;
-    /** Updates the modifiers provided by the pillar */
-    updatePassives(passives: MappedModifiers): void;
+    updatePassives(pillar: AgilityPillar): void;
     setActive(): void;
     setInactive(): void;
 }
 /** Component for the obstacle selection modal */
-declare class AgilityObstacleSelection extends HTMLElement {
+declare class AgilityObstacleSelectionElement extends HTMLElement implements CustomElement {
     _content: DocumentFragment;
     link: HTMLAnchorElement;
     activeText: HTMLHeadingElement;
@@ -90,32 +75,38 @@ declare class AgilityObstacleSelection extends HTMLElement {
     itemReduction: HTMLSpanElement;
     costContainer: HTMLDivElement;
     requirementContainer: HTMLDivElement;
-    xpGrants: HTMLSpanElement;
-    gpGrants: HTMLSpanElement;
+    xpContainer: HTMLSpanElement;
+    xpAmount: HTMLSpanElement;
+    axpContainer: HTMLSpanElement;
+    axpAmount: HTMLSpanElement;
+    itemCurrencyContainer: HTMLSpanElement;
     passivesContainer: HTMLDivElement;
     obstacleOnlyElements: HTMLElement[];
     constructor();
     connectedCallback(): void;
-    createInlineRequirement(textClass: string): InlineRequirement;
+    createInlineRequirement(textClass: string): InlineRequirementElement;
     /** Sets the content of the costs container */
-    setCosts(items: AnyItemQuantity[], gpReq: number, scReq: number): void;
-    setPassives(passives: MappedModifiers): void;
+    setCosts(items: AnyItemQuantity[], currencies: CurrencyQuantity[]): void;
+    setPassives(obstacle: BaseAgilityObject, negMult?: number): void;
     setBuildStatus(built: boolean): void;
     setObstacle(obstacle: AgilityObstacle): void;
     setPillar(pillar: AgilityPillar): void;
-    setElitePillar(pillar: AgilityPillar): void;
 }
-declare class InlineRequirement extends HTMLElement {
+declare class InlineRequirementElement extends HTMLElement implements CustomElement {
     _content: DocumentFragment;
     image: HTMLImageElement;
     text: HTMLSpanElement;
     imageTooltip?: TippyTooltip;
+    tooltipDisabled: boolean;
+    tooltipContent: string;
     constructor();
     setContent(media: string, text: string, tooltipText: string): void;
+    disableTooltip(): void;
+    enableTooltip(): void;
     connectedCallback(): void;
     disconnectedCallback(): void;
 }
-declare class MultiProgressBar extends HTMLElement {
+declare class MultiProgressBarElement extends HTMLElement implements CustomElement {
     _content: DocumentFragment;
     barContainer: HTMLDivElement;
     progressDivs: {
@@ -134,4 +125,19 @@ declare class MultiProgressBar extends HTMLElement {
     setSegmentPattern(classPattern: string[]): void;
     animateFromTimer(segment: number, timer: Timer): void;
     stopAnimation(): void;
+}
+declare class AgilityBreakdownElement extends HTMLElement implements CustomElement {
+    _content: DocumentFragment;
+    interval: HTMLSpanElement;
+    xpContainer: HTMLSpanElement;
+    xpAmount: HTMLSpanElement;
+    axpContainer: HTMLSpanElement;
+    axpAmount: HTMLSpanElement;
+    currencyContainer: HTMLSpanElement;
+    itemsContainer: HTMLSpanElement;
+    viewPassivesButton: HTMLButtonElement;
+    constructor();
+    connectedCallback(): void;
+    init(agility: Agility): void;
+    updateRates(interval: number, xp: number, axp: number, items: AnyItemQuantity[], currencies: CurrencyQuantity[]): void;
 }

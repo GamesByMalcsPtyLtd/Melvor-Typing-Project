@@ -1,5 +1,4 @@
-interface AttackStyleData extends IDData {
-    modifiers: PlayerModifierData;
+interface AttackStyleData extends IDData, IStatObjectData {
     experienceGain: {
         skillID: string;
         ratio: number;
@@ -8,7 +7,7 @@ interface AttackStyleData extends IDData {
     name: string;
 }
 declare class AttackStyle extends NamespacedObject {
-    modifiers: PlayerModifierObject;
+    stats: StatObject;
     experienceGain: {
         skill: AnySkill;
         ratio: number;

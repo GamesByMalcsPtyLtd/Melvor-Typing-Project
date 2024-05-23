@@ -1,4 +1,13 @@
-declare class ItemCharges implements EncodableObject {
+declare class ItemChargesChangedEvent extends GameEvent {
+    item: EquipmentItem;
+    oldCharges: number;
+    newCharges: number;
+    constructor(item: EquipmentItem, oldCharges: number, newCharges: number);
+}
+declare type ItemChargesEvents = {
+    chargesChanged: ItemChargesChangedEvent;
+};
+declare class ItemCharges extends GameEventEmitter<ItemChargesEvents> implements EncodableObject {
     game: Game;
     charges: Map<EquipmentItem, number>;
     renderQueue: ItemChargeRenderQueue;

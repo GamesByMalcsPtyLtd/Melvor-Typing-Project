@@ -22,6 +22,15 @@ interface PageData extends IDData {
     skillSidebarCategoryID?: string;
     displayClass?: string;
 }
+interface PageModificationData extends IDData {
+    skills?: {
+        add?: {
+            skillID: string;
+            insertAt?: number;
+        }[];
+        remove?: string[];
+    };
+}
 declare class Page extends NamespacedObject {
     get name(): string;
     get media(): string;
@@ -38,6 +47,7 @@ declare class Page extends NamespacedObject {
     _media: string;
     _customName?: string;
     constructor(namespace: DataNamespace, data: PageData, game: Game);
+    applyDataModification(modData: PageModificationData, game: Game): void;
     /** Generates sidebar elements for the page, with the exception of skills */
     generateSideBar(): void;
 }

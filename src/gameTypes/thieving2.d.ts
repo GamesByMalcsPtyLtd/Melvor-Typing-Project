@@ -3,9 +3,28 @@ interface ThievingNPCData extends BasicSkillRecipeData {
     media: string;
     perception: number;
     maxHit: number;
-    maxGP: number;
+    /** @deprecated Use currencyDrops instead */
+    maxGP?: number;
+    /** Determines the maximum amounts of currencies that can drop from this NPC */
+    currencyDrops: IDQuantity[];
     uniqueDrop?: IDQuantity;
     lootTable: DropTableData[];
+    /** Determines the allowed damage types a player can use to pickpocket the NPC. Unset means all damage types allowed. */
+    allowedDamageTypeIDs?: string[];
+}
+interface ThievingNPCModificationData extends BasicSkillRecipeModificationData {
+    perception?: number;
+    maxHit?: number;
+    currencyDrops?: CurrencyQuantitiesModificationData;
+    uniqueDrop?: IDQuantity;
+    lootTable?: {
+        add?: DropTableData[];
+        remove?: string[];
+    };
+    allowedDamageTypeIDs?: {
+        add?: string[];
+        remove?: string[];
+    };
 }
 declare class ThievingNPC extends BasicSkillRecipe {
     get name(): string;
@@ -14,31 +33,36 @@ declare class ThievingNPC extends BasicSkillRecipe {
     _media: string;
     perception: number;
     maxHit: number;
-    maxGP: number;
+    currencyDrops: CurrencyQuantity[];
     uniqueDrop?: AnyItemQuantity;
     lootTable: DropTable;
+    allowedDamageTypes: Set<DamageType>;
+    /** The area that this NPC belongs to */
+    area?: ThievingArea;
     constructor(namespace: DataNamespace, data: ThievingNPCData, game: Game);
+    applyDataModification(data: ThievingNPCModificationData, game: Game): void;
+    canUseWithDamageType(damageType: DamageType): boolean;
 }
-interface ThievingAreaData extends IDData {
+interface ThievingAreaData extends RealmedObjectData {
     name: string;
     npcIDs: string[];
     uniqueDrops: IDQuantity[];
 }
-declare class ThievingArea extends NamespacedObject {
+declare class ThievingArea extends RealmedObject {
     get name(): string;
     npcs: ThievingNPC[];
     uniqueDrops: AnyItemQuantity[];
     _name: string;
     constructor(namespace: DataNamespace, data: ThievingAreaData, game: Game, thieving: Thieving);
 }
-declare const enum DevilResult {
+declare const enum LeprechaunDevilResult {
     DOUBLE_GP = 0,
     QUAD_ITEMS = 1,
     NOTHING = 2
 }
-declare const enum OtherDevilResult {
-    SKILL_XP = 0,
-    MORE_GOLD = 1,
+declare const enum AbyssalLeprechaunDevilResult {
+    DOUBLE_AP = 0,
+    QUAD_ITEMS = 1,
     NOTHING = 2
 }
 declare class ThievingRenderQueue extends GatheringSkillRenderQueue<ThievingNPC> {
@@ -46,23 +70,25 @@ declare class ThievingRenderQueue extends GatheringSkillRenderQueue<ThievingNPC>
     stopButton: boolean;
     /** Updates the NPC buttons based on skill level */
     npcUnlock: boolean;
+    areaRealmVisibility: boolean;
 }
 interface GeneralThievingRareData {
     itemID: string;
     chance: number;
     npcs?: string[];
+    realms?: string[];
 }
 interface GeneralThievingRare {
     item: AnyItem;
     chance: number;
     npcs?: Set<ThievingNPC>;
+    realms: Set<Realm>;
 }
 interface ThievingSkillData extends MasterySkillData {
     npcs?: ThievingNPCData[];
     areas?: ThievingAreaData[];
     generalRareItems?: GeneralThievingRareData[];
     entLeprechaunItem?: string;
-    crowLeprechaunItem?: string;
     bearLeprechaunItem?: string;
     easterEgg?: {
         equippedID: string;
@@ -70,27 +96,22 @@ interface ThievingSkillData extends MasterySkillData {
         rewardID: string;
     };
 }
+interface ThievingModificationData extends MasterySkillModificationData {
+    npcs?: ThievingNPCModificationData[];
+}
 declare type ThievingEvents = {
     action: ThievingActionEvent;
-};
+} & SkillWithMasteryEvents;
 declare const enum ThievingStunState {
     None = 0,
     Stunned = 1,
     AvoidedStun = 2
 }
-declare class Thieving extends GatheringSkill<ThievingNPC, ThievingSkillData> implements IGameEventEmitter<ThievingEvents> {
-    _events: import("mitt").Emitter<ThievingEvents>;
-    on: {
-        <Key extends "action">(type: Key, handler: import("mitt").Handler<ThievingEvents[Key]>): void;
-        (type: "*", handler: import("mitt").WildcardHandler<ThievingEvents>): void;
-    };
-    off: {
-        <Key extends "action">(type: Key, handler?: import("mitt").Handler<ThievingEvents[Key]> | undefined): void;
-        (type: "*", handler: import("mitt").WildcardHandler<ThievingEvents>): void;
-    };
+declare class Thieving extends GatheringSkill<ThievingNPC, ThievingSkillData, ThievingEvents, ThievingModificationData> {
     stunTimer: Timer;
     readonly _media = Assets.Thieving;
-    getTotalUnlockedMasteryActions(): number;
+    get levelCompletionBreakdown(): LevelCompletionBreakdown[];
+    isMasteryActionUnlocked(action: ThievingNPC): boolean;
     readonly baseInterval = 3000;
     readonly baseStunInterval = 3000;
     readonly itemChance = 75;
@@ -99,7 +120,6 @@ declare class Thieving extends GatheringSkill<ThievingNPC, ThievingSkillData> im
     areas: NamespaceRegistry<ThievingArea>;
     generalRareItems: GeneralThievingRare[];
     entLeprechaunItem?: AnyItem;
-    crowLeprechaunItem?: AnyItem;
     bearLeprechaunItem?: AnyItem;
     barItems: AnyItem[];
     easterEgg?: {
@@ -117,23 +137,30 @@ declare class Thieving extends GatheringSkill<ThievingNPC, ThievingSkillData> im
     get masteryAction(): ThievingNPC;
     get actionLevel(): number;
     get canStop(): boolean;
-    get avoidStunChance(): number;
+    get stunAvoidanceChance(): number;
     get stunInterval(): number;
     constructor(namespace: DataNamespace, game: Game);
     registerData(namespace: DataNamespace, data: ThievingSkillData): void;
+    isCorrectRealmForGeneralRareDrop(drop: GeneralThievingRare, realm: Realm): boolean;
+    modifyData(data: ThievingModificationData): void;
     postDataRegistration(): void;
     activeTick(): void;
     getErrorLog(): string;
+    onRealmChange(): void;
     render(): void;
+    renderAreaRealmVisibility(): void;
     renderNPCUnlock(): void;
     resetActionState(): void;
     encode(writer: SaveWriter): SaveWriter;
     decode(reader: SaveWriter, version: number): void;
     deserialize(reader: DataReader, version: number, idMap: NumericIDMap): void;
     getActionIDFromOldID(oldActionID: number, idMap: NumericIDMap): string;
+    getRegistry(type: ScopeSourceType): NamespaceRegistry<NamedObject> | undefined;
+    getPkgObjects(pkg: GameDataPackage, type: ScopeSourceType): IDData[] | undefined;
+    getActionModifierQueryParams(action?: NamedObject): SkillModifierQueryParams;
     onModifierChange(): void;
     onEquipmentChange(): void;
-    onLevelUp(oldLevel: number, newLevel: number): void;
+    onAnyLevelUp(): void;
     onLoad(): void;
     onStop(): void;
     onAncientRelicUnlock(): void;
@@ -151,38 +178,38 @@ declare class Thieving extends GatheringSkill<ThievingNPC, ThievingSkillData> im
      */
     onNPCPanelSelection(npc: ThievingNPC, area: ThievingArea): boolean;
     startThieving(area: ThievingArea, npc: ThievingNPC): void;
-    getStunInterval(): number;
+    getStunInterval(npc?: ThievingNPC): number;
     getNPCSuccessRate(npc: ThievingNPC): number;
     getNPCSleightOfHand(npc: ThievingNPC): number;
     getNPCPickpocket(npc: ThievingNPC): number;
     getStealthAgainstNPC(npc: ThievingNPC): number;
-    getFlatIntervalModifier(action: ThievingNPC): number;
     getPercentageIntervalModifier(action: ThievingNPC): number;
     /** Returns the interval an npc in ms */
     getNPCInterval(npc: ThievingNPC): number;
     getNPCDoublingChance(npc: ThievingNPC): number;
-    getNPCGPRange(npc: ThievingNPC): {
-        minGP: number;
-        maxGP: number;
+    getNPCCurrencyRange(npc: ThievingNPC, currency: Currency, max: number): {
+        min: number;
+        max: number;
     };
-    getNPCMinGPRoll(npc: ThievingNPC): number;
-    getNPCGPMultiplier(npc: ThievingNPC): number;
-    getXPModifier(masteryAction?: ThievingNPC): number;
-    getMasteryXPModifier(action: ThievingNPC): number;
+    getMinCurrencyRoll(currency: Currency, max: number): number;
+    modifyCurrencyReward(currency: Currency, amount: number, npc: ThievingNPC): number;
     /** Method for processing a stunned thieving turn */
     stunned(): void;
     stunState: ThievingStunState;
     get isStunned(): boolean;
     get actionRewards(): Rewards;
-    addJesterHatGP(item: AnyItem, rewards: Rewards): void;
+    addJesterHatGP(item: AnyItem, rewards: Rewards, currentNPC: ThievingNPC): void;
     get actionInterval(): number;
     get masteryModifiedInterval(): number;
     startActionTimer(): void;
+    notifyIncorrectDamageType(npc: ThievingNPC): void;
     preAction(): void;
     postAction(): void;
     addStat(stat: ThievingStats, amount?: number): void;
+    formatSpecialDrop(item: AnyItem, qty?: number): string;
+    fireNPCDropsModal(area: ThievingArea, npc: ThievingNPC): void;
     testTranslations(): void;
     getObtainableItems(): Set<AnyItem>;
-    static readonly DevilTable: [number, number, number][];
-    static readonly OtherDevilTable: [number, number, number][];
+    static readonly LEPRECHAUN_DEVIL_TABLE: WeightedResult<LeprechaunDevilResult>[];
+    static readonly ABYSSAL_LEPRECHAUN_DEVIL_TABLE: WeightedResult<AbyssalLeprechaunDevilResult>[];
 }

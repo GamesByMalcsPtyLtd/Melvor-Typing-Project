@@ -1,7 +1,7 @@
 declare type ViewportZoomedEvent = import('pixi-viewport/dist/types').ZoomedEvent;
 declare type ViewportMovedEvent = import('pixi-viewport/dist/types').MovedEvent;
 declare const MAP_ASSET_VERSION = 14;
-declare class WorldMapDisplayElement extends HTMLElement {
+declare class WorldMapDisplayElement extends HTMLElement implements CustomElement {
     _content: DocumentFragment;
     canvas: HTMLCanvasElement;
     topOverlay: HTMLDivElement;
@@ -124,7 +124,7 @@ declare class WorldMapDisplayElement extends HTMLElement {
     updateOverview(map: WorldMap, game: Game, cartography: Cartography): void;
     /** Updates the survey options on the hex-overview */
     updateOverviewSurvey(map: WorldMap, game: Game, cartography: Cartography): void;
-    updateOverviewQuantities(): void;
+    updateOverviewQuantities(game: Game): void;
     highlightHex(hex: Hex): void;
     unHighlightHex(hex: Hex): void;
     loadMapAssets(map: WorldMap): Promise<void>;
@@ -541,7 +541,7 @@ declare class TooltipDisabler extends pixi_viewport.Plugin {
     constructor(parent: pixi_viewport.Viewport, mapDisplay: WorldMapDisplayElement);
     up(event: PIXI.FederatedPointerEvent): boolean;
 }
-declare class HexOverviewElement extends HTMLElement {
+declare class HexOverviewElement extends HTMLElement implements CustomElement {
     _content: DocumentFragment;
     hexCoords: HTMLSpanElement;
     closeBtn: HTMLButtonElement;
@@ -555,12 +555,10 @@ declare class HexOverviewElement extends HTMLElement {
     requirementList: HTMLUListElement;
     fastTravel: HTMLDivElement;
     fastTravelInfo: HTMLParagraphElement;
-    fastTravelUnlockCost: HTMLDivElement;
-    fastTravelUnlockIcons: QtyIcon[];
+    fastTravelUnlockCost: QuantityIconsElement;
     fastTravelUnlockBtn: HTMLButtonElement;
     travelCost: HTMLDivElement;
-    travelCostList: HTMLDivElement;
-    travelCostIcons: QtyIcon[];
+    travelCostList: QuantityIconsElement;
     interactions: HTMLDivElement;
     queueSurveyBtn: HTMLButtonElement;
     autoSurveyBtn: HTMLButtonElement;
@@ -578,24 +576,24 @@ declare class HexOverviewElement extends HTMLElement {
     /** Updates the text and colour of the auto-survey button based on cartography state */
     updateAutoSurveyButtonText(hex: Hex, cartography: Cartography): void;
     /** Updates the quantites of bank items and currencies */
-    updateQuantities(): void;
+    updateQuantities(game: Game): void;
     showPoiInfo(poi: PointOfInterest, cartography: Cartography): void;
     showUnknownPoi(): void;
 }
-declare class SurveyOverviewElement extends HTMLElement {
+declare class SurveyOverviewElement extends HTMLElement implements CustomElement {
     _content: DocumentFragment;
     goToHexButton: HTMLButtonElement;
     hexName: HTMLSpanElement;
-    progressBar: ProgressBar;
-    xpIcon: XPIcon;
-    intervalIcon: IntervalIcon;
+    progressBar: ProgressBarElement;
+    xpIcon: XpIconElement;
+    intervalIcon: IntervalIconElement;
     constructor();
     connectedCallback(): void;
     setHex(cartography: Cartography, hex: Hex): void;
     /** Updates the xp and interval for surveying a hex */
     updateRates(cartography: Cartography, hex: Hex): void;
 }
-declare class WorldMapFilterElement extends HTMLElement {
+declare class WorldMapFilterElement extends HTMLElement implements CustomElement {
     _content: DocumentFragment;
     checkbox: HTMLInputElement;
     icon: HTMLImageElement;
@@ -614,7 +612,7 @@ declare class WorldMapFilterElement extends HTMLElement {
     /** Updates if the checkbox should be currently checked */
     updateChecked(isChecked: boolean): void;
 }
-declare class ImageSearchResultElement extends HTMLElement {
+declare class ImageSearchResultElement extends HTMLElement implements CustomElement {
     _content: DocumentFragment;
     /** LI element to bind click events to */
     item: HTMLLIElement;
@@ -627,7 +625,7 @@ declare class ImageSearchResultElement extends HTMLElement {
     setActive(): void;
     setInactive(): void;
 }
-declare class PoiSearchResultElement extends HTMLElement {
+declare class PoiSearchResultElement extends HTMLElement implements CustomElement {
     _content: DocumentFragment;
     item: HTMLLIElement;
     image: HTMLImageElement;
@@ -639,7 +637,7 @@ declare class PoiSearchResultElement extends HTMLElement {
     setCallback(callback: VoidFunction): void;
     setPoi(poi: PointOfInterest, cartography: Cartography): void;
 }
-declare class CreateMapMenuElement extends HTMLElement {
+declare class CreateMapMenuElement extends HTMLElement implements CustomElement {
     _content: DocumentFragment;
     digSiteSelectToggle: HTMLButtonElement;
     digSiteSelect: DigSiteSelectMenuElement;
@@ -650,10 +648,10 @@ declare class CreateMapMenuElement extends HTMLElement {
     connectedCallback(): void;
     toggleDigSiteSelect(): void;
     /** Initializes the menu, assigning callbacks and generating menu elements */
-    init(archaeology: Archaeology, cartography: Cartography): void;
+    init(archaeology: Archaeology, cartography: Cartography, game: Game): void;
     updateUpgradeProgress(map: DigSiteMap): void;
 }
-declare class DigSiteSelectMenuElement extends HTMLElement {
+declare class DigSiteSelectMenuElement extends HTMLElement implements CustomElement {
     _content: DocumentFragment;
     digSiteSearchBar: HTMLInputElement;
     clearDigSiteSearchBtn: HTMLButtonElement;
@@ -675,36 +673,35 @@ declare class DigSiteSelectMenuElement extends HTMLElement {
     /** Sets the menu to no digsite being selected */
     setInactiveDigSite(): void;
 }
-declare class PaperMakingMenuElement extends HTMLElement {
+declare class PaperMakingMenuElement extends HTMLElement implements CustomElement {
     _content: DocumentFragment;
     recipeSelectButton: HTMLButtonElement;
     recipeOptions: HTMLDivElement;
-    recipeInfo: HTMLDivElement;
-    requires: RequiresBox;
-    haves: HavesBox;
-    produces: ProducesBox;
-    producesHaves: HavesBox;
-    grants: GrantsBox;
+    requires: RequiresBoxElement;
+    haves: HavesBoxElement;
+    produces: ProducesBoxElement;
+    producesHaves: HavesBoxElement;
+    grants: GrantsBoxElement;
     createButton: HTMLButtonElement;
-    intervalIcon: IntervalIcon;
-    doublingIcon: DoublingIcon;
-    preserveIcon: PreservationIcon;
-    progressBar: ProgressBar;
-    recipeCostIcons: QtyIcon[];
+    intervalIcon: IntervalIconElement;
+    doublingIcon: DoublingIconElement;
+    preserveIcon: PreservationIconElement;
+    progressBar: ProgressBarElement;
+    recipeCosts: QuantityIconsElement[];
     constructor();
     connectedCallback(): void;
     /** Initializes the menu, assigning callbacks and generating recipe select */
-    init(cartography: Cartography): void;
+    init(cartography: Cartography, game: Game): void;
     /** Adjust UI based on language and device */
     setLangOverrides(): void;
     /** Sets the currently selected recipe */
-    setSelectedRecipe(cartography: Cartography, recipe: PaperMakingRecipe): void;
+    setSelectedRecipe(cartography: Cartography, recipe: PaperMakingRecipe, game: Game): void;
     unsetRecipe(): void;
-    updateQuantities(): void;
+    updateQuantities(game: Game): void;
     updateRates(cartography: Cartography, recipe: PaperMakingRecipe): void;
-    updateRecipeOptions(): void;
+    updateRecipeOptions(game: Game): void;
 }
-declare class DigSiteMapInfoElement extends HTMLElement {
+declare class DigSiteMapInfoElement extends HTMLElement implements CustomElement {
     _content: DocumentFragment;
     noMapContainer: HTMLDivElement;
     infoContainer: HTMLDivElement;
@@ -724,7 +721,7 @@ declare class DigSiteMapInfoElement extends HTMLElement {
     updateUpgradeProgress(map: DigSiteMap): void;
     setUnselected(): void;
 }
-declare class MapUpgradeMenuElement extends HTMLElement {
+declare class MapUpgradeMenuElement extends HTMLElement implements CustomElement {
     _content: DocumentFragment;
     digSiteName: HTMLHeadingElement;
     digSiteImage: HTMLImageElement;
@@ -733,17 +730,16 @@ declare class MapUpgradeMenuElement extends HTMLElement {
         tooltip: TippyTooltip;
     }[];
     createMapButton: HTMLButtonElement;
-    mapCreationCosts: HTMLDivElement;
-    creationCostIcons: QtyIcon[];
+    mapCreationCosts: QuantityIconsElement;
     mapInfo: DigSiteMapInfoElement;
-    upgradeRequires: RequiresBox;
-    upgradeHaves: HavesBox;
-    grants: GrantsBox;
+    upgradeRequires: RequiresBoxElement;
+    upgradeHaves: HavesBoxElement;
+    grants: GrantsBoxElement;
     upgradeButton: HTMLButtonElement;
+    intervalIcon: IntervalIconElement;
+    preserveIcon: PreservationIconElement;
+    progressBar: ProgressBarElement;
     deleteMap: HTMLAnchorElement;
-    intervalIcon: IntervalIcon;
-    preserveIcon: PreservationIcon;
-    progressBar: ProgressBar;
     constructor();
     connectedCallback(): void;
     /** Initializes the menu, assigning callback functions */
@@ -752,17 +748,17 @@ declare class MapUpgradeMenuElement extends HTMLElement {
     setDigSite(digSite: ArchaeologyDigSite, cartography: Cartography): void;
     unsetDigSiteMap(): void;
     /** Sets the menu for a given map */
-    setDigSiteMap(map: DigSiteMap, cartography: Cartography): void;
+    setDigSiteMap(map: DigSiteMap, cartography: Cartography, game: Game): void;
     updateMapSelectButtons(digSite: ArchaeologyDigSite, cartography: Cartography): void;
     /** Updates the cost to perform a single upgrade action */
-    updateUpgradeCosts(map: DigSiteMap, cartography: Cartography): void;
+    updateUpgradeCosts(map: DigSiteMap, cartography: Cartography, game: Game): void;
     /** Updates the cost to create a new map */
     updateMapCreationCost(digSite: ArchaeologyDigSite): void;
-    updateQuantities(): void;
+    updateQuantities(game: Game): void;
     /** Updates the interval and preservation chance when modifiers change */
     updateRates(cartography: Cartography, map: DigSiteMap): void;
 }
-declare class MapRefinementMenuElement extends HTMLElement {
+declare class MapRefinementMenuElement extends HTMLElement implements CustomElement {
     _content: DocumentFragment;
     digSiteName: HTMLHeadingElement;
     digSiteImage: HTMLImageElement;
@@ -774,8 +770,7 @@ declare class MapRefinementMenuElement extends HTMLElement {
     refinementContainer: HTMLUListElement;
     refinements: HTMLLIElement[];
     newContainer: HTMLDivElement;
-    costsContainer: HTMLDivElement;
-    refinementCostIcons: QtyIcon[];
+    refinementCosts: QuantityIconsElement;
     refinementSelectContainer: HTMLDivElement;
     refinementSelects: HTMLButtonElement[];
     constructor();
@@ -785,14 +780,14 @@ declare class MapRefinementMenuElement extends HTMLElement {
     /** Updates the map selection for a given digsite */
     setDigSite(digSite: ArchaeologyDigSite, cartography: Cartography): void;
     unsetDigSiteMap(): void;
-    setDigSiteMap(map: DigSiteMap, cartography: Cartography): void;
+    setDigSiteMap(map: DigSiteMap, cartography: Cartography, game: Game): void;
     /** Updates the current refinements for the selected map */
     updateRefinements(map: DigSiteMap): void;
     /** Updates the refinement selection for the given map */
-    updateNewRefinement(map: DigSiteMap, cartography: Cartography): void;
-    updateQuantities(): void;
+    updateNewRefinement(map: DigSiteMap, cartography: Cartography, game: Game): void;
+    updateQuantities(game: Game): void;
 }
-declare class HexTooltipElement extends HTMLElement {
+declare class HexTooltipElement extends HTMLElement implements CustomElement {
     _content: DocumentFragment;
     coords: HTMLSpanElement;
     xp: HTMLSpanElement;
@@ -826,7 +821,7 @@ declare class HexTooltipElement extends HTMLElement {
     setTitle(text: string): void;
     static showAxialCoords: boolean;
 }
-declare class MapMasteryMenuElement extends HTMLElement {
+declare class MapMasteryMenuElement extends HTMLElement implements CustomElement {
     _content: DocumentFragment;
     mapTitle: HTMLHeadingElement;
     masteryContainer: HTMLDivElement;
@@ -837,7 +832,7 @@ declare class MapMasteryMenuElement extends HTMLElement {
     setMap(map: WorldMap): void;
     setHexMasteryCount(map: WorldMap): void;
 }
-declare class MapMasteryBonusElement extends HTMLElement {
+declare class MapMasteryBonusElement extends HTMLElement implements CustomElement {
     _content: DocumentFragment;
     hexCount: HTMLHeadingElement;
     modifierContainer: HTMLDivElement;
@@ -849,14 +844,14 @@ declare class MapMasteryBonusElement extends HTMLElement {
     setBonus(bonus: WorldMapMasteryBonus): void;
     createReward(media: string, quantity: string, name: string): void;
 }
-declare class PoiDiscoveryCostsElement extends HTMLElement {
+declare class PoiDiscoveryCostsElement extends HTMLElement implements CustomElement {
     _content: DocumentFragment;
     infoText: HTMLHeadingElement;
-    costsBox: RequiresBox;
-    havesBox: HavesBox;
+    costsBox: RequiresBoxElement;
+    havesBox: HavesBoxElement;
     constructor();
     connectedCallback(): void;
-    setCosts(costs: Costs): void;
+    setCosts(costs: Costs, game: Game): void;
     setInfoText(modalState: DiscoveryModalState, isDigSite: boolean): void;
     destroyIcons(): void;
     disconnectedCallback(): void;

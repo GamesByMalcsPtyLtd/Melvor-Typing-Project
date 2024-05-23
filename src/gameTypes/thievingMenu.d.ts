@@ -1,59 +1,79 @@
-/** Menu class for thieving */
-declare class ThievingMenu {
-    container: HTMLElement;
-    areaPanels: Map<ThievingArea, ThievingAreaPanel>;
-    npcNavs: Map<ThievingNPC, ThievingNPCNav>;
-    activePanel: ThievingAreaPanel | undefined;
-    constructor(containerID: string);
-    createInfoBox(container: HTMLDivElement): ThievingInfoBox;
-    hideAreaPanel(area: ThievingArea): void;
-    showAreaPanel(area: ThievingArea): void;
-    updateNPCsForLevel(level: number): void;
-    updateNPCButtons(): void;
-    selectNPC(npc: ThievingNPC, area: ThievingArea): void;
-    selectNPCInPanel(npc: ThievingNPC, panel: ThievingAreaPanel): void;
-    updateAllAreaPanels(): void;
-    setStopButton(area: ThievingArea): void;
-    removeStopButton(): void;
-    updateAreaPanelInfo(panel: ThievingAreaPanel): void;
-    updateInfoContainerForNPC(panel: ThievingAreaPanel, npc: ThievingNPC): void;
-    showNPCDrops(npc: ThievingNPC, area: ThievingArea): void;
-    formatSpecialDrop(item: AnyItem, qty?: number): string;
-    getProgressBar(area: ThievingArea): ProgressBar | undefined;
-    localize(): void;
+declare class ThievingNPCNavElement extends HTMLElement implements CustomElement {
+    _content: DocumentFragment;
+    button: HTMLAnchorElement;
+    buttonContent: HTMLDivElement;
+    npcImage: HTMLImageElement;
+    npcName: HTMLSpanElement;
+    masteryDisplay: CompactMasteryDisplayElement;
+    perception: HTMLSpanElement;
+    success: HTMLSpanElement;
+    maxHit: HTMLSpanElement;
+    unlock: HTMLDivElement;
+    level: HTMLSpanElement;
+    abyssalLevel: HTMLSpanElement;
+    constructor();
+    connectedCallback(): void;
+    setNPC(npc: ThievingNPC, thieving: Thieving): void;
+    updateNPC(npc: ThievingNPC, game: Game): void;
+    setLocked(npc: ThievingNPC, thieving: Thieving): void;
+    setUnlocked(callback: VoidFunction): void;
 }
-declare type ThievingAreaPanel = {
-    panelContainer: HTMLDivElement;
+declare class ThievingInfoBoxElement extends HTMLElement implements CustomElement {
+    _content: DocumentFragment;
+    stealth: StealthIconElement;
+    double: DoublingIconElement;
+    xp: XpIconElement;
+    abyssalXP: AbyssalXpIconElement;
+    masteryXP: MasteryXpIconElement;
+    poolXP: MasteryPoolIconElement;
+    interval: IntervalIconElement;
+    constructor();
+    connectedCallback(): void;
+    setNPC(thieving: Thieving, npc: ThievingNPC): void;
+}
+declare class ThievingAreaPanelElement extends HTMLElement implements CustomElement {
+    _content: DocumentFragment;
+    header: HTMLDivElement;
+    eyeIcon: HTMLElement;
+    areaName: HTMLSpanElement;
     targetContainer: HTMLDivElement;
     infoContainer: HTMLDivElement;
-    infoBoxName: HTMLElement;
     infoSkillName: HTMLElement;
+    infoBoxName: HTMLSpanElement;
     infoBoxImage: HTMLImageElement;
+    infoBox: ThievingInfoBoxElement;
     startButton: HTMLButtonElement;
     dropsButton: HTMLButtonElement;
-    progressBar: ProgressBar;
-    infoBox: ThievingInfoBox;
-    selectedNPC: ThievingNPC | -1;
-    area: ThievingArea;
-    areaName: HTMLSpanElement;
-};
-declare type ThievingInfoBox = {
-    container: HTMLDivElement;
-    xp: XPIcon;
-    interval: IntervalIcon;
-    stealth: StealthIcon;
-    double: DoublingIcon;
-    masteryXP: MasteryXPIcon;
-    poolXP: MasteryPoolIcon;
-};
-declare type ThievingNPCNav = {
-    npcName: HTMLSpanElement;
-    button: HTMLAnchorElement;
-    panel: ThievingAreaPanel;
-    buttonContent: HTMLDivElement;
-    perception: HTMLSpanElement;
-    success: HTMLElement;
-    maxHit: HTMLElement;
-    unlock: HTMLDivElement;
-    masteryDisplay: CompactMasteryDisplay;
-};
+    npcNavs: Map<ThievingNPC, ThievingNPCNavElement>;
+    selectedNPC?: ThievingNPC;
+    progressBar: ProgressBarElement;
+    constructor();
+    connectedCallback(): void;
+    setArea(area: ThievingArea, thieving: Thieving): void;
+    hide(): void;
+    show(): void;
+    updateNPCsForLevel(thieving: Thieving, area: ThievingArea): void;
+    updateNPCButtons(game: Game): void;
+    selectNPC(area: ThievingArea, npc: ThievingNPC, thieving: Thieving): void;
+    updateAreaInfo(thieving: Thieving): void;
+    updateNPCInfo(thieving: Thieving, npc: ThievingNPC): void;
+    setStopButton(thieving: Thieving): void;
+    removeStopButton(thieving: Thieving, area: ThievingArea): void;
+}
+/** Menu class for thieving */
+declare class ThievingMenu {
+    areaPanels: Map<ThievingArea, ThievingAreaPanelElement>;
+    activeArea: ThievingArea | undefined;
+    constructor(containerID: string, thieving: Thieving);
+    hideAreaPanel(area: ThievingArea): void;
+    showAreaPanel(area: ThievingArea): void;
+    hideArea(area: ThievingArea): void;
+    showArea(area: ThievingArea): void;
+    updateNPCsForLevel(thieving: Thieving): void;
+    updateNPCButtons(game: Game): void;
+    selectNPC(npc: ThievingNPC, area: ThievingArea, thieving: Thieving): void;
+    updateAllAreaPanels(thieving: Thieving): void;
+    setStopButton(thieving: Thieving, area: ThievingArea): void;
+    removeStopButton(thieving: Thieving): void;
+    getProgressBar(area: ThievingArea): ProgressBarElement | undefined;
+}

@@ -1,10 +1,12 @@
-declare class ProgressBar {
-    barElem: HTMLElement;
+declare class ProgressBarElement extends HTMLElement implements CustomElement {
+    _content: DocumentFragment;
+    outerBar: HTMLDivElement;
+    innerBar: HTMLDivElement;
     currentStyle: ProgressBarStyle;
     isStriped: boolean;
     isReversed: boolean;
-    static stripeClasses: string[];
-    constructor(barElem: HTMLElement, currentStyle?: ProgressBarStyle);
+    constructor();
+    connectedCallback(): void;
     animateProgressFromTimer(timer: Timer): void;
     /** Animates the progress bar from start to end over the alloted interval */
     animateProgress(elapsedTime: number, totalTime: number): void;
@@ -15,5 +17,6 @@ declare class ProgressBar {
     setAnimation(animation: string): void;
     /** Sets the progress bar to a fixed position. Will stop existing progress animations. */
     setFixedPosition(percent: number): void;
+    static stripeClasses: string[];
 }
-declare type ProgressBarStyle = 'bg-danger' | 'bg-info' | 'bg-warning' | 'bg-slowed' | 'bg-success' | 'bg-primary' | 'bg-woodcutting' | 'bg-secondary' | 'bg-mining';
+declare type ProgressBarStyle = 'bg-danger' | 'bg-info' | 'bg-warning' | 'bg-slowed' | 'bg-success' | 'bg-primary' | 'bg-woodcutting' | 'bg-secondary' | 'bg-mining' | 'bg-archaeology' | 'bg-harvesting';

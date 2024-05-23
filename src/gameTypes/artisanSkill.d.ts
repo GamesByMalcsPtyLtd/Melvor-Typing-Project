@@ -1,24 +1,26 @@
 /** Base class for artisan skills, contains similar code to simplify rendering */
-declare abstract class ArtisanSkill<RecipeClass extends ArtisanSkillRecipe, DataType extends MasterySkillData, ProductType extends Item> extends CraftingSkill<RecipeClass, DataType> {
+declare abstract class ArtisanSkill<RecipeClass extends ArtisanSkillRecipe, DataType extends MasterySkillData, ProductType extends Item, Events extends SkillWithMasteryEvents = SkillWithMasteryEvents, ModificationDataType extends MasterySkillModificationData = MasterySkillModificationData> extends CraftingSkill<RecipeClass, DataType, Events, ModificationDataType> {
     /** Associated menu for the skill */
-    abstract menu: ArtisanMenu<ProductType>;
-    abstract selectionTabs: Map<SkillCategory, RecipeSelectionTab<RecipeClass>>;
+    abstract menu: ArtisanMenuElement;
+    abstract selectionTabs: Map<SkillCategory, RecipeSelectionTabElement<RecipeClass, RecipeOptionElement<RecipeClass>>>;
+    abstract categoryMenu: RealmedCategoryMenuElement;
     abstract renderQueue: ArtisanSkillRenderQueue<RecipeClass>;
     abstract readonly baseInterval: number;
     /** Gets the base XP for the current action */
     get actionXP(): number;
-    /** Gets the primary item ID produced for the current action */
+    /** Gets the base Abyssal XP for the current action */
+    get actionAbyssalXP(): number;
+    /** Gets the primary item produced for the current action */
     abstract readonly actionItem: ProductType;
     /** Gets the primary item quantity produced for the current action */
-    abstract readonly actionItemQuantity: number;
+    abstract readonly unmodifiedActionQuantity: number;
     /** Currently selected recipe */
     abstract readonly activeRecipe: RecipeClass;
     /** ID of currently selected recipe */
     selectedRecipe?: RecipeClass;
-    /** Doubling chance for currently selected recipe */
-    get actionDoublingChance(): number;
     get actionInterval(): number;
     get actionLevel(): number;
+    get actionAbyssalLevel(): number;
     get masteryAction(): RecipeClass;
     /** Callback function for when the create button is pressed */
     createButtonOnClick(): void;
@@ -29,18 +31,13 @@ declare abstract class ArtisanSkill<RecipeClass extends ArtisanSkillRecipe, Data
     queueBankQuantityRender(item: AnyItem): void;
     onModifierChange(): void;
     onEquipmentChange(): void;
-    onLevelUp(oldLevel: number, newLevel: number): void;
+    onAnyLevelUp(): void;
     getErrorLog(): string;
     render(): void;
+    renderRealmVisibility(): void;
     /** Gets the costs for a recipe for this skill */
     getRecipeCosts(recipe: RecipeClass): Costs;
     getCurrentRecipeCosts(): Costs;
-    /** Modifies the cost of a specific item for a recipe */
-    modifyItemCost(item: AnyItem, quantity: number, recipe: RecipeClass): number;
-    /** Modifies the cost of gp for a recipe */
-    modifyGPCost(recipe: RecipeClass): number;
-    /** Modifies the cost of slayer coins for a recipe */
-    modifySCCost(recipe: RecipeClass): number;
     /** Render the quantities of items, gp, and slayer coins */
     renderQuantities(): void;
     /** Renders the selected recipe */
@@ -49,6 +46,7 @@ declare abstract class ArtisanSkill<RecipeClass extends ArtisanSkillRecipe, Data
     renderRecipeInfo(): void;
     renderProgressBar(): void;
     renderSelectionTabs(): void;
+    getBestMasteryRealm(): Realm;
     encode(writer: SaveWriter): SaveWriter;
     decode(reader: SaveWriter, version: number): void;
     deserialize(reader: DataReader, version: number, idMap: NumericIDMap): void;
@@ -65,25 +63,41 @@ declare class ArtisanSkillRenderQueue<ActionType extends ArtisanSkillRecipe> ext
 }
 interface ArtisanSkillRecipeData extends BasicSkillRecipeData {
     itemCosts: IDQuantity[];
-    gpCost: number;
-    scCost: number;
+    currencyCosts?: IDQuantity[];
+    /** @deprecated Use currencyCosts instead */
+    gpCost?: number;
+    /** @deprecated Use currencyCosts instead */
+    scCost?: number;
+}
+interface ArtisanSkillRecipeModificationData extends BasicSkillRecipeModificationData {
+    itemCosts?: ItemQuantitiesModificationData;
+    currencyCosts?: CurrencyQuantitiesModificationData;
 }
 declare abstract class ArtisanSkillRecipe extends BasicSkillRecipe {
     itemCosts: AnyItemQuantity[];
-    gpCost: number;
-    scCost: number;
+    currencyCosts: CurrencyQuantity[];
     constructor(namespace: DataNamespace, data: ArtisanSkillRecipeData, game: Game);
+    applyDataModification(data: ArtisanSkillRecipeModificationData, game: Game): void;
 }
 interface CategorizedArtisanRecipeData extends ArtisanSkillRecipeData {
     categoryID: string;
 }
+interface CategorizedArtisanRecipeModificationData extends ArtisanSkillRecipeModificationData {
+    categoryID?: string;
+}
 declare abstract class CategorizedArtisanRecipe<CategoryType extends SkillCategory> extends ArtisanSkillRecipe {
+    skill: AnySkill & SkillCategoryObject<CategoryType>;
     category: CategoryType;
-    constructor(namespace: DataNamespace, data: CategorizedArtisanRecipeData, game: Game, skill: Skill<any> & SkillCategoryObject<CategoryType>);
+    constructor(namespace: DataNamespace, data: CategorizedArtisanRecipeData, game: Game, skill: AnySkill & SkillCategoryObject<CategoryType>);
+    applyDataModification(data: CategorizedArtisanRecipeModificationData, game: Game): void;
 }
 interface SingleProductArtisanSkillRecipeData extends CategorizedArtisanRecipeData {
     productID: string;
     baseQuantity: number;
+}
+interface SingleProductArtisanSkillRecipeModificationData extends CategorizedArtisanRecipeModificationData {
+    productID?: string;
+    baseQuantity?: number;
 }
 declare class SingleProductArtisanSkillRecipe<CategoryType extends SkillCategory> extends CategorizedArtisanRecipe<CategoryType> {
     get name(): string;
@@ -91,4 +105,5 @@ declare class SingleProductArtisanSkillRecipe<CategoryType extends SkillCategory
     product: AnyItem;
     baseQuantity: number;
     constructor(namespace: DataNamespace, data: SingleProductArtisanSkillRecipeData, game: Game, skill: Skill<any> & SkillCategoryObject<CategoryType>);
+    applyDataModification(data: SingleProductArtisanSkillRecipeModificationData, game: Game): void;
 }

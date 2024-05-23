@@ -1,5 +1,5 @@
 /** Contains Mastery Icon with Level, Progress bar for % progress to next level and experience progress */
-declare class MasteryDisplay extends HTMLElement {
+declare class MasteryDisplayElement extends HTMLElement implements CustomElement {
     _content: DocumentFragment;
     icon: HTMLImageElement;
     level: HTMLSpanElement;
@@ -14,7 +14,7 @@ declare class MasteryDisplay extends HTMLElement {
     updateValues(progress: MasteryProgress): void;
 }
 /** Contains Mastery Icon with Level, and percentage to next mastery level */
-declare class CompactMasteryDisplay extends HTMLElement {
+declare class CompactMasteryDisplayElement extends HTMLElement implements CustomElement {
     _content: DocumentFragment;
     icon: HTMLImageElement;
     level: HTMLSpanElement;
@@ -26,21 +26,32 @@ declare class CompactMasteryDisplay extends HTMLElement {
     setMastery(skill: SkillWithMastery<MasteryAction, MasterySkillData>, action: MasteryAction): void;
     updateValues(progress: MasteryProgress): void;
 }
-declare class MasteryPoolDisplay extends HTMLElement {
-    _content: DocumentFragment;
-    poolIcon: HTMLImageElement;
-    poolProgress: HTMLDivElement;
+interface MasteryPoolRealmDisplay {
+    progressContainer: HTMLDivElement;
+    progress: HTMLDivElement;
+    labelContainer: HTMLElement;
+    realmImage: HTMLImageElement;
+    realmTooltip: TippyTooltip;
     currentXP: HTMLSpanElement;
     totalXP: HTMLSpanElement;
     percentXP: HTMLSpanElement;
+}
+declare class MasteryPoolDisplayElement extends HTMLElement implements CustomElement {
+    _content: DocumentFragment;
+    poolIcon: HTMLImageElement;
+    progressBarContainer: HTMLDivElement;
+    labelContainer: HTMLDivElement;
+    realmDisplays: MasteryPoolRealmDisplay[];
+    realmDisplayMap: Map<Realm, MasteryPoolRealmDisplay>;
     poolTooltip?: TippyTooltip;
     constructor();
     connectedCallback(): void;
     disconnectedCallback(): void;
-    setSkill(skill: SkillWithMastery<MasteryAction, MasterySkillData>): void;
-    updateProgress(skill: SkillWithMastery<MasteryAction, MasterySkillData>): void;
+    setSkill(skill: SkillWithMastery<MasteryAction, MasterySkillData>, realmsToShow?: Realm[]): void;
+    updateProgress(skill: SkillWithMastery<MasteryAction, MasterySkillData>, realm: Realm): void;
+    createRealmDisplay(): MasteryPoolRealmDisplay;
 }
-declare class SpendMasteryMenuItem extends HTMLElement {
+declare class SpendMasteryMenuItemElement extends HTMLElement implements CustomElement {
     _content: DocumentFragment;
     actionImage: HTMLImageElement;
     level: HTMLElement;
@@ -55,13 +66,19 @@ declare class SpendMasteryMenuItem extends HTMLElement {
     setAction(action: MasteryAction): void;
     updateProgress(skill: SkillWithMastery<MasteryAction, MasterySkillData>, action: MasteryAction, spendAmount: number): void;
 }
-declare class SpendMasteryMenu extends HTMLElement {
+interface ClaimMasteryTokenButton {
+    button: HTMLButtonElement;
+    image: HTMLImageElement;
+    quantity: HTMLSpanElement;
+}
+declare class SpendMasteryMenuElement extends HTMLElement implements CustomElement {
     _content: DocumentFragment;
     masteryItemContainer: HTMLDivElement;
-    poolDisplay: MasteryPoolDisplay;
-    claimTokenButton: HTMLButtonElement;
-    tokenImage: HTMLImageElement;
-    tokenQuantity: HTMLSpanElement;
+    realmSelect: RealmTabSelectElement;
+    poolDisplay: MasteryPoolDisplayElement;
+    claimTokenContainer: HTMLDivElement;
+    claimTokenButtons: ClaimMasteryTokenButton[];
+    claimTokenButtonMap: Map<MasteryTokenItem, ClaimMasteryTokenButton>;
     setLevel1Button: HTMLButtonElement;
     setLevel5Button: HTMLButtonElement;
     setLevel10Button: HTMLButtonElement;
@@ -72,27 +89,33 @@ declare class SpendMasteryMenu extends HTMLElement {
         input: HTMLInputElement;
         label: HTMLLabelElement;
     }[];
-    get curentSkill(): SkillWithMastery<MasteryAction, MasterySkillData> | undefined;
-    get currentToken(): TokenItem | undefined;
+    get curentSkill(): SkillWithMastery<MasteryAction, MasterySkillData, SkillWithMasteryEvents, MasterySkillModificationData> | undefined;
+    get currentRealm(): Realm | undefined;
     _currentSkill?: SkillWithMastery<MasteryAction, MasterySkillData>;
-    masteryItems: SpendMasteryMenuItem[];
-    itemsByAction: Map<MasteryAction, SpendMasteryMenuItem>;
+    _currentRealm?: Realm;
+    masteryItems: SpendMasteryMenuItemElement[];
+    itemsByAction: Map<MasteryAction, SpendMasteryMenuItemElement>;
     levelUpAmount: number;
     constructor();
     connectedCallback(): void;
-    setSkill(skill: SkillWithMastery<MasteryAction, MasterySkillData>, game: Game): void;
+    setSkill(skill: SkillWithMastery<MasteryAction, MasterySkillData>, realm: Realm, game: Game): void;
     unsetSkill(): void;
+    updateRealmUnlock(realm: Realm): void;
+    createRealmOptions(skill: SkillWithMastery<MasteryAction, MasterySkillData>, game: Game): void;
+    showMasteriesForRealm(skill: SkillWithMastery<MasteryAction, MasterySkillData>, realm: Realm, game: Game): void;
     shouldHideMastery(skill: SkillWithMastery<MasteryAction, MasterySkillData>, action: MasteryAction): boolean;
     updateAllActions(): void;
     updateFilterOptions(namespaces: Set<string>): void;
     onFilterChange(): void;
     updateAction(skill: SkillWithMastery<MasteryAction, MasterySkillData>, action: MasteryAction): void;
-    updateTokenQuantity(amount: number): void;
+    updateTokenQuantity(token: MasteryTokenItem, amount: number): void;
     changeLevelUpAmount(newAmount: number): void;
+    createClaimTokenButton(): ClaimMasteryTokenButton;
+    setClaimTokenButton(button: ClaimMasteryTokenButton, token: MasteryTokenItem, game: Game): void;
 }
-declare class MasterySkillOptionsElement extends HTMLElement {
+declare class MasterySkillOptionsElement extends HTMLElement implements CustomElement {
     _content: DocumentFragment;
-    poolDisplay: MasteryPoolDisplay;
+    poolDisplay: MasteryPoolDisplayElement;
     viewCheckpointsButton: HTMLButtonElement;
     spendMasteryButton: HTMLButtonElement;
     masteryImage: HTMLImageElement;
@@ -101,4 +124,23 @@ declare class MasterySkillOptionsElement extends HTMLElement {
     connectedCallback(): void;
     disconnectedCallback(): void;
     setSkill(skill: SkillWithMastery<MasteryAction, MasterySkillData>): void;
+}
+declare class MasteryPoolBonusElement extends HTMLElement implements CustomElement {
+    _content: DocumentFragment;
+    percent: HTMLHeadingElement;
+    description: HTMLDivElement;
+    xpRequired: HTMLElement;
+    constructor();
+    connectedCallback(): void;
+    setBonus(bonus: MasteryPoolBonus, skill: SkillWithMastery<MasteryAction, MasterySkillData>): void;
+}
+declare class MasteryPoolBonusesElement extends HTMLElement implements CustomElement {
+    _content: DocumentFragment;
+    realmSelect: RealmTabSelectElement;
+    bonusContainer: HTMLDivElement;
+    bonuses: MasteryPoolBonusElement[];
+    constructor();
+    connectedCallback(): void;
+    setSkill(skill: SkillWithMastery<MasteryAction, MasterySkillData>, realm: Realm): void;
+    setBonuses(skill: SkillWithMastery<MasteryAction, MasterySkillData>, realm: Realm): void;
 }

@@ -52,21 +52,6 @@ interface ActiveAction extends Action {
   /** Optional, Called when generating an offline modal, and this action was/is the current active action. Intended to parse state changes from createOfflineSnapShot */
   getOfflineMessages?(): string[];
 }
-/** Provides modifiers or stats to the Player or Enemy class */
-interface StatProvider {
-  /** Modifiers that apply to the player */
-  modifiers?: MappedModifiers;
-  /** Modifiers that apply to enemies */
-  enemyModifiers?: TargetModifiers;
-  /** Modifiers that can apply to the player/enemy that only apply based on a condition */
-  conditionalModifiers?: ConditionalModifier[];
-  /** Equipment stats that apply to the player */
-  equipmentStats?: EquipStatPair[];
-}
-/** Provides modifiers or stats to the Player/Enemy class in Golbin Raid */
-interface RaidStatProvider {
-  raidStats: StatProvider
-}
 interface SkillCategoryObject<CategoryType extends SkillCategory> {
   categories: NamespaceRegistry<CategoryType>
 }

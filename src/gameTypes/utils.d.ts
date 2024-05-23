@@ -3,7 +3,6 @@ declare function rollPercentage(chance: number): boolean;
 /** Rolls an interger value between [minValue,maxValue] */
 declare function rollInteger(minValue: number, maxValue: number): number;
 declare function rollForOffItem(baseChance: number): boolean;
-declare function rollForAncientRelic(baseChance: number): boolean;
 declare function generateGaussianNumber($mean: number, $stdDev: number): number;
 declare function getMean(numActions: number, probability: number): number;
 declare function getStdDev(numActions: number, probability: number): number;
@@ -56,13 +55,27 @@ declare function getSortableDelayOnTouch(): boolean;
 declare function roundToTickInterval(interval: number): number;
 declare const joinList: (seperator: string) => (list: string[]) => string;
 declare function joinAsList(list: string[]): string;
+declare function joinAsOrList(list: string[]): string;
 declare function joinAsLineBreakList(list: string[]): string;
 declare const joinAsSuperList: (list: string[]) => string;
+/** A function used to format the descriptions of modifiers and effect applicators */
+declare type DescriptionFormatter<T> = (description: string, textClass: string) => T;
+/** Formats a description without any HTML syntax or styling */
+declare const plainDescriptionFormatter: DescriptionFormatter<string>;
+/** Formats a description as HTML with span elements */
+declare const spanHTMLDescriptionFormatter: DescriptionFormatter<string>;
+/** Returns a description formatter that returns span elements */
+declare const getSpanElementDescriptionFormatter: (className?: string) => DescriptionFormatter<HTMLSpanElement>;
+declare const spanDescriptionFormatter: DescriptionFormatter<HTMLSpanElement>;
 declare function pluralS(number: number): "" | "s";
 declare function checkMediaQuery(mediaQuery: string): boolean;
+declare const addMediaQueryListener: (mediaQuery: string, callbackFn: (this: MediaQueryList, ev: MediaQueryListEvent) => void) => void, removeMediaQueryListener: (mediaQuery: string, callbackFn: (this: MediaQueryList, ev: MediaQueryListEvent) => void) => void;
 declare function createElement<T extends keyof HTMLElementTagNameMap>(tagName: T, options?: ElemCreationOptions): HTMLElementTagNameMap[T];
 declare function hideElement(elem: Element): void;
 declare function showElement(elem: Element): void;
+declare function hideElements(elems: Element[]): void;
+declare function showElements(elems: Element[]): void;
+declare function createImage(media: string, imageClass: string): HTMLImageElement;
 /** Toggles the color of an elements text between success and failure */
 declare function toggleDangerSuccess(elem: HTMLElement, success: boolean): void;
 declare function removeElementID(elem: HTMLElement): void;
@@ -82,8 +95,6 @@ declare type ElemCreationOptions = {
     /** Element ID */
     id?: string;
 };
-/** Returns a reducer for computing the total number of unlocked items in a NamespaceRegistry */
-declare const levelUnlockSum: (skill: AnySkill) => (previous: number, current: BasicSkillRecipe) => number;
 declare function fireBottomToast(text: string, duration?: number): void;
 declare function fireTopToast(text: string, duration?: number): void;
 declare function imageNotify(media: string, message: string, messageTheme?: StandardTheme): void;
@@ -103,12 +114,20 @@ declare let skillXPNotifyToProcess: SkillQuantity[];
 declare function skillXPNotify(skill: AnySkill, quantity: number): void;
 /** Fires an item gain notifiaction for the specified item and quantity */
 declare function processSkillXPNotify(skill: AnySkill, quantity: number): void;
+declare let abyssalXPNotifyTimer: number;
+declare let abyssalXPNotifyToProcess: SkillQuantity[];
+/** Queues up an item gain notifiaction for the specified item and quantity */
+declare function abyssalXPNotify(skill: AnySkill, quantity: number): void;
+/** Fires an item gain notifiaction for the specified item and quantity */
+declare function processAbyssalXPNotify(skill: AnySkill, quantity: number): void;
 /** Fires a stun notification for thieving, with the damage specified */
 declare function stunNotify(damage: number): void;
 /** Fires a bank full notification */
 declare function bankFullNotify(): void;
 /** Fires a skill level up notification */
 declare function levelUpNotify(skill: AnySkill): void;
+/** Fires a skill abyssal level up notification */
+declare function abyssalLevelUpNotify(skill: AnySkill): void;
 /** Unused notification function */
 declare function level99Notify(skill: AnySkill): void;
 /** Fires a resource preservation notification */
@@ -119,13 +138,12 @@ declare function notifyPlayer(skill: AnySkill | -1, message: string, messageThem
 declare function notifyItemCharges(item: EquipmentItem): void;
 /** Fires a notification that a tutorial task was completed */
 declare function tutorialNotify(): void;
-declare function currencyNotify(type: string, amount: number): void;
+declare function currencyNotify(currency: Currency, amount: number): void;
 /** Queues a modal notifying the player of a mastery level up for the specified skill and masteryID */
 declare function notifyMasteryLevelUp(action: MasteryAction, newLevel: number): void;
 declare function notify99ItemMastery(action: MasteryAction): void;
-declare function notifyCompletionYay(): void;
-declare function notifyCompletionTotH(): void;
-declare function notifyCompletionAoD(): void;
+declare function notifyCompletionBaseGame(): void;
+declare function notifyCompletionExpansion(namespace: Namespaces): void;
 declare function notifyCompletionEverything(): void;
 declare let pyroInterval: number;
 declare let forcePyro: boolean;
@@ -142,6 +160,7 @@ declare class NotificationQueue {
     add(notification: QueuedNotify): void;
     clear(): void;
     disableMaxQueue(): void;
+    enableMaxQueue(): void;
 }
 /** Utility class for computing experience and levels */
 declare class ExperienceCalculator {
@@ -154,15 +173,44 @@ declare class ExperienceCalculator {
     estConstB: number;
     constructor();
     equate(level: number): number;
+    /** Computes the xp required for the next level in the table */
+    computeNextLevelXP(level: number): number;
+    /** Computes an under-estimate of the level corresponding to an amount of XP */
+    estimateXPToLevel(xp: number): number;
+    levelToXP(level: number): number;
+    /** @deprecated Use levelToXP instead */
     level_to_xp(level: number): number;
-    /** XP to level function, utilizing loop. Returns level + 1 */
-    xp_to_level(xp: number, level?: number): number;
     /** XP To level function utilizing estimate method */
     xpToLevel(xp: number): number;
 }
+/**
+ * New abyssal exp class for testing purposes for a different XP scaling
+ * Based directly off of the base game experience calculator
+ * Level 1 -> 2 starts at the difference in XP between level 99 and 100, and continues up from there
+ */
+declare class AbyssalExperienceCalculator {
+    exp: ExperienceCalculator;
+    readonly xpOffset: number;
+    readonly levelOffset = 98;
+    levelToXP(level: number): number;
+    xpToLevel(xp: number): number;
+}
+/** Old Utility class for computing abyssal experience and levels
+ * Leaving this here in case we want to revert back to it
+ */
+declare class OldAbyssalExperienceCalculator extends ExperienceCalculator {
+    estConstA: number;
+    estConstB: number;
+    equate(level: number): number;
+    computeNextLevelXP(level: number): number;
+    estimateXPToLevel(xp: number): number;
+}
 /** Calculator for experience and levels */
 declare const exp: ExperienceCalculator;
-declare type QueuedNotify = ItemNotify | StunNotify | BankFullNotify | LevelUpNotify | PlayerNotify | ItemChargeNotify | MasteryNotify | Mastery99Notify | PreserveNotify | CurrencyNotify | TutorialNotify | SkillXPNotify;
+declare const abyssalExp: AbyssalExperienceCalculator;
+declare function printAbyssalXPTable(upToLevel?: number): void;
+declare function printXPTable(upToLevel?: number): void;
+declare type QueuedNotify = ItemNotify | StunNotify | BankFullNotify | LevelUpNotify | AbyssalLevelUpNotify | PlayerNotify | ItemChargeNotify | MasteryNotify | Mastery99Notify | PreserveNotify | CurrencyNotify | TutorialNotify | SkillXPNotify | AbyssalXPNotify;
 declare type ItemNotify = {
     type: 'Item';
     args: Parameters<typeof itemNotify>;
@@ -177,6 +225,10 @@ declare type BankFullNotify = {
 };
 declare type LevelUpNotify = {
     type: 'LevelUp';
+    args: Parameters<typeof levelUpNotify>;
+};
+declare type AbyssalLevelUpNotify = {
+    type: 'AbyssalLevelUp';
     args: Parameters<typeof levelUpNotify>;
 };
 declare type PlayerNotify = {
@@ -210,10 +262,17 @@ declare type SkillXPNotify = {
     type: 'SkillXP';
     args: Parameters<typeof skillXPNotify>;
 };
-declare function getItemBaseStatsBreakdown(item: EquipmentItem): string;
+declare type AbyssalXPNotify = {
+    type: 'AbyssalXP';
+    args: Parameters<typeof abyssalXPNotify>;
+};
 declare function lockedSkillAlert(skill: AnySkill, messageTemplate: string): void;
 declare function showStunnedNotification(): void;
 declare function showSleepNotification(): void;
+declare type NameValuePair = {
+    name: string;
+    value: number;
+};
 declare function compareNameValuePairs(currentPairs: NameValuePair[], oldPairs: NameValuePair[], onFirstDiff: string): boolean;
 declare function convertNameValuePairToMap(pairs: NameValuePair[]): Map<string, number>;
 /**
@@ -236,8 +295,6 @@ declare function multiplyByNumberMultiplier(value: number): number;
 declare function divideByNumberMultiplier(value: number): number;
 declare function animateProgress(div: string, interval: number, stayFull?: boolean): void;
 declare function resetProgressAnimation(div: string): void;
-/** Gets the dom nodes for `Unlocked at ${image} level ${level}' */
-declare function getUnlockedAtNodes(skill: AnySkill, level: number): (HTMLImageElement | Text)[];
 declare function templateLangStringWithNodes(id: string | number, nodeData: StringDictionary<Node>, textData: StringDictionary<string>, clone?: boolean): (Node | string)[];
 declare function templateStringWithNodes(string: string, nodeData: StringDictionary<Node>, textData: StringDictionary<string>, clone?: boolean): (string | Node)[];
 /** Formats a number in it's ordinal form
@@ -248,7 +305,7 @@ declare const formatAsOrdinal: (value: number) => string;
 /** Formats a number with a locale specific thousands seperator */
 declare function numberWithCommas(number: number | string, ignoreSetting?: boolean): string;
 /** Formats a number with a postfix */
-declare function formatNumber(number: number): string;
+declare function formatNumber(number: number, decimals?: number): string;
 /** Formats a percentage with locale sensitivity. Uses the 0-100 range
  * @example formatPercent(5) // 5%
  * @example formatPercent(34.2,2) // 34.20%
@@ -286,7 +343,7 @@ declare function formatAsTimePeriod(timeInMs: number): string;
 /** Locally formats a time period in ms using shorthand terminology
  * @example formatAsTimePeriod(1000) // '1s'
  */
-declare function formatAsShorthandTimePeriod(timeInMs: number, roundSeconds?: boolean): string;
+declare function formatAsShorthandTimePeriod(timeInMs: number, roundSeconds?: boolean, showMs?: boolean, padding?: boolean): string;
 declare function successSpan(content: string): string;
 declare function getTemplateElement(templateID: string): HTMLTemplateElement;
 declare function getTemplateNode(templateID: string): Node;
@@ -294,7 +351,7 @@ declare function getAnyElementFromFragment(fragment: DocumentFragment, elementID
 declare function getElementFromFragment<T extends keyof HTMLElementTagNameMap>(fragment: DocumentFragment, elementID: string, tagName: T): HTMLElementTagNameMap[T];
 /** Formats a number to locale sensitive fixed digits */
 declare function formatFixed(num: number, digits: number): string;
-declare function switchToCategory<T extends HasLevel>(tabs: Map<CategoryLike, RecipeSelectionTab<T>>): (categoryToShow: CategoryLike) => void;
+declare function switchToCategory<T extends HasLevels>(tabs: Map<CategoryLike, RecipeSelectionTabElement<T>>): (categoryToShow: CategoryLike) => void;
 /**
  * Creates a promise that resolves after delay
  * @param delay Time to delay in [ms]
@@ -307,9 +364,22 @@ declare function removeFromArray<T>(original: T[], remove: T[]): T[];
 declare function mapOrder<T, K extends keyof T>(array: T[], order: T[K][], key: K): T[];
 /** Returns a function for use in Array.sort, that will sort an array of objects T, in the order corresponding to their property key */
 declare function sortByOrder<T, K extends keyof T>(order: T[K][], key: K): (a: T, b: T) => number;
+declare function sortByCurrencyValue(ascending: boolean, a: CurrencyQuantity, b: CurrencyQuantity): number;
 declare function logConsole(message: string): void;
 /** Utility function for throwing errors related to unregistered objects during save game conversion */
 declare const unregisteredMessage: (type: string) => string;
+/** Error type for when the construction of a data object fails */
+declare class DataConstructionError extends Error {
+    inner?: unknown;
+    get name(): string;
+    constructor(className: string, inner?: unknown, id?: string);
+}
+/** Error type for when the modification of a data object fails */
+declare class DataModificationError extends Error {
+    inner?: unknown;
+    get name(): string;
+    constructor(className: string, inner?: unknown, id?: string);
+}
 /** Returns an error message for failing to construct an object that requires registered data. */
 declare class UnregisteredConstructionError extends Error {
     constructor(object: Object, unregisteredName: string, id: string);
@@ -327,15 +397,19 @@ declare type DropTableElement = {
     maxQuantity: number;
     weight: number;
 };
+interface Weighted {
+    weight: number;
+}
+interface WeightedResult<T> extends Weighted {
+    result: T;
+}
 /**
  * Selects a random element from a weighted array
  * @param array Weighted array elements
  * @param totalWeight Sum of all weights in the array
  * @returns
  */
-declare function selectFromWeightedArray<T extends {
-    weight: number;
-}>(array: T[], totalWeight: number): T;
+declare function selectFromWeightedArray<T extends Weighted>(array: T[], totalWeight: number): T;
 declare class DropTable {
     totalWeight: number;
     drops: DropTableElement[];
@@ -343,8 +417,6 @@ declare class DropTable {
     get size(): number;
     get weight(): number;
     get sortedDropsArray(): DropTableElement[];
-    /** Average GP sale value from recieving a drop from the table */
-    get averageDropValue(): number;
     constructor(game: Game, data: DropTableData[]);
     registerDrops(game: Game, data: DropTableData[]): void;
     unregisterDrops(data: string[]): void;
@@ -352,39 +424,27 @@ declare class DropTable {
     getDrop(): AnyItemQuantity;
     /** Rolls for a drop on the table and returns raw drop data with quantity */
     getRawDrop(): RawDrop;
+    /** Gets the average currency value of a drop in this table */
+    getAverageDropValue(): SparseNumericMap<Currency>;
 }
 interface RawDrop {
     drop: DropTableElement;
     quantity: number;
 }
-declare type SkillModifierTableElementData = {
+declare type RandomModifierTableElement = {
     weight: number;
-    key: SkillModifierKeys;
-    skill: string;
-    min: number;
-    max: number;
-    unique?: boolean;
-};
-declare type StandardModifierTableElement = {
-    weight: number;
-    key: StandardModifierKeys;
+    modifier: ModifierValue;
     min: number;
     max: number;
     unique: boolean;
 };
-declare type StandardModifierTableElementData = Omit<StandardModifierTableElement, 'unique'> & {
-    unique?: boolean;
-};
-declare type SkillModifierTableElement = {
+declare type RandomModifierTableData = ModifierScopeData & {
+    id: string;
     weight: number;
-    key: SkillModifierKeys;
-    skill: AnySkill;
     min: number;
     max: number;
-    unique: boolean;
+    unique?: boolean;
 };
-declare type RandomModifierTableElement = StandardModifierTableElement | SkillModifierTableElement;
-declare type RandomModifierTableData = StandardModifierTableElementData | SkillModifierTableElementData;
 /** Utility class for selecting random modifiers */
 declare class RandomModifierTable {
     totalWeight: number;
@@ -394,21 +454,22 @@ declare class RandomModifierTable {
     /** Registers new modifiers that can be rolled from this table */
     registerModifiers(game: Game, data: RandomModifierTableData[]): void;
     /** Gets a single random modifier from this table */
-    getModifier(): ModifierArrayElement;
-    processRoll(roll: RandomModifierTableElement): ModifierArrayElement;
-    getExcludedTable(existing: ModifierArrayElement[]): {
+    getModifier(): ModifierValue;
+    processRoll(roll: RandomModifierTableElement): ModifierValue;
+    getExcludedTable(existing: ModifierValue[]): {
         excludedWeight: number;
         excludedDrops: RandomModifierTableElement[];
     };
     /** Gets a single random modifier from this table, excluding the modifiers flagged as unique contained in existing */
-    getModifierExcludingUnique(existing: ModifierArrayElement[]): ModifierArrayElement;
+    getModifierExcludingUnique(existing: ModifierValue[]): ModifierValue;
     /** Gets multiple random modifiers from this table, excluding the modifiers flagged as unique contained in existing. More efficient than calling getModifierExludingUnique multiple times due to excluded table caching. */
-    getModifiersExcludingUnique(existing: ModifierArrayElement[], count: number): ModifierArrayElement[];
+    getModifiersExcludingUnique(existing: ModifierValue[], count: number): ModifierValue[];
 }
 /** Wrapper for sparse numeric maps */
 declare class SparseNumericMap<T> {
     data: Map<T, number>;
     get size(): number;
+    get isEmpty(): boolean;
     has(key: T): boolean;
     get(key: T): number;
     set(key: T, value: number): void;
@@ -422,6 +483,7 @@ declare class SparseNumericMap<T> {
     getSumOfKeys(keys: T[]): number;
     clear(): void;
     forEach(callbackfn: (value: number, key: T) => void): void;
+    keys(): IterableIterator<T>;
 }
 /**
  * Escapes the characters in a string such that they are considered as their literal values in a RegExp
@@ -429,11 +491,13 @@ declare class SparseNumericMap<T> {
  */
 declare function escapeRegExp(string: string): string;
 declare function generateComponentClass(tagName: string): string;
-declare function generateModifierDataSchema(): void;
 declare function getRequirementTextClass(met: boolean): "text-success" | "text-danger";
 declare function createUnlockElement(costNodes: (string | Node)[], met: boolean): HTMLDivElement;
 declare function printUnlockRequirements(requirements: AnyRequirement[]): HTMLDivElement[];
+/** Displays unlock requirements that are not met. Hides others.*/
 declare function printUnlockRequirementsAsHTML(requirements: AnyRequirement[]): string[];
+/** Displays all unlock requirements instead of hiding requirements that are met */
+declare function printAllUnlockRequirementsAsHTML(requirements: AnyRequirement[]): string[];
 declare function isRequirementMet(requirements: AnyRequirement[]): boolean;
 /**
  * Create an immutable clone of an array or object
@@ -454,6 +518,7 @@ declare function getMAsTime(time: number): {
 declare function addAllNonCombatSkillActionEventListeners(game: Game, actionFunction: () => void): void;
 /** Removes the blanket listener to all on-combat skilling actions for the specified function */
 declare function removeAllNonCombatSkillActionEventListeners(game: Game, actionFunction: () => void): void;
+declare function reverseCombatTriangle(triangle: CombatTriangle): CombatTriangle;
 declare type ScheduledPushNotifications = ScheduledPushNotificationData[];
 interface ScheduledPushNotificationData {
     id: string;
@@ -486,10 +551,6 @@ declare enum PushNotificationType {
 interface SteamPurchaseResult {
     isOwned: boolean;
 }
-declare type AgilityBlueprintData = {
-    name: string;
-    obstacles: Map<number, AgilityObstacle>;
-    pillar?: AgilityPillar;
-    elitePillar?: AgilityPillar;
-};
-declare type AgilityBlueprints = Map<number, AgilityBlueprintData>;
+declare function generateMonsterStatsCSV(): void;
+declare function generateEquipmentStatsCSV(): void;
+declare function generateLangModifierCustomDescriptionForItem(item: EquipmentItem): void;

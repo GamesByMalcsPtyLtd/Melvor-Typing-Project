@@ -1,62 +1,89 @@
 declare type CharacterCombatEvents = {
     attack: CharacterAttackEvent;
     hitpointRegen: HitpointRegenerationEvent;
+    endOfTurn: CharacterEndOfTurnEvent;
+    preAttack: CharacterAttackEvent;
+    hitWithAttack: CharacterAttackEvent;
+    missedWithAttack: CharacterAttackEvent;
+    beingAttacked: CharacterAttackedEvent;
+    hitByAttack: CharacterAttackedEvent;
+    evadedAttack: CharacterAttackedEvent;
+    wasAttacked: CharacterAttackedEvent;
+    rebirth: CharacterRebirthEvent;
+    effectApplied: CharacterEffectAppliedEvent;
+    effectRemoved: CharacterEffectRemovedEvent;
+    effectGroupApplied: CharacterEffectGroupAppliedEvent;
+    effectGroupRemoved: CharacterEffectGroupRemovedEvent;
+    /** Fires when the current or maximum hitpoints of a character changes */
+    hitpointsChanged: HitpointsChangedEvent;
+    /** Fires when the current or maximum barrier of a character changes */
+    barrierChanged: BarrierChangedEvent;
 };
-declare abstract class Character implements EncodableObject, Serializable {
+declare abstract class Character implements EncodableObject, Serializable, INoWildCardGameEventEmitter<CharacterCombatEvents> {
     manager: BaseManager;
     game: Game;
     abstract _events: Pick<Emitter<CharacterCombatEvents>, 'emit'>;
+    abstract on<Key extends keyof CharacterCombatEvents>(type: Key, handler: Handler<CharacterCombatEvents[Key]>): void;
+    abstract off<Key extends keyof CharacterCombatEvents>(type: Key, handler: Handler<CharacterCombatEvents[Key]>): void;
     abstract readonly type: string;
     hitpoints: number;
-    stun: ActiveStun;
-    sleep: ActiveSleep;
+    /** Effect applicators that have been merged with this character, and need to be processed as the "applyEffectWhenMerged" property is true */
+    effectApplicatorsToProcess: CombatEffectApplicator[];
+    effectApplicators: Map<CombatEffectApplicationTrigger, CombatEffectApplicator[]>;
+    /** Stores a count of the number of active combat effects that belong to each group id */
+    activeEffectGroups: SparseNumericMap<string>;
+    /** Stores all CombatEffects that are active on this character */
+    activeEffects: Map<CombatEffect, ActiveCombatEffect>;
+    /** All timers for active effects that are currently started. */
+    activeEffectTimers: Set<Timer>;
+    /** Returns if the Character has an active effect belonging to the Curse group */
+    get isCursed(): boolean;
+    /** Returns if the Character has an active effect belonging to the Sleep group */
+    get isSleeping(): boolean;
+    /** Returns if the character has an active effect belonging to the StunLike group */
+    get isStunned(): boolean;
+    /** Returns if the character has an active effect belonging to the Crystallize group */
+    get isCrystallized(): boolean;
+    /** Returns if the character has an active effect belonging to the Freeze group */
+    get isFrozen(): boolean;
+    /** Returns if the character has an active effect belonging to the Slow group */
+    get isSlowed(): boolean;
+    /** Returns if the character has an active effect belonging to the BurnDOT group */
+    get isBurning(): boolean;
+    /** Returns if the character has an active effect belonging to the BleedDOT group */
+    get isBleeding(): boolean;
+    /** Returns if the character has an active effect belonging to the PoisonDOT group */
+    get isPoisoned(): boolean;
+    /** Returns if the character has an active effect belonging to the Corruption group */
+    get isCorrupted(): boolean;
+    /** Returns if the character has an active effect belonging to the Blight group */
+    get isBlighted(): boolean;
+    /** Returns if the character has an active effect belonging to the AblazeDOT group */
+    get isAblaze(): boolean;
+    /** Returns if the character has an active effect belonging to the ToxinDOT group */
+    get isToxined(): boolean;
+    /** Returns the number of effects belonging to the Debuff group that are active on this character */
+    get debuffCount(): number;
+    /** Returns the total number of CombatEffects that are active on the character */
+    get activeEffectCount(): number;
+    /** If this character is considered to be a boss. */
+    isBoss: boolean;
     nextAction: ActionType;
     attackCount: number;
     nextAttack: SpecialAttack;
-    stunImmunity: ActiveStunImmunity;
     /** Controls if the character is performing hits in a multi-hit attack */
     isAttacking: boolean;
     /** True if first hit of attack has not occurred */
     firstHit: boolean;
-    /** Number of effects active that are slowing the character */
-    slowCount: number;
-    /** Number of effects that are active on the character */
-    effectCount: number;
-    /** Number of frostburn effects active on the character */
-    frostBurnCount: number;
-    /** Number of Unholy Mark Stacks on the character */
-    get unholyMarkStacks(): number;
+    /** True if the first miss of an attack has not occured */
+    firstMiss: boolean;
     /** The amount of Barrier remaining */
     barrier: number;
     /** The amount of Barrier remaining */
     maxBarrierPercent: number;
-    get barrierRegenTurns(): number;
-    get hasBarrierRegen(): boolean;
     barrierTurns: number;
     hasBarrier: boolean;
-    /** Currently active curse. Undefined if no curse is active */
-    curse?: ActiveCurse;
-    get isCursed(): boolean;
-    get isSleeping(): boolean;
-    /** Returns if the character has a stun effect active. Regardless of flavour */
-    get isStunned(): boolean;
-    /** Returns if the character has a stun effect active. Regardless of flavour */
-    get isCrystallized(): boolean;
-    /** Returns if the character has a stun effect active. Regardless of flavour */
-    get isFrozen(): boolean;
-    /** Returns if the character has a slow effect active */
-    get isSlowed(): boolean;
     timers: CharacterTimers;
-    modifierEffects: ModifierEffects;
-    reflexiveEffects: Map<ReflexiveEffect, ActiveReflexiveEffect>;
-    /** The reductive effects that are reduced when this character is hit by an attack */
-    hitByReductiveEffects: Map<ReductiveEffect, ActiveReductiveEffect>;
-    /** The reductive effects that are reduced when this character hits with an attack */
-    hitWithReductiveEffects: Map<ReductiveEffect, ActiveReductiveEffect>;
-    incrementalEffects: Map<IncrementalEffect, ActiveIncrementalEffect>;
-    stackingEffect: Map<StackingEffect, ActiveStackingEffect>;
-    comboEffects: Map<ComboEffect, ActiveComboEffect>;
-    activeDOTs: Map<number, ActiveDOT>;
     /** Stores additional hitpoints that will be regenerated on the next HP regen proc */
     bufferedRegen: number;
     target: Character;
@@ -64,53 +91,47 @@ declare abstract class Character implements EncodableObject, Serializable {
     equipmentStats: EquipmentStats;
     /** Combat levels of character including hidden levels */
     levels: CombatLevels;
+    /** Abyssal levels of character including hidden levels. Mainly used for Player-related functions that require abyssal level to be included in the calcs. */
+    abyssalLevels: CombatLevels;
     /** Current Combat Stats */
-    stats: CharacterStats;
+    stats: CharacterCombatStats;
     attackType: AttackType;
-    hitchance: number;
+    /** The default damage type for the character */
+    damageType: DamageType;
     availableAttacks: AttackSelection[];
-    abstract modifiers: CombatModifiers;
-    /** Modifiers that are applied to the target constantly */
-    targetModifiers: TargetModifiers;
+    /** The modifiers that are currently active on this character */
+    abstract modifiers: CharacterModifierTable;
     canCurse: boolean;
     canAurora: boolean;
-    abstract noun: Noun;
     abstract effectRenderer: EffectRenderer;
     abstract statElements: RenderHTMLElements;
     abstract splashManager: SplashManager;
-    abstract attackBar: ProgressBar;
-    abstract attackBarMinibar: ProgressBar;
-    /** Map of active passives, value determines if it should be rendered */
-    passives: Map<CombatPassive, ActivePassive>;
+    abstract attackBar: ProgressBarElement;
+    abstract attackBarMinibar: ProgressBarElement;
     /** Stores state of things that require re-rendering */
-    abstract rendersRequired: CharacterRenderQueue;
+    abstract renderQueue: CharacterRenderQueue;
     /** Turns taken in the current fight */
     turnsTaken: number;
     get hitpointsPercent(): number;
     get barrierPercent(): number;
-    get usingAncient(): boolean;
-    /** If the character is using an Archaic Magic spell */
-    get isUsingArchaic(): boolean;
-    get isBurning(): boolean;
-    get isBleeding(): boolean;
-    get isPoisoned(): boolean;
+    /** If this character cannot benefit from max hit/damage modifiers */
+    get cantUseDamageModifiers(): boolean;
+    /** If this character is currently using a spell that only has one special attack */
+    get isUsingSpecialAttackSpell(): boolean;
     get isBarrierActive(): boolean;
-    isDotActive(type: DOTType): boolean;
-    isEffectSubtypeActive(type: ModifierEffectSubtype): boolean;
-    isTargetDotActive(type: DOTType): boolean;
+    readonly BASE_REGEN_INTERVAL = 10000;
+    readonly MIN_REGEN_INTERVAL = 2500;
+    get hpRegenInterval(): number;
     isFightingTypeVsType(thisType: AttackType, targetType: AttackType): boolean;
-    isFighting(): boolean;
-    get minHitFromMaxHitPercent(): number;
+    static readonly numberExprTranspiler: IExprTranspiler<(character: Character) => number>;
     /** Baseclass for Enemy, Player and Golbin */
     constructor(manager: BaseManager, game: Game);
-    /** Resets all properties of this class, as if it were freshly constructed. Does not reset event handlers. */
-    resetStateToDefault(): void;
+    actOnClick(): void;
+    /** Resets all properties of this class, preparing it for an enemy spawn */
+    resetForSpawning(): void;
     setDefaultSpells(): void;
     /** Sets all renders required to true */
     setRenderAll(): void;
-    actOnClick(): void;
-    /** Performs unique spawn effects (Like random curse application) */
-    applyUniqueSpawnEffects(): void;
     /** Performs stat updates for when an enemy spawns, or a fight ends */
     initializeForCombat(): void;
     /** Stops timers and sets stats to update */
@@ -142,32 +163,49 @@ declare abstract class Character implements EncodableObject, Serializable {
     getMeleeDefenceBonus(): number;
     getRangedDefenceBonus(): number;
     getMagicDefenceBonus(): number;
-    /** Calculates base damage reduction */
-    computeDamageReduction(): void;
+    /** Calculates base resistances */
+    computeAllResistances(): void;
+    computeResistance(damageType: DamageType): void;
     /** Standard Stat calculation for accuracy and evasion */
     static calculateStandardStat(values: BaseStatValues): number;
     /** Standard MaxHit calculation for Melee and Ranged */
     static calculateStandardMaxHit(baseLevel: number, strengthBonus: number): number;
+    spellModifierQuery: ModifierQuery;
+    computeSpellModifierQuery(): void;
+    readonly selfModifierQuery: ModifierQuery;
+    /** Gets the percent modifier to accuracy rating */
+    getAccuracyModifier(): number;
     /** Applies modifiers to accuracy rating */
     modifyAccuracy(accuracy: number): number;
+    /** Gets the modifiers for each evasion type */
+    getEvasionModifiers(): Evasion<number>;
     /** Applies modifiers to evasion rating */
     modifyEvasion(evasion: Evasion<number>): void;
     /** Applies modifiers to max hit */
     modifyMaxHit(maxHit: number): number;
+    getFlatMaxHitModifier(): number;
     getMaxHitModifier(): number;
+    getMinHitFromMaxHitPercent(): number;
     /** Applies modifiers to min hit */
     modifyMinHit(minHit: number): number;
     /** Applies modifiers to max hp */
     modifyMaxHP(maxHP: number): number;
     /** Applies modifiers to attack interval */
     modifyAttackInterval(attackInterval: number): number;
+    /** Modifies the specified resistance */
+    modifyResistance(damageType: DamageType, resistance: number): number;
+    /** Modified normal damage reduction
+     * @deprecated Use modifyResistance instead
+     */
     modifyDamageReduction(reduction: number): number;
-    /** Performs a full calculation of all stats and properties */
-    computeAllStats(): void;
+    /** Computes all stats that should be computed before conditional modifiers are calculated */
+    computePreConditionalStats(): void;
+    /** Computes all modifiers and combat effects, excluding area-effects */
+    computeModifiersAndEffects(): void;
+    /** Computes all stats that should be computed after modifiers have been calculated */
+    computePostModifierStats(): void;
     /** Performs a calculation of currentStats property */
     computeCombatStats(): void;
-    /** Adds modifiers that are based on hitpoints */
-    updateHPConditionals(computeStats?: boolean): void;
     computeHitchance(): void;
     canDamageBarrier(source: SplashType): boolean;
     /** Deals damage to self */
@@ -179,42 +217,83 @@ declare abstract class Character implements EncodableObject, Serializable {
     addBarrier(amount: number): void;
     /** Actions to perform when Barrier is removed */
     onBarrierRemoval(): void;
-    /** Actions to perform when Barrier is regenerated */
-    onBarrierRegeneration(): void;
     /** Sets hitpoints to a given value */
     setHitpoints(value: number): void;
-    isImmuneTo(attackType: AttackType): boolean;
+    /**
+     * Determines if this character is immune to the attacks/effects from another. Checks for attack type and damage type immunities
+     * @param attacker The character that is attacking or processing effects
+     * @returns If this character is immune to attacks/effects
+     */
+    isImmuneTo(attacker: Character): boolean;
     fireMissSplash(immune: boolean): void;
-    applyEffects(effects: AnyEffect[], target: Character, damage?: number, attack?: SpecialAttack): void;
+    /**
+     * Merges (adds) an effect applicator to this character. Matching applicators will have their chances added together.
+     * @param applicator The applicator to merge
+     * @param mult Optional multiplier to apply to the applicator's chances
+     */
+    mergeEffectApplicator(applicator: CombatEffectApplicator, mult?: number): void;
+    /**
+     * Splits (removes) an effect applicator from this character.
+     * @param applicator The applicator to split
+     * @param mult Optional multiplier to apply to the applicators chances
+     */
+    splitEffectApplicator(applicator: CombatEffectApplicator, mult?: number): void;
+    /**
+     * Merges (adds) an array of effect applicators onto this character. Matching applicators will have their chances added together.
+     * @param applicators The array of applicators to merge
+     * @param mult Optional multiplier to apply to the applicators' chances
+     */
+    mergeEffectApplicators(applicators: CombatEffectApplicator[], mult?: number): void;
+    /**
+     * Splits (removes) an array of effect applicators from this character.
+     * @param applicators The array of applicators to split
+     * @param mult Optional multiplier to apply to the applicators' chances
+     */
+    splitEffectApplicators(applicators: CombatEffectApplicator[], mult?: number): void;
+    /** Listener for when the appropriate effect application trigger event occurs. */
+    onEffectApplicatorTrigger(trigger: CombatEffectApplicationTrigger, source: CombatEffectSource): void;
+    /** Assigns event handlers for processing effect applicators that have been merged with this character */
+    assignEffectApplicatorListeners(): void;
+    /** Returns the percent chance that this character is immune to an effect */
+    getEffectIgnoreChance(effect: CombatEffect): number;
+    /** Applies a combat effect to this character */
+    applyCombatEffect(effect: CombatEffect, sourceCharacter: Character, source: CombatEffectSource, initialParams?: Record<string, number>): void;
+    /** Computes the net chance to apply a CombatEffect */
+    getEffectApplicatorChance(applicator: CombatEffectApplicator, source: CombatEffectSource): number;
+    checkEffectApplicatorCondition(condition: CombatEffectApplicatorCondition, source: CombatEffectSource): boolean;
+    /** Processes a combat effect, and applies it to the appropriate character via this one */
+    processEffectApplicator(applicator: CombatEffectApplicator, source: CombatEffectSource): void;
+    /** Processes an array of combat effects, applying them to the appropriate characters via this one */
+    processEffectApplicators(applicators: CombatEffectApplicator[], source: CombatEffectSource): void;
+    /** Removes a combat effect from this Character */
+    removeCombatEffect(effect: CombatEffect): void;
+    initializeEffects(): void;
     clampDamageValue(damage: number, target: Character): number;
     /** Perform an attack against a target */
     attack(target: Character, attack: SpecialAttack): number;
     /** Computes the flat bonus to attack damage. Applied directly after computing the base damage from an attack. */
     getFlatAttackDamageBonus(target: Character): number;
-    /** Computes the flat bonus to lifesteal from attacks. Computed before the attacks damage is performed. */
-    getFlatLifestealBonus(target: Character): number;
-    modifyAttackDamage(target: Character, attack: SpecialAttack, damage: number): number;
+    /** Computes the flat bonus to normal attack damage. Applied directly after computing the base damage from an attack. */
+    getNormalFlatAttackDamageBonus(target: Character): number;
+    /** Computes the flat bonus to abyssal attack damage. Applied directly after computing the base damage from an attack. */
+    getAbyssalFlatAttackDamageBonus(target: Character): number;
+    /**
+     * Modifies the damage dealt by an attack by damage modifiers and damage reduction
+     * @param target The character being attacked
+     * @param attack The attack being performed
+     * @param damage The raw damage dealt
+     * @param applyReduction If damage reduction should be applied. Defaults to true
+     * @returns The modified attack damage
+     */
+    modifyAttackDamage(target: Character, attack: SpecialAttack, damage: number, applyReduction?: boolean): number;
     /** Returns the maximum damage an attack can do in a single hit, accounting for all modifiers */
     getAttackMaxDamage(attack: SpecialAttack): number;
+    /** Computes the flat bonus to lifesteal from attacks. Computed before the attacks damage is performed. */
+    getFlatLifestealBonus(target: Character): number;
+    /** Gets the current modifier to lifesteal from attacks */
+    getAttackLifestealModifier(): number;
     /** Performs lifesteal from attack damage. Returns the true amount healed. */
     lifesteal(attack: SpecialAttack, damage: number, flatBonus: number): number;
-    getReductiveEffectMap(effect: ReductiveEffect): Map<ReductiveEffect, ActiveReductiveEffect>;
-    /** Reduces the stacks of reductive effects in the given map by 1, removing the effect if they reach 0 */
-    reduceReductiveEffects(effectMap: Map<ReductiveEffect, ActiveReductiveEffect>): void;
-    /**
-     * Counts down the turns of reductive effects in the given map by 1, removing th effect if the turns reach 0
-     * @param effectMap
-     * @returns If an effect was removed from the map
-     */
-    countReductiveEffects(effectMap: Map<ReductiveEffect, ActiveReductiveEffect>): boolean;
-    removeReductiveEffect(effect: ReductiveEffect): void;
-    removeIncrementalEffect(effect: IncrementalEffect): void;
-    /** Removes the specified stacking effect from this character */
-    removeStackingEffect(effect: StackingEffect): void;
-    /** Applies an effect sourced from an ItemEffect to this character */
-    applyItemEffect(effect: AnyEffect): void;
-    /** Removes or applies an effect sourced from an ItemEffect */
-    checkItemEffect(effect: AnyEffect, shouldBeActive: boolean): void;
     /** Method called after being attacked */
     abstract postAttack(): void;
     /** Method called when hitting attack */
@@ -225,126 +304,58 @@ declare abstract class Character implements EncodableObject, Serializable {
     abstract onMiss(): void;
     rollToHit(target: Character, attack: SpecialAttack): boolean;
     addAuroraModifiers(): void;
-    /** Adds curse modifiers */
-    addCurseModifiers(): void;
-    /** Adds modifiers from attack effects */
+    /** Adds modifiers from active effects */
     addEffectModifiers(): void;
-    addCombatAreaEffectModifiers(): void;
-    addPassiveModifiers(): void;
     /** Adds modifiers provided by the current gamemode */
     abstract addGamemodeModifiers(): void;
-    addTargetModifiers(): void;
+    /** Gets the modifier to damage taken by this character */
+    getDamageTakenModifier(): number;
+    /** Gets the modifier to damage dealt by this character to a target character */
+    getDamageDealtModifier(): number;
     /** Gets the damage modifiers for the character */
     getDamageModifiers(target: Character): number;
+    /** Reduces a damage array using this character as the Attacker and this character's target as the Target */
+    reduceDamage(damage: Damage[], damageDealt?: number, damageTaken?: number): number;
     applyDamageModifiers(target: Character, damage: number): number;
-    /** Removes every effect from the character */
-    removeAllEffects(removeDOTS?: boolean): void;
-    /** Recomputes the number of effects on this character */
-    computeEffectCount(): void;
-    /** Removes all combo effects, does not compute stats */
-    removeComboEffects(): void;
-    addPassives(passives: CombatPassive[], save?: boolean, display?: boolean, statUpdate?: boolean): void;
-    removePassives(passives: CombatPassive[]): void;
-    removeAllPassives(): void;
-    applyEffect(effect: AnyEffect, target: Character, damage?: number, attack?: SpecialAttack): void;
-    /** Applies a stacking effect to the target */
-    applyStackingEffect(effect: StackingEffect, target: Character, stacksToAdd?: number): void;
-    /** Applies a reflexive effect to self */
-    applyReflexiveEffect(effect: ReflexiveEffect, attack: SpecialAttack): void;
-    /** Applies a reductive effect to self */
-    applyReductiveEffect(effect: ReductiveEffect, attack: SpecialAttack): void;
-    /** Applies a incremental effect to self */
-    applyIncrementalEffect(effect: IncrementalEffect, attack: SpecialAttack): void;
-    applyComboEffect(effect: ComboEffect, attack: SpecialAttack): void;
-    /** Attempts to cast the curse spell this character has selected on the target. Differs from applyCurse, as this may include rune costs. */
-    castCurseSpell(target: Character, curse: CurseSpell): void;
-    /** Applies the specified curse to the target charcter for 3 turns */
-    applyCurse(target: Character, curse: CurseSpell): void;
-    /** Recomputes combat stats based on only modifiers updating */
-    combatModifierUpdate(): void;
-    /** Determines if character is immune to a DOT type */
-    immuneToDOT(type: DOTType): boolean;
-    /** Applies a DOT to the target. Returns true if successfully applied */
-    applyDOT(effect: DOTEffect, target: Character, damageDealt: number): boolean;
-    /** Called when dot is applied to this character */
-    onDOTApplication(type: DOTType): void;
-    /** Called when dot is removed from this character */
-    onDOTRemoval(type: DOTType, statUpdate?: boolean): void;
-    /** Method called when dot is removed from target */
-    onTargetDOTRemoval(type: DOTType, statUpdate?: boolean): void;
-    /** Called when a modifier effect is applied to this character. Does not trigger stat update. */
-    onModifierEffectApplication(): void;
-    /** Called when a modifier effect is removed from this character. Does not trigger stat update. */
-    onModifierEffectRemoval(): void;
-    /** Method called when target modifier effect is removed. Does not trigger stat update. */
-    onTargetModifierEffectRemoval(): void;
-    /** Method called when target modifier effect is added */
-    onTargetModifierEffectApplication(): void;
-    /** Method called when target unholy mark stacks are changed */
-    onTargetUnholyMarkChange(oldStacks: number, newStacks: number): void;
-    /** Get the attack modifiers as if applying the effect to target */
-    getModifierEffectAttackMap(effect: ModifierEffect): Map<SpecialAttack, Map<ModifierEffect, ActiveModifierEffect>>;
-    applyRandomCurseEffect(chance: number, target: Character): void;
-    applyCurseEffect(effect: CurseEffect, target: Character): void;
-    applyModifierEffect(effect: ModifierEffect, target: Character, attack: SpecialAttack): void;
-    /**
-     * Applies a Sleep Effect to the target character
-     * @param effect Data specifying the sleep
-     * @param target Character to apply the sleep to
-     * @param interruptAttack If the sleep should interrupt the attack state of the target.  Set to false if this sleep is being applied while the target is attacking.
-     */
-    applySleep(effect: SleepEffect, target: Character, interruptAttack?: boolean): void;
-    /** Triggers when this character has sleep applied to it */
-    onBeingSlept(): void;
-    /** Triggers when sleep is removed from this chracter */
-    onSleepRemoval(): void;
-    /** Triggers when sleep is removed from this character target */
-    onTargetSleepRemoval(): void;
-    /** Triggers when this character applies a sleep effect */
-    onApplyingSleep(target: Character): void;
-    /**
-     * Applies a Stun Effect to the target character
-     * @param effect Data specifying the stun
-     * @param target Character to apply the stun to
-     * @param interruptAttack If the stun should interrupt the attack state of the target. Set to false if this stun is being applied while the target is attacking.
-     */
-    applyStun(effect: StunEffect, target: Character, interruptAttack?: boolean): void;
-    /** Triggers when this character has stun applied to it */
-    onBeingStunned(): void;
-    /** Triggers when stun is removed from this character */
-    onStunRemoval(): void;
-    /** Triggers when stun is removed from this characters target */
-    onTargetStunRemoval(): void;
-    /** Triggers when this character applies a stun effect */
-    onApplyingStun(target: Character): void;
-    /** Ticks regen, and dots */
+    modifyDamageDealt(damage: number): number;
+    /** Gets the modifier to the amount of DOT damage taken by this character */
+    getDotDamageModifier(type: DOTType): number;
+    /** Removes every effect from the character. Only occurs when this character dies. */
+    removeAllEffects(): void;
+    /** Attempts to cast the curse spell on this character's target. May contain rune costs. */
+    castCurseSpell(curse: CurseSpell): void;
+    /** Ticks regen, and effect timers */
     passiveTick(): void;
     /** Ticks action and summons */
     activeTick(): void;
     getErrorLog(): string;
+    /** If thie character's attack method was interrupted */
+    attackInterrupted: boolean;
+    /** If this character is currently processing code inside of the attack method */
+    inAttack: boolean;
     /** Performs an action: E.g. Sleep/Stun/Attack */
     act(): void;
-    /** Triggers when an Incremental Effect is reset to 0 stacks */
-    onIncrementalEffectReset(effect: IncrementalEffect): void;
-    /** Counts down the turns of modifier effects that count on the targets turn */
-    countTargetEffectTurns(): boolean;
-    /** Counts down the turns of modifier effects */
-    countModifierEffectTurns(attackMap: Map<SpecialAttack, Map<ModifierEffect, ActiveModifierEffect>>): boolean;
-    decreaseStackingEffect(effect: StackingEffect, activeEffect: ActiveStackingEffect): boolean;
-    consumeUnholyMarkStack(): void;
-    removeModifierEffects(attackMap: Map<SpecialAttack, Map<ModifierEffect, ActiveModifierEffect>>): boolean;
-    /** Processes the characters DOT effects */
-    dot(dotID: number): void;
+    /** Adds a timer to the set of timers that should be ticked on this character's passive tick */
+    addCombatEffectTimer(timer: Timer): void;
+    /** Removes a timer from the set of timers that should be ticked on this character's passive tick */
+    removeCombatEffectTimer(timer: Timer): void;
+    /** Interrupts the current action of the character, resetting their attack bar, and cancelling multi-hit special attacks */
+    interruptAction(): void;
     /** Queues up the next action to perform. Will interrupt current action if called */
     queueNextAction(noSpec?: boolean, tickOffset?: boolean): void;
     isAttackAlreadyActive(attack: SpecialAttack): boolean;
-    isEffectActive(effect: AnyEffect, attack: SpecialAttack): boolean;
+    isEffectApplicatorApplied(applicator: AnyCombatEffectApplicator): boolean;
+    /** Checks if a combat effect is active on this character */
+    isEffectActive(effect: CombatEffect): boolean;
+    /** Checks if a combat effect group is active on this character */
+    isEffectGroupActive(group: CombatEffectGroup): boolean;
     /** Renders the character's current stats */
     renderStats(): void;
     renderDamageValues(): void;
+    abstract renderNormalDamage(minHit: string, maxHit: string): void;
     formatNormalAttackDamage(damage: number): string;
     /** Updates the hitchance display */
-    renderHitchance(): void;
+    abstract renderHitchance(): void;
     /** Updates all hitpoint numbers and bars */
     renderHitpoints(): void;
     /** Updates all barrier numbers and bars */
@@ -353,35 +364,15 @@ declare abstract class Character implements EncodableObject, Serializable {
     renderDamageSplashes(): void;
     renderEffects(): void;
     renderAttackBar(): void;
-    renderModifierEffect(attackMap: Map<SpecialAttack, Map<ModifierEffect, ActiveModifierEffect>>, turnNoun: Noun): void;
-    checkCombatCondition(condition: CombatCondition): boolean;
     render(): void;
     resetActionState(): void;
     encode(writer: SaveWriter): SaveWriter;
     decode(reader: SaveWriter, version: number): void;
-    encodeModifierEffects(attackMap: Map<SpecialAttack, Map<ModifierEffect, ActiveModifierEffect>>, writer: SaveWriter): void;
-    decodeModifierEffects(reader: SaveWriter, version: number): Map<SpecialAttack, Map<ModifierEffect, ActiveModifierEffect>>;
-    encodeReflexiveEffects(writer: SaveWriter): void;
-    decodeReflexiveEffects(reader: SaveWriter, version: number): Map<ReflexiveEffect, ActiveReflexiveEffect>;
-    encodeReductiveEffects(writer: SaveWriter, effectMap: Map<ReductiveEffect, ActiveReductiveEffect>): void;
-    decodeReductiveEffects(reader: SaveWriter, version: number): Map<ReductiveEffect, ActiveReductiveEffect>;
-    encodeIncrementalEffects(writer: SaveWriter): void;
-    decodeIncrementalEffects(reader: SaveWriter, version: number): Map<IncrementalEffect, ActiveIncrementalEffect>;
-    encodeStackingEffects(writer: SaveWriter): void;
-    decodeStackingEffects(reader: SaveWriter, version: number): Map<StackingEffect, ActiveStackingEffect>;
-    encodeDOTS(writer: SaveWriter): void;
-    decodeDOTS(reader: SaveWriter, version: number): Map<number, ActiveDOT>;
-    encodePassives(writer: SaveWriter): void;
-    decodePassives(reader: SaveWriter, version: number): void;
-    encodeComboEffects(writer: SaveWriter): void;
-    decodeComboEffects(reader: SaveWriter, version: number): Map<ComboEffect, ActiveComboEffect>;
+    /** Skips old effects data for Reflexive, reductive and incremental effects */
+    skipReflexiveLikeData(reader: SaveWriter, version: number): void;
+    encodeActiveEffects(writer: SaveWriter): void;
+    decodeActiveEffects(reader: SaveWriter, version: number): void;
     deserialize(reader: DataReader, version: number, idMap: NumericIDMap): void;
-    deserializeModifierEffects(attackMap: Map<SpecialAttack, Map<ModifierEffect, ActiveModifierEffect>>, reader: DataReader, version: number, idMap: NumericIDMap): void;
-    deserializeReflexiveEffects(reader: DataReader, version: number, idMap: NumericIDMap): void;
-    deserializeStackingEffects(reader: DataReader, version: number, idMap: NumericIDMap): void;
-    deserializeComboEffects(reader: DataReader, version: number, idMap: NumericIDMap): void;
-    deserializeDOTS(reader: DataReader, version: number): void;
-    deserializePassives(reader: DataReader, version: number, idMap: NumericIDMap): void;
     /** Calculates the equipment stats of the character */
     abstract computeEquipmentStats(): void;
     /** Applies regeneration to the character */
@@ -390,20 +381,31 @@ declare abstract class Character implements EncodableObject, Serializable {
     abstract processDeath(): void;
     /** Computes and sets the combat levels of the character */
     abstract computeLevels(): void;
+    /** Computes and sets the abyssal combat levels of the character */
+    abstract computeAbyssalLevels(): void;
     /** Computes the attack type of the character */
     abstract computeAttackType(): void;
     /** Computes the modifiers of the character */
     abstract computeModifiers(): void;
+    /** Computes sources of CombatEffects outside of special attacks */
+    computeEffectApplicators(): void;
+    /** Merges effect applicators common to all sub-classes */
+    mergeInheritedEffectApplicators(): void;
+    /** Merges effect applicators that should not be inherited by sub-classes */
+    abstract mergeUninheritedEffectApplicators(): void;
+    /** Checks for removed effect applicators that have the removeEffectWhenRemove property */
+    checkEffectApplicators(): void;
     /** Computes the attacks the character can use */
     abstract computeAttackSelection(): void;
+    /** Computes the damage type of the character */
+    abstract computeDamageType(): void;
 }
 declare class SpellSelection implements EncodableObject {
     game: Game;
-    standard?: StandardSpell;
-    ancient?: AncientSpell;
+    /** The current attack spell that is selected */
+    attack?: AttackSpell;
     aurora?: AuroraSpell;
     curse?: CurseSpell;
-    archaic?: ArchaicSpell;
     constructor(game: Game);
     encode(writer: SaveWriter): SaveWriter;
     decode(reader: SaveWriter, version: number): void;
@@ -412,10 +414,6 @@ declare class SpellSelection implements EncodableObject {
 declare type BaseStatValues = {
     effectiveLevel: number;
     bonus: number;
-};
-declare type ActivePassive = {
-    display: boolean;
-    save: boolean;
 };
 declare class EquipmentStats {
     attackSpeed: number;
@@ -430,26 +428,96 @@ declare class EquipmentStats {
     meleeDefenceBonus: number;
     rangedDefenceBonus: number;
     magicDefenceBonus: number;
-    damageReduction: number;
+    /** @deprecated Use new character resistances class instead */
+    get damageReduction(): number;
     summoningMaxhit: number;
-    constructor(stats?: EquipStatPair[]);
+    resistances: ResistanceMap;
+    constructor(stats?: EquipStatPair[], resists?: Map<DamageType, number>);
     addItemStats(item: EquipmentItem): void;
     remItemStats(item: EquipmentItem): void;
     addStats(stats: EquipStatPair[]): void;
     subtractStats(stats: EquipStatPair[]): void;
+    getResistance(damageType: DamageType): number;
+    addResistances(resistances: Map<DamageType, number>): void;
+    subtractResistances(resistances: Map<DamageType, number>): void;
+    resetResistances(): void;
     resetStats(): void;
 }
-declare class CharacterStats {
-    evasion: Evasion<number>;
-    minHit: number;
-    maxHit: number;
-    accuracy: number;
-    maxHitpoints: number;
-    attackInterval: number;
-    damageReduction: number;
-    maxBarrier: number;
+interface DamageTypeData extends IDData {
+    name: string;
+    media: string;
+    resistanceName: string;
+    resistanceCap: number;
+    immuneTo?: string[];
+    spanClass: string;
+    onlyShowIfUsing?: boolean;
+}
+interface DamageTypeModificationData extends IDData {
+    resistanceCap?: number;
+    immuneTo?: {
+        add?: string[];
+        remove?: string[];
+    };
+}
+declare class DamageType extends NamespacedObject {
+    get name(): string;
+    get resistanceName(): string;
+    get media(): string;
+    _media: string;
+    _name: string;
+    _resistanceName: string;
+    _resistanceCap: number;
+    onlyShowIfUsing: boolean;
+    get resistancCap(): number;
+    immuneTo: Set<DamageType>;
+    /** The colour to use for the damage type spans */
+    spanClass: string;
+    readonly modQuery: ModifierQuery;
+    constructor(namespace: DataNamespace, data: DamageTypeData, game: Game);
+    applyDataModification(modData: DamageTypeModificationData, game: Game): void;
+}
+/** List of keys that can be used as named values for character stats */
+declare type CharacterStatKey = 'minHit' | 'maxHit' | 'accuracy' | 'maxHitpoints' | 'attackInterval' | 'maxBarrier';
+declare class CharacterCombatStats {
+    character: Character;
+    get maxHitpoints(): number;
+    set maxHitpoints(value: number);
+    get attackInterval(): number;
+    set attackInterval(value: number);
+    get accuracy(): number;
+    set accuracy(value: number);
+    get evasion(): Evasion<number>;
     get averageEvasion(): number;
     get maxEvasion(): number;
+    get maxHit(): number;
+    set maxHit(value: number);
+    get minHit(): number;
+    set minHit(value: number);
+    get maxBarrier(): number;
+    set maxBarrier(value: number);
+    get hitChance(): number;
+    set hitChance(value: number);
+    get dirty(): boolean;
+    _evasion: Evasion<number>;
+    _averageEvasion: number;
+    _maxEvasion: number;
+    _minHit: number;
+    _maxHit: number;
+    _accuracy: number;
+    _maxHitpoints: number;
+    _attackInterval: number;
+    _maxBarrier: number;
+    _hitChance: number;
+    _resistances: ResistanceMap;
+    /** Flags if these stats need to be re-calculated when getting a value */
+    _dirty: boolean;
+    constructor(character: Character);
+    setDirty(): void;
+    getResistance(damageType: DamageType): number;
+    getResistanceByID(damageTypeID: string): number;
+    setResistance(damageType: DamageType, resistance: number): void;
+    dirtyCheck(): void;
+    update(): void;
     getValueTable(): {
         name: string;
         value: number;
@@ -461,14 +529,8 @@ declare type AttackSelection = {
 };
 /** HTML Elements that all characters have */
 declare type RenderHTMLElements = {
-    evasion: Evasion<HTMLElement[]>;
-    minHit: HTMLElement[];
-    maxHit: HTMLElement[];
-    accuracy: HTMLElement[];
     maxHitpoints: HTMLElement[];
     attackInterval: HTMLElement[];
-    damageReduction: HTMLElement[];
-    hitChance: HTMLElement[];
     hitpoints: HTMLElement[];
     hitpointsBar: HTMLElement[];
     attackName: HTMLElement[];
@@ -476,19 +538,12 @@ declare type RenderHTMLElements = {
     barrier: HTMLElement[];
     barrierBar: HTMLElement[];
     barrierContainer: HTMLElement[];
+    resistances: Map<DamageType, CharacterResistanceElement>;
 };
 declare type Evasion<T> = {
     melee: T;
     ranged: T;
     magic: T;
-};
-declare type CountedModifier = {
-    countSelf: Map<SpecialAttack, Map<ModifierEffect, ActiveModifierEffect>>;
-    countTarget: Map<SpecialAttack, Map<ModifierEffect, ActiveModifierEffect>>;
-};
-declare type ModifierEffects = {
-    fromSelf: CountedModifier;
-    fromTarget: CountedModifier;
 };
 declare type AttackType = 'melee' | 'ranged' | 'magic';
 declare type TimerTypes = 'Act' | 'Spawn' | 'Regen' | 'DOT' | 'SlayerTask' | 'Summon' | 'Skill';
@@ -497,45 +552,6 @@ declare type CharacterTimers = {
     regen: Timer;
 };
 declare type ActionType = 'Attack' | 'Nothing';
-declare type ActiveCurse = {
-    turns: number;
-    data: CurseSpell;
-};
-declare type ActiveDOT = {
-    type: DOTType;
-    damage: number;
-    procsLeft: number;
-    interval: number;
-    timer: Timer;
-};
-declare type ActiveModifierEffect = {
-    turnsLeft: number;
-    stacks: number;
-};
-declare type ActiveSleep = {
-    turns: number;
-};
-interface ActiveStun extends ActiveSleep {
-    flavour: StunFlavour;
-}
-declare type ActiveStunImmunity = {
-    turns: number;
-};
-declare type ActiveStackingEffect = {
-    stacks: number;
-};
-interface ActiveComboEffect extends ActiveStackingEffect {
-    sourceAttack: SpecialAttack;
-}
-interface ActiveReflexiveEffect extends ActiveComboEffect {
-    turnsLeft: number;
-}
-interface ActiveReductiveEffect extends ActiveComboEffect {
-    turnsLeft: number;
-}
-interface ActiveIncrementalEffect extends ActiveComboEffect {
-    turnsLeft: number;
-}
 declare class CharacterRenderQueue {
     stats: boolean;
     hitChance: boolean;

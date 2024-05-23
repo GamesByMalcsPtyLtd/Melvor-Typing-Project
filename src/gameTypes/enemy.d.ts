@@ -12,36 +12,50 @@ declare class Enemy extends Character implements IGameEventEmitter<CharacterComb
     };
     get type(): string;
     state: EnemyState;
-    modifiers: CombatModifiers;
+    modifiers: CharacterModifierTable;
     spellSelection: SpellSelection;
-    stats: CharacterStats;
-    readonly noun: Noun;
+    stats: CharacterCombatStats;
     get statElements(): EnemyRenderHTMLElements;
     get splashManager(): SplashManager;
     get effectRenderer(): EffectRenderer;
-    get attackBar(): ProgressBar;
-    get attackBarMinibar(): ProgressBar;
-    rendersRequired: EnemyRenderQueue;
+    get attackBar(): ProgressBarElement;
+    get attackBarMinibar(): ProgressBarElement;
+    renderQueue: EnemyRenderQueue;
     randomAttackType: AttackType | 'unset';
     monster?: Monster;
-    isBoss: boolean;
+    overrideDamageType?: DamageType;
     /** Flag for if the monster property should be encoded */
     get encodeMonster(): boolean;
     constructor(manager: BaseManager, game: Game);
-    /** Resets all mutable properties of this class, as if it were freshly constructed. Does not reset event handlers. */
-    resetStateToDefault(): void;
-    setMonster(monster: Monster): void;
+    /** Sets a new monster to this enemy, preparing it for spawning */
+    setNewMonster(monster: Monster): void;
     computeAttackType(): void;
+    computeDamageType(): void;
     computeAttackSelection(): void;
+    mergeInheritedEffectApplicators(): void;
+    mergeUninheritedEffectApplicators(): void;
     computeLevels(): void;
+    computeAbyssalLevels(): void;
     computeEquipmentStats(): void;
     computeModifiers(): void;
+    addPassiveModifiers(): void;
     addGamemodeModifiers(): void;
+    /** Adds the enemy modifiers from stat providers */
+    addProviderModifiers(): void;
+    /** Adds the enemy modifiers from player attack styles */
+    addPlayerAttackStyleModifiers(): void;
+    /** Adds the enemy modifiers from the player's equipment */
+    addPlayerEquipmentModifiers(): void;
+    /** Adds the enemy modifiers from the player's food */
+    addPlayerFoodModifiers(): void;
+    addPlayerPrayerModifiers(): void;
+    addPlayerAuroraModifiers(): void;
+    /** Adds all conditional modifiers that are active */
+    addConditionalModifiers(): void;
     getAccuracyValues(): {
         effectiveLevel: number;
         bonus: number;
     };
-    modifyDamageReduction(reduction: number): number;
     getFlatReflectDamage(): number;
     damage(amount: number, source: SplashType): void;
     processDeath(): void;
@@ -49,19 +63,19 @@ declare class Enemy extends Character implements IGameEventEmitter<CharacterComb
     /** Sets the enemy to render as spawning */
     setSpawning(): void;
     setRenderAll(): void;
-    /** For specific enemy only spawn effects */
-    applyUniqueSpawnEffects(): void;
     initializeForCombat(): void;
     render(): void;
     /** Updates all barrier numbers and bars */
     renderBarrier(): void;
+    renderHitchance(): void;
     renderHitpoints(): void;
-    renderAttacksAndPassives(): void;
+    renderPassives(): void;
+    renderAttacks(): void;
     renderDamageValues(): void;
+    renderNormalDamage(minHit: string, maxHit: string): void;
     renderLevels(): void;
     renderImageAndName(): void;
     renderStats(): void;
-    getAttackTypeMedia(attackType: string): string;
     renderNoStats(): void;
     resetActionState(): void;
     encode(writer: SaveWriter): SaveWriter;
@@ -76,7 +90,6 @@ interface EnemyRenderHTMLElements extends RenderHTMLElements {
     image: HTMLDivElement;
     name: HTMLElement[];
     attackType: HTMLImageElement[];
-    levels: StringDictionary<HTMLElement[]>;
 }
 declare enum EnemyState {
     Dead = 0,

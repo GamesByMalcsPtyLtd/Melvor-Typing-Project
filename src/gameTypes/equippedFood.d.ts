@@ -20,27 +20,31 @@ declare type FoodData = {
     item: FoodItem;
     quantity: number;
 };
-declare class FoodMenu {
-    container: HTMLElement;
-    selected: FoodDropOption;
-    dropContainer: HTMLDivElement;
-    dropOptions: FoodDropOption[];
+declare class FoodSelectOptionElement extends HTMLElement implements CustomElement {
+    _content: DocumentFragment;
+    quantity: HTMLSpanElement;
+    image: HTMLImageElement;
+    hitpoints: HTMLSpanElement;
+    modifiers: HTMLDivElement;
+    constructor();
+    connectedCallback(): void;
+    setFood(food: FoodData, player: Player): void;
+}
+declare class FoodSelectMenuElement extends HTMLElement implements CustomElement {
+    _content: DocumentFragment;
+    eatButton: HTMLButtonElement;
+    selected: FoodSelectOptionElement;
+    optionsContainer: HTMLDivElement;
     dropDivider: HTMLDivElement;
     unequipButton: HTMLAnchorElement;
-    constructor(containerID: string);
+    dropOptions: FoodSelectOptionElement[];
+    constructor();
+    connectedCallback(): void;
     addDropdownOption(): void;
+    removeDropOption(): void;
     showHoldToEat(): void;
     hideHoldToEat(): void;
-    removeDropOption(): void;
-    renderOption(food: FoodData, option: FoodDropOption, player: Player): void;
-    renderSelected(food: FoodData, player: Player): void;
     renderSelection(foods: FoodData[], player: Player): void;
     render(player: Player): void;
     setCallbacks(player: Player): void;
 }
-declare type FoodDropOption = {
-    button: HTMLAnchorElement | HTMLButtonElement;
-    quantity: HTMLSpanElement;
-    image: HTMLImageElement;
-    healing: HTMLSpanElement;
-};

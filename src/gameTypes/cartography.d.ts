@@ -3,8 +3,10 @@ interface CartographySkillData extends BaseSkillData {
     mapPortals?: WorldMapPortalData[];
     travelEvents?: RandomTravelEventData[];
     refinementSlotCosts?: FixedCostsData[];
-    refinementModifiers?: ModifierArrayData[];
+    refinementModifiers?: ModifierValuesArrayData[];
     paperRecipes?: PaperMakingRecipeData[];
+}
+interface CartographyModificationData extends BaseSkillModificationData {
 }
 declare class CartographyOfflineSnapshot {
     /** Stores a snapshot of the total number of hexes surveyed in each WorldMap */
@@ -41,8 +43,6 @@ declare class CartographyRenderQueue extends SkillRenderQueue {
     poiMarkers: Set<PointOfInterest>;
     /** Updates the mastery markers for hexes on the World Map */
     masteryMarkers: Set<Hex>;
-    /** Updates the hex mastery button in the skill header */
-    masteryButton: boolean;
     /** Updates the survey indicator on the hex currently being surveyed */
     surveyMarker: boolean;
     /** Updates the XP and interval for surveying */
@@ -104,23 +104,28 @@ declare class PaperMakingRecipe extends SingleProductRecipe {
     costs: FixedCosts;
     constructor(namespace: DataNamespace, data: PaperMakingRecipeData, game: Game);
 }
+declare class CartographyHexSurveyedEvent extends GameEvent {
+    worldMap: WorldMap;
+    hex: Hex;
+    oldCount: number;
+    newCount: number;
+    constructor(worldMap: WorldMap, hex: Hex, oldCount: number, newCount: number);
+}
+declare class CartographyPOIDiscoveredEvent extends GameEvent {
+    worldMap: WorldMap;
+    poi: PointOfInterest;
+    constructor(worldMap: WorldMap, poi: PointOfInterest);
+}
 declare type CartographyEvents = {
     survey: CartographySurveyEvent;
     madePaper: CartographyPaperMakingEvent;
     upgradeMap: CartographyMapUpgradeEvent;
     mapRefinement: CartographyMapRefinementEvent;
     travel: CartographyTravelEvent;
-};
-declare class Cartography extends Skill<CartographySkillData> implements ActiveAction, StatProvider, IGameEventEmitter<CartographyEvents> {
-    _events: import("mitt").Emitter<CartographyEvents>;
-    on: {
-        <Key extends keyof CartographyEvents>(type: Key, handler: import("mitt").Handler<CartographyEvents[Key]>): void;
-        (type: "*", handler: import("mitt").WildcardHandler<CartographyEvents>): void;
-    };
-    off: {
-        <Key extends keyof CartographyEvents>(type: Key, handler?: import("mitt").Handler<CartographyEvents[Key]> | undefined): void;
-        (type: "*", handler: import("mitt").WildcardHandler<CartographyEvents>): void;
-    };
+    hexSurveyed: CartographyHexSurveyedEvent;
+    poiDiscovered: CartographyPOIDiscoveredEvent;
+} & SkillEvents;
+declare class Cartography extends Skill<CartographySkillData, CartographyEvents, CartographyModificationData> implements ActiveAction {
     readonly _media = Assets.Cartography;
     renderQueue: CartographyRenderQueue;
     worldMaps: NamespaceRegistry<WorldMap>;
@@ -129,13 +134,13 @@ declare class Cartography extends Skill<CartographySkillData> implements ActiveA
     /** Stores the recipes used to make paper */
     paperRecipes: NamespaceRegistry<PaperMakingRecipe>;
     /** Modifiers that are available for each refinement slot of dig site maps */
-    refinementModifiers: ModifierArray[];
+    refinementModifiers: ModifierValue[][];
     /** Convenience array of all registered travel events */
     allTravelEvents: RandomTravelEvent[];
     /** Total weight of all registered travel events */
     totalTravelEventWeight: number;
     readonly BASE_TRAVEL_EVENT_CHANCE: number;
-    get levelCap(): number;
+    get maxLevelCap(): number;
     isActive: boolean;
     /** True if the skill is active and in a surveying mode */
     get isSurveying(): boolean;
@@ -186,14 +191,9 @@ declare class Cartography extends Skill<CartographySkillData> implements ActiveA
     get currentUpgradeMap(): DigSiteMap | undefined;
     /** Returns the interval of the action currently being performed in [ms] */
     get currentActionInteral(): number;
-    /** Returns the maximum number of maps a dig site can have */
-    getMaxDigSiteMaps(digSite: ArchaeologyDigSite): number;
     /** Currently active potion for this skill */
     get activePotion(): PotionItem | undefined;
     activeDiscoveryModifiers: Set<POIDiscoveryModifiers>;
-    modifiers: MappedModifiers;
-    enemyModifiers: TargetModifiers;
-    conditionalModifiers: ConditionalModifier[];
     /** If the map creation modal is open and should recieve rendering updates */
     modalOpen: boolean;
     /** If the poi discovery modal is open */
@@ -209,6 +209,7 @@ declare class Cartography extends Skill<CartographySkillData> implements ActiveA
     constructor(namespace: DataNamespace, game: Game);
     registerKeyBinds(): void;
     registerData(namespace: DataNamespace, data: CartographySkillData): void;
+    modifyData(data: CartographyModificationData): void;
     postDataRegistration(): void;
     getErrorLog(): string;
     render(): void;
@@ -240,7 +241,6 @@ declare class Cartography extends Skill<CartographySkillData> implements ActiveA
     renderSelectedUpgradeMap(): void;
     renderCreateMapSpinner(): void;
     renderDigSiteSelect(): void;
-    renderMasteryButton(): void;
     renderPOIDiscoveryOptions(): void;
     renderPOIDiscoveryBtn(): void;
     renderHexMasteryCount(): void;
@@ -294,7 +294,7 @@ declare class Cartography extends Skill<CartographySkillData> implements ActiveA
     /** Method for when the actionTimer is completed */
     action(): void;
     /** Rolls for rewards common for skill actions */
-    addCommonRewards(rewards: Rewards, actionLevel: number): void;
+    addCommonRewards(rewards: Rewards, actionLevel: number, realm?: Realm): void;
     /** Computes the base Skill XP gained per survey action of a hex */
     getSkillXPForHexSurveyAction(hex: Hex): number;
     /** Finds the next hex to autosurvey, starting from hex. Returns undefined if no suitable hex is found. */
@@ -422,6 +422,7 @@ declare class Cartography extends Skill<CartographySkillData> implements ActiveA
     fireMapMasteryModal(): void;
     stop(): boolean;
     activeTick(): void;
+    initMenus(): void;
     /** Called on save file load */
     onLoad(): void;
     onModalOpen(): void;
@@ -439,7 +440,7 @@ declare class Cartography extends Skill<CartographySkillData> implements ActiveA
     /** Called when the player changes equipments */
     onEquipmentChange(): void;
     addPoiModifiers(poi: PointOfInterest): void;
-    computeProvidedStats(updatePlayer?: boolean): void;
+    addProvidedStats(): void;
     encode(writer: SaveWriter): SaveWriter;
     decode(reader: SaveWriter, version: number): void;
     resetActionState(): void;
@@ -459,9 +460,10 @@ interface RandomTravelEventData extends IDData {
     /** Items that the player must have in the bank for the event to trigger. Items are consumed when the event triggers. */
     itemsRequired?: IDQuantity[];
     /** Temporary modifiers given to the player when the event triggers. Modifiers are removed when the player moves to a new hex. */
-    tempBonuses?: PlayerModifierData;
+    tempBonuses?: ModifierValuesRecordData;
 }
-declare class RandomTravelEvent extends NamespacedObject {
+declare class RandomTravelEvent extends NamespacedObject implements SoftDataDependant<RandomTravelEventData> {
+    get name(): string;
     /** Localized description of the event */
     get description(): string;
     /** Weight of the event occuring relative to other events */
@@ -473,8 +475,9 @@ declare class RandomTravelEvent extends NamespacedObject {
     /** Items required for the event to trigger, that are consumed when it triggers */
     itemsRequired?: AnyItemQuantity[];
     /** Tempoary modifiers given to the player until they travel to a new hex */
-    tempBonuses?: PlayerModifierObject;
+    tempBonuses?: ModifierValue[];
     constructor(namespace: DataNamespace, data: RandomTravelEventData, game: Game);
+    registerSoftDependencies(data: RandomTravelEventData, game: Game): void;
 }
 /** Stores the Artefact values for a map */
 declare type ArtefactValues = ArtefactObject<number>;
@@ -500,7 +503,7 @@ declare class DigSiteMap implements EncodableObject {
     /** Artefact values for the map. Determines chances to get items from archaeology */
     artefactValues: ArtefactValues;
     /** Refinements (modifiers) that the map has */
-    refinements: ModifierArray;
+    refinements: ModifierValue[];
     /** Current tier that the map has reached */
     tier: DigSiteMapTier;
     /** If this map has reached the maximum tier */

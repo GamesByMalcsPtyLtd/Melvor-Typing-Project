@@ -2,31 +2,31 @@
 declare class RaidPlayer extends Player {
     manager: RaidManager;
     food: EquippedFood;
-    altAttacks: EquipmentObject<SpecialAttack[]>;
+    altAttacks: Map<EquipmentSlot, SpecialAttack[]>;
     get isPrayerUnlocked(): boolean;
     get prayerPointsOnWaveCompletion(): number;
-    get activeTriangle(): TriangleData;
     get allowRegen(): boolean;
     get useCombinationRunes(): boolean;
     get addItemsToBankOnLoadFail(): boolean;
     /** Constructs a player for golbin raid */
     constructor(manager: RaidManager, game: Game);
-    isEquipmentSlotUnlocked(slot: SlotTypes): boolean;
+    isEquipmentSlotUnlocked(slot: EquipmentSlot): boolean;
     modifyAttackInterval(interval: number): number;
     resetAltAttacks(): void;
-    getSlotAttacks(slot: EquipSlot): SpecialAttack[];
+    getSlotAttacks(equipped: EquippedItem): SpecialAttack[];
     computeLevels(): void;
     computeModifiers(): void;
+    mergeUninheritedEffectApplicators(): void;
     processDeath(): void;
     baseSpawnInterval: number;
-    equipItem(item: EquipmentItem, set: number, slot?: SlotTypes | 'Default', quantity?: number, altAttacks?: SpecialAttack[]): boolean;
+    equipItem(item: EquipmentItem, set: number, slot?: EquipmentSlot, quantity?: number, altAttacks?: SpecialAttack[]): boolean;
     updateForEquipmentChange(): void;
     /** Equips the selected food, replacing it if it is different */
     equipFood(item: FoodItem, quantity: number): boolean;
     /** Sets default starting equipment for golbin raid */
     setEquipmentToDefault(): void;
     addMiscModifiers(): void;
-    getSkillLevel(skill: keyof CombatLevels): number;
+    getSkillLevel(skill: CombatLevelKey): number;
     getLevelHistory(): number[];
     getEquipmentHistory(): EquipmentItem[];
     getFoodHealingBonus(item: FoodItem): number;
@@ -38,7 +38,7 @@ declare class RaidPlayer extends Player {
     trackItemUsage(costs: AnyItemQuantity[]): void;
     trackWeaponStat(stat: ItemStats, amount?: number): void;
     consumeItemCharges(e: GameEvent, item: EquipmentItem): void;
-    consumeItemQuantities(e: GameEvent, slot: EquipSlot): void;
+    consumeItemQuantities(e: GameEvent, equipped: EquippedItem): void;
     consumeSynergyTablets(e: GameEvent): void;
     trackArmourStat(stat: ItemStats, amount?: number): void;
     addItemStat(item: EquipmentItem, stat: ItemStats, amount: number): void;

@@ -66,6 +66,7 @@ interface LatestHCDeath {
 declare function createLatestDeathNotification(): string;
 declare function showDiscontinuedModal(title: string): void;
 declare function createToggleCharacterSelectionViewBtn(): string;
+declare function createSaveInfoBox(): string;
 declare function createCharacterSelectSettings(): string;
 declare function toggleCharacteSelectWarningPopup(): void;
 declare function setNewStartPage(page: CharacterSelectPage): void;

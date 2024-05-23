@@ -1,220 +1,324 @@
-declare type Resize = 48 | 40 | 32 | 24;
-/** Base class for UI Components that put their content into a container */
-declare abstract class ContainedComponent {
-    abstract container: HTMLElement;
-    show(): void;
-    hide(): void;
-    invisible(): void;
-    visible(): void;
+declare abstract class InfoIconElement extends HTMLElement implements CustomElement {
+    abstract _content: DocumentFragment;
+    abstract container: HTMLDivElement;
+    abstract tooltipElem: HTMLElement;
+    tooltip?: TippyTooltip;
+    connectedCallback(): void;
+    disconnectedCallback(): void;
+    setInvalidBorder(): void;
+    removeInvalidBorder(): void;
+    toggleInvalidBorder(isValid: boolean): void;
 }
-declare abstract class InfoIcon extends ContainedComponent {
+declare class XpIconTooltipElement extends HTMLElement implements CustomElement {
+    _content: DocumentFragment;
+    xp: HTMLSpanElement;
+    baseXp: HTMLElement;
+    modifiersXp: HTMLElement;
+    sourceContainer: HTMLDivElement;
+    constructor();
+    connectedCallback(): void;
+    setXP(xp: number, baseXP: number): void;
+    setAbyssalXP(xp: number, baseXP: number): void;
+    setSkillXP(skill: AnySkill, xp: number, baseXP: number): void;
+    setMasteryXP(xp: number, baseXP: number): void;
+    setModifiersText(xp: number, baseXP: number): void;
+    updateSources(sourceSpans: HTMLSpanElement[]): void;
+}
+declare class XpIconElement extends InfoIconElement {
+    _content: DocumentFragment;
     container: HTMLDivElement;
+    tooltipElem: XpIconTooltipElement;
+    xp: HTMLElement;
+    constructor();
+    setXP(xp: number, baseXP: number): void;
+    setSources(modifierSources: HTMLSpanElement[]): void;
+}
+declare class AbyssalXpIconElement extends InfoIconElement {
+    _content: DocumentFragment;
+    container: HTMLDivElement;
+    tooltipElem: XpIconTooltipElement;
+    xp: HTMLElement;
+    constructor();
+    setXP(xp: number, baseXP: number): void;
+    setSources(modifierSources: HTMLSpanElement[]): void;
+}
+declare class SkillXpIconElement extends InfoIconElement {
+    _content: DocumentFragment;
+    container: HTMLDivElement;
+    tooltipElem: XpIconTooltipElement;
+    skillImage: HTMLImageElement;
+    xp: HTMLElement;
+    constructor();
+    setXP(skill: AnySkill, xp: number, baseXP: number): void;
+    setSources(modifierSources: HTMLSpanElement[]): void;
+}
+declare class IntervalIconTooltipElement extends HTMLElement implements CustomElement {
+    _content: DocumentFragment;
+    sourceContainer: HTMLDivElement;
+    constructor();
+    connectedCallback(): void;
+    updateSources(sourceSpans: HTMLSpanElement[]): void;
+}
+declare class IntervalIconElement extends InfoIconElement {
+    _content: DocumentFragment;
+    container: HTMLDivElement;
+    tooltipElem: IntervalIconTooltipElement;
     image: HTMLImageElement;
-    text: HTMLElement;
-    tooltip: TippyTooltip;
-    parent: HTMLElement;
-    constructor(parent: HTMLElement, pillClass: string, size: Resize);
-    setImage(media: string): void;
-    setText(text: string): void;
-    setTooltip(content: string): void;
-    destroy(): void;
-    hide(): void;
-    show(): void;
-    static readonly media: {
-        skillXP: string;
-        strXP: Assets;
-        masteryXP: Assets;
-        poolXP: Assets;
-        preserveChance: string;
-        doublingChance: string;
-        interval: string;
-        gp: Assets;
-        slayerCoins: Assets;
-        shopIcon: string;
-        perfectCook: string;
-        successfulCook: string;
-        intervalAlt: string;
-    };
-    abstract localize(): void;
-}
-declare class XPIcon extends InfoIcon {
-    xp: number;
-    baseXP: number;
-    constructor(parent: HTMLElement, xp: number, baseXP: number, size?: Resize);
-    setXP(xp: number, baseXP: number): void;
-    localize(): void;
-    getTooltipContent(xp: number, baseXP: number): string;
-    getTextClass(value: number): string;
-    getTextClassSymbol(value: number): string;
-}
-declare class STRXPIcon extends InfoIcon {
-    xp: number;
-    baseXP: number;
-    constructor(parent: HTMLElement, xp: number, baseXP: number, size?: Resize);
-    setXP(xp: number, baseXP: number): void;
-    localize(): void;
-    getTooltipContent(xp: number, baseXP: number): string;
-    getTextClass(value: number): string;
-    getTextClassSymbol(value: number): string;
-}
-declare class IntervalIcon extends InfoIcon {
-    constructor(parent: HTMLElement, interval: number, size?: Resize, altMedia?: boolean);
+    interval: HTMLElement;
+    constructor();
+    /** Toggles the alternative media for this icon */
     setMedia(altMedia: boolean): void;
-    localize(): void;
-    /** Sets the interval [ms] formatted in seconds. */
-    setInterval(interval: number): void;
+    setInterval(interval: number, modifierSources: HTMLSpanElement[]): void;
+    setCustomInterval(interval: string): void;
 }
-declare class DoublingIcon extends InfoIcon {
-    constructor(parent: HTMLElement, chance: number, size?: Resize);
-    localize(): void;
-    getTooltipContent(): string;
-    setChance(chance: number): void;
+declare class DoublingIconTooltipElement extends HTMLElement implements CustomElement {
+    _content: DocumentFragment;
+    cap: HTMLHeadingElement;
+    sourceContainer: HTMLDivElement;
+    constructor();
+    connectedCallback(): void;
+    setCap(cap: number): void;
+    updateSources(sourceSpans: HTMLSpanElement[]): void;
 }
-declare class PreservationIcon extends InfoIcon {
-    constructor(parent: HTMLElement, chance: number, size?: Resize);
-    localize(): void;
-    getTooltipContent(): string;
-    setChance(chance: number): void;
+declare class DoublingIconElement extends InfoIconElement {
+    _content: DocumentFragment;
+    container: HTMLDivElement;
+    tooltipElem: DoublingIconTooltipElement;
+    chance: HTMLElement;
+    constructor();
+    setChance(chance: number, sourceSpans: HTMLSpanElement[]): void;
 }
-declare class PerfectCookIcon extends InfoIcon {
-    constructor(parent: HTMLElement, chance: number, size?: Resize);
-    localize(): void;
-    getTooltipContent(): string;
-    setChance(chance: number): void;
+declare class PreservationIconTooltipElement extends HTMLElement implements CustomElement {
+    _content: DocumentFragment;
+    cap: HTMLHeadingElement;
+    sourceContainer: HTMLDivElement;
+    constructor();
+    connectedCallback(): void;
+    setCap(cap: number): void;
+    updateSources(sourceSpans: HTMLSpanElement[]): void;
 }
-declare class CookingSuccessIcon extends InfoIcon {
-    constructor(parent: HTMLElement, chance: number, size?: Resize);
-    localize(): void;
-    getTooltipContent(): string;
-    setChance(chance: number): void;
+declare class PreservationIconElement extends InfoIconElement {
+    _content: DocumentFragment;
+    container: HTMLDivElement;
+    tooltipElem: PreservationIconTooltipElement;
+    chance: HTMLElement;
+    constructor();
+    setChance(chance: number, sourceSpans: HTMLSpanElement[]): void;
 }
-declare class MasteryXPIcon extends InfoIcon {
-    xp: number;
-    baseXP: number;
-    constructor(parent: HTMLElement, xp: number, baseXP: number, size?: Resize);
-    localize(): void;
+declare class PerfectCookIconTooltipElement extends HTMLElement implements CustomElement {
+    _content: DocumentFragment;
+    cap: HTMLHeadingElement;
+    sourceContainer: HTMLDivElement;
+    constructor();
+    connectedCallback(): void;
+    setCap(cap: number): void;
+    updateSources(sourceSpans: HTMLSpanElement[]): void;
+}
+declare class PerfectCookIconElement extends InfoIconElement {
+    _content: DocumentFragment;
+    container: HTMLDivElement;
+    tooltipElem: PerfectCookIconTooltipElement;
+    chance: HTMLElement;
+    constructor();
+    setChance(chance: number, sourceSpans: HTMLSpanElement[]): void;
+}
+declare class CookingSuccessIconTooltipElement extends HTMLElement implements CustomElement {
+    _content: DocumentFragment;
+    cap: HTMLHeadingElement;
+    sourceContainer: HTMLDivElement;
+    constructor();
+    connectedCallback(): void;
+    setCap(cap: number): void;
+    updateSources(sourceSpans: HTMLSpanElement[]): void;
+}
+declare class CookingSuccessIconElement extends InfoIconElement {
+    _content: DocumentFragment;
+    container: HTMLDivElement;
+    tooltipElem: CookingSuccessIconTooltipElement;
+    chance: HTMLElement;
+    constructor();
+    setChance(chance: number, sourceSpans: HTMLSpanElement[]): void;
+}
+declare class AdditionalPrimaryQuantityIconTooltipElement extends HTMLElement implements CustomElement {
+    _content: DocumentFragment;
+    sourceContainer: HTMLDivElement;
+    constructor();
+    connectedCallback(): void;
+    updateSources(sourceSpans: HTMLSpanElement[]): void;
+}
+declare class AdditionalPrimaryQuantityIconElement extends InfoIconElement {
+    _content: DocumentFragment;
+    container: HTMLDivElement;
+    tooltipElem: AdditionalPrimaryQuantityIconTooltipElement;
+    quantity: HTMLElement;
+    constructor();
+    setQuantity(qty: number, sourceSpans: HTMLSpanElement[]): void;
+}
+declare class CostReductionIconTooltipElement extends HTMLElement implements CustomElement {
+    _content: DocumentFragment;
+    cap: HTMLHeadingElement;
+    sourceContainer: HTMLDivElement;
+    constructor();
+    connectedCallback(): void;
+    setCap(cap: number): void;
+    updateSources(sourceSpans: HTMLSpanElement[]): void;
+}
+declare class CostReductionIconElement extends InfoIconElement {
+    _content: DocumentFragment;
+    container: HTMLDivElement;
+    tooltipElem: CostReductionIconTooltipElement;
+    percent: HTMLElement;
+    constructor();
+    setChance(chance: number, sourceSpans: HTMLSpanElement[]): void;
+}
+declare class MasteryXpIconElement extends InfoIconElement {
+    _content: DocumentFragment;
+    container: HTMLDivElement;
+    tooltipElem: XpIconTooltipElement;
+    xp: HTMLElement;
+    constructor();
     setXP(xp: number, baseXP: number): void;
-    getTooltipContent(xp: number, baseXP: number): string;
-    getTextClass(value: number): string;
-    getTextClassSymbol(value: number): string;
+    setSources(modifierSources: HTMLSpanElement[]): void;
 }
-declare class MasteryPoolIcon extends InfoIcon {
-    xp: number;
-    constructor(parent: HTMLElement, xp: number, size?: Resize);
-    localize(): void;
+declare class MasteryPoolIconTooltipElement extends HTMLElement implements CustomElement {
+    _content: DocumentFragment;
+    xp: HTMLSpanElement;
+    constructor();
+    connectedCallback(): void;
     setXP(xp: number): void;
-    getTooltipContent(): string;
 }
-declare class StealthIcon extends InfoIcon {
-    npc?: ThievingNPC;
-    constructor(parent: HTMLElement, size?: Resize);
-    setNPC(npc: ThievingNPC): void;
-    localize(): void;
-    getTooltipContent(): string;
+declare class MasteryPoolIconElement extends InfoIconElement {
+    _content: DocumentFragment;
+    container: HTMLDivElement;
+    tooltipElem: MasteryPoolIconTooltipElement;
+    xp: HTMLElement;
+    realmIconMelvor: HTMLImageElement;
+    realmIconAbyssal: HTMLImageElement;
+    realmIconUnknown: HTMLImageElement;
+    constructor();
+    setXP(xp: number): void;
+    setRealm(realm: Realm): void;
+    hideRealms(): void;
 }
-/** Info Icon for items that have a chance to drop */
-declare class ItemChanceIcon extends InfoIcon {
-    item?: AnyItem;
-    constructor(parent: HTMLElement, size?: Resize);
-    setItem(item: AnyItem): void;
-    localize(): void;
-    getTooltipContent(): string;
-    /** Sets the chance with 2 digits of precision */
+declare class StealthIconTooltipElement extends HTMLElement implements CustomElement {
+    _content: DocumentFragment;
+    stealthVsPerception: HTMLHeadingElement;
+    successRate: HTMLSpanElement;
+    increasedDoubling: HTMLSpanElement;
+    npcUniqueChance: HTMLSpanElement;
+    sourceContainer: HTMLDivElement;
+    constructor();
+    connectedCallback(): void;
+    setNPC(npc: ThievingNPC, thieving: Thieving): void;
+    updateSources(sourceSpans: HTMLSpanElement[]): void;
+}
+declare class StealthIconElement extends InfoIconElement {
+    _content: DocumentFragment;
+    container: HTMLDivElement;
+    tooltipElem: StealthIconTooltipElement;
+    stealth: HTMLElement;
+    constructor();
+    setNPC(npc: ThievingNPC, thieving: Thieving): void;
+    setSources(modifierSources: HTMLSpanElement[]): void;
+}
+declare class ItemChanceIconElement extends InfoIconElement {
+    _content: DocumentFragment;
+    container: HTMLDivElement;
+    tooltipElem: HTMLDivElement;
+    itemImage: HTMLImageElement;
+    chance: HTMLElement;
+    constructor();
+    setItem(item: Item): void;
     setChance(chance: number): void;
 }
-/** Info Icon for meteorites that have a chance to be located in astrology */
-declare class MeteoriteChanceIcon extends InfoIcon {
-    constructor(parent: HTMLElement, size?: Resize);
-    localize(): void;
-    getTooltipContent(): string;
-    /** Sets the chance with 2 digits of precision */
+declare class MeteoriteChanceIconTooltipElement extends HTMLElement implements CustomElement {
+    _content: DocumentFragment;
+    constructor();
+    connectedCallback(): void;
+}
+declare class MeteoriteChanceIconElement extends InfoIconElement {
+    _content: DocumentFragment;
+    container: HTMLDivElement;
+    tooltipElem: MeteoriteChanceIconTooltipElement;
+    chance: HTMLElement;
+    constructor();
     setChance(chance: number): void;
 }
-declare abstract class QtyIcon extends InfoIcon {
-    qty: number;
-    abstract getCurrentQty(): number;
-    abstract getName(): string;
-    constructor(parent: HTMLElement, qty: number, size?: Resize);
-    localize(): void;
-    updateQuantity(): void;
-    getTooltipContent(): string;
+declare class StarfallChanceIconElement extends InfoIconElement {
+    _content: DocumentFragment;
+    container: HTMLDivElement;
+    tooltipElem: HTMLDivElement;
+    chance: HTMLElement;
+    constructor();
+    setChance(chance: number): void;
 }
-declare class ItemQtyIcon extends QtyIcon {
-    allowQuickBuy: boolean;
+declare class ItemQuantityIconElement extends InfoIconElement {
+    _content: DocumentFragment;
+    container: HTMLDivElement;
+    tooltipElem: HTMLDivElement;
+    itemImage: HTMLImageElement;
+    quantity: HTMLElement;
     autoBuyIcon: HTMLImageElement;
-    item?: AnyItem;
-    constructor(parent: HTMLElement, quickBuy?: boolean, qty?: number, size?: Resize);
-    setItem(item: AnyItem, qty: number, altMedia?: boolean): void;
-    getCurrentQty(): number;
-    getName(): string;
+    itemQuantity?: AnyItemQuantity;
+    constructor();
+    setItem(item: AnyItem, quantity: number, allowQuickBuy?: boolean, altMedia?: boolean): void;
+    updateBorder(game: Game): void;
 }
-declare class CookingStockpileIcon extends ItemQtyIcon {
-    constructor(parent: HTMLElement, category: CookingCategory, size?: Resize);
+declare class CookingStockpileIconElement extends InfoIconElement {
+    _content: DocumentFragment;
+    container: HTMLDivElement;
+    tooltipElem: HTMLDivElement;
+    itemImage: HTMLImageElement;
+    quantity: HTMLElement;
+    constructor();
+    connectedCallback(): void;
     unsetItem(): void;
-    setItem(item: AnyItem, qty: number): void;
+    setItem(item: AnyItem, quantity: number): void;
+    setOnClick(callback: VoidFunction): void;
 }
-declare class GPQtyIcon extends QtyIcon {
-    constructor(parent: HTMLElement, qty: number, size?: Resize);
-    getCurrentQty(): number;
-    getName(): string;
+declare class CurrencyQuantityIconElement extends InfoIconElement {
+    _content: DocumentFragment;
+    container: HTMLDivElement;
+    tooltipElem: HTMLDivElement;
+    currencyImage: HTMLImageElement;
+    quantity: HTMLElement;
+    currencyQuantity?: CurrencyQuantity;
+    constructor();
+    setCurrency(currency: Currency, quantity: number): void;
+    updateBorder(): void;
 }
-declare class SCQtyIcon extends QtyIcon {
-    constructor(parent: HTMLElement, qty: number, size?: Resize);
-    getCurrentQty(): number;
-    getName(): string;
-}
-declare function createQtyIconsForCosts(container: HTMLElement, size: Resize, quickBuy: boolean, items?: AnyItemQuantity[], gp?: number, sc?: number): QtyIcon[];
-/**
- * Creates and appends QtyIcons for a Costs object
- * @param container The Element to append the icons to
- * @param costs The costs to display
- * @param size Size of the quantity icons to use
- * @returns An array of QtyIcons
- */
-declare function createQtyIconsFromCosts(container: HTMLElement, costs: Costs, quickBuy?: boolean, size?: Resize): QtyIcon[];
-/**
- * Creates and appends QtyIcons for a FixedCosts object
- * @param container The Element to append the icons to
- * @param costs The costs to display
- * @param size Size of the quantity icons to use
- * @returns An array of QtyIcons
- */
-declare function createQtyIconsFromFixedCosts(container: HTMLElement, costs: FixedCosts, quickBuy?: boolean, size?: Resize): QtyIcon[];
-declare abstract class QtyCurrentIcon extends InfoIcon {
-    abstract getCurrentQty(): number;
-    abstract getName(): string;
-    currentQuantity: number;
+declare class ItemCurrentIconElement extends InfoIconElement {
+    _content: DocumentFragment;
+    container: HTMLDivElement;
+    tooltipElem: HTMLDivElement;
+    itemImage: HTMLImageElement;
+    quantity: HTMLElement;
+    autoBuyIcon: HTMLImageElement;
+    item?: Item;
     requiredQuantity: number;
-    constructor(parent: HTMLElement, requiredQty: number, size?: Resize);
-    localize(): void;
-    init(): void;
+    currentQuantity: number;
+    constructor();
+    connectedCallback(): void;
+    setItem(item: Item, requiredQuantity: number, game: Game, allowQuickBuy?: boolean, altMedia?: boolean): void;
+    updateQuantity(bank: Bank): void;
+    onMouseOver(): void;
+    onMouseLeave(): void;
+    highlight(): void;
+    unHighlight(): void;
+}
+declare class CurrencyCurrentIconElement extends InfoIconElement {
+    _content: DocumentFragment;
+    container: HTMLDivElement;
+    tooltipElem: HTMLDivElement;
+    currencyImage: HTMLImageElement;
+    quantity: HTMLElement;
+    currency?: Currency;
+    requiredQuantity: number;
+    currentQuantity: number;
+    constructor();
+    connectedCallback(): void;
+    setCurrency(currency: Currency, requiredQuantity: number): void;
     updateQuantity(): void;
-    onMouseover(): void;
-    onMouseleave(): void;
-    getTooltipContent(): string;
-}
-declare class ItemCurrentIcon extends QtyCurrentIcon {
-    item: AnyItem;
-    constructor(parent: HTMLElement, item: AnyItem, requiredQty: number, quickBuy?: boolean, size?: Resize, altMedia?: boolean);
-    getCurrentQty(): number;
-    getName(): string;
-}
-declare class GPCurrentIcon extends QtyCurrentIcon {
-    constructor(parent: HTMLElement, requiredQty: number, size?: Resize);
-    getCurrentQty(): number;
-    getName(): string;
-}
-declare class SCCurrentIcon extends QtyCurrentIcon {
-    constructor(parent: HTMLElement, requiredQty: number, size?: Resize);
-    getCurrentQty(): number;
-    getName(): string;
-}
-declare class TownshipResourceIcon extends InfoIcon {
-    resource: TownshipResource;
-    qty: number;
-    constructor(parent: HTMLElement, resource: TownshipResource, qty: number, size?: Resize);
-    setQty(qty: number): void;
-    localize(): void;
-    getTooltipContent(): string;
-    getSymbol(): string;
+    onMouseOver(): void;
+    onMouseLeave(): void;
 }

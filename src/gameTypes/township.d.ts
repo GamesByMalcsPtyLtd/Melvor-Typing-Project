@@ -4,8 +4,10 @@ interface TownshipBiomeData extends IDData {
     name: string;
     /** URI of the biomes image */
     media: string;
-    /** The Tier of Biome. Determines Population and level requirements to build in it. Integer between [1-7]. */
+    /** The Tier of Biome. Determines Population and level requirements to build in it. Integer between [1-8]. */
     tier: number;
+    /** The Abyssal Tier of Biome. Determines Protection and abyssal level requirements to build in it. Integer between [0-7]. */
+    abyssalTier?: number;
 }
 declare const enum TownshipConvertQtyType {
     Number = 0,
@@ -19,9 +21,11 @@ declare const enum TownshipConvertType {
 declare class TownshipBiome extends NamespacedObject {
     get name(): string;
     get media(): string;
+    get englishName(): string;
     _name: string;
     _media: string;
     tier: number;
+    abyssalTier: number;
     /** The number of buildings that have been built in the biome */
     buildingsBuilt: Map<TownshipBuilding, number>;
     /** The efficiency of buildings that have been built in the biome */
@@ -56,6 +60,10 @@ interface TownshipBuildingProvidesData {
     resources: IDQuantity[];
     /** Base worship provided by the building */
     worship?: number;
+    /** ItA Only: Base Protected provided by the building */
+    public?: number;
+    /** ItA Only: Soul storage cap provided by the building */
+    soulStorage?: number;
 }
 interface TownshipBuildingCostData {
     /** The ID of the biome costs apply to */
@@ -69,12 +77,14 @@ declare class TownshipBuildingProvides {
     education: number;
     storage: number;
     resources: Map<TownshipResource, number>;
-    worship?: number;
+    worship: number;
+    public: number;
+    soulStorage: number;
     constructor(data: TownshipBuildingProvidesData, game: Game);
     resourceCount(resource: TownshipResource): number;
 }
 /** Data for constructing a TownshipBuilding object */
-interface TownshipBuildingData extends IDData {
+interface TownshipBuildingData extends IDData, IStatObjectData {
     /** The display name of the building */
     name: string;
     /** URI of the buildings image */
@@ -89,16 +99,17 @@ interface TownshipBuildingData extends IDData {
     provides: TownshipBuildingProvidesData[];
     /** The IDs of TownshipBiomes that this building can be built in */
     biomes: string[];
-    /** Modifiers provided to the player for each of this building built */
-    modifiers?: PlayerModifierData;
     /** The maximum number of times this building can be upgraded. Integer between [1, Infinity) */
     maxUpgrades: number;
     /** Optional. Whether the building efficiency automatically decays over time. Default is true */
     canDegrade: boolean;
+    /** The Abyssal Tier of the building. Determines Township Abyssal Level and protection requirements. Integer between [0,7] */
+    abyssalTier?: number;
 }
 declare class TownshipBuilding extends NamespacedObject {
     get name(): string;
     get media(): string;
+    get englishName(): string;
     _name: string;
     _media: string;
     tier: number;
@@ -107,12 +118,17 @@ declare class TownshipBuilding extends NamespacedObject {
     costs: Map<TownshipBiome, ResourceQuantity[]>;
     provides: Map<TownshipBiome, TownshipBuildingProvides>;
     biomes: TownshipBiome[];
-    modifiers?: PlayerModifierObject;
+    stats: StatObject;
     maxUpgrades: number;
     canDegrade: boolean;
     upgradeChain: TownshipBuilding[];
-    /** Modifiers that are currently provided by the given building */
-    providedModifiers?: MappedModifiers;
+    abyssalTier: number;
+    get providesStats(): boolean;
+    /** Multipliers for the stats provided by this building */
+    providedStatMultiplier: {
+        pos: number;
+        neg: number;
+    };
     constructor(namespace: DataNamespace, data: TownshipBuildingData, game: Game);
     get totalUpgrades(): number;
     get upgradePosition(): number;
@@ -135,11 +151,11 @@ interface TownshipWorshipData extends IDData {
     /** URI of the worships image */
     media: string;
     /** Modifiers that are always provided by this worship */
-    modifiers: PlayerModifierData;
+    modifiers: ModifierValuesRecordData;
     /** If this worship should be hidden from the player */
     isHidden: boolean;
     /** Modifiers that are provided as each worship checkpoint is reached. Must have 5 elements */
-    checkpoints: PlayerModifierData[];
+    checkpoints: ModifierValuesRecordData[];
     /** Requirements the player must meet before being able to use this worship */
     unlockRequirements: AnyRequirementData[];
     /** The display name of the statue building when this worship is selected */
@@ -149,23 +165,25 @@ interface TownshipWorshipData extends IDData {
     /** Defines seasons where the positive modifiers of this worship are multiplied by a value */
     seasonMultiplier: TownshipWorshipSeasonMultiplierData[];
 }
-declare class TownshipWorship extends NamespacedObject {
+declare class TownshipWorship extends NamespacedObject implements SoftDataDependant<TownshipWorshipData> {
     get name(): string;
     get description(): string;
     get media(): string;
     get statueName(): string;
     get statueMedia(): string;
+    get englishName(): string;
     _name: string;
     _description: string;
     _media: string;
-    modifiers: PlayerModifierObject;
+    modifiers: ModifierValue[];
     isHidden: boolean;
-    checkpoints: PlayerModifierObject[];
+    checkpoints: ModifierValue[][];
     unlockRequirements: AnyRequirement[];
     _statueName: string;
     _statueMedia: string;
     seasonMultiplier: Map<TownshipSeason, number>;
     constructor(namespace: DataNamespace, data: TownshipWorshipData, game: Game);
+    registerSoftDependencies(data: TownshipWorshipData, game: Game): void;
 }
 declare class DummyTownshipWorship extends TownshipWorship {
     constructor(namespace: DataNamespace, id: string, game: Game);
@@ -188,15 +206,18 @@ interface TownshipSingleItemConversionData {
     itemID: string;
     /** Requirements the player must meet before unlocking this conversion */
     unlockRequirements: AnyRequirementData[];
+    /** Set a custom base cost for item conversion */
+    baseCost?: number;
 }
 declare class TownshipItemConversion {
     get item(): AnyItem;
     _item: AnyItem | undefined;
     unlockRequirements: AnyRequirement[];
+    baseCost: number;
     constructor(data: TownshipSingleItemConversionData, game: Game);
 }
 /** Data for constructing a TownshipSeason object */
-interface TownshipSeasonData extends IDData {
+interface TownshipSeasonData extends IDData, IStatObjectData {
     /** The display name of the season */
     name: string;
     /** The URI of the seasons image */
@@ -205,21 +226,27 @@ interface TownshipSeasonData extends IDData {
     order: number;
     /** The number of Township Ticks (1 hour) that the season lasts */
     seasonLength: number;
-    /** Modifiers provided to the player when the season is active */
-    modifiers: PlayerModifierData;
     /** If the player should be unable to change their current worship while the season is active */
     disableWorshipChange: boolean;
+}
+/** Data for modifying a TownshipSeason object */
+interface TownshipSeasonModificationData extends IDData {
+    modifiers?: ModifierValuesModificationData;
+    combatEffects?: CombatEffectApplicatorModificationData;
+    enemyModifiers?: ModifierValuesModificationData;
 }
 declare class TownshipSeason extends NamespacedObject {
     get name(): string;
     get media(): string;
+    get englishName(): string;
     _name: string;
     _media: string;
     order: number;
     seasonLength: number;
-    modifiers: PlayerModifierObject;
+    stats: StatObject;
     disableWorshipChange: boolean;
     constructor(namespace: DataNamespace, data: TownshipSeasonData, game: Game);
+    applyDataModification(modData: TownshipSeasonModificationData, game: Game): void;
 }
 declare class DummyTownshipSeason extends TownshipSeason {
     constructor(namespace: DataNamespace, id: string, game: Game);
@@ -228,6 +255,11 @@ declare type TownshipResourceType = 'Currency' | 'Raw';
 declare enum TownshipResourceTypeID {
     Currency = 0,
     Raw = 1
+}
+declare type TownshipStorageType = 'Normal' | 'Soul';
+declare enum TownshipStorageTypeID {
+    Normal = 0,
+    Soul = 1
 }
 /** Data for constructing a TownshipResource object */
 interface TownshipResourceData extends IDData {
@@ -239,6 +271,8 @@ interface TownshipResourceData extends IDData {
     type: TownshipResourceType;
     /** The amount of this resource the player starts with */
     startingAmount: number;
+    /** What storage to use in Township */
+    storageType?: TownshipStorageType;
 }
 interface TownshipItemConversion {
     toTownship: TownshipResourceItemConversion;
@@ -252,6 +286,7 @@ interface TownshipSingleItemConversion {
 declare class TownshipResource extends NamespacedObject {
     get name(): string;
     get media(): string;
+    get englishName(): string;
     type: TownshipResourceTypeID;
     startingAmount: number;
     _name: string;
@@ -268,6 +303,8 @@ declare class TownshipResource extends NamespacedObject {
     _cap: number;
     /** Current generation rate of resource */
     generation: number;
+    /** What storage this resource uses */
+    storageType: TownshipStorageType;
     constructor(namespace: DataNamespace, data: TownshipResourceData, game: Game);
 }
 declare class DummyTownshipResource extends TownshipResource {
@@ -284,10 +321,14 @@ interface TownshipSkillData extends BaseSkillData {
     worships?: TownshipWorshipData[];
     buildingDisplayOrder?: InsertOrder[];
     resourceDisplayOrder?: InsertOrder[];
+    taskCategories?: TownshipTaskCategoryData[];
     tasks?: TownshipTaskData[];
-    casualTasks?: TownshipTaskData[];
+    casualTasks?: TownshipCasualTaskData[];
     seasons?: TownshipSeasonData[];
     itemConversions?: TownshipItemConversionData;
+}
+interface TownshipModificationData extends BaseSkillModificationData {
+    seasons?: TownshipSeasonModificationData[];
 }
 declare class TownshipRenderQueue extends SkillRenderQueue {
     /** Renders population, workers, storage, happiness, education, health and worship. Impacted by modifiers. */
@@ -319,37 +360,47 @@ declare class TownshipRenderQueue extends SkillRenderQueue {
     updateSeason: boolean;
     /** Renders the building names */
     buildingNames: boolean;
-    dailyTaskCount: boolean;
-    /** Updates the timer for casual tasks */
-    casualTaskTimer: boolean;
     /** Updates the task ready icon */
     taskReadyIcon: boolean;
-    /** Updates the active task category */
-    activeTaskCategory: boolean;
     /** Updates Town Summary for current biome */
     townSummary: boolean;
-    /** Updated building modifier text */
+    /** Updates building modifier text */
     buildingModifiers: boolean;
+    /** Updates next Abyssal Wave size */
+    abyssalWaveSize: boolean;
+    /** Updates next Fight Abyssal Wave button */
+    fightAbyssalWave: boolean;
 }
-declare class Township extends Skill<TownshipSkillData> implements StatProvider, PassiveAction {
+declare class TownshipBuildingCountChangedEvent extends GameEvent {
+    building: TownshipBuilding;
+    biome: TownshipBiome;
+    constructor(building: TownshipBuilding, biome: TownshipBiome);
+}
+declare type TownshipEvents = {
+    buildingCountChanged: TownshipBuildingCountChangedEvent;
+} & SkillEvents;
+declare class Township extends Skill<TownshipSkillData, TownshipEvents, TownshipModificationData> implements PassiveAction {
     readonly _media: string;
+    get levelCompletionBreakdown(): LevelCompletionBreakdown[];
     /** Tick length in seconds */
     TICK_LENGTH: number;
     readonly PASSIVE_TICK_LENGTH = 3600;
-    readonly LEGACY_TICK_LENGTH = 300;
+    readonly LEGACY_TICK_LENGTH = 3600;
     readonly BASE_TAX_RATE = 0;
     readonly BASE_STORAGE = 50000;
+    readonly BASE_SOUL_STORAGE = 0;
     readonly WORSHIP_CHECKPOINTS: number[];
     readonly MAX_WORSHIP: number;
     readonly DECREASED_BUILDING_COST_CAP = -80;
     readonly GP_PER_CITIZEN = 15;
     readonly WORSHIP_CHANGE_COST = 50000000;
     readonly RARE_SEASON_CHANCE = 20;
+    readonly ABYSSAL_WAVE_REWARD_DIVIDER = 1;
+    readonly BASE_MAX_HEALTH = 100;
     readonly populationForTier: NumberDictionary<BuildingRequirement>;
+    readonly abyssalTierRequirements: NumberDictionary<BuildingAbyssalRequirement>;
     renderQueue: TownshipRenderQueue;
-    modifiers: MappedModifiers;
     totalTicks: number;
-    modifiersFromBuildings: MappedModifiers;
     /** Current Town page biome the user is viewing. If undefined, user is viewing all biomes. */
     currentTownBiome?: TownshipBiome;
     convertQty: number;
@@ -386,8 +437,14 @@ declare class Township extends Skill<TownshipSkillData> implements StatProvider,
     readonly MINIMUM_HEALTH = 20;
     displayReworkNotification: boolean;
     gpRefunded: number;
+    get abyssalGatewayBuilt(): boolean;
+    get enableAbyssalWaves(): boolean;
     get timeToNextUpdate(): number;
     get timeToNextSeason(): number;
+    get timeToNextAbyssalWave(): number;
+    get abyssalWaveSize(): number;
+    get soulsReward(): number;
+    get canWinAbyssalWave(): boolean;
     get oneDayInTicks(): number;
     get chanceForPet(): number;
     get statueName(): string;
@@ -395,28 +452,40 @@ declare class Township extends Skill<TownshipSkillData> implements StatProvider,
     /** The base rate of xp gained per tick, before modifiers */
     get baseXPRate(): number;
     get currentPopulation(): number;
+    get currentProtected(): number;
     get currentEducation(): number;
     get currentHappiness(): number;
     get nightfallSeasonEnabled(): boolean;
     get solarEclipseSeasonEnabled(): boolean;
     get lemonSeasonEnabled(): boolean;
+    get eternalDarknessSeasonEnabled(): boolean;
+    getModifiedArmourWeaponryValueForAbyssalWave(): number;
+    getTotalArmourWeaponry(): number;
     /** Callback function for the Repair All in this Biome button */
     repairAllBuildingsInCurrentBiome(): void;
+    /** Callback function for the Repair All button for specific storage types only */
+    repairAllBuildingsFromStorageType(storageType: TownshipStorageType): void;
     /** Callback function for the Repair All button */
     repairAllBuildings(): void;
+    onRepairAllBuildings(): void;
     getBuildingEfficiencyInBiome(building: TownshipBuilding, biome: TownshipBiome | undefined): number;
     reduceAllBuildingEfficiency(amount: number): void;
+    reduceAllAbyssalBuildingEfficiency(amount: number): void;
     getBiomeProgress(biome: TownshipBiome): number;
     getBasePopulationProvidesForBiome(building: TownshipBuilding, biome: TownshipBiome | undefined): number;
     getBaseEducationProvidesForBiome(building: TownshipBuilding, biome: TownshipBiome | undefined): number;
     getBaseHappinessProvidesForBiome(building: TownshipBuilding, biome: TownshipBiome | undefined): number;
     getBaseWorshipProvidesForBiome(building: TownshipBuilding, biome: TownshipBiome | undefined): number;
     getBaseStorageProvidesForBiome(building: TownshipBuilding, biome: TownshipBiome | undefined): number;
+    getBaseProtectedProvidesForBiome(building: TownshipBuilding, biome: TownshipBiome | undefined): number;
+    getBaseSoulStorageProvidesForBiome(building: TownshipBuilding, biome: TownshipBiome | undefined): number;
     getPopulationProvidesForBiome(building: TownshipBuilding, biome: TownshipBiome): number;
     getEducationProvidesForBiome(building: TownshipBuilding, biome: TownshipBiome): number;
     getHappinessProvidesForBiome(building: TownshipBuilding, biome: TownshipBiome): number;
     getWorshipProvidesForBiome(building: TownshipBuilding, biome: TownshipBiome): number;
     getStorageProvidesForBiome(building: TownshipBuilding, biome: TownshipBiome): number;
+    getProtectedProvidesForBiome(building: TownshipBuilding, biome: TownshipBiome): number;
+    getSoulStorageProvidesForBiome(building: TownshipBuilding, biome: TownshipBiome): number;
     getProvidesForBiome(building: TownshipBuilding, biome: TownshipBiome | undefined): TownshipBuildingProvides | undefined;
     get currentWorshipName(): string;
     get worshipPercent(): number;
@@ -425,16 +494,21 @@ declare class Township extends Skill<TownshipSkillData> implements StatProvider,
     get taxRate(): number;
     get canAffordWorshipChange(): boolean;
     get isStorageFull(): boolean;
+    get isSoulStorageFull(): boolean;
     constructor(namespace: DataNamespace, game: Game);
     registerData(namespace: DataNamespace, data: TownshipSkillData): void;
+    modifyData(data: TownshipModificationData): void;
     getResourceQuantityFromData(resourceData: IDQuantity[]): ResourceQuantity[];
     postDataRegistration(): void;
+    getRegistry(type: ScopeSourceType): NamespaceRegistry<NamedObject> | undefined;
+    getPkgObjects(pkg: GameDataPackage, type: ScopeSourceType): IDData[] | undefined;
     getBuildingCountRemainingForLevelUp(building: TownshipBuilding, biome: TownshipBiome): number;
     isBuildingAvailable(building: TownshipBuilding, biome: TownshipBiome): boolean;
     hasBuildingBeenUpgraded(building: TownshipBuilding, biome: TownshipBiome | undefined): boolean;
     isBuildingUpgradedButNotBuiltd(building: TownshipBuilding, biome: TownshipBiome | undefined): boolean;
     isBuildingMaxed(building: TownshipBuilding, biome: TownshipBiome | undefined): boolean;
     getIncreaseHealthCost(resource: TownshipResource): number;
+    get maxHealth(): number;
     /**
      * Callback function for when an increase health button is clicked
      * @param resource The resource to spend to increase health
@@ -452,7 +526,6 @@ declare class Township extends Skill<TownshipSkillData> implements StatProvider,
     deserialize(reader: DataReader, version: number, idMap: NumericIDMap): void;
     deserializeTownData(reader: DataReader, version: number, idMap: NumericIDMap): void;
     deserializeTownDataResources(reader: DataReader, version: number, idMap: NumericIDMap): void;
-    onLevelUp(oldLevel: number, newLevel: number): void;
     /** Queues renders when resources change */
     onResourceAmountChange(): void;
     /** Queues renders when buildings change */
@@ -462,10 +535,7 @@ declare class Township extends Skill<TownshipSkillData> implements StatProvider,
     renderResourceRates(): void;
     renderBuildingCosts(): void;
     renderBuildingNames(): void;
-    renderDailyTaskCount(): void;
-    renderCasualTaskTimer(): void;
     renderTaskReadyIcon(): void;
-    renderActiveTaskCategory(): void;
     renderTownAge(): void;
     renderBuildingProvides(): void;
     renderBiomeProgress(): void;
@@ -477,6 +547,8 @@ declare class Township extends Skill<TownshipSkillData> implements StatProvider,
     renderUpdateTime(): void;
     renderUpdateSeason(): void;
     render(): void;
+    renderNextAbyssalWaveSize(): void;
+    renderFightAbyssalWave(): void;
     renderBuildingModifiers(): void;
     renderTownSummary(): void;
     initTownCreation(): void;
@@ -490,9 +562,11 @@ declare class Township extends Skill<TownshipSkillData> implements StatProvider,
     /** Callback function for the View Season Modifiers button */
     viewSeasonModifiers(): void;
     preLoad(): void;
+    removeDummyTownshipData(): void;
     postStatLoad(): void;
     postLoad(): void;
     onLoad(): void;
+    queueCurrencyQuantityRender(currency: Currency): void;
     /** @deprecated This method will be removed in the next major update. Use renderModifierChange instead */
     onModifierChange(): void;
     onPageChange(): void;
@@ -512,6 +586,12 @@ declare class Township extends Skill<TownshipSkillData> implements StatProvider,
     tick(): boolean;
     applyPreTickTownUpdates(): void;
     tickSeason(): void;
+    processAbyssalWaveOnClick(): void;
+    getAbyssalXPOnWin(): number;
+    getAbyssalXPOnLoss(protectionValue: number): number;
+    processAbyssalWave(): void;
+    onAbyssalWaveProcessed(): void;
+    removeArmourWeaponryAmount(amount: number): void;
     rollForPets(interval: number): void;
     /** Adds the starting buildings to the town if they are missing */
     addStartingBuildings(): void;
@@ -535,9 +615,17 @@ declare class Township extends Skill<TownshipSkillData> implements StatProvider,
     getMaxStorage(): number;
     /** Returns the total storage used by all resources, excepting GP. */
     getUsedStorage(): number;
+    /** Recomputes the base total soul storage provided by all buildings */
+    computeSoulStorage(): void;
+    /** Returns the modified soul storage of the town */
+    getMaxSoulStorage(): number;
+    /** Returns the total storage used by all resources, excepting GP. */
+    getUsedSoulStorage(): number;
+    computeTownProtected(): void;
     modifyBuildingResourceCost(quantity: number): number;
     getBuildingCostsForBiome(building: TownshipBuilding, biome: TownshipBiome | undefined): ResourceQuantity[];
     canAffordBuilding(building: TownshipBuilding, biome: TownshipBiome | undefined, qty?: number): boolean;
+    getMaxAffordableBuildingQty(building: TownshipBuilding, biome: TownshipBiome): number;
     canAffordRepair(building: TownshipBuilding, biome: TownshipBiome | undefined): boolean;
     getSingleResourceRepairCostForBuilding(building: TownshipBuilding, biome: TownshipBiome | undefined, resourceQuantity: number): number;
     getRepairCostModifier(building: TownshipBuilding, biome: TownshipBiome | undefined): number;
@@ -546,7 +634,15 @@ declare class Township extends Skill<TownshipSkillData> implements StatProvider,
     subtractRepairAllCosts(costs: Map<TownshipResource, number>): void;
     canAffordRepairAllCosts(costs: Map<TownshipResource, number>): boolean;
     getTotalRepairCosts(): Map<TownshipResource, number>;
+    getTotalRepairCostForStorage(storageType: TownshipStorageType): Map<TownshipResource, number>;
     getTotalRepairCostInBiome(biome: TownshipBiome): Map<TownshipResource, number>;
+    getRepairCostInBiomeForBuilding(biome: TownshipBiome, building: TownshipBuilding, costs: Map<TownshipResource, number>): Map<TownshipResource, number>;
+    checkTierPopulationReqs(tier: number): boolean;
+    checkTierLevelReqs(tier: number): boolean;
+    checkTierReqs(tier: number): boolean;
+    checkAbyssalTierProtectionReqs(tier: number): boolean;
+    checkAbyssalTierLevelReqs(tier: number): boolean;
+    checkAbyssalTierReqs(tier: number): boolean;
     isBiomeUnlocked(biome: TownshipBiome): boolean;
     canBuildTierOfBuilding(building: TownshipBuilding, notify?: boolean): boolean;
     buildBuilding(building: TownshipBuilding): void;
@@ -558,38 +654,37 @@ declare class Township extends Skill<TownshipSkillData> implements StatProvider,
     addBuildingToBiome(biome: TownshipBiome, building: TownshipBuilding, count?: number): number;
     confirmChangeOfWorship(): void;
     destroyAllWorshipBuildings(): void;
-    /** Recomputes the modifiers provided by buildings. Does not recalculate provided stats or player stats. */
-    computeModifiersFromBuildings(): void;
-    /** Recomputes the modifiers provided by township */
-    computeProvidedStats(updatePlayer?: boolean): void;
-    /** Sets the modifier for a given building, does not update player stats */
-    setModifiers(building: TownshipBuilding): void;
-    updateBuildingModifierData(building: TownshipBuilding): void;
-    updateAllBuildingModifierData(): void;
+    addProvidedStats(): void;
+    /** Sets the multipliers for a given buildings provided stats */
+    setBuildingProvidedStatsMultiplier(building: TownshipBuilding): void;
+    updateBuildingProvidedStats(building: TownshipBuilding): void;
+    updateAllBuildingProvidedStatsMultiplier(): void;
     updateForBuildingChange(): void;
     getGPGainRate(): number;
+    getAPGainFromAbyssalWave(): number;
+    getASCGainFromAbyssalWave(): number;
     computeTownResourceGain(): void;
-    getBiomeResourceProductionModifier(biome: TownshipBiome): number;
-    getBuildingResourceProductionModifier(building: TownshipBuilding): number;
+    getBuildingProductionModifier(biome: TownshipBiome, building: TownshipBuilding): number;
     getSingleResourceGainAmountInBiome(resource: TownshipResource, building: TownshipBuilding, biome: TownshipBiome, applyEfficiency: boolean): number;
     getResourceGainModifier(resource: TownshipResource): number;
     countNumberOfBuildings(building: TownshipBuilding): number;
     getMaxRawCreationAmount(resource: TownshipResource): number;
+    getMaxSoulsToAddAmount(amount: number): number;
     addResources(): void;
     getMaxResourceAmount(resource: TownshipResource): number;
     setResourceCap(resource: TownshipResource, cap: number): void;
     processYeet(resource: TownshipResource, amount: number): void;
     /** Callback Method */
     updateConvertQty(value: number): void;
-    updateConvertToQty(value: number, resource: TownshipResource, item: AnyItem): void;
-    updateConvertFromQty(value: number, resource: TownshipResource, item: AnyItem): void;
-    getConvertToTownshipRatio(resource: TownshipResource, item: AnyItem): number;
-    getConvertFromTownshipRatio(resource: TownshipResource, item: AnyItem): number;
-    getBaseConvertToTownshipRatio(resource: TownshipResource, item: AnyItem): number;
-    getBaseConvertFromTownshipRatio(resource: TownshipResource, item: AnyItem): number;
-    processConversionToTownship(item: AnyItem, resource: TownshipResource): void;
-    processConversionFromTownship(item: AnyItem, resource: TownshipResource): void;
-    getMaxPossibleConvertToTownshipValue(item: AnyItem, resource: TownshipResource): number;
+    updateConvertToQty(value: number, conversion: TownshipItemConversion): void;
+    updateConvertFromQty(value: number, resource: TownshipResource, conversion: TownshipItemConversion): void;
+    getConvertToTownshipRatio(conversion: TownshipItemConversion): number;
+    getConvertFromTownshipRatio(conversion: TownshipItemConversion): number;
+    getBaseConvertToTownshipRatio(conversion: TownshipItemConversion): number;
+    getBaseConvertFromTownshipRatio(conversion: TownshipItemConversion): number;
+    processConversionToTownship(conversion: TownshipItemConversion, resource: TownshipResource): void;
+    processConversionFromTownship(conversion: TownshipItemConversion, resource: TownshipResource): void;
+    getMaxPossibleConvertToTownshipValue(conversion: TownshipItemConversion): number;
     getMaxPossibleConvertFromTownshipValue(resource: TownshipResource, convertRatio: number): number;
     testTranslations(): void;
     getObtainableItems(): Set<AnyItem>;
@@ -610,6 +705,7 @@ declare class TownshipUI {
             trader: HTMLLinkElement;
             manageStorage: HTMLLinkElement;
             tasks: HTMLLinkElement;
+            processAbyssalWave: HTMLButtonElement;
         };
         div: {
             town: HTMLDivElement;
@@ -625,7 +721,7 @@ declare class TownshipUI {
             worshipModifiers: HTMLDivElement;
             worshipModifiersModal: HTMLDivElement;
             generateTown: HTMLDivElement;
-            tasks: HTMLDivElement;
+            tasks: TownshipTasksMenuElement;
             timeToNextUpdate: HTMLSpanElement;
             timeToNextSeason: HTMLSpanElement;
             currentSeasonImg: HTMLImageElement;
@@ -636,6 +732,12 @@ declare class TownshipUI {
             worshipChangeCost: HTMLSpanElement;
             cannotChangeWorship: HTMLDivElement;
             increaseHealth: HTMLDivElement;
+            nextAbyssalWaveSize: HTMLSpanElement;
+            abyssalWave: HTMLElement;
+            buildAbyssalGateway: HTMLDivElement;
+            abyssalWaveSize: HTMLDivElement;
+            abyssalXPOnWin: HTMLSpanElement;
+            abyssalXPValues: HTMLLIElement;
         };
         town: {
             population: HTMLSpanElement;
@@ -651,7 +753,10 @@ declare class TownshipUI {
                 happiness: HTMLDivElement;
                 education: HTMLDivElement;
                 health: HTMLDivElement;
+                public: HTMLDivElement;
+                soulStorage: HTMLDivElement;
             };
+            public: HTMLSpanElement;
         };
         trader: {
             trader: HTMLDivElement;
@@ -660,12 +765,14 @@ declare class TownshipUI {
         notifications: {
             global: {
                 noStorage: HTMLDivElement;
+                noSoulStorage: HTMLDivElement;
             };
         };
         icon: {
             taskReady: HTMLSpanElement;
         };
     };
+    tasks: TownshipTasksMenuElement;
     resourceDisplays: Map<TownshipResource, TownshipResourceDisplayElement>;
     townBiomeSelectButtons: Map<TownshipBiome | undefined, TownshipTownBiomeSelectElement>;
     buildingsInTown: Map<TownshipBuilding, BuildingInTownElement>;
@@ -680,15 +787,23 @@ declare class TownshipUI {
         button: HTMLButtonElement;
         cost: HTMLSpanElement;
     }[]>;
-    constructor(township: Township);
+    constructor(game: Game, township: Township);
     loadTownshipUI(): void;
     updateTownStats(): void;
     /** Determines the quantities that health may be increased by using herbs/potions */
     static increaseHealthOptions: number[];
+    updateAbyssalWaveUI(): void;
+    showSpinnerOnFightAbyssalWaveButton(): void;
+    hideSpinnerOnFightAbyssalWaveButton(): void;
+    disableFightAbyssalWaveButton(): void;
+    enableFightAbyssalWaveButton(): void;
+    abyssalWaveBtnOnCooldown: boolean;
+    onFightAbyssalWaveClick(): void;
     createIncreaseHealthBtns(): void;
     updateIncreaseHealthBtns(): void;
     updateWorshipChangeCost(): void;
     updateTimeToNextUpdate(): void;
+    updateNextAbyssalWaveSize(): void;
     updateSeason(): void;
     updateLegacyTimeLeft(): void;
     getPageButton(page: TownshipPage): HTMLLinkElement;
@@ -720,6 +835,7 @@ declare class TownshipUI {
     displayWorshipTooltip(): string;
     displayXPInfo(): string;
     updatePopulation(): void;
+    updateProtected(): void;
     updateHappiness(): void;
     updateEducation(): void;
     updateHealth(): void;
@@ -734,7 +850,10 @@ declare class TownshipUI {
     createResourceBreakdownTable(): void;
     updateStorageBreakdown(): void;
     updateStorageBreakdownColour(): void;
+    updateSoulStorageBreakdown(): void;
+    updateSoulStorageBreakdownColour(): void;
     getStorageBreakdown(): string;
+    getSoulStorageBreakdown(): string;
     updateResourceAmounts(): void;
     updateResourceTickBreakdown(): void;
     unhighlightTownBiomeBtn(biome: TownshipBiome | undefined): void;
@@ -764,8 +883,8 @@ declare class TownshipUI {
     updateTownBuildingProvides(): void;
     displayTownSummary(): void;
     updateAllBuildingNames(): void;
-    updateAllBuildingTotalModifierElements(): void;
-    updateBuildingTotalModifierElement(building: TownshipBuilding): void;
+    updateAllBuildingTotalStatsElements(): void;
+    updateBuildingTotalStatsElement(building: TownshipBuilding): void;
     updateBuildingTotalOutput(building: TownshipBuilding): void;
     createWorshipSelection(): void;
     updateCurrentWorship(): void;
@@ -805,6 +924,10 @@ interface BuildingRequirement {
     population: number;
     level: number;
 }
+interface BuildingAbyssalRequirement {
+    protection: number;
+    abyssalLevel: number;
+}
 declare class TownshipData implements EncodableObject {
     township: Township;
     game: Game;
@@ -831,6 +954,14 @@ declare class TownshipData implements EncodableObject {
     previousSeason?: TownshipSeason;
     /** Save State Property. Stores health value of town. */
     health: number;
+    /** ItA Only: Stores to current public of the Town */
+    public: number;
+    /** ItA Only: Save State Property. Stores to current amount of Souls collected */
+    souls: number;
+    /** ItA Only: Base soul storage provided by all buildings */
+    soulStorage: number;
+    /** Save State Property. Stores the ticks remaining until next wave of abyssal monsters. */
+    abyssalWaveTicksRemaining: number;
     constructor(township: Township, game: Game);
     encode(writer: SaveWriter): SaveWriter;
     decode(reader: SaveWriter, version: number): void;
@@ -843,4 +974,6 @@ declare const townshipIcons: {
     health: Assets;
     storage: Assets;
     worship: Assets;
+    public: Assets;
+    soulStorage: Assets;
 };

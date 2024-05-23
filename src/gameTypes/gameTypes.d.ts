@@ -21,6 +21,8 @@ interface ItemSearch {
   description?: string;
   type: string;
   slot?:string;
+  namespace:string;
+  namespaceName:string;
 }
 interface BankSearch extends ItemSearch {
     qty: number;
@@ -233,12 +235,12 @@ interface SaveGame {
     agilityPassivePillarActive: number;
     scheduledPushNotifications: StringDictionary<string>;
     randomModifiers: {
-        equipment: NumberDictionary<Partial<ModifierObject<OldSkillModifierData[], number>>>;
-        player: NumberDictionary<Partial<ModifierObject<OldSkillModifierData[], number>>>;
+        equipment: NumberDictionary<unknown>;
+        player: NumberDictionary<unknown>;
     };
     summoningData: OldPlayerSummoningData;
     cookingStockpiles?: OldItemQuantity2[];
-    activeAstrologyModifiers: NumberDictionary<OldPlayerModifierData>[];
+    activeAstrologyModifiers: NumberDictionary<unknown>[];
     tutorialProgress: number;
     tutorialComplete: boolean;
     completedTasks: number[];
@@ -285,29 +287,21 @@ interface SkillObject<T> {
     Astrology: T;
     Township: T;
 }
-declare type SkillName = keyof SkillObject<any>;
 declare type OldPlayerSummoningData = {
     MarksDiscovered: NumberDictionary<number>;
     defaultRecipe?: number[];
 };
-declare type CombatLevels = {
-    Hitpoints: number;
-    Attack: number;
-    Strength: number;
-    Defence: number;
-    Ranged: number;
-    Magic: number;
-    Prayer: number;
-};
+declare type CombatLevelKey = 'Hitpoints'|'Attack'|'Strength'|'Defence'|'Ranged'|'Magic'|'Prayer'|'Corruption';
+declare type CombatLevels = Record<CombatLevelKey, number>
 declare type MapToElement<Type> = {
     [Property in keyof Type]: HTMLElement;
 };
-declare type SlotTypes = 'Helmet' | 'Platebody' | 'Platelegs' | 'Boots' | 'Weapon' | 'Shield' | 'Amulet' | 'Ring' | 'Gloves' | 'Quiver' | 'Cape' | 'Passive' | 'Summon1' | 'Summon2' | 'Consumable' | 'Gem';
-declare type EquipStatKey = 'attackSpeed' | 'stabAttackBonus' | 'slashAttackBonus' | 'blockAttackBonus' | 'rangedAttackBonus' | 'magicAttackBonus' | 'meleeStrengthBonus' | 'rangedStrengthBonus' | 'magicDamageBonus' | 'meleeDefenceBonus' | 'rangedDefenceBonus' | 'magicDefenceBonus' | 'damageReduction' | 'summoningMaxhit';
+declare type EquipStatKey = 'attackSpeed' | 'stabAttackBonus' | 'slashAttackBonus' | 'blockAttackBonus' | 'rangedAttackBonus' | 'magicAttackBonus' | 'meleeStrengthBonus' | 'rangedStrengthBonus' | 'magicDamageBonus' | 'meleeDefenceBonus' | 'rangedDefenceBonus' | 'magicDefenceBonus' | 'summoningMaxhit' | 'damageReduction';
 declare type EquipStatPair = {
     key: EquipStatKey;
     value: number;
 };
+declare type ResistanceMap = Map<DamageType, number>;
 declare type TippyTooltip = import("tippy.js").Instance<import("tippy.js").Props>;
 declare type TippyProps = import("tippy.js").Props;
 declare type OldPurchasedShopItem = {
@@ -321,6 +315,8 @@ declare type EventType = import("mitt").EventType;
 declare type Handler<T = unknown> = import("mitt").Handler<T>;
 declare type WildcardHandler<T = Record<string, unknown>> = import("mitt").WildcardHandler<T>;
 declare type Emitter<Events extends Record<EventType, unknown>> = import("mitt").Emitter<Events>;
+declare type EventHandlerMap<Events extends Record<EventType, unknown>> = import("mitt").EventHandlerMap<Events>;
+
 interface OfflineBase {
     timestamp: number;
 }
@@ -374,4 +370,34 @@ declare interface OldBankItem {
   qty: number;
   tab: number;
   locked: boolean;
+}
+
+/** Utility Type. Sets the specified keys to be required in a type. */
+type PickRequired<T, K extends keyof T> = {
+  [P in K]-?: T[P];
+} & Omit<T, K>;
+
+/** Utility Type. Sets the specified keys to be optional in a type */
+type PickPartial<T, K extends keyof T> = {
+  [P in K]?: T[P];
+} & Omit<T, K>;
+
+/** 
+ * A convenience interface for the Custom Elements API
+ * @see https://developer.mozilla.org/en-US/docs/Web/API/Web_components/Using_custom_elements
+ */
+interface CustomElement {
+  /** Called each time this element is added to the document. Custom element setup should be performed in this method as much as possible */
+  connectedCallback?(): void;
+  /** Called each time this element is removed from the document. */
+  disconnectedCallback?(): void;
+  /** Called each time this element is moved to a new document */
+  adoptedCallback?(): void;
+  /**
+   * Called when an attribute whose name is within the observedAttributes property is added, modified, removed or replaced
+   * @param name The name of the attribute which changed
+   * @param oldValue The attributes old value
+   * @param newValue The attributes new value
+   */
+  attributeChangedCallback?(name: string, oldValue: string|null, newValue: string|null): void;
 }
