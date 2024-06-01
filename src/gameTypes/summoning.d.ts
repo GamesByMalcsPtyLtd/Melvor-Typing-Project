@@ -1,4 +1,12 @@
 declare type SummoningTier = 1 | 2 | 3 | 4 | 5;
+declare type SummoningCategoryType = 'Mark' | 'Tablet' | 'Synergy';
+interface SummoningCategoryData extends SkillCategoryData {
+    type: SummoningCategoryType;
+}
+declare class SummoningCategory extends SkillCategory {
+    readonly type: SummoningCategoryType;
+    constructor(namespace: DataNamespace, data: SummoningCategoryData, skill: AnySkill, game: Game);
+}
 interface SummoningRecipeData extends SingleProductArtisanSkillRecipeData {
     markMedia: string;
     nonShardItemCosts: string[];
@@ -19,7 +27,7 @@ interface SummoningRecipeModificationData extends SingleProductArtisanSkillRecip
     };
     maxMarkLevel?: number;
 }
-declare class SummoningRecipe extends CategorizedArtisanRecipe<SkillCategory> {
+declare class SummoningRecipe extends CategorizedArtisanRecipe<SummoningCategory> {
     nonShardItemCosts: AnyItem[];
     tier: SummoningTier;
     skills: AnySkill[];
@@ -61,7 +69,7 @@ declare class SummoningSynergy implements SoftDataDependant<SummoningSynergyData
     registerSoftDependencies(data: SummoningSynergyData, game: Game): void;
 }
 interface SummoningSkillData extends MasterySkillData {
-    categories?: SkillCategoryData[];
+    categories?: SummoningCategoryData[];
     recipes?: SummoningRecipeData[];
     synergies?: SummoningSynergyData[];
 }
@@ -71,7 +79,7 @@ interface SummoningModificationData extends MasterySkillModificationData {
 declare type SummoningEvents = {
     action: SummoningActionEvent;
 } & SkillWithMasteryEvents;
-declare class Summoning extends ArtisanSkill<SummoningRecipe, SummoningSkillData, AnyItem, SummoningEvents, SummoningModificationData> implements SkillCategoryObject<SkillCategory> {
+declare class Summoning extends ArtisanSkill<SummoningRecipe, SummoningSkillData, AnyItem, SummoningEvents, SummoningModificationData> implements SkillCategoryObject<SummoningCategory> {
     readonly _media = Assets.Summoning;
     get levelCompletionBreakdown(): LevelCompletionBreakdown[];
     isMasteryActionUnlocked(action: SummoningRecipe): boolean;
@@ -82,7 +90,7 @@ declare class Summoning extends ArtisanSkill<SummoningRecipe, SummoningSkillData
     selectionTabs: Map<SkillCategory, SummoningSelectionTabElement>;
     get categoryMenu(): RealmedCategoryMenuElement;
     renderQueue: SummoningRenderQueue;
-    categories: NamespaceRegistry<SkillCategory>;
+    categories: NamespaceRegistry<SummoningCategory>;
     synergies: SummoningSynergy[];
     synergiesByItem: Map<AnyItem, Map<AnyItem, SummoningSynergy>>;
     recipesByProduct: Map<AnyItem, SummoningRecipe>;

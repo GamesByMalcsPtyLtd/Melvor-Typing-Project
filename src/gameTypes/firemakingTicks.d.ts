@@ -169,13 +169,14 @@ declare class Firemaking extends CraftingSkill<FiremakingLog, FiremakingSkillDat
     selectOil(oil: FiremakingOilItem): void;
     render(): void;
     renderBonfireStatus(): void;
+    renderBonfireQuantity(): void;
     renderFireProgress(): void;
     renderBonfireProgress(): void;
     renderOilProgress(): void;
     renderOilStatus(): void;
     renderSelectedLog(): void;
     renderSelectedOil(): void;
-    renderItemQuantities(): void;
+    renderLogQuantity(): void;
     renderLogSelection(): void;
     renderOilQuantities(): void;
     renderOilSelection(): void;
@@ -190,6 +191,7 @@ declare class FiremakingRenderQueue extends GatheringSkillRenderQueue<Firemaking
     selectedLog: boolean;
     bonfireProgress: boolean;
     bonfireStatus: boolean;
+    bonfireQty: boolean;
     logQty: boolean;
     logInfo: boolean;
     selectedOil: boolean;

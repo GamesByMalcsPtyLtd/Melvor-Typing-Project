@@ -109,8 +109,8 @@ declare class ModifierTable {
     updateModifiers(source: ModifierSource, negMult: number, posMult: number): void;
     addTable(table: ModifierTable): void;
     removeTable(table: ModifierTable): void;
-    getActiveModifierDescriptions(): [string, string][];
-    getEnemyModifierDescriptions(): [string, string][];
+    getActiveModifierDescriptions(): StatDescription[];
+    getEnemyModifierDescriptions(): StatDescription[];
     getModifierDescriptionsAsNodes<T extends keyof HTMLElementTagNameMap>(tagName: T, additionalClasses?: string[]): HTMLElementTagNameMap[T][];
     /** Gets a log of the modifiers that are contained in this object. Useful for debugging. */
     getLog(): NameValuePair[];
@@ -330,6 +330,7 @@ declare class PlayerModifierTable extends CharacterModifierTable {
     readonly skillXP: number;
     readonly flatMiningNodeHP: number;
     readonly dungeonEquipmentSwapping: number;
+    readonly strongholdEquipmentSwapping: number;
     readonly equipmentSets: number;
     readonly autoSlayerUnlocked: number;
     readonly treeCutLimit: number;
@@ -386,6 +387,8 @@ declare class PlayerModifierTable extends CharacterModifierTable {
     readonly magicDamageBonus: number;
     readonly agilityObstacleCost: number;
     readonly freeCompost: number;
+    readonly compostPreservationChance: number;
+    readonly bypassCompostPreservationChance: number;
     readonly offItemChance: number;
     readonly miningGemChance: number;
     readonly bonusCoalMining: number;

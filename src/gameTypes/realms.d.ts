@@ -16,6 +16,16 @@ declare class Realm extends NamespacedObject {
     registerSoftDependencies(data: RealmData, game: Game): void;
     get isUnlocked(): boolean;
 }
+declare class RealmManager {
+    game: Game;
+    readonly unlockUnlisteners: Map<Realm, VoidFunction[]>;
+    constructor(game: Game);
+    onLoad(): void;
+    assignUnlockListeners(): void;
+    onRealmRequirementMet(realm: Realm): void;
+    queueRealmUnlockedModal(realm: Realm): void;
+    queueRealmUnlockRenders(realm: Realm): void;
+}
 interface RealmedObjectData extends IDData {
     /** Optional. The ID of the realm the object belongs to. Defaults to melvorD:Melvor */
     realm?: string;

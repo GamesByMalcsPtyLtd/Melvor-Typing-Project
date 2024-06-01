@@ -111,11 +111,11 @@ declare class ModifierValue extends ModifierScope implements IModifierValue {
         description: string;
         isNegative: boolean;
     };
-    print(negMult?: number, posMult?: number, precision?: number): [string, string];
-    printEnemy(negMult?: number, posMult?: number, precision?: number, showPrefix?: boolean): [string, string];
+    print(negMult?: number, posMult?: number, precision?: number): StatDescription;
+    printEnemy(negMult?: number, posMult?: number, precision?: number, showPrefix?: boolean): StatDescription;
     getTemplatedDescription(prefix: string, postfix: string): string;
     getTemplateData(includeSign: boolean, negMult?: number, posMult?: number, precision?: number): Record<string, string>;
-    addEffectTemplateData(templateData: Record<string, string>, prefix: string, postfix: string): void;
+    addEffectTemplateData(templateData: Record<string, string>, prefix: string, postfix: string, mult?: number): void;
     addDescriptionTemplateData(templateData: Record<string, string> | undefined, includeSign: boolean, prefix: string, postfix: string): Record<string, string>;
     static readonly posTextClass = "text-success";
     static readonly negTextClass = "font-w700 text-danger";
@@ -261,6 +261,7 @@ declare class Modifier extends NamespacedObject {
     getScopingFromDataWithAlias(data: ModifierScopeData, alias: ModifierAlias): ModifierScoping;
     hasScoping(scope: IModifierScope): boolean;
     getScopingFromKey(scopeKey: number): ModifierScoping | undefined;
+    static formatTotalValue(includeSign: boolean, value: number, precision?: number, percent?: boolean): string;
     static getScopeKey(scope: ModifierQueryParams): number;
     static getIdFromKey(key: string): string;
     static valueTranspiler: IExprTranspiler<(value: number) => number>;
@@ -294,8 +295,6 @@ declare function formatModifiers<T>(formatter: DescriptionFormatter<T>, modifier
 declare function addEffectModifierTemplateData(templateData: StringDictionary<string>, modifiers: ModifierValue[], prefix: string): void;
 declare function getModifierDataDescriptions(modifiers: ModifierValue[], prefix: string): string[];
 declare function generateModifierDataDescription(modifiers: ModifierValue[], key: string): string;
-/** Pass a modifier description through here. Applies strike through if modifier is disabled */
-declare function disableModifierPass(modifier: Modifier, desc: string): string;
 /** Gets an array of plain modifier descriptions from data*/
 declare function getPlainModifierDescriptions(modifiers: ModifierValue[]): string[];
 declare function containsDisabledModifier(modifiers: ModifierValue[] | undefined): boolean;

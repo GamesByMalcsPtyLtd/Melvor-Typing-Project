@@ -224,7 +224,7 @@ interface CombatAreaData extends RealmedObjectData {
     requiredLanguages?: string[];
     gamemodeEntryRequirements?: AnyGamemodeRequirementData[];
     combatTriangleSet?: string;
-    disallowDamageTypes?: string[];
+    allowedDamageTypeIDs?: string[];
     overrideDamageType?: string;
     allowedGamemodeIDs?: string[];
 }
@@ -249,7 +249,7 @@ interface CombatAreaModificationData extends IDData {
         add?: AnyRequirementData[];
         remove?: string[];
     };
-    disallowDamageTypes?: {
+    allowedDamageTypeIDs?: {
         add?: string[];
         remove?: string[];
     };
@@ -341,8 +341,8 @@ declare class CombatArea extends RealmedObject implements SoftDataDependant<Comb
     allowSlayerKills: boolean;
     /** If monsters in this area can be automatically jumped to */
     allowAutoJump: boolean;
-    /** Disallow fighting in this combat area if player is using damage type */
-    disallowDamageTypes: Set<DamageType>;
+    /** Determines which damage types are allowed in this area. Unset allows all damage types */
+    allowedDamageTypes: Set<DamageType>;
     /** If set, override all monster damage types in the area with this */
     overrideDamageType?: DamageType;
     allowedGamemodes: Set<Gamemode>;
@@ -353,6 +353,7 @@ declare class CombatArea extends RealmedObject implements SoftDataDependant<Comb
     /** Constructs a CombatAreaEffect object from data */
     constructAreaEffect(data: CombatAreaEffectData, game: Game): CombatAreaEffect;
     isRequiredGamemode(gamemode: Gamemode): boolean;
+    canEnterWithDamageType(damageType: DamageType): boolean;
 }
 declare class SlayerArea extends CombatArea {
     areaEffect?: CombatAreaEffect;

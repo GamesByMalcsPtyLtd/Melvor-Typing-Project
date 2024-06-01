@@ -102,6 +102,7 @@ declare class AttackSpell extends CombatSpell {
     spellbook: AttackSpellbook;
     modQuery: ModifierQuery;
     constructor(namespace: DataNamespace, data: AttackSpellData, game: Game);
+    registerSoftDependencies(data: CombatSpellData, game: Game): void;
 }
 interface CurseSpellData extends CombatSpellData {
     /** The ID of the effect to apply when casting the curse */

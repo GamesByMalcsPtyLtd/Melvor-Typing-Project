@@ -15,6 +15,7 @@ declare let lolYouDiedGetRekt: boolean;
 /** Multiplier for HP and damage values */
 declare let numberMultiplier: number;
 declare let returnToGameAfterSubmission: boolean;
+declare let modalQueuePaused: boolean;
 declare const modalQueue: SweetAlertOptions[];
 declare const cloudSaveHeartbeatLevel = 0;
 declare let loadingOfflineProgress: boolean;
@@ -67,6 +68,10 @@ declare const startIAPPurchaseInterval: () => void;
 declare const getAndroidIAPStatus: () => Promise<unknown>;
 declare const updateMobilePurchaseStatus: () => void;
 declare const getLockedBtn: (productID: string) => string;
+/** Temporarily stops modals from being automatically opened when added to the queue */
+declare function pauseModalQueue(): void;
+/** Resumes modals being automatically opened when added to the queue, and opens the next one */
+declare function resumeModalQueue(): void;
 declare function openNextModal(): void;
 declare function addModalToQueue(modal: SweetAlertOptions): void;
 declare function showBaneCompletionModal(): void;

@@ -314,18 +314,22 @@ interface ConditionalModifierData {
     description?: string;
     descriptionLang?: string;
 }
+interface ConditionalModifiersModificationData {
+    add?: ConditionalModifierData[];
+    remove?: string[];
+}
 declare class ConditionalModifier implements SoftDataDependant<ConditionalModifierData> {
     condition: ConditionalModifierCondition;
     modifiers?: ModifierValue[];
     enemyModifiers?: ModifierValue[];
     isNegative: boolean;
-    get description(): string | undefined;
     _description?: string;
     _descriptionLang?: string;
     constructor(data: ConditionalModifierData, game: Game, selfItem?: EquipmentItem);
     registerSoftDependencies(data: ConditionalModifierData, game: Game): void;
-    getTemplateData(): Record<string, string>;
-    getDescription(): [string, string] | undefined;
+    getDescription(negMult?: number, posMult?: number): StatDescription | undefined;
+    getDescriptionTemplate(): string | undefined;
+    getTemplateData(mult: number): Record<string, string>;
     static getCombatConditionFromData(data: CombatConditionData, game: Game): AnyCharacterCondition;
     static getConditionFromData(data: ConditionalModifierConditionData, game: Game, selfItem?: EquipmentItem): ConditionalModifierCondition;
 }

@@ -20,6 +20,7 @@ interface CorruptionEffectTableRow {
 }
 declare class CorruptionEffectTable implements EncodableObject {
     game: Game;
+    corruption: Corruption;
     allRows: CorruptionEffectTableRow[];
     unlockedRows: CorruptionEffectTableRow[];
     lockedRows: CorruptionEffectTableRow[];
@@ -29,7 +30,7 @@ declare class CorruptionEffectTable implements EncodableObject {
     get allEffectRows(): CorruptionEffectTableRow[];
     /** Gets the number of corruptions the player has unlocked */
     get numberUnlocked(): number;
-    constructor(game: Game);
+    constructor(game: Game, corruption: Corruption);
     /** Gets a random effect applicator */
     getApplicator(monsterLevel?: number, exclude?: CombatEffect): SingleCombatEffectApplicator;
     getRandomUnlockedRow(exclude?: CombatEffect): CorruptionEffectTableRow;

@@ -303,6 +303,8 @@ declare class Agility extends GatheringSkill<AgilityObstacle, AgilitySkillData, 
     getObtainableItems(): Set<AnyItem>;
     getRegistry(type: ScopeSourceType): NamespaceRegistry<NamedObject> | undefined;
     getPkgObjects(pkg: GameDataPackage, type: ScopeSourceType): IDData[] | undefined;
+    static searchArray: AgilitySearch[];
+    static updateSearchArray(): void;
 }
 declare class AgilityRenderQueue extends GatheringSkillRenderQueue<AgilityObstacle> {
     /** Updates the intervals, GP and XP for each obstacle */
@@ -316,3 +318,10 @@ declare class AgilityRenderQueue extends GatheringSkillRenderQueue<AgilityObstac
     /** Sets the start/stop button disabled/enabled */
     startButtons: boolean;
 }
+declare type AgilitySearch = {
+    modifiers: string;
+    category: number;
+    course: AgilityCourse;
+    obstacle: AgilityObstacle | undefined;
+    pillar: AgilityPillar | undefined;
+};

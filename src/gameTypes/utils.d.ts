@@ -58,14 +58,36 @@ declare function joinAsList(list: string[]): string;
 declare function joinAsOrList(list: string[]): string;
 declare function joinAsLineBreakList(list: string[]): string;
 declare const joinAsSuperList: (list: string[]) => string;
+interface StatDescription {
+    text: string;
+    isNegative: boolean;
+    isDisabled: boolean;
+}
 /** A function used to format the descriptions of modifiers and effect applicators */
-declare type DescriptionFormatter<T> = (description: string, textClass: string) => T;
-/** Formats a description without any HTML syntax or styling */
+declare type DescriptionFormatter<T> = (description: StatDescription) => T;
+declare function getStandardDescTextClass(description: StatDescription, fontWeight: boolean): string;
+/** Formats a description, with no HTML syntax. For use in search functionality */
+declare const searchDescriptionFormatter: DescriptionFormatter<string>;
+/** Formats a description, without any positive or negative colours, but with disabled descriptions wrapped in span elements */
 declare const plainDescriptionFormatter: DescriptionFormatter<string>;
+/**
+ * Gets a description formatter that returns an HTML string for elements of the given type
+ * @param tagName The tag-name of the type of element to format to
+ * @param className Optional additional className to add to the elements
+ * @param fontWeight If the default font-weight classes should be added to the elements
+ * @returns
+ */
+declare const getElementHTMLDescriptionFormatter: <T extends keyof HTMLElementTagNameMap>(tagName: T, className?: string, fontWeight?: boolean) => DescriptionFormatter<string>;
 /** Formats a description as HTML with span elements */
 declare const spanHTMLDescriptionFormatter: DescriptionFormatter<string>;
-/** Returns a description formatter that returns span elements */
-declare const getSpanElementDescriptionFormatter: (className?: string) => DescriptionFormatter<HTMLSpanElement>;
+/**
+ * Returns a description formatter that returns elements of the given type
+ * @param tagName The tag-name of the type of element to format to
+ * @param className Optional additional className to add to the elements
+ * @param fontWeight If the default font-weight classes should be added to the elements
+ * @returns
+ */
+declare const getElementDescriptionFormatter: <T extends keyof HTMLElementTagNameMap>(tagName: T, className?: string, fontWeight?: boolean) => DescriptionFormatter<HTMLElementTagNameMap[T]>;
 declare const spanDescriptionFormatter: DescriptionFormatter<HTMLSpanElement>;
 declare function pluralS(number: number): "" | "s";
 declare function checkMediaQuery(mediaQuery: string): boolean;
@@ -94,6 +116,8 @@ declare type ElemCreationOptions = {
     attributes?: [string, string][];
     /** Element ID */
     id?: string;
+    /** Sets the element's innerHTML */
+    innerHTML?: string;
 };
 declare function fireBottomToast(text: string, duration?: number): void;
 declare function fireTopToast(text: string, duration?: number): void;

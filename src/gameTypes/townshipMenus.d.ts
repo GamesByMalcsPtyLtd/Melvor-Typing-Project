@@ -27,7 +27,7 @@ declare class TownshipTownBiomeSelectElement extends HTMLElement implements Cust
     levelRequirement: HTMLDivElement;
     popRequirement: HTMLDivElement;
     abyssalLevelRequirement: HTMLDivElement;
-    publicRequirement: HTMLDivElement;
+    fortificationRequirement: HTMLDivElement;
     buildAvailable: HTMLSpanElement;
     constructor();
     connectedCallback(): void;
@@ -53,7 +53,7 @@ declare class TownshipBuildingSummaryElement extends HTMLElement implements Cust
     levelRequirement: HTMLDivElement;
     popRequirement: HTMLDivElement;
     abyssalLevelRequirement: HTMLDivElement;
-    publicRequirement: HTMLDivElement;
+    fortificationRequirement: HTMLDivElement;
     constructor();
     connectedCallback(): void;
     setBuilding(building: TownshipBuilding, township: Township): void;
@@ -73,7 +73,7 @@ declare class BuildingRequirementsElement extends HTMLElement implements CustomE
     levelRequirement: HTMLLIElement;
     popRequirement: HTMLLIElement;
     abyssalLevelRequirement: HTMLLIElement;
-    publicRequirement: HTMLLIElement;
+    fortificationRequirement: HTMLLIElement;
     constructor();
     connectedCallback(): void;
     applyReqFormatting(req: HTMLElement, isMet: boolean): void;

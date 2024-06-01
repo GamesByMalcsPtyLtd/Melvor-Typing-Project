@@ -189,6 +189,8 @@ declare abstract class Skill<DataType extends BaseSkillData, Events extends Skil
     sortMilestones(): void;
     /** Readonly. Returns the current virtual level of the skill */
     get virtualLevel(): number;
+    /** Readonly. Returns the current virtual abyssal level of the skill */
+    get virtualAbyssalLevel(): number;
     /** The absolute maximum skill level achievable */
     get maxLevelCap(): number;
     _currentLevelCap: number;
@@ -705,9 +707,9 @@ declare abstract class SkillWithMastery<ActionType extends MasteryAction, DataTy
     updateTotalCurrentMasteryLevel(): void;
     /** Returns the sum of all current mastery levels */
     get totalCurrentMasteryLevel(): number;
-    _sortedMasteryActionsPerRealm: Map<Realm, MasteryAction[]>;
+    _sortedMasteryActionsPerRealm: Map<Realm, ActionType[]>;
     /** Gets an array of mastery actions belonging to a given realm, sorted by display order */
-    getSortedMasteryActionsInRealm(realm: Realm): MasteryAction[];
+    getSortedMasteryActionsInRealm(realm: Realm): ActionType[];
     /** Returns the sum of all current mastery levels for within a specific realm */
     getTotalCurrentMasteryLevelInRealm(realm: Realm): number;
     getTotalCurrentMasteryLevels(namespace: string): number;

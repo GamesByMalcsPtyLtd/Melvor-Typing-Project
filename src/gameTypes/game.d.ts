@@ -194,9 +194,12 @@ declare class Game extends GameEventEmitter<GameEvents> implements Serializable,
     randomFragmentTable: DropTable;
     randomFiremakingOilTable: DropTable;
     ancientRelics: NamespaceRegistry<AncientRelic>;
+    ancientRelicsDisplayOrder: NamespacedArray<AnySkill>;
     skillTreesDisplayOrder: NamespacedArray<AnySkill>;
     /** Registry of all modifiers */
     modifierRegistry: ModifierRegistry;
+    /** Utility class for managing realm unlocks */
+    realmManager: RealmManager;
     softDataRegQueue: SoftDataDependantElement<any>[];
     get unlockedRealms(): Realm[];
     get playerCombatLevel(): number;
@@ -273,8 +276,11 @@ declare class Game extends GameEventEmitter<GameEvents> implements Serializable,
      */
     getModifierValuesFromData(data: ModifierValuesRecordData): ModifierValue[];
     getEnemyModifierValuesFromData(data: ModifierValuesRecordData): ModifierValue[];
+    _modifyModifierValues(modifiers: ModifierValue[], modData: ModifierValuesModificationData, getAlias: (key: string) => ModifierAliasInfo | undefined, getValues: (data: ModifierValuesRecordData) => ModifierValue[]): ModifierValue[];
     /** Applies modification data to a ModifierValue[] array, returning the mutated array */
     modifyModifierValues(modifiers: ModifierValue[], modData: ModifierValuesModificationData): ModifierValue[];
+    /** Applies modification data to an enemy ModifierValue[] array, returning the mutated array */
+    modifyEnemyModifierValues(modifiers: ModifierValue[], modData: ModifierValuesModificationData): ModifierValue[];
     /** Constructs a Single or Table CombatEffectApplicator from data */
     getCombatEffectApplicatorFromData(data: AnyCombatEffectApplicatorData): AnyCombatEffectApplicator;
     /** Constructs an array of Single or Table CombatEffectApplictors from an array of data */
@@ -468,6 +474,7 @@ interface OfflineSnapshot {
     soulPoints: number;
     abyssalExperience: Map<AnySkill, number>;
     abyssalLevels: Map<AnySkill, number>;
+    corruptionsUnlocked: number;
 }
 interface MiningNodeSnapshot {
     totalFound: number;

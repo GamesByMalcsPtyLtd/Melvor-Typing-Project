@@ -132,7 +132,7 @@ declare class RealmedCategoryMenuElement extends HTMLElement implements CustomEl
     categoryOptions: Map<SkillCategory, CategoryMenuOptionElement>;
     constructor();
     connectedCallback(): void;
-    addOptions(categories: SkillCategory[], expandText: string, callbackFn: (category: SkillCategory) => void): void;
+    addOptions<T extends SkillCategory>(categories: T[], expandText: string, callbackFn: (category: T) => void): void;
     updateRealmUnlock(realm: Realm): void;
     highlightOption(option: SkillCategory): void;
     unhighlightOption(option: SkillCategory): void;

@@ -54,8 +54,6 @@ declare function exportSave(update?: boolean): Promise<void>;
 declare function setSlotToSaveString(slotID: number, saveString: string): Promise<void>;
 /** Attempts to import a save to the specified slot. Returns a promise which if resolved to true means the import was a success. */
 declare function importSaveToSlot(saveString: string, slotID: number): Promise<boolean>;
-declare function openDeleteMelvorCloudAccount(): void;
-declare function confirmDeleteMelvorCloudAccount(): void;
 /**
  * Copies a given string to the clipboard
  * @param input Text to copy to the clipboard
@@ -154,9 +152,9 @@ declare let inFocus: boolean;
 declare const onloadEvent: (accessCheck?: boolean) => void;
 declare function confirmedAuthenticated(): void;
 declare function checkIfAuthenticated(): Promise<void>;
-declare const INTERFACE_VERSION = 152;
+declare const INTERFACE_VERSION = 159;
 declare function loadGameInterface(accessCheck?: boolean): Promise<void>;
-declare const DATA_VERSION = 450;
+declare const DATA_VERSION = 458;
 declare function changePageCharacterSelection(page: CharacterSelectPage): void;
 /** Future announcement handler that will occur dynamically. For now this is hard coded. */
 declare function updateUIForAnnouncements(): void;

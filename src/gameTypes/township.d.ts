@@ -6,7 +6,7 @@ interface TownshipBiomeData extends IDData {
     media: string;
     /** The Tier of Biome. Determines Population and level requirements to build in it. Integer between [1-8]. */
     tier: number;
-    /** The Abyssal Tier of Biome. Determines Protection and abyssal level requirements to build in it. Integer between [0-7]. */
+    /** The Abyssal Tier of Biome. Determines Fortification and abyssal level requirements to build in it. Integer between [0-7]. */
     abyssalTier?: number;
 }
 declare const enum TownshipConvertQtyType {
@@ -60,8 +60,8 @@ interface TownshipBuildingProvidesData {
     resources: IDQuantity[];
     /** Base worship provided by the building */
     worship?: number;
-    /** ItA Only: Base Protected provided by the building */
-    public?: number;
+    /** ItA Only: Base Fortification provided by the building */
+    fortification?: number;
     /** ItA Only: Soul storage cap provided by the building */
     soulStorage?: number;
 }
@@ -78,7 +78,7 @@ declare class TownshipBuildingProvides {
     storage: number;
     resources: Map<TownshipResource, number>;
     worship: number;
-    public: number;
+    fortification: number;
     soulStorage: number;
     constructor(data: TownshipBuildingProvidesData, game: Game);
     resourceCount(resource: TownshipResource): number;
@@ -103,7 +103,7 @@ interface TownshipBuildingData extends IDData, IStatObjectData {
     maxUpgrades: number;
     /** Optional. Whether the building efficiency automatically decays over time. Default is true */
     canDegrade: boolean;
-    /** The Abyssal Tier of the building. Determines Township Abyssal Level and protection requirements. Integer between [0,7] */
+    /** The Abyssal Tier of the building. Determines Township Abyssal Level and Fortification requirements. Integer between [0,7] */
     abyssalTier?: number;
 }
 declare class TownshipBuilding extends NamespacedObject {
@@ -452,7 +452,7 @@ declare class Township extends Skill<TownshipSkillData, TownshipEvents, Township
     /** The base rate of xp gained per tick, before modifiers */
     get baseXPRate(): number;
     get currentPopulation(): number;
-    get currentProtected(): number;
+    get currentFortification(): number;
     get currentEducation(): number;
     get currentHappiness(): number;
     get nightfallSeasonEnabled(): boolean;
@@ -477,14 +477,14 @@ declare class Township extends Skill<TownshipSkillData, TownshipEvents, Township
     getBaseHappinessProvidesForBiome(building: TownshipBuilding, biome: TownshipBiome | undefined): number;
     getBaseWorshipProvidesForBiome(building: TownshipBuilding, biome: TownshipBiome | undefined): number;
     getBaseStorageProvidesForBiome(building: TownshipBuilding, biome: TownshipBiome | undefined): number;
-    getBaseProtectedProvidesForBiome(building: TownshipBuilding, biome: TownshipBiome | undefined): number;
+    getBaseFortificationProvidesForBiome(building: TownshipBuilding, biome: TownshipBiome | undefined): number;
     getBaseSoulStorageProvidesForBiome(building: TownshipBuilding, biome: TownshipBiome | undefined): number;
     getPopulationProvidesForBiome(building: TownshipBuilding, biome: TownshipBiome): number;
     getEducationProvidesForBiome(building: TownshipBuilding, biome: TownshipBiome): number;
     getHappinessProvidesForBiome(building: TownshipBuilding, biome: TownshipBiome): number;
     getWorshipProvidesForBiome(building: TownshipBuilding, biome: TownshipBiome): number;
     getStorageProvidesForBiome(building: TownshipBuilding, biome: TownshipBiome): number;
-    getProtectedProvidesForBiome(building: TownshipBuilding, biome: TownshipBiome): number;
+    getFortificationProvidesForBiome(building: TownshipBuilding, biome: TownshipBiome): number;
     getSoulStorageProvidesForBiome(building: TownshipBuilding, biome: TownshipBiome): number;
     getProvidesForBiome(building: TownshipBuilding, biome: TownshipBiome | undefined): TownshipBuildingProvides | undefined;
     get currentWorshipName(): string;
@@ -588,7 +588,7 @@ declare class Township extends Skill<TownshipSkillData, TownshipEvents, Township
     tickSeason(): void;
     processAbyssalWaveOnClick(): void;
     getAbyssalXPOnWin(): number;
-    getAbyssalXPOnLoss(protectionValue: number): number;
+    getAbyssalXPOnLoss(fortificationValue: number): number;
     processAbyssalWave(): void;
     onAbyssalWaveProcessed(): void;
     removeArmourWeaponryAmount(amount: number): void;
@@ -621,7 +621,7 @@ declare class Township extends Skill<TownshipSkillData, TownshipEvents, Township
     getMaxSoulStorage(): number;
     /** Returns the total storage used by all resources, excepting GP. */
     getUsedSoulStorage(): number;
-    computeTownProtected(): void;
+    computeFortification(): void;
     modifyBuildingResourceCost(quantity: number): number;
     getBuildingCostsForBiome(building: TownshipBuilding, biome: TownshipBiome | undefined): ResourceQuantity[];
     canAffordBuilding(building: TownshipBuilding, biome: TownshipBiome | undefined, qty?: number): boolean;
@@ -640,7 +640,7 @@ declare class Township extends Skill<TownshipSkillData, TownshipEvents, Township
     checkTierPopulationReqs(tier: number): boolean;
     checkTierLevelReqs(tier: number): boolean;
     checkTierReqs(tier: number): boolean;
-    checkAbyssalTierProtectionReqs(tier: number): boolean;
+    checkAbyssalTierFortificationReqs(tier: number): boolean;
     checkAbyssalTierLevelReqs(tier: number): boolean;
     checkAbyssalTierReqs(tier: number): boolean;
     isBiomeUnlocked(biome: TownshipBiome): boolean;
@@ -753,10 +753,10 @@ declare class TownshipUI {
                 happiness: HTMLDivElement;
                 education: HTMLDivElement;
                 health: HTMLDivElement;
-                public: HTMLDivElement;
+                fortification: HTMLDivElement;
                 soulStorage: HTMLDivElement;
             };
-            public: HTMLSpanElement;
+            fortification: HTMLSpanElement;
         };
         trader: {
             trader: HTMLDivElement;
@@ -835,7 +835,7 @@ declare class TownshipUI {
     displayWorshipTooltip(): string;
     displayXPInfo(): string;
     updatePopulation(): void;
-    updateProtected(): void;
+    updateFortification(): void;
     updateHappiness(): void;
     updateEducation(): void;
     updateHealth(): void;
@@ -925,7 +925,7 @@ interface BuildingRequirement {
     level: number;
 }
 interface BuildingAbyssalRequirement {
-    protection: number;
+    fortification: number;
     abyssalLevel: number;
 }
 declare class TownshipData implements EncodableObject {
@@ -954,8 +954,8 @@ declare class TownshipData implements EncodableObject {
     previousSeason?: TownshipSeason;
     /** Save State Property. Stores health value of town. */
     health: number;
-    /** ItA Only: Stores to current public of the Town */
-    public: number;
+    /** ItA Only: Stores to current fortification of the Town */
+    fortification: number;
     /** ItA Only: Save State Property. Stores to current amount of Souls collected */
     souls: number;
     /** ItA Only: Base soul storage provided by all buildings */
@@ -974,6 +974,6 @@ declare const townshipIcons: {
     health: Assets;
     storage: Assets;
     worship: Assets;
-    public: Assets;
+    fortification: Assets;
     soulStorage: Assets;
 };

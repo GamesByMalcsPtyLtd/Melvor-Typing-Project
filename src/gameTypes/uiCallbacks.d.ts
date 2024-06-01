@@ -36,7 +36,7 @@ declare let selectedCombatMenu: CombatMenuId;
 declare function changeCombatMenu(id: CombatMenuId): void;
 declare function togglePlayerContainer(): void;
 /** Callback function that changes the summoning category */
-declare function switchSummoningCategory(category: SkillCategory): void;
+declare function switchSummoningCategory(category: SummoningCategory): void;
 /** Callback function that opens the summoning synergy breakdown menu */
 declare function openSynergiesBreakdown(): void;
 /** Callback function that opens the browse corruptions menu */
@@ -71,3 +71,4 @@ declare function filterItemsByAbyssalLevel(skill: AnySkill): string[];
 declare function openSkillTreeModalFromSidebar(): void;
 declare function openCombatTriangleModal(): void;
 declare function openViewMonsterListModal(): void;
+declare function displayReportContentSwal(): void;

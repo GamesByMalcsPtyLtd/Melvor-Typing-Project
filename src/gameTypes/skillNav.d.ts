@@ -77,6 +77,7 @@ declare class SkillHeaderElement extends HTMLElement implements CustomElement {
     upperContainer: HTMLDivElement;
     skillLevel: HTMLSpanElement;
     skillXp: HTMLSpanElement;
+    combatLevelXpLimit: HTMLSpanElement;
     abyssalLevel: HTMLSpanElement;
     abyssalXp: HTMLSpanElement;
     upgradeChainContainer: HTMLDivElement;
@@ -93,6 +94,7 @@ declare class SkillHeaderElement extends HTMLElement implements CustomElement {
     updateLevel(game: Game, skill: AnySkill): void;
     updateAbyssalXP(game: Game, skill: AnySkill): void;
     updateAbyssalLevel(game: Game, skill: AnySkill): void;
+    toggleCombatLevelCap(show: boolean): void;
     appendUpper(...nodes: Node[]): void;
     appendLower(...nodes: Node[]): void;
 }

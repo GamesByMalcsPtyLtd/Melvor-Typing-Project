@@ -4,6 +4,12 @@ interface IStatObjectData {
     conditionalModifiers?: ConditionalModifierData[];
     combatEffects?: TriggeredCombatEffectApplicatorData[];
 }
+interface IStatObjectModificationData {
+    modifiers?: ModifierValuesModificationData;
+    enemyModifiers?: ModifierValuesModificationData;
+    combatEffects?: CombatEffectApplicatorModificationData;
+    conditionalModifiers?: ConditionalModifiersModificationData;
+}
 interface IStatObject {
     modifiers?: ModifierValue[];
     enemyModifiers?: ModifierValue[];
@@ -20,9 +26,11 @@ declare class StatObject implements IStatObject, SoftDataDependant<IStatObjectDa
     get hasStats(): boolean;
     constructor(data: IStatObjectData, game: Game, where: string);
     registerSoftDependencies(data: IStatObjectData, game: Game): void;
+    applyDataModification(data: IStatObjectModificationData, game: Game): void;
     describeAsSpanHTML(negMult?: number, posMult?: number): string;
     describeLineBreak(): string;
     describeAsSpans(negMult?: number, posMult?: number): HTMLSpanElement[];
+    describeSearch(): string;
     describePlain(): string;
     /**
      * Gets the descriptions of a stat providing object
@@ -32,7 +40,7 @@ declare class StatObject implements IStatObject, SoftDataDependant<IStatObjectDa
      * @param includeZero If zero valued effects should be included
      * @returns An array of [description, textClass] tuples
      */
-    static getDescriptions(statObject: IStatObject, negMult?: number, posMult?: number, includeZero?: boolean): [string, string][];
+    static getDescriptions(statObject: IStatObject, negMult?: number, posMult?: number, includeZero?: boolean): StatDescription[];
     /**
      * Checks if a description should be included when getting descriptions
      * @param isNegative If the given effect is negative to the player
@@ -93,5 +101,5 @@ declare class StatObjectSummary {
     combatEffects: CombatEffectApplicator[];
     conditionalModifiers: ConditionalModifier[];
     addStatObject(source: ModifierSource, stats: IStatObject, negMult?: number, posMult?: number): void;
-    getAllDescriptions(): [string, string][];
+    getAllDescriptions(): StatDescription[];
 }

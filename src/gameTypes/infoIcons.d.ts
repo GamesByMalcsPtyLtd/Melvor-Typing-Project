@@ -271,7 +271,6 @@ declare class CookingStockpileIconElement extends InfoIconElement {
     itemImage: HTMLImageElement;
     quantity: HTMLElement;
     constructor();
-    connectedCallback(): void;
     unsetItem(): void;
     setItem(item: AnyItem, quantity: number): void;
     setOnClick(callback: VoidFunction): void;

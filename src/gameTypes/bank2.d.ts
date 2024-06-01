@@ -224,6 +224,7 @@ declare class Bank extends GameEventEmitter<BankEvents> implements EncodableObje
     getSelectedItemInfo(): {
         count: number;
         value: SparseNumericMap<Currency>;
+        firstCurrency?: Currency;
     };
     /** Callback function for selling all selected items */
     sellAllSelectedItems(): void;
@@ -238,7 +239,7 @@ declare class Bank extends GameEventEmitter<BankEvents> implements EncodableObje
     setLockOfAllItemsOnClick(locked: boolean): void;
     /** Callback function for setting all items in the bank to match the locked input */
     setLockOfAllItems(locked: boolean): void;
-    fireBulkItemSaleConfirmation(totalCurrency: SparseNumericMap<Currency>, count: number, onConfirm: VoidFunction): void;
+    fireBulkItemSaleConfirmation(totalCurrency: SparseNumericMap<Currency>, firstCurrency: Currency, count: number, onConfirm: VoidFunction): void;
     /** Callback function for when the sort button is clicked */
     sortButtonOnClick(): void;
     storeCustomSortOrder(): void;

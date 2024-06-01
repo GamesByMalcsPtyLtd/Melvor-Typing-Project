@@ -592,15 +592,15 @@ declare class RemoveEffectBehaviour extends CombatEffectBehaviour {
 }
 /** Data used to construct a ModifyBehaviour */
 interface ModifyBehaviourData extends CombatEffectBehaviourData {
-    /** Operations that will be applied to the value being modified */
-    operations: CombatEffectNumberExpression;
+    /** The new value to set the existing value to */
+    newValue: CombatEffectNumberExpression;
 }
 /** Base class for Combat effect behaviours that modify a value on an ActiveCombatEffect */
 declare abstract class ModifyBehaviour extends CombatEffectBehaviour {
     /** Operations to apply to the value being modified */
     newValue: CombatEffectNumberFunc;
     constructor(data: ModifyBehaviourData, game: Game, transpiler: IExprTranspiler<CombatEffectNumberFunc>);
-    /** Performs the operations of this object on the value, using character and activeEffect for parameters */
+    /** Computes the new value to set the stat group/parameter to */
     getNewValue(activeEffect: ActiveCombatEffect): number;
 }
 /** Data used to construct a ModifyStatsBehaviour */
@@ -1077,7 +1077,7 @@ declare abstract class CombatEffectApplicator {
      * @param posMult Optional. Multiplier applied to the chance if this is not a negative applicator
      * @returns [description, textClass]
      */
-    getDescription(negMult?: number, posMult?: number): [string, string];
+    getDescription(negMult?: number, posMult?: number): StatDescription;
     /**
      * Formats the description for this applicator using the given formatter function
      * @param formatter Formats the description and textclass of this applicator

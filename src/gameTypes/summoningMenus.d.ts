@@ -11,6 +11,9 @@ declare class SummoningMarkDiscoveryElement extends HTMLElement implements Custo
     quickCreateButton: HTMLButtonElement;
     constructor();
     connectedCallback(): void;
+    setMark(mark: SummoningRecipe, summoning: Summoning): void;
+    /** Updates the current state based on the mark discovery count + level */
+    updateState(mark: SummoningRecipe, summoning: Summoning): void;
     /** Sets the mark to the state of being too high level */
     setLocked(mark: SummoningRecipe): void;
     /** Sets the mark to the state of being unlocked via level, but undiscovered */
@@ -90,4 +93,18 @@ declare class SynergySearchMenuElement extends HTMLElement implements CustomElem
     querySynergies(query: string): void;
     /** Callback for when the current search changes */
     onSearchChange(): void;
+}
+declare class SummoningMarkMenuElement extends HTMLElement implements CustomElement {
+    _content: DocumentFragment;
+    discoveryContainer: HTMLDivElement;
+    categoryImage: HTMLImageElement;
+    categoryName: HTMLSpanElement;
+    discoveryElements: SummoningMarkDiscoveryElement[];
+    discoveryElemMap: Map<SummoningRecipe, SummoningMarkDiscoveryElement>;
+    activeCategory?: SummoningCategory;
+    constructor();
+    connectedCallback(): void;
+    showMarksInCategory(category: SummoningCategory, summoning: Summoning): void;
+    updateMarkState(mark: SummoningRecipe, summoning: Summoning): void;
+    updateDiscoveryCount(mark: SummoningRecipe): void;
 }

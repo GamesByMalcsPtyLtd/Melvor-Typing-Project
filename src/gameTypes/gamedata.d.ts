@@ -93,6 +93,7 @@ interface GameData {
   /** Register drops for the random Firemaking Oils table */
   randomFiremakingOils?: DropTableData[];
   skillTreesDisplayOrder?: InsertOrder[];
+  ancientRelicsDisplayOrder?: InsertOrder[];
 }
 
 interface GameDataModifications {

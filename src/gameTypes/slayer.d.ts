@@ -70,6 +70,7 @@ declare class SlayerTaskCategory extends RealmedObject {
     monsterSelection: AnySlayerTaskMonsterSelection;
     baseTaskLength: number;
     previousCategory?: SlayerTaskCategory;
+    nextCategory?: SlayerTaskCategory;
     /** The number of times a task in this category has been completed */
     tasksCompleted: number;
     /** Unlocalized display name */

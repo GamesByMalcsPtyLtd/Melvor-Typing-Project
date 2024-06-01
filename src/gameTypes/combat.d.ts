@@ -36,7 +36,7 @@ declare const fletchingSelectionTabs: Map<SkillCategory, RecipeSelectionTabEleme
 declare let summoningArtisanMenu: ArtisanMenuElement;
 declare const summoningSelectionTabs: Map<SkillCategory, SummoningSelectionTabElement>;
 declare let summoningCategoryMenu: RealmedCategoryMenuElement;
-declare const markDiscoveryMenus: Map<SummoningRecipe, SummoningMarkDiscoveryElement>;
+declare let summoningMarkMenu: SummoningMarkMenuElement;
 declare let summoningSearchMenu: SynergySearchMenuElement;
 declare const fishingAreaMenus: Map<FishingArea, FishingAreaMenuElement>;
 declare const cookingMenus: Map<CookingCategory, CookingMenuElement>;

@@ -32,7 +32,7 @@ declare class FiremakingLogMenuElement extends HTMLElement implements CustomElem
 declare class FiremakingBonfireMenuElement extends HTMLElement implements CustomElement {
     _content: DocumentFragment;
     bonfireImage: HTMLImageElement;
-    firemakingBonfireStatusText: HTMLSpanElement;
+    statusText: HTMLSpanElement;
     statusState: HTMLSpanElement;
     standardXpBonus: HTMLDivElement;
     standardXpPercent: HTMLSpanElement;
@@ -46,8 +46,9 @@ declare class FiremakingBonfireMenuElement extends HTMLElement implements Custom
     connectedCallback(): void;
     init(firemaking: Firemaking): void;
     updateInfo(firemaking: Firemaking, recipe: FiremakingLog): void;
-    setActive(firemaking: Firemaking, activeBonfire: FiremakingLog): void;
+    setActive(firemaking: Firemaking): void;
     setInactive(firemaking: Firemaking, selectedLog: FiremakingLog | undefined): void;
+    updateItemQuantity(game: Game, activeBonfire: FiremakingLog): void;
     toggleAbyssalState(isAbyssal: boolean): void;
 }
 declare class FiremakingOilMenuElement extends HTMLElement implements CustomElement {
@@ -69,7 +70,7 @@ declare class FiremakingOilMenuElement extends HTMLElement implements CustomElem
     constructor();
     connectedCallback(): void;
     init(firemaking: Firemaking): void;
-    updateInfo(firemaking: Firemaking, oil: FiremakingOilItem): void;
+    updateInfo(firemaking: Firemaking, oil: FiremakingOilItem, cost: number): void;
     updateOptions(game: Game, firemaking: Firemaking): void;
     setUnselected(): void;
     setOil(game: Game, firemaking: Firemaking, oil: FiremakingOilItem): void;

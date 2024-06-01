@@ -125,7 +125,7 @@ interface ResistanceStatData {
     /** The amount of resistance */
     value: number;
 }
-interface BaseEquipmentItemData extends BaseItemData {
+interface BaseEquipmentItemData extends BaseItemData, IStatObjectData {
     tier: string;
     /** The IDs of the EquipmentSlots this item can be equipped to */
     validSlots: string[];
@@ -135,12 +135,8 @@ interface BaseEquipmentItemData extends BaseItemData {
     cantEquipWith?: string[];
     equipRequirements: AnyRequirementData[];
     equipmentStats: EquipStatPair[];
-    modifiers?: ModifierValuesRecordData;
-    enemyModifiers?: ModifierValuesRecordData;
-    conditionalModifiers?: ConditionalModifierData[];
     specialAttacks?: string[];
     overrideSpecialChances?: number[];
-    combatEffects?: TriggeredCombatEffectApplicatorData[];
     providedRunes?: IDQuantity[];
     ammoType?: AmmoType;
     consumesChargesOn?: GameEventMatcherData[];
@@ -155,13 +151,8 @@ interface BaseEquipmentItemData extends BaseItemData {
     /** Optional. DamageType resistances provided by this item. Do not apply if item is in the Passive slot. */
     resistanceStats?: ResistanceStatData[];
 }
-interface BaseEquipmentItemModificationData extends BaseItemModificationData {
+interface BaseEquipmentItemModificationData extends BaseItemModificationData, IStatObjectModificationData {
     ammoType?: AmmoType | null;
-    conditionalModifiers?: {
-        add?: ConditionalModifierData[];
-        remove?: string[];
-    };
-    enemyModifiers?: ModifierValuesModificationData;
     equipRequirements?: {
         add?: AnyRequirementData[];
         remove?: string[];
@@ -170,8 +161,6 @@ interface BaseEquipmentItemModificationData extends BaseItemModificationData {
         add?: EquipStatPair[];
         remove?: EquipStatKey[];
     };
-    combatEffects?: CombatEffectApplicatorModificationData;
-    modifiers?: ModifierValuesModificationData;
     occupiesSlots?: {
         add?: string[];
         remove?: string[];
@@ -282,10 +271,8 @@ interface FoodItemData extends BaseItemData, IStatObjectData {
     itemType: 'Food';
     healsFor: number;
 }
-interface FoodItemModificationData extends BaseItemModificationData {
+interface FoodItemModificationData extends BaseItemModificationData, IStatObjectModificationData {
     healsFor?: number;
-    modifiers?: ModifierValuesModificationData;
-    combatEffects?: CombatEffectApplicatorModificationData;
 }
 declare class FoodItem extends Item {
     healsFor: number;
@@ -329,10 +316,8 @@ interface PotionItemData extends BaseItemData, IStatObjectData {
     action: string;
     consumesOn: GameEventMatcherData[];
 }
-interface PotionItemModificationData extends BaseItemModificationData {
+interface PotionItemModificationData extends BaseItemModificationData, IStatObjectModificationData {
     charges?: number;
-    modifiers?: ModifierValuesModificationData;
-    combatEffects?: CombatEffectApplicatorModificationData;
 }
 declare class PotionItem extends Item implements SoftDataDependant<PotionItemData> {
     /** Stat provided by this potion */
@@ -392,10 +377,7 @@ declare class OpenableItem extends Item {
 interface TokenItemData extends BaseItemData, IStatObjectData {
     itemType: 'Token';
 }
-interface TokenItemModificationData extends BaseItemModificationData {
-    modifiers?: ModifierValuesModificationData;
-    combatEffects?: CombatEffectApplicatorModificationData;
-}
+declare type TokenItemModificationData = BaseItemModificationData & IStatObjectModificationData;
 declare class TokenItem extends Item {
     game: Game;
     /** Stats provided based on the amount of tokens claimed */

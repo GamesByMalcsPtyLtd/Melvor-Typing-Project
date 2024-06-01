@@ -3,10 +3,8 @@ interface AstrologyModifierData extends IStatObjectData {
     costs: number[];
     unlockRequirements?: AnyRequirementData[];
 }
-interface AstrologyModifierModificationData {
+interface AstrologyModifierModificationData extends IStatObjectModificationData {
     index: number;
-    modifiers?: ModifierValuesModificationData;
-    combatEffects?: CombatEffectApplicatorModificationData;
     maxCount?: number;
     costs?: {
         modify?: {

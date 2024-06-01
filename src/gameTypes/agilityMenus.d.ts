@@ -35,6 +35,8 @@ declare class BuiltAgilityObstacleElement extends HTMLElement implements CustomE
     updatePassives(obstacle: AgilityObstacle, negMult: number): void;
     /** Turns the background highlight on or off */
     setHighlight(on: boolean): void;
+    /** Turns the background highlight on or off */
+    setSearchHighlight(on: boolean): void;
     /** Sets the obstacle to being active */
     setActive(): void;
     /** Sets the obstacle to being inactive */
@@ -59,6 +61,8 @@ declare class PassivePillarMenuElement extends HTMLElement implements CustomElem
     updatePassives(pillar: AgilityPillar): void;
     setActive(): void;
     setInactive(): void;
+    /** Turns the background highlight on or off */
+    setSearchHighlight(on: boolean): void;
 }
 /** Component for the obstacle selection modal */
 declare class AgilityObstacleSelectionElement extends HTMLElement implements CustomElement {
@@ -91,6 +95,8 @@ declare class AgilityObstacleSelectionElement extends HTMLElement implements Cus
     setBuildStatus(built: boolean): void;
     setObstacle(obstacle: AgilityObstacle): void;
     setPillar(pillar: AgilityPillar): void;
+    /** Turns the background highlight on or off */
+    setSearchHighlight(on: boolean): void;
 }
 declare class InlineRequirementElement extends HTMLElement implements CustomElement {
     _content: DocumentFragment;
@@ -136,8 +142,15 @@ declare class AgilityBreakdownElement extends HTMLElement implements CustomEleme
     currencyContainer: HTMLSpanElement;
     itemsContainer: HTMLSpanElement;
     viewPassivesButton: HTMLButtonElement;
+    searchBar: HTMLInputElement;
+    clearSearchBar: HTMLButtonElement;
     constructor();
     connectedCallback(): void;
     init(agility: Agility): void;
     updateRates(interval: number, xp: number, axp: number, items: AnyItemQuantity[], currencies: CurrencyQuantity[]): void;
+    cachedSearchResults: AgilitySearch[];
+    /** Updates the obstacles based on a fuzzy search query */
+    queryObstacles(query: string): void;
+    /** Callback for when the current search changes */
+    onSearchChange(searchOnEmpty?: boolean): void;
 }
