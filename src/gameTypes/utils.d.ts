@@ -385,7 +385,6 @@ declare function delayPromise(delay: number): Promise<void>;
 declare function downloadTextFile(fileName: string, fileText: string, fileType?: string): void;
 /** Takes the original array, and returns a soft copy without the elements contained in remove */
 declare function removeFromArray<T>(original: T[], remove: T[]): T[];
-declare function mapOrder<T, K extends keyof T>(array: T[], order: T[K][], key: K): T[];
 /** Returns a function for use in Array.sort, that will sort an array of objects T, in the order corresponding to their property key */
 declare function sortByOrder<T, K extends keyof T>(order: T[K][], key: K): (a: T, b: T) => number;
 declare function sortByCurrencyValue(ascending: boolean, a: CurrencyQuantity, b: CurrencyQuantity): number;
@@ -518,6 +517,7 @@ declare function generateComponentClass(tagName: string): string;
 declare function getRequirementTextClass(met: boolean): "text-success" | "text-danger";
 declare function createUnlockElement(costNodes: (string | Node)[], met: boolean): HTMLDivElement;
 declare function printUnlockRequirements(requirements: AnyRequirement[]): HTMLDivElement[];
+declare function printUnlockAllRequirements(requirements: AnyRequirement[]): HTMLDivElement[];
 /** Displays unlock requirements that are not met. Hides others.*/
 declare function printUnlockRequirementsAsHTML(requirements: AnyRequirement[]): string[];
 /** Displays all unlock requirements instead of hiding requirements that are met */

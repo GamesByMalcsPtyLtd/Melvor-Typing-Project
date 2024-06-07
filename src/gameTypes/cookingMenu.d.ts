@@ -22,6 +22,8 @@ declare class CookingMenuElement extends HTMLElement implements CustomElement {
     productQty: number;
     productTooltip?: TippyTooltip;
     progressBar: ProgressBarElement;
+    intervalTooltipEl: IntervalIconTooltipElement;
+    intervalTooltip?: TippyTooltip;
     constructor();
     connectedCallback(): void;
     disconnectedCallback(): void;

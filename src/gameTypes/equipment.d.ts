@@ -126,7 +126,8 @@ declare class Equipment implements EncodableObject, Serializable {
     convertFromOldFormat(oldData: OldEquipmentSet, idMap: NumericIDMap): void;
     /** Removes all equipment */
     unequipAll(): void;
-    static getEquipStatDescription(type: EquipStatKey, value: number): string;
+    static getEquipStatDescription(stat: AnyEquipStat): string;
+    static getSummoningMaxHitStatDescription(damageType: DamageType, value: number): string;
     static getEquipResistStatDescription(damageType: DamageType, value: number): string;
     /** Maps the old IDs for equipment slots to the new ones */
     static slotIDMap: Record<number, EquipmentSlotIDs>;

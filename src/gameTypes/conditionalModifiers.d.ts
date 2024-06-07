@@ -21,7 +21,7 @@ interface SomeCondition<T> {
     conditions: T[];
 }
 declare function checkSomeCondition<T>(condition: SomeCondition<T>, checkCondition: (condition: T) => boolean): boolean;
-declare type ConditionalModifierConditionData = CombatConditionData | ItemInBankConditionData | ItemChargeConditionData | PotionUsedConditionData | EveryCondition<ConditionalModifierConditionData> | SomeCondition<ConditionalModifierConditionData> | EquipStatCompareConditionData | FightingSlayerTaskConditionData;
+declare type ConditionalModifierConditionData = CombatConditionData | ItemInBankConditionData | ItemChargeConditionData | PotionUsedConditionData | EveryCondition<ConditionalModifierConditionData> | SomeCondition<ConditionalModifierConditionData> | EquipStatCompareConditionData | DamageTypeEquipStatCompareConditionData | FightingSlayerTaskConditionData;
 /** Base class for all conditional modifier classes */
 declare abstract class ConditionalModifierCondition {
     abstract readonly type: string;
@@ -269,22 +269,42 @@ declare class FightingSlayerTaskCondition extends BooleanCondition {
     _checkIfMet(manager: BaseManager): boolean;
     addTemplateData(templateData: Record<string, string>, prefix?: string, postfix?: string): void;
 }
-/** Checks if PlayerEquipStat operator EnemyEquipStat */
-interface EquipStatCompareConditionData {
+interface BaseEquipStatCompareConditionData {
     type: 'EquipStatCompare';
-    statKey: EquipStatKey;
     operator: Comparison;
 }
-declare class EquipStatCompareCondition extends ConditionalModifierCondition {
-    readonly type = "EquipStatCompare";
+/** Checks if PlayerEquipStat operator EnemyEquipStat */
+interface EquipStatCompareConditionData extends BaseEquipStatCompareConditionData {
     statKey: EquipStatKey;
+}
+interface DamageTypeEquipStatCompareConditionData extends BaseEquipStatCompareConditionData {
+    statKey: DamageTypeEquipStatKey;
+    damageType: string;
+}
+declare abstract class BaseEquipStatCompareCondition extends ConditionalModifierCondition {
+    readonly type = "EquipStatCompare";
     operator: Comparison;
-    constructor(data: EquipStatCompareConditionData);
+    constructor(data: BaseEquipStatCompareConditionData);
     checkIfMet(manager: BaseManager): boolean;
-    isEquals(condition: ConditionalModifierCondition): boolean;
+    abstract getEquipStat(character: Character): number;
     _assignWrappedHandler(manager: BaseManager, handler: VoidFunction): void;
     _unassignWrappedHandler(manager: BaseManager, handler: VoidFunction): void;
     addTemplateData(templateData: Record<string, string>, prefix?: string, postfix?: string): void;
+}
+declare class EquipStatCompareCondition extends BaseEquipStatCompareCondition {
+    readonly type = "EquipStatCompare";
+    statKey: EquipStatKey;
+    constructor(data: EquipStatCompareConditionData);
+    getEquipStat(character: Character): number;
+    isEquals(condition: ConditionalModifierCondition): boolean;
+}
+declare class DamageTypeEquipStatCompareCondition extends BaseEquipStatCompareCondition {
+    readonly type = "EquipStatCompare";
+    statKey: DamageTypeEquipStatKey;
+    damageType: DamageType;
+    constructor(data: DamageTypeEquipStatCompareConditionData, game: Game);
+    getEquipStat(character: Character): number;
+    isEquals(condition: ConditionalModifierCondition): boolean;
 }
 declare class SomeConditionClass extends ConditionalModifierCondition {
     readonly type = "Some";

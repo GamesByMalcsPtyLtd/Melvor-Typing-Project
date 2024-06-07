@@ -29,6 +29,10 @@ interface BaseSkillData {
     headerUpgradeChains?: string[];
     /** Items with charges that should show in the skill's header */
     headerItemCharges?: string[];
+    /** Optional. Sets a realm that this skills standard levels are tied to */
+    standardLevelRealm?: string;
+    /** Optional. Sets a realm that this skills abyssal levels are tied to */
+    abyssalLevelRealm?: string;
 }
 interface BaseSkillModificationData {
 }
@@ -116,6 +120,10 @@ declare class SkillRenderQueue {
     realmSelection: boolean;
     /** Render respective realm visibility */
     realmVisibility: Set<Realm>;
+    /** Updates the visibility of this skill's levels in the UI */
+    levelVisibility: boolean;
+    /** Updates the visibility of this skill's abyssal levels in the UI */
+    abyssalLevelVisibility: boolean;
 }
 declare class SkillLevelChangedEvent extends GameEvent {
     skill: AnySkill;
@@ -239,6 +247,14 @@ declare abstract class Skill<DataType extends BaseSkillData, Events extends Skil
     /** Determines whether this skill has abyssal levels */
     _hasAbyssalLevels: boolean;
     get hasAbyssalLevels(): boolean;
+    /** Realm tied to the standard levels of this skill. If present, standard levels will not render unless this realm is unlocked */
+    standardLevelRealm?: Realm;
+    /** Realm tied to the abyssal levels of this skill. If present, abyssal levels will not render unless this realm is unlocked */
+    abyssalLevelRealm?: Realm;
+    /** If the standard levels of this skill should be shown in the UI */
+    get shouldShowStandardLevels(): boolean;
+    /** If the abyssal levels of this skill should be shown in the UI */
+    get shouldShowAbyssalLevels(): boolean;
     currentRealm: Realm;
     realmSelect?: RealmSelectMenuElement;
     get availableRealmCount(): number;
@@ -275,6 +291,8 @@ declare abstract class Skill<DataType extends BaseSkillData, Events extends Skil
     renderLockStatus(): void;
     renderRealmSelection(): void;
     renderRealmVisibility(): void;
+    renderLevelVisibility(): void;
+    renderAbyssalLevelVisibility(): void;
     fireLevelUpModal(previousLevel: number): void;
     fireAbyssalLevelUpModal(previousLevel: number): void;
     getNewMilestoneHTML(previousLevel: number): string;
@@ -337,6 +355,7 @@ declare abstract class Skill<DataType extends BaseSkillData, Events extends Skil
      * @returns The experience with modifiers applied
      */
     modifyXP(amount: number, action?: NamedObject): number;
+    _buildXPSources(action?: NamedObject): ModifierSourceBuilder;
     getXPSources(action?: NamedObject): HTMLSpanElement[];
     /**
      * Gets the modified abyssal xp to add to the skill
@@ -345,6 +364,7 @@ declare abstract class Skill<DataType extends BaseSkillData, Events extends Skil
      * @returns The experience with modifiers applied
      */
     modifyAbyssalXP(amount: number, action?: NamedObject): number;
+    _buildAbyssalXPSources(action?: NamedObject): ModifierSourceBuilder;
     getAbyssalXPSources(action?: NamedObject): HTMLSpanElement[];
     /**
      * Gets the percentage xp modifier for a skill
@@ -362,6 +382,7 @@ declare abstract class Skill<DataType extends BaseSkillData, Events extends Skil
     getUncappedDoublingChance(action?: NamedObject): number;
     /** Gets the clamped doubling chance for this skill */
     getDoublingChance(action?: NamedObject): number;
+    _buildDoublingSources(action?: NamedObject): ModifierSourceBuilder;
     /** Gets the sources of item doubling for this skill */
     getDoublingSources(action?: NamedObject): HTMLSpanElement[];
     /**
@@ -379,6 +400,7 @@ declare abstract class Skill<DataType extends BaseSkillData, Events extends Skil
      * @returns The percentage reduction clamped to the maximum value
      */
     getCostReduction(action?: NamedObject, item?: AnyItem): number;
+    _buildCostReductionSources(action?: NamedObject): ModifierSourceBuilder;
     getCostReductionSources(action?: NamedObject): HTMLSpanElement[];
     /**
      * Gets the flat cost reduction for this skill
@@ -392,9 +414,11 @@ declare abstract class Skill<DataType extends BaseSkillData, Events extends Skil
     modifyCurrencyCost(currency: Currency, quantity: number, recipe: NamedObject): number;
     /** Gets the flat change in [ms] for the given action */
     getFlatIntervalModifier(action?: NamedObject): number;
+    _buildFlatIntervalSources(action?: NamedObject): ModifierSourceBuilder;
     getFlatIntervalSources(action?: NamedObject): HTMLSpanElement[];
     /** Gets the percentage change in interval for the given action */
     getPercentageIntervalModifier(action?: NamedObject): number;
+    _buildPercentageIntervalSources(action?: NamedObject): ModifierSourceBuilder;
     getPercentageIntervalSources(action?: NamedObject): HTMLSpanElement[];
     getIntervalSources(action?: NamedObject): HTMLSpanElement[];
     modifyInterval(interval: number, action?: NamedObject): number;
@@ -409,6 +433,7 @@ declare abstract class Skill<DataType extends BaseSkillData, Events extends Skil
     getRandomFlatAdditionalPrimaryProductQuantity(item: Item, action: NamedObject, query: ModifierQuery): number;
     /** Gets the additional resource quantity in the skill. Cannot be doubled. */
     getFlatAdditionalPrimaryProductQuantity(item: Item, query: ModifierQuery): number;
+    _buildAdditionalPrimaryResourceQuantitySources(query: ModifierQuery): ModifierSourceBuilder;
     getAdditionalPrimaryResourceQuantitySources(query: ModifierQuery): HTMLSpanElement[];
     /**
      * Calculates the minimum base quantity of the primary product given by this skill
@@ -429,6 +454,7 @@ declare abstract class Skill<DataType extends BaseSkillData, Events extends Skil
     addCurrencyFromPrimaryProductGain(rewards: Rewards, item: Item, quantity: number, action: NamedObject): void;
     /** Gets the preservation chance for the skill for a given action */
     getPreservationChance(action: NamedObject): number;
+    _buildPreservationSources(action: NamedObject): ModifierSourceBuilder;
     getPreservationSources(action: NamedObject): HTMLSpanElement[];
     /** Gets the maximum preservation change for a skill */
     getPreservationCap(action?: NamedObject): number;
@@ -762,10 +788,11 @@ declare abstract class SkillWithMastery<ActionType extends MasteryAction, DataTy
      */
     getMasteryXPToAddToPool(xp: number): number;
     getMasteryXPModifier(action: ActionType): number;
+    _buildMasteryXPSources(action?: NamedObject): ModifierSourceBuilder;
+    getMasteryXPSources(action?: NamedObject): HTMLSpanElement[];
     getMasteryLevel(action: ActionType): number;
     getMasteryXP(action: ActionType): number;
     get isAnyMastery99(): boolean;
-    getMasteryXPSources(action?: NamedObject): HTMLSpanElement[];
     constructor(namespace: DataNamespace, id: string, game: Game, actionClassName?: string);
     onAnyLevelUp(): void;
     registerData(namespace: DataNamespace, data: DataType): void;

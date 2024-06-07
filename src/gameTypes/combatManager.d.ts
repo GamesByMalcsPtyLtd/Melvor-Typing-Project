@@ -149,6 +149,11 @@ declare class CombatManager extends BaseManager implements PassiveAction, IGameE
         timeoutID: number;
         quantity: number;
     }>;
+    /** Stores debouncing for ap telemetry events */
+    apTelemetryDebouncing: Map<string, {
+        timeoutID: number;
+        quantity: number;
+    }>;
     /** The interval between GP Telemetry events */
     readonly GP_TELEMETRY_DEBOUNCE_INTERVAL = 500;
     /** Gets the base currency modifier to apply to all gains */

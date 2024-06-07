@@ -1,8 +1,12 @@
 declare class PlayerCombatStats extends CharacterCombatStats {
+    /** If the player can currently attack with summons */
+    get canSummonAttack(): boolean;
+    set canSummonAttack(value: boolean);
     get summoningMaxHit(): number;
     set summoningMaxHit(value: number);
     get barrierDamage(): number;
     set barrierDamage(value: number);
+    _canSummonAttack: boolean;
     _summoningMaxHit: number;
     _barrierDamage: number;
     constructor(player: Player);
@@ -107,8 +111,8 @@ declare class Player extends Character implements IGameEventEmitter<PlayerCombat
     computePreConditionalStats(): void;
     computePostModifierStats(): void;
     computeCombatStats(): void;
-    /** Resets the primary spell selection to Wind Strike */
-    resetPrimarySpell(): void;
+    /** Resets the attack spell selection to the first valid spell that can be used with the current damage type */
+    resetAttackSpell(): void;
     /** Checks the usage of combat spells and disables them if they are not usable */
     checkMagicUsage(): void;
     computeLevels(): void;
@@ -133,13 +137,21 @@ declare class Player extends Character implements IGameEventEmitter<PlayerCombat
     rewardForDamage(damage: number): void;
     attack(target: Character, attack: SpecialAttack): number;
     lifesteal(attack: SpecialAttack, damage: number, flatBonus: number): number;
-    rewardForSummonDamage(damage: number, isBarrierDmg: boolean): void;
-    /** Applies combat triangle, modifiers and damage reduction to summoning attack damage */
-    modifySummonAttackDamage(damage: number, forceCalc?: boolean): number;
-    /** Returns Summon Max Hit without Barrier modifications. Used for UI rendering */
-    getSummonMaxHitWithoutBarrier(damage: number): number;
+    /**
+     * Provides rewards for when a summon attack deals damage
+     * @param damage The damage dealt
+     * @param isBarrier If the damage was dealt to barrier
+     */
+    rewardForSummonDamage(damage: number, isBarrier: boolean): void;
+    /**
+     * Applies combat triangle, modifiers and damage reduction to summoning attack damage
+     * @param damage The base damage to modify
+     * @param isBarrier If this summon attack is damaging barrier
+     * @returns The modified damage
+     */
+    modifySummonAttackDamage(damage: number, isBarrier: boolean): number;
     /** Applies multiplicative and flat damage modifiers to summoning attack damage */
-    applySummonDamageModifiers(damage: number, forceCalc?: boolean): number;
+    applySummonDamageModifiers(damage: number, isBarrier: boolean): number;
     /** Clamps summoning attack damage to remaining barrier or hitpoints */
     clampSummonAttackDamage(damage: number, target: Character): number;
     summonAttack(): void;
@@ -240,6 +252,13 @@ declare class Player extends Character implements IGameEventEmitter<PlayerCombat
     togglePrayer(prayer: ActivePrayer, render?: boolean): void;
     /** Checks if the player meets the requirements to use the currently selected prayers */
     checkPrayerUsage(): void;
+    /**
+     * Checks if a combat spell can be used by the player
+     * @param spell The combat spell to check
+     * @param ignoreReqs Whether to ignore requirements other than equipped item requirements
+     * @returns If the spell can be used
+     */
+    canUseCombatSpell(spell: CombatSpell, ignoreReqs?: boolean): boolean;
     selectAttackSpell(spell: AttackSpell, render?: boolean): void;
     toggleCurse(spell: CurseSpell, render?: boolean): void;
     toggleAurora(spell: AuroraSpell, render?: boolean): void;

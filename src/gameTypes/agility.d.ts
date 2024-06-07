@@ -211,6 +211,7 @@ declare class Agility extends GatheringSkill<AgilityObstacle, AgilitySkillData, 
     getXPModifier(masteryAction?: AgilityObstacle): number;
     getCurrencyModifier(currency: Currency, obstacle: AgilityObstacle): number;
     getMasteryXPModifier(action: AgilityObstacle): number;
+    _buildMasteryXPSources(action?: NamedObject): ModifierSourceBuilder;
     /** Gets the negative multiplier for an obstacles negative modifiers/effect applicators */
     getObstacleNegMult(obstacle: AgilityObstacle, checkSelfModifiers?: boolean): number;
     getObstacleCostModifier(obstacle: AgilityObstacle, currency?: Currency): number;

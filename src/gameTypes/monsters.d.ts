@@ -20,9 +20,7 @@ interface MonsterData extends IDData {
     media: string;
     mediaAnimation?: string;
     levels: PickPartial<Omit<CombatLevels, 'Prayer'>, 'Corruption'>;
-    equipmentStats: EquipStatPair[];
-    /** Resistance stats for the monster */
-    resistanceStats?: ResistanceStatData[];
+    equipmentStats: AnyEquipStatData[];
     ignoreCompletion: boolean;
     attackType: AttackType | 'random';
     specialAttacks: string[];
@@ -55,10 +53,7 @@ interface MonsterModificationData extends IDData {
         quantity: number;
     } | null;
     canSlayer?: boolean;
-    equipmentStats?: {
-        add?: EquipStatPair[];
-        remove?: string[];
-    };
+    equipmentStats?: EquipStatsModificationData;
     currencyDrops?: {
         add?: {
             currencyID: string;
@@ -93,10 +88,6 @@ interface MonsterModificationData extends IDData {
         remove?: string[];
     };
     combatEffects?: CombatEffectApplicatorModificationData;
-    resistanceStats?: {
-        add?: ResistanceStatData[];
-        remove?: string[];
-    };
 }
 declare type MonsterEvents = {
     killed: MonsterKilledEvent;
@@ -110,7 +101,7 @@ declare class Monster extends NamespacedObject implements IGameEventEmitter<Mons
     get description(): string;
     get combatLevel(): number;
     levels: Omit<CombatLevels, 'Prayer'>;
-    equipmentStats: EquipStatPair[];
+    equipmentStats: AnyEquipStat[];
     ignoreCompletion: boolean;
     attackType: AttackType | 'random';
     specialAttacks: AttackSelection[];
@@ -141,8 +132,6 @@ declare class Monster extends NamespacedObject implements IGameEventEmitter<Mons
     barrierPercent: number;
     /** The type of damage this Monster deals. Defaults to Normal if not set. */
     damageType: DamageType;
-    /** Resistance stats for the monster */
-    resistanceStats: Map<DamageType, number>;
     _events: import("mitt").Emitter<MonsterEvents>;
     on: {
         <Key extends "killed">(type: Key, handler: import("mitt").Handler<MonsterEvents[Key]>): void;

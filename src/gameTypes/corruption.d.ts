@@ -24,16 +24,15 @@ declare class CorruptionEffectTable implements EncodableObject {
     allRows: CorruptionEffectTableRow[];
     unlockedRows: CorruptionEffectTableRow[];
     lockedRows: CorruptionEffectTableRow[];
-    selectedUnlockRow?: CorruptionEffectTableRow;
+    selectedUnlockRows: Map<CombatEffect, CorruptionEffectTableRow>;
     effectRemovalHandler: (e: CharacterEffectRemovedEvent) => void;
     readonly NEW_EFFECT_CHANCE = 0.2;
     get allEffectRows(): CorruptionEffectTableRow[];
     /** Gets the number of corruptions the player has unlocked */
     get numberUnlocked(): number;
     constructor(game: Game, corruption: Corruption);
-    /** Gets a random effect applicator */
-    getApplicator(monsterLevel?: number, exclude?: CombatEffect): SingleCombatEffectApplicator;
-    getRandomUnlockedRow(exclude?: CombatEffect): CorruptionEffectTableRow;
+    /** Gets a number of unique effect applicators */
+    getApplicators(count: number, monsterLevel?: number): SingleCombatEffectApplicator[];
     unlockRow(row: CorruptionEffectTableRow): void;
     onEffectRemoval(e: CharacterEffectRemovedEvent): void;
     registerRows(data: CorruptionEffectTableData[]): void;

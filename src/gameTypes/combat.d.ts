@@ -46,6 +46,7 @@ declare const agilityObstacleSelectMenus: AgilityObstacleSelectionElement[];
 declare let agilityBreakdownMenu: AgilityBreakdownElement;
 declare let astrologyMenus: {
     constellations: Map<AstrologyRecipe, ConstellationMenuElement>;
+    locked: LockedConstellationMenuElement;
     infoPanel: AstrologyInformationPanelElement;
     explorePanel: AstrologyExplorationPanelElement;
 };

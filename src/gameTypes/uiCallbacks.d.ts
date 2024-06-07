@@ -1,4 +1,4 @@
-declare const equipStatKeys: Exclude<EquipStatKey, 'damageReduction'>[];
+declare const equipStatKeys: EquipStatKey[];
 /** Callback function for viewing the contents of an Openable item. Modal will not fire if item is not openable. */
 declare function viewItemContents(item: OpenableItem): void;
 declare const enum DiffType {
@@ -56,8 +56,10 @@ declare function openDiscordLink(): void;
 declare function openWikiLink(): void;
 declare function openExpansionSteamLink(): void;
 declare function openExpansion2SteamLink(): void;
+declare function openExpansion3SteamLink(): void;
 declare function openExpansionEpicLink(): void;
 declare function openExpansion2EpicLink(): void;
+declare function openExpansion3EpicLink(): void;
 declare function openExpandedEditionSteamLink(): void;
 declare function viewMonsterStats(monster: Monster): void;
 declare const changePage: (page: Page, subCategory?: number, skill?: AnySkill, showRaidShop?: boolean, toggleSidebar?: boolean) => void;

@@ -976,7 +976,7 @@ interface CombatEffectApplicatorTriggerData {
     appliesWhen: CombatEffectApplicationTrigger;
     /** Optional. Specifies if the effect should be applied when the applicator is merged. Defaults to false. */
     applyEffectWhenMerged?: boolean;
-    /** Optional. Specifies a string which will be used as a custom description for this applicator */
+    /** Optional. Specifies a string which will be used as a custom description for this applicator. If set to an empty string, the applicator will have no description. */
     customDescription?: string;
     /** Optional. Specifies the ID of a language string which will be used as a custom description for this applicator */
     descriptionLang?: string;
@@ -1072,19 +1072,12 @@ declare abstract class CombatEffectApplicator {
     /** Adds string template data for this applicator */
     addTemplateData(data: StringDictionary<string>, preKey?: string, negMult?: number, posMult?: number): void;
     /**
-     * Gets a description tuple for this applicator
+     * Gets a description for this applicator. Returns undefined if it has none
      * @param negMult Optional. Multiplier applied to the chance if this is a negative applicator
      * @param posMult Optional. Multiplier applied to the chance if this is not a negative applicator
      * @returns [description, textClass]
      */
-    getDescription(negMult?: number, posMult?: number): StatDescription;
-    /**
-     * Formats the description for this applicator using the given formatter function
-     * @param formatter Formats the description and textclass of this applicator
-     * @param negMult Optional. Multiplier applied to the chance if this is a negative applicator
-     * @param posMult Optional. Multiplier applied to the chance if this is not a negative applicator
-     */
-    formatDescription<T>(formatter: DescriptionFormatter<T>, negMult?: number, posMult?: number): T;
+    getDescription(negMult?: number, posMult?: number): StatDescription | undefined;
     /**
      * Creates a clone of this object
      * @param mult Multiplier for the baseChance and conditionChances of this object in the clone

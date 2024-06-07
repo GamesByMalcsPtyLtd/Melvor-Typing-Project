@@ -33,6 +33,8 @@ declare class SkillSidebarAsideElement extends HTMLElement implements CustomElem
     connectedCallback(): void;
     setLocked(): void;
     setUnlocked(visibility: SkillSidebarLevelVisibility): void;
+    setStandardVisibility(shouldShow: boolean): void;
+    setAbyssalVisibility(shouldShow: boolean): void;
     updateLevel(level: number, levelCap: number): void;
     updateAbyssalLevel(level: number, levelCap: number): void;
 }
@@ -49,6 +51,8 @@ declare class SkillNav {
     /** Updates the lock icon of a skill */
     updateSkillLock(skill: AnySkill): void;
     updateDisplayedLevels(): void;
+    updateLevelVisibility(skill: AnySkill): void;
+    updateAbyssalLevelVisibility(skill: AnySkill): void;
     /** Sets a skill as active and highlights it green */
     setActive(skill: AnySkill): void;
     /** Sets a skill as inactive and removes its green highlights */
@@ -57,6 +61,8 @@ declare class SkillNav {
     /** Removes grene highlights from all skills */
     setAllInactive(): void;
     getNavs(skill: AnySkill): SkillSidebarItem[];
+    shouldShowStandardLevels(skill: AnySkill): boolean;
+    shouldShowAbyssalLevels(skill: AnySkill): boolean;
     getLevelVisibility(skill: AnySkill): SkillSidebarLevelVisibility;
 }
 declare type SkillSidebarLevelVisibility = {
@@ -95,6 +101,8 @@ declare class SkillHeaderElement extends HTMLElement implements CustomElement {
     updateAbyssalXP(game: Game, skill: AnySkill): void;
     updateAbyssalLevel(game: Game, skill: AnySkill): void;
     toggleCombatLevelCap(show: boolean): void;
+    updateLevelVisibility(skill: AnySkill): void;
+    updateAbyssalLevelVisibility(skill: AnySkill): void;
     appendUpper(...nodes: Node[]): void;
     appendLower(...nodes: Node[]): void;
 }
@@ -126,6 +134,8 @@ declare class CombatSkillProgressTableRow {
     updateAbyssalLevel(game: Game, skill: AnySkill): void;
     showLevelCapPurchase(): void;
     hideLevelCapPurchase(): void;
+    updateLevelVisibility(skill: AnySkill): void;
+    updateAbyssalLevelVisibility(skill: AnySkill): void;
     destroy(): void;
     createXPTooltip(element: HTMLElement): TippyTooltip;
 }
@@ -143,4 +153,6 @@ declare class CombatSkillProgressTableElement extends HTMLElement implements Cus
     updateLevel(game: Game, skill: AnySkill): void;
     updateAbyssalXP(game: Game, skill: AnySkill): void;
     updateAbyssalLevel(game: Game, skill: AnySkill): void;
+    updateLevelVisibility(skill: AnySkill): void;
+    updateAbyssalLevelVisibility(skill: AnySkill): void;
 }

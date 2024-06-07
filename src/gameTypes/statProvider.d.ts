@@ -75,11 +75,9 @@ interface IStatProvider {
     /** Modifiers that can apply to the player/enemy that only apply based on a condition */
     conditionalModifiers?: ConditionalModifierSource[];
     /** Equipment stats that apply to the player */
-    equipmentStats?: EquipStatPair[];
+    equipmentStats?: AnyEquipStat[];
     /** CombatEffects applied via the player at the specified times */
     combatEffects?: CombatEffectApplicator[];
-    /** Resistance stats that apply to the player */
-    resistanceStats?: ResistanceMap;
 }
 /** Provides modifiers or stats to the Player/Enemy class in Golbin Raid */
 interface IRaidStatProvider {
@@ -89,9 +87,8 @@ declare class StatProvider implements IStatProvider {
     modifiers: ModifierTable;
     enemyModifiers: ModifierTable;
     conditionalModifiers: ConditionalModifierSource[];
-    equipmentStats: EquipStatPair[];
+    equipmentStats: AnyEquipStat[];
     combatEffects: CombatEffectApplicator[];
-    resistanceStats: ResistanceMap;
     reset(): void;
     addStatObject(source: ModifierSource, stats: IStatObject, negMult?: number, posMult?: number): void;
 }

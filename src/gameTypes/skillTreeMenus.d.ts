@@ -101,7 +101,6 @@ declare class SkillTreeMenuElement extends HTMLElement implements CustomElement 
     assignRenderListeners(tree: SkillTree, game: Game): void;
     unassignRenderListeners(): void;
     onClose(): void;
-    updateAllIcons(): void;
     render(): void;
     renderNodeRequirements(tree: SkillTree): void;
     renderNodeCosts(tree: SkillTree): void;

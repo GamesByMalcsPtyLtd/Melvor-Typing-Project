@@ -17,7 +17,6 @@ declare class ConstellationMenuElement extends HTMLElement implements CustomElem
     masteryDisplay: MasteryDisplayElement;
     stardustBreakdown: HTMLDivElement;
     stardustIcons: ItemCurrentIconElement[];
-    viewModifierContainer: HTMLDivElement;
     constructor();
     connectedCallback(): void;
     initIcons(game: Game): void;
@@ -36,6 +35,15 @@ declare class ConstellationMenuElement extends HTMLElement implements CustomElem
     setExplored(): void;
     /** Sets the constellation to the un-explored state */
     setUnexplored(): void;
+}
+/** Component for displaying a locked constellation */
+declare class LockedConstellationMenuElement extends HTMLElement implements CustomElement {
+    _content: DocumentFragment;
+    level: HTMLSpanElement;
+    abyssalLevel: HTMLSpanElement;
+    constructor();
+    connectedCallback(): void;
+    setConstellation(constellation: AstrologyRecipe, astrology: Astrology): void;
 }
 /** Component for displaying standard/unique modifiers, with a reroll button
  *  For usage in the AstrologyExplorationPanel component

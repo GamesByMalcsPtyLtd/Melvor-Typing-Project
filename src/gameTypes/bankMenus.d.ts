@@ -330,6 +330,19 @@ declare class BankSidebarMenuElement extends HTMLElement implements CustomElemen
     setUnselected(): void;
     initialize(game: Game): void;
 }
+declare class SummoningMaxHitElement extends HTMLElement implements CustomElement {
+    _content: DocumentFragment;
+    damageTypeMedia: HTMLImageElement;
+    damageTypeName: HTMLSpanElement;
+    maxHit: HTMLSpanElement;
+    maxHitDiff: HTMLSpanElement;
+    constructor();
+    connectedCallback(): void;
+    setDamageType(damageType: DamageType): void;
+    setValue(value: number): void;
+    hideDiff(): void;
+    setDiff(diff: number): void;
+}
 declare class ItemUpgradeMenuElement extends HTMLElement implements CustomElement {
     _content: DocumentFragment;
     itemName: HTMLHeadingElement;
@@ -342,8 +355,8 @@ declare class ItemUpgradeMenuElement extends HTMLElement implements CustomElemen
     equipmentStatsContainer: HTMLDivElement;
     attackSpeedContainer: HTMLDivElement;
     summoningMaxHitContainer: HTMLDivElement;
-    equipStats: Record<Exclude<EquipStatKey, 'damageReduction'>, HTMLSpanElement>;
-    equipStatDiffs: Record<Exclude<EquipStatKey, 'damageReduction'>, HTMLSpanElement>;
+    equipStats: Record<EquipStatKey, HTMLSpanElement>;
+    equipStatDiffs: Record<EquipStatKey, HTMLSpanElement>;
     upgradeMasteryRequirement: HTMLSpanElement;
     upgradeMasteryLevel: HTMLSpanElement;
     currencyCosts: HTMLSpanElement;
@@ -356,6 +369,7 @@ declare class ItemUpgradeMenuElement extends HTMLElement implements CustomElemen
     }[];
     resistancesContainer: HTMLDivElement;
     resistances: Map<DamageType, CharacterResistanceElement>;
+    summoningMaxHits: Map<DamageType, SummoningMaxHitElement>;
     itemConsumable: HTMLHeadElement;
     constructor();
     connectedCallback(): void;

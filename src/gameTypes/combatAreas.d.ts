@@ -271,7 +271,7 @@ interface DungeonData extends CombatAreaData {
     floors?: number[];
     eventID?: string;
     unlockRequirement?: DungeonRequirementData[];
-    pet: PetChanceData;
+    pet?: PetChanceData;
     fixedPetClears: boolean;
     pauseOnBosses: boolean;
     nonBossPassives?: string[];
@@ -373,7 +373,7 @@ declare class Dungeon extends CombatArea {
     floors?: number[];
     event?: CombatEvent;
     unlockRequirement?: DungeonRequirement[];
-    pet: PetChance;
+    pet?: PetChance;
     fixedPetClears: boolean;
     /** If Combat should pause before fighting a monster that is a boss */
     pauseOnBosses: boolean;

@@ -164,7 +164,7 @@ declare type PackagedSave = {
     cd: number[];
 };
 declare const saveFormat2Version = 21;
-declare const currentSaveVersion = SaveVersion.CombatEffectStatGroups;
+declare const currentSaveVersion = SaveVersion.AbyssalWaveTimer;
 declare const enum SaveVersion {
     ModProfiles = 83,
     MasteryModalFilter = 84,
@@ -189,7 +189,9 @@ declare const enum SaveVersion {
     TownshipTaskRefactor = 116,
     OilYourLogs = 117,
     FiremakingSelectedOil = 118,
-    CombatEffectStatGroups = 119
+    CombatEffectStatGroups = 119,
+    CorruptionUnlocks = 120,
+    AbyssalWaveTimer = 121
 }
 interface AddRemove<T> {
     add: T[];

@@ -296,12 +296,6 @@ declare type CombatLevels = Record<CombatLevelKey, number>
 declare type MapToElement<Type> = {
     [Property in keyof Type]: HTMLElement;
 };
-declare type EquipStatKey = 'attackSpeed' | 'stabAttackBonus' | 'slashAttackBonus' | 'blockAttackBonus' | 'rangedAttackBonus' | 'magicAttackBonus' | 'meleeStrengthBonus' | 'rangedStrengthBonus' | 'magicDamageBonus' | 'meleeDefenceBonus' | 'rangedDefenceBonus' | 'magicDefenceBonus' | 'summoningMaxhit' | 'damageReduction';
-declare type EquipStatPair = {
-    key: EquipStatKey;
-    value: number;
-};
-declare type ResistanceMap = Map<DamageType, number>;
 declare type TippyTooltip = import("tippy.js").Instance<import("tippy.js").Props>;
 declare type TippyProps = import("tippy.js").Props;
 declare type OldPurchasedShopItem = {

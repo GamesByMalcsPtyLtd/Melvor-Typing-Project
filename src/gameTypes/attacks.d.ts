@@ -1,5 +1,5 @@
 declare type CharacterType = 'Target' | 'Attacker';
-declare type DamageRollType = 'MaxHit' | 'MinHit' | 'CurrentHP' | 'MaxHP' | 'DamageDealt' | 'DamageTaken' | 'MagicScaling' | 'Fixed' | 'One' | 'Rend' | 'Poisoned' | 'Bleeding' | 'PoisonMax35' | 'PoisonMin35' | 'PoisonFixed100' | 'BurnFixed100' | 'BurnMaxHit100' | 'CursedFixed100' | 'MaxHitDR' | 'MaxHitScaledByHP' | 'MaxHitScaledByHP2x' | 'FixedPlusMaxHit50' | 'HPUnder90' | 'PoisonedMaxHit' | 'Reflection' | 'DefenceLevel' | 'Crystallize' | 'BaseMaxHP';
+declare type DamageRollType = 'MaxHit' | 'MinHit' | 'CurrentHP' | 'CurrentHPCapped200' | 'MaxHP' | 'DamageDealt' | 'DamageTaken' | 'MagicScaling' | 'Fixed' | 'One' | 'Rend' | 'Poisoned' | 'Bleeding' | 'PoisonMax35' | 'PoisonMin35' | 'PoisonFixed100' | 'BurnFixed100' | 'BurnMaxHit100' | 'CursedFixed100' | 'MaxHitDR' | 'MaxHitScaledByHP' | 'MaxHitScaledByHP2x' | 'FixedPlusMaxHit50' | 'HPUnder90' | 'PoisonedMaxHit' | 'Reflection' | 'DefenceLevel' | 'Crystallize' | 'BaseMaxHP';
 declare type DOTType = 'Burn' | 'Bleed' | 'Poison' | 'Regen' | 'DeadlyPoison' | 'BarrierBleed' | 'BarrierBurn' | 'Laceration' | 'Voidburst' | 'Ablaze' | 'Toxin';
 /** Damage of an attack */
 interface BaseDamage {
@@ -77,7 +77,7 @@ declare const rollData: Record<DamageRollType, DamageRollData>;
  * @param description The description to modify
  * @returns
  */
-declare function applyDescriptionModifications(description: string): string;
+declare const applyDescriptionModifications: (description: string) => string;
 /** Gets the prefix to use for a special attack's effect's string template data */
 declare function effectPrefix(preHit: boolean, idx: number): string;
 /**

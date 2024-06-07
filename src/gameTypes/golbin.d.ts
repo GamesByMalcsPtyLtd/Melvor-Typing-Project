@@ -18,8 +18,7 @@ declare class Golbin extends Enemy {
     static getLevel(wave: number, isBoss: boolean, hitpoints?: boolean): number;
     static getAttackType(): AttackType;
     static getMedia(isBoss: boolean): string;
-    static getStats(wave: number, isBoss: boolean): EquipStatPair[];
-    static getResistanceStats(wave: number, isBoss: boolean): ResistanceStatData[];
+    static getStats(wave: number, isBoss: boolean): AnyEquipStatData[];
     static getStatValue(wave: number, isBoss: boolean): number;
     encode(writer: SaveWriter): SaveWriter;
     /** Encodes the current Golbins monster data */

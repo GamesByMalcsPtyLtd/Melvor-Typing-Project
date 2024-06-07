@@ -195,7 +195,7 @@ declare class PlayerStatsElement extends HTMLElement implements CustomElement {
     setPrayerPoints(player: Player): void;
     setSoulPoints(player: Player): void;
     setActivePrayers(player: Player, prayers: Set<ActivePrayer>): void;
-    setSummonMaxHit(maxHit: number, barrierMaxHit: number, isFighting: boolean): void;
+    setSummonMaxHit(canAttack: boolean, maxHit: number, barrierMaxHit: number, isFighting: boolean): void;
     setCombatTriangle(player: Player, triangle: CombatTriangle, triangleSet: CombatTriangleSet): void;
     hideCombatTriangle(): void;
     addTooltip(image: HTMLImageElement, text: string): void;

@@ -415,7 +415,35 @@ declare type BaseStatValues = {
     effectiveLevel: number;
     bonus: number;
 };
-declare class EquipmentStats {
+/** The keys of equipment stats that do not require a damage type */
+declare type EquipStatKey = 'attackSpeed' | 'stabAttackBonus' | 'slashAttackBonus' | 'blockAttackBonus' | 'rangedAttackBonus' | 'magicAttackBonus' | 'meleeStrengthBonus' | 'rangedStrengthBonus' | 'magicDamageBonus' | 'meleeDefenceBonus' | 'rangedDefenceBonus' | 'magicDefenceBonus';
+/** The keys of equipment stats that also require damage types */
+declare type DamageTypeEquipStatKey = 'resistance' | 'summoningMaxhit';
+interface EquipStatPairData {
+    key: EquipStatKey | 'damageReduction';
+    value: number;
+}
+interface EquipStatPair {
+    key: EquipStatKey;
+    value: number;
+}
+interface DamageTypeEquipStatData {
+    key: DamageTypeEquipStatKey;
+    value: number;
+    damageType?: string;
+}
+interface DamageTypeEquipStat {
+    key: DamageTypeEquipStatKey;
+    value: number;
+    damageType: DamageType;
+}
+declare type AnyEquipStatData = EquipStatPairData | DamageTypeEquipStatData;
+declare type AnyEquipStat = EquipStatPair | DamageTypeEquipStat;
+interface EquipStatsModificationData {
+    add?: AnyEquipStatData[];
+    remove?: string[];
+}
+declare class EquipmentStats implements Record<EquipStatKey, number> {
     attackSpeed: number;
     stabAttackBonus: number;
     slashAttackBonus: number;
@@ -428,19 +456,18 @@ declare class EquipmentStats {
     meleeDefenceBonus: number;
     rangedDefenceBonus: number;
     magicDefenceBonus: number;
-    /** @deprecated Use new character resistances class instead */
+    /** @deprecated Use resistances instead */
     get damageReduction(): number;
-    summoningMaxhit: number;
-    resistances: ResistanceMap;
-    constructor(stats?: EquipStatPair[], resists?: Map<DamageType, number>);
+    summoningMaxHit: SparseNumericMap<DamageType>;
+    resistances: SparseNumericMap<DamageType>;
+    constructor(stats?: AnyEquipStat[]);
     addItemStats(item: EquipmentItem): void;
     remItemStats(item: EquipmentItem): void;
-    addStats(stats: EquipStatPair[]): void;
-    subtractStats(stats: EquipStatPair[]): void;
+    addStats(stats: AnyEquipStat[]): void;
+    subtractStats(stats: AnyEquipStat[]): void;
+    adjustSummoningMaxHit(value: number): number;
     getResistance(damageType: DamageType): number;
-    addResistances(resistances: Map<DamageType, number>): void;
-    subtractResistances(resistances: Map<DamageType, number>): void;
-    resetResistances(): void;
+    getSummoningMaxHit(damageType: DamageType): number;
     resetStats(): void;
 }
 interface DamageTypeData extends IDData {
@@ -508,7 +535,7 @@ declare class CharacterCombatStats {
     _attackInterval: number;
     _maxBarrier: number;
     _hitChance: number;
-    _resistances: ResistanceMap;
+    _resistances: Map<DamageType, number>;
     /** Flags if these stats need to be re-calculated when getting a value */
     _dirty: boolean;
     constructor(character: Character);

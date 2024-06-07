@@ -4,20 +4,16 @@ interface ItemSynergyData {
     playerModifiers?: ModifierValuesRecordData;
     enemyModifiers?: ModifierValuesRecordData;
     conditionalModifiers?: ConditionalModifierData[];
-    equipmentStats?: EquipStatPair[];
+    equipmentStats?: AnyEquipStatData[];
     combatEffects?: TriggeredCombatEffectApplicatorData[];
-    /** Resistance stats provided by item */
-    resistanceStats?: ResistanceStatData[];
 }
 declare class ItemSynergy implements SoftDataDependant<ItemSynergyData> {
     items: (EquipmentItem | SynergyGroup)[];
     playerModifiers?: ModifierValue[];
     enemyModifiers?: ModifierValue[];
     conditionalModifiers?: ConditionalModifier[];
-    equipmentStats?: EquipStatPair[];
+    equipmentStats?: AnyEquipStat[];
     combatEffects?: CombatEffectApplicator[];
-    /** Resistance stats provided by item */
-    resistanceStats: ResistanceMap;
     get name(): string;
     constructor(data: ItemSynergyData, game: Game);
     registerSoftDependencies(data: ItemSynergyData, game: Game): void;

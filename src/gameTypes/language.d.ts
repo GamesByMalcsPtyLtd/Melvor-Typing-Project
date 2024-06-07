@@ -2,7 +2,7 @@ declare let setLang: SupportedLanguage;
 declare let loadedLangJson: LanguageData;
 /** Language specific collator for the currently loaded language. Useful for sorting things alphabetically. */
 declare let langCollator: Intl.Collator;
-declare const langVersion = 1534;
+declare const langVersion = 1550;
 declare const LANGS: SupportedLanguage[];
 declare function fetchLanguageJSON(lang: 'catOrder'): Promise<string[]>;
 declare function fetchLanguageJSON(lang: SupportedLanguage): Promise<LanguageData>;

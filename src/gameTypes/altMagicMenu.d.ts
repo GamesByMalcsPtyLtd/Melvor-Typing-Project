@@ -5,8 +5,10 @@ declare class AltMagicMenuElement extends HTMLElement implements CustomElement {
     spellName: HTMLSpanElement;
     spellDescription: HTMLElement;
     runeRequirements: RequiresBoxElement;
+    itemRequirementsContainer: HTMLDivElement;
     itemRequirements: QuantityIconsElement;
     runeHaves: HavesBoxElement;
+    itemHavesContainer: HTMLDivElement;
     itemHaves: CurrentQuantityIconsElement;
     producesSingle: ProducesBoxElement;
     producesCurrent: HavesBoxElement;

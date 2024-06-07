@@ -29,6 +29,7 @@ declare class TownshipTownBiomeSelectElement extends HTMLElement implements Cust
     abyssalLevelRequirement: HTMLDivElement;
     fortificationRequirement: HTMLDivElement;
     buildAvailable: HTMLSpanElement;
+    otherRequirements: HTMLUListElement;
     constructor();
     connectedCallback(): void;
     setBiome(biome: TownshipBiome, township: Township): void;

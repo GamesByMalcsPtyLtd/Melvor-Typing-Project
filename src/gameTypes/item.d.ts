@@ -119,12 +119,6 @@ interface ItemChance {
     chance: number;
 }
 declare type AmmoType = 'Arrows' | 'Bolts' | 'Javelins' | 'ThrowingKnives' | 'None' | 'AbyssalArrows' | 'AbyssalBolts';
-interface ResistanceStatData {
-    /** The ID of the damage type resistance should be given to */
-    id: string;
-    /** The amount of resistance */
-    value: number;
-}
 interface BaseEquipmentItemData extends BaseItemData, IStatObjectData {
     tier: string;
     /** The IDs of the EquipmentSlots this item can be equipped to */
@@ -134,7 +128,7 @@ interface BaseEquipmentItemData extends BaseItemData, IStatObjectData {
     /** Optional. The IDs of Equipment Items that this item cannot be equipped with at the same time */
     cantEquipWith?: string[];
     equipRequirements: AnyRequirementData[];
-    equipmentStats: EquipStatPair[];
+    equipmentStats: AnyEquipStatData[];
     specialAttacks?: string[];
     overrideSpecialChances?: number[];
     providedRunes?: IDQuantity[];
@@ -148,8 +142,6 @@ interface BaseEquipmentItemData extends BaseItemData, IStatObjectData {
     };
     /** Optional. If present sets the priority of losing this item when dying. Lower priority indicates the item will be lost sooner. Defaults to 0. */
     deathPenaltyPriority?: number;
-    /** Optional. DamageType resistances provided by this item. Do not apply if item is in the Passive slot. */
-    resistanceStats?: ResistanceStatData[];
 }
 interface BaseEquipmentItemModificationData extends BaseItemModificationData, IStatObjectModificationData {
     ammoType?: AmmoType | null;
@@ -157,10 +149,7 @@ interface BaseEquipmentItemModificationData extends BaseItemModificationData, IS
         add?: AnyRequirementData[];
         remove?: string[];
     };
-    equipmentStats?: {
-        add?: EquipStatPair[];
-        remove?: EquipStatKey[];
-    };
+    equipmentStats?: EquipStatsModificationData;
     occupiesSlots?: {
         add?: string[];
         remove?: string[];
@@ -174,10 +163,6 @@ interface BaseEquipmentItemModificationData extends BaseItemModificationData, IS
     tier?: string;
     validSlots?: {
         add?: string[];
-        remove?: string[];
-    };
-    resistanceStats?: {
-        add?: ResistanceStatData[];
         remove?: string[];
     };
     consumesOn?: {
@@ -206,7 +191,7 @@ declare class EquipmentItem extends Item implements SoftDataDependant<EquipmentI
     /** Requirements for equipping the item */
     equipRequirements: AnyRequirement[];
     /** Equipment stats provided by item */
-    equipmentStats: EquipStatPair[];
+    equipmentStats: AnyEquipStat[];
     /** Modifiers provided by the item */
     modifiers?: ModifierValue[];
     /** Enemy modifiers provided by the item */
@@ -231,8 +216,6 @@ declare class EquipmentItem extends Item implements SoftDataDependant<EquipmentI
     consumesItemOn?: BankItemConsumption;
     /** Determines the priority of losing this item to the death penalty. Lower priority is lost before other items. */
     deathPenaltyPriority: number;
-    /** Resistance stats provided by item */
-    resistanceStats: Map<DamageType, number>;
     get hasDescription(): boolean;
     get description(): string;
     get modifiedDescription(): string;

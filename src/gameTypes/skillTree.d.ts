@@ -1,5 +1,6 @@
 interface SkillTreeData extends IDData {
     name: string;
+    nameLang?: string;
     media: string;
     unlockRequirements: AnyRequirementData[];
     nodes: SkillTreeNodeData[];
@@ -21,7 +22,9 @@ interface SkillTreeNodeData extends IDData, IStatObjectData {
     requirements?: AnyRequirementData[];
 }
 declare class SkillTreeNode extends NamespacedObject implements SoftDataDependant<SkillTreeNodeData> {
+    tree: SkillTree;
     game: Game;
+    /** The name of this node as it shows in modifier sources */
     get name(): string;
     get shortName(): string;
     /** Returns if this node can be unlocked */
@@ -68,6 +71,7 @@ declare class SkillTree extends NamespacedObject implements EncodableObject, IGa
     get name(): string;
     get points(): number;
     _name: string;
+    _nameLang?: string;
     _media: string;
     unlockRequirements: AnyRequirement[];
     nodes: NamespaceRegistry<SkillTreeNode>;

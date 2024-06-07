@@ -8,6 +8,7 @@ interface TownshipBiomeData extends IDData {
     tier: number;
     /** The Abyssal Tier of Biome. Determines Fortification and abyssal level requirements to build in it. Integer between [0-7]. */
     abyssalTier?: number;
+    requirements?: AnyRequirementData[];
 }
 declare const enum TownshipConvertQtyType {
     Number = 0,
@@ -18,7 +19,7 @@ declare const enum TownshipConvertType {
     ToTownship = 0,
     FromTownship = 1
 }
-declare class TownshipBiome extends NamespacedObject {
+declare class TownshipBiome extends NamespacedObject implements SoftDataDependant<TownshipBiomeData> {
     get name(): string;
     get media(): string;
     get englishName(): string;
@@ -32,7 +33,9 @@ declare class TownshipBiome extends NamespacedObject {
     buildingEfficiency: Map<TownshipBuilding, number>;
     /** Cache of buildings that are available in this biome. Used to only render buildings for the selected biome */
     availableBuildings: TownshipBuilding[];
+    requirements: AnyRequirement[];
     constructor(namespace: DataNamespace, data: TownshipBiomeData, game: Game);
+    registerSoftDependencies(data: TownshipBiomeData, game: Game): void;
     /** Returns the number of a particular building that has been built in the biome */
     getBuildingCount(building: TownshipBuilding): number;
     getCurrentBuildingInUpgradeChain(building: TownshipBuilding): TownshipBuilding;
@@ -105,8 +108,9 @@ interface TownshipBuildingData extends IDData, IStatObjectData {
     canDegrade: boolean;
     /** The Abyssal Tier of the building. Determines Township Abyssal Level and Fortification requirements. Integer between [0,7] */
     abyssalTier?: number;
+    requirements?: AnyRequirementData[];
 }
-declare class TownshipBuilding extends NamespacedObject {
+declare class TownshipBuilding extends NamespacedObject implements SoftDataDependant<TownshipBuildingData> {
     get name(): string;
     get media(): string;
     get englishName(): string;
@@ -123,6 +127,7 @@ declare class TownshipBuilding extends NamespacedObject {
     canDegrade: boolean;
     upgradeChain: TownshipBuilding[];
     abyssalTier: number;
+    requirements: AnyRequirement[];
     get providesStats(): boolean;
     /** Multipliers for the stats provided by this building */
     providedStatMultiplier: {
@@ -130,6 +135,7 @@ declare class TownshipBuilding extends NamespacedObject {
         neg: number;
     };
     constructor(namespace: DataNamespace, data: TownshipBuildingData, game: Game);
+    registerSoftDependencies(data: TownshipBuildingData, game: Game): void;
     get totalUpgrades(): number;
     get upgradePosition(): number;
     calculateUpgradeData(): void;
@@ -353,6 +359,7 @@ declare class TownshipRenderQueue extends SkillRenderQueue {
     buildingCurrentProvides: boolean;
     /** Renders the current total building resource generation in biomes */
     buildingResourceGeneration: boolean;
+    /** Renders the build available icon in the biome select buttons */
     buildAvailable: boolean;
     /** Renders the time till the next passive tick */
     updateTimer: boolean;
@@ -385,7 +392,7 @@ declare class Township extends Skill<TownshipSkillData, TownshipEvents, Township
     /** Tick length in seconds */
     TICK_LENGTH: number;
     readonly PASSIVE_TICK_LENGTH = 3600;
-    readonly LEGACY_TICK_LENGTH = 3600;
+    readonly LEGACY_TICK_LENGTH = 300;
     readonly BASE_TAX_RATE = 0;
     readonly BASE_STORAGE = 50000;
     readonly BASE_SOUL_STORAGE = 0;
@@ -397,6 +404,8 @@ declare class Township extends Skill<TownshipSkillData, TownshipEvents, Township
     readonly RARE_SEASON_CHANCE = 20;
     readonly ABYSSAL_WAVE_REWARD_DIVIDER = 1;
     readonly BASE_MAX_HEALTH = 100;
+    /** The cooldown time between fighting abyssal waves in [ms] */
+    readonly ABYSSAL_WAVE_COOLDOWN = 2000;
     readonly populationForTier: NumberDictionary<BuildingRequirement>;
     readonly abyssalTierRequirements: NumberDictionary<BuildingAbyssalRequirement>;
     renderQueue: TownshipRenderQueue;
@@ -432,13 +441,17 @@ declare class Township extends Skill<TownshipSkillData, TownshipEvents, Township
     worshipInSelection: TownshipWorship | undefined;
     townshipConverted: boolean;
     tickTimer: Timer;
+    /** Timer for the cooldown when fighting abyssal waves */
+    abyssalWaveTimer: Timer;
     defaultSeason?: TownshipSeason;
     readonly REDUCE_EFFICIENCY_CHANGE = 0.25;
     readonly MINIMUM_HEALTH = 20;
     displayReworkNotification: boolean;
     gpRefunded: number;
     get abyssalGatewayBuilt(): boolean;
-    get enableAbyssalWaves(): boolean;
+    get canFightAbyssalWaves(): boolean;
+    /** Returns if an abyssal wave is currently being fought */
+    get isFightingAbyssalWave(): boolean;
     get timeToNextUpdate(): number;
     get timeToNextSeason(): number;
     get timeToNextAbyssalWave(): number;
@@ -496,6 +509,7 @@ declare class Township extends Skill<TownshipSkillData, TownshipEvents, Township
     get isStorageFull(): boolean;
     get isSoulStorageFull(): boolean;
     constructor(namespace: DataNamespace, game: Game);
+    onAnyLevelUp(): void;
     registerData(namespace: DataNamespace, data: TownshipSkillData): void;
     modifyData(data: TownshipModificationData): void;
     getResourceQuantityFromData(resourceData: IDQuantity[]): ResourceQuantity[];
@@ -579,14 +593,15 @@ declare class Township extends Skill<TownshipSkillData, TownshipEvents, Township
     onTickTimer(): void;
     /** Method used to tick the timer manually based on defined amount. For Clicker gamemode. */
     tickTimerOnClick(): void;
-    /** Callback function for the "All" button for spending legacy ticks */
     spendAllLegacyTicks(): void;
-    /** Callback function for spending legacy ticks */
     spendLegacyTicks(ticksToSpend: number): void;
     tick(): boolean;
     applyPreTickTownUpdates(): void;
     tickSeason(): void;
+    /** Callback function for when the player clicks the "Fight Wave Now" button */
     processAbyssalWaveOnClick(): void;
+    /** Method called when the abyssal wave timer fires */
+    onAbyssalWaveTimer(): void;
     getAbyssalXPOnWin(): number;
     getAbyssalXPOnLoss(fortificationValue: number): number;
     processAbyssalWave(): void;
@@ -797,8 +812,6 @@ declare class TownshipUI {
     hideSpinnerOnFightAbyssalWaveButton(): void;
     disableFightAbyssalWaveButton(): void;
     enableFightAbyssalWaveButton(): void;
-    abyssalWaveBtnOnCooldown: boolean;
-    onFightAbyssalWaveClick(): void;
     createIncreaseHealthBtns(): void;
     updateIncreaseHealthBtns(): void;
     updateWorshipChangeCost(): void;

@@ -267,6 +267,19 @@ declare class Game extends GameEventEmitter<GameEvents> implements Serializable,
     /** Registers a skill. Returns the constructed instance of the skill */
     registerSkill<T extends AnySkill>(namespace: DataNamespace, constructor: new (namespace: DataNamespace, game: Game) => T & Partial<PassiveAction> & Partial<ActiveAction>): T;
     applyDataModifications(modificationData: GameDataModifications): void;
+    /**
+     * Gets an array of equipment stats from data
+     * @param statsData The array of equipment stat data
+     * @returns Any array of equipment stats
+     */
+    getEquipStatsFromData(statsData: AnyEquipStatData[]): AnyEquipStat[];
+    /**
+     * Applies data modifications to an equipment stats array
+     * @param equipStats The equipment stats array to modify
+     * @param modData The modification data to apply
+     * @returns A new modified equipment stats array
+     */
+    modifyEquipStats(equipStats: AnyEquipStat[], modData: EquipStatsModificationData): AnyEquipStat[];
     getModifierValuesFromArrayData(data: ModifierValuesArrayData): ModifierValue[];
     /**
      * Gets an array of modifier values from a record of modifier data

@@ -36,10 +36,18 @@ declare class Telemetry {
      * @param skill The skill that gained xp
      */
     createOfflineXPGainEvent(skill: AnySkill, offlineTime: number, xpBefore: number, xpAfter: number, levelBefore: number, levelAfter: number): void;
+    /** Create a new offline xp gained event
+     * @param skill The skill that gained xp
+     */
+    createOfflineAXPGainEvent(skill: AnySkill, offlineTime: number, xpBefore: number, xpAfter: number, levelBefore: number, levelAfter: number): void;
     /** Create a new online xp gained event.
      * Updates an existing event if it already exists
      */
     createOnlineXPGainEvent(skill: AnySkill, onlineTime: number, xpBefore: number, xpAfter: number, levelBefore: number, levelAfter: number): void;
+    /** Create a new online abyssal xp gained event.
+     * Updates an existing event if it already exists
+     */
+    createOnlineAXPGainEvent(skill: AnySkill, onlineTime: number, xpBefore: number, xpAfter: number, levelBefore: number, levelAfter: number): void;
     /** Create a new item gained event.
      * Adds volume the existing event if it already exists (Same Item & source)
      * @param item The item that was gained
@@ -61,6 +69,13 @@ declare class Telemetry {
      * @param source Where the GP adjustment originated from
      */
     createGPAdjustedEvent(amount: number, total: number, source: string): void;
+    /** Create a new ap adjusted event.
+     * Adds amount the existing event if it already exists (Same source)
+     * @param amount The AP amount that was gained/lossed
+     * @param total The total AP value.
+     * @param source Where the AP adjustment originated from
+     */
+    createAPAdjustedEvent(amount: number, total: number, source: string): void;
     removeTelemetryEvent(eventType: TelemetryEventID, eventID: string): void;
     /** Returns existing the existing Telemetry Event that is scheduled to send */
     getExistingTelemetryEvent(eventType: TelemetryEventID, eventID: string): TelemetryEvents | undefined;
@@ -133,7 +148,31 @@ declare class OfflineXPGainTelemetryEvent extends GenericTelemetryEvent {
     updateValues(level: number, xp: number): void;
     get requiresPurge(): boolean;
 }
+declare class OfflineAXPGainTelemetryEvent extends GenericTelemetryEvent {
+    _skill: AnySkill;
+    _xpBefore: number;
+    _xpAfter: number;
+    _levelBefore: number;
+    _levelAfter: number;
+    _offlineTime: number;
+    constructor(skill: AnySkill, offlineTime: number, xpBefore: number, xpAfter: number, levelBefore: number, levelAfter: number);
+    get payload(): OfflineXPGainTelemetryEventPayload;
+    updateValues(level: number, xp: number): void;
+    get requiresPurge(): boolean;
+}
 declare class OnlineXPGainTelemetryEvent extends GenericTelemetryEvent {
+    _skill: AnySkill;
+    _xpBefore: number;
+    _xpAfter: number;
+    _levelBefore: number;
+    _levelAfter: number;
+    _onlineTime: number;
+    constructor(skill: AnySkill, onlineTime: number, xpBefore: number, xpAfter: number, levelBefore: number, levelAfter: number);
+    get payload(): OnlineXPGainTelemetryEventPayload;
+    updateValues(level: number, xp: number, onlineTime: number): void;
+    get requiresPurge(): boolean;
+}
+declare class OnlineAXPGainTelemetryEvent extends GenericTelemetryEvent {
     _skill: AnySkill;
     _xpBefore: number;
     _xpAfter: number;
@@ -161,6 +200,13 @@ declare class ItemRemovedFromBankTelemetryEvent extends GenericTelemetryEvent {
     get payload(): ItemRemovedFromBankEventPayload;
 }
 declare class GPAdjustedTelemetryEvent extends GenericTelemetryEvent {
+    amount: number;
+    total: number;
+    _source: string;
+    constructor(amount: number, total: number, source: string);
+    get payload(): GPAdjustedEventPayload;
+}
+declare class APAdjustedTelemetryEvent extends GenericTelemetryEvent {
     amount: number;
     total: number;
     _source: string;
@@ -224,12 +270,12 @@ interface ItemRemovedFromBankEventPayload extends ItemMovementEventPayload {
 }
 declare type TelemetryEvent = Map<TelemetryEventID, TelemetryEventData>;
 declare type TelemetryEventData = Map<string, TelemetryEvents>;
-declare type TelemetryEventID = 'monster_killed' | 'player_death' | 'offline_xp_gain' | 'online_xp_gain' | 'item_gained' | 'item_removed_from_bank' | 'gp_adjusted';
+declare type TelemetryEventID = 'monster_killed' | 'player_death' | 'offline_xp_gain' | 'offline_abyssal_xp_gain' | 'online_xp_gain' | 'online_abyssal_xp_gain' | 'item_gained' | 'item_removed_from_bank' | 'gp_adjusted' | 'ap_adjusted';
 interface TelemetryData {
     EventNamespace: 'custom';
     Name: TelemetryEventID;
     Payload: TelemetryEventPayload;
 }
-declare type TelemetryEvents = MonsterKilledTelemetryEvent | PlayerDeathTelemetryEvent | OfflineXPGainTelemetryEvent | OnlineXPGainTelemetryEvent | ItemGainedTelemetryEvent | ItemRemovedFromBankTelemetryEvent | GPAdjustedTelemetryEvent;
+declare type TelemetryEvents = MonsterKilledTelemetryEvent | PlayerDeathTelemetryEvent | OfflineXPGainTelemetryEvent | OnlineXPGainTelemetryEvent | ItemGainedTelemetryEvent | ItemRemovedFromBankTelemetryEvent | GPAdjustedTelemetryEvent | APAdjustedTelemetryEvent | OfflineAXPGainTelemetryEvent | OnlineAXPGainTelemetryEvent;
 declare type TelemetryEventPayload = MonsterKilledTelemetryEventPayload | PlayerDeathTelemetryEventPayload | OfflineXPGainTelemetryEventPayload | OnlineXPGainTelemetryEventPayload | ItemGainedEventPayload | ItemRemovedFromBankEventPayload | GPAdjustedEventPayload;
 declare type PlayerDeathTelemetryEventCause = Monster | 'Thieving' | 'GolbinRaid' | 'Unknown';

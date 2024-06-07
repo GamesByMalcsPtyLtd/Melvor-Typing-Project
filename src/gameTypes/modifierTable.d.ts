@@ -82,7 +82,6 @@ declare class ModifierTable {
     dirtyValue(key: string, query: ModifierQuery): void;
     computeValue(entries: ModifierQueryResult[]): number;
     printSources(key: string, params?: ModifierQueryParams): void;
-    getSources(key: string, query?: ModifierQuery, percent?: boolean): HTMLSpanElement[];
     /** Removes all modifiers stored in this table, and invalidates the entire cache */
     empty(): void;
     /**
@@ -604,4 +603,16 @@ declare class PlayerModifierTable extends CharacterModifierTable {
     init(game: Game): void;
     getHiddenSkillLevels(skill: AnySkill): number;
     getInstantActionsToPerform(): number;
+}
+/** Utility class for formatting and creating modifier source spans */
+declare class ModifierSourceBuilder {
+    modifiers: ModifierTable;
+    percent: boolean;
+    _totalValue: number;
+    _spans: HTMLSpanElement[];
+    _totalValueSpan: HTMLSpanElement;
+    constructor(modifiers: ModifierTable, percent?: boolean);
+    addBaseSource(sourceName: string, value: number, isPositive?: boolean): void;
+    addSources(key: string, query?: ModifierQuery, mult?: number): void;
+    getSpans(): HTMLSpanElement[];
 }
