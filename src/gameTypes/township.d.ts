@@ -770,8 +770,11 @@ declare class TownshipUI {
                 health: HTMLDivElement;
                 fortification: HTMLDivElement;
                 soulStorage: HTMLDivElement;
+                soulStorageDiv: HTMLLIElement;
+                fortificationDiv: HTMLLIElement;
             };
             fortification: HTMLSpanElement;
+            soulStorage: HTMLSpanElement;
         };
         trader: {
             trader: HTMLDivElement;

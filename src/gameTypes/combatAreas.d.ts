@@ -270,13 +270,15 @@ interface DungeonData extends CombatAreaData {
     dropBones: boolean;
     floors?: number[];
     eventID?: string;
-    unlockRequirement?: DungeonRequirementData[];
+    unlockRequirement?: AnyRequirementData[];
     pet?: PetChanceData;
     fixedPetClears: boolean;
     pauseOnBosses: boolean;
     nonBossPassives?: string[];
     bossOnlyPassives?: string[];
     gamemodeRewardItemIDs?: DungeonGamemodeRewardData[];
+    showUnlockRequirements?: boolean;
+    hideIfLocked?: boolean;
 }
 interface DungeonGamemodeRewardData {
     gamemodeID: string;
@@ -299,7 +301,7 @@ interface DungeonModificationData extends CombatAreaModificationData {
         remove?: string[];
     };
     unlockRequirement?: {
-        add?: DungeonRequirementData[];
+        add?: AnyRequirementData[];
         remove: string[];
     };
     gamemodeRewardItemIDs?: {
@@ -367,12 +369,12 @@ declare class SlayerArea extends CombatArea {
     constructor(namespace: DataNamespace, data: SlayerAreaData, game: Game);
     applyDataModification(modData: SlayerAreaModificationData, game: Game): void;
 }
-declare class Dungeon extends CombatArea {
+declare class Dungeon extends CombatArea implements SoftDataDependant<DungeonData> {
     _rewards: AnyItem[];
     oneTimeReward?: AnyItem;
     floors?: number[];
     event?: CombatEvent;
-    unlockRequirement?: DungeonRequirement[];
+    unlockRequirement?: AnyRequirement[];
     pet?: PetChance;
     fixedPetClears: boolean;
     /** If Combat should pause before fighting a monster that is a boss */
@@ -381,11 +383,14 @@ declare class Dungeon extends CombatArea {
     bossOnlyPassives: CombatPassive[];
     gamemodeRewards: Map<Gamemode, AnyItem[]>;
     skillUnlockCompletions: number[];
+    showUnlockRequirements: boolean;
+    hideIfLocked: boolean;
     get name(): string;
     get hasBarrierMonsters(): boolean;
     get rewards(): AnyItem[];
     get wikiName(): string;
     constructor(namespace: DataNamespace, data: DungeonData, game: Game);
+    registerSoftDependencies(data: DungeonData, game: Game): void;
     applyDataModification(modData: DungeonModificationData, game: Game): void;
 }
 declare class AbyssDepth extends Dungeon {

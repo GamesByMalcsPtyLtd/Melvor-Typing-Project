@@ -511,6 +511,7 @@ declare class PlayerModifierTable extends CharacterModifierTable {
     readonly agilityItemCostReductionCanReach100: number;
     readonly agilityObstacleItemCost: number;
     readonly removeDebuffsFromAgility: number;
+    readonly harvestingUniqueProductChance: number;
     readonly doubleModifiersInAstrologyForMaxedConstellations: number;
     readonly mapRefinementCost: number;
     readonly travelEventChance: number;

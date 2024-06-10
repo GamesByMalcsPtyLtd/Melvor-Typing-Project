@@ -187,6 +187,8 @@ interface BooleanSettings {
     enableDoubleClickOpen: boolean;
     /** Enable double click to bury items from Bank */
     enableDoubleClickBury: boolean;
+    /** If Soul Points should show next to Prayer instead of PP */
+    showSPNextToPrayerSidebar: boolean;
 }
 interface ChoiceSettings {
     /** If special attack modifiers should use neutral colours */
@@ -342,6 +344,7 @@ declare class Settings implements EncodableObject, BooleanSettings, ChoiceSettin
     get enableDoubleClickEquip(): boolean;
     get enableDoubleClickOpen(): boolean;
     get enableDoubleClickBury(): boolean;
+    get showSPNextToPrayerSidebar(): boolean;
     /** The set of mastery namespaces that should be hidden in the spend mastery modal */
     hiddenMasteryNamespaces: Set<string>;
     constructor(game: Game);

@@ -64,8 +64,9 @@ declare class Harvesting extends GatheringSkill<HarvestingVein, HarvestingSkillD
     readonly baseInterval = 3000;
     readonly baseVeinIntensity = 28800;
     readonly passiveRegenInterval = 20000;
-    readonly uniqueProductChance = 0.1;
+    readonly baseUniqueProductChance = 0.1;
     readonly hpCheckpoints: number[];
+    get uniqueProductChance(): number;
     get actionInterval(): number;
     get actionLevel(): number;
     get masteryAction(): HarvestingVein;

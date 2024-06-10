@@ -4603,7 +4603,6 @@ declare const enum ItemIDs {
     Starwood_Logs = "melvorItA:Starwood_Logs",
     Eternal_Ash = "melvorItA:Eternal_Ash",
     Riftwood_Bow_U = "melvorItA:Riftwood_Bow_U",
-    Eternal_Fragment = "melvorItA:Eternal_Fragment",
     Eternal_Rune = "melvorItA:Eternal_Rune",
     Starwood_Bow_U = "melvorItA:Starwood_Bow_U",
     Eternity_Seed = "melvorItA:Eternity_Seed",
@@ -5136,7 +5135,8 @@ declare const enum AbyssDepthIDs {
     Depth5 = "melvorItA:Depth5",
     Depth6 = "melvorItA:Depth6",
     Depth7 = "melvorItA:Depth7",
-    Depth8 = "melvorItA:Depth8"
+    Depth8 = "melvorItA:Depth8",
+    Depth9 = "melvorItA:Depth9"
 }
 declare const enum PetIDs {
     Beavis = "melvorD:Beavis",
@@ -7703,7 +7703,8 @@ declare const enum ShopUpgradeChainIDs {
     Shovel = "melvorAoD:Shovel",
     FishingRodCoating = "melvorItA:FishingRodCoating",
     AxeCoating = "melvorItA:AxeCoating",
-    PickaxeCoating = "melvorItA:PickaxeCoating"
+    PickaxeCoating = "melvorItA:PickaxeCoating",
+    Harvester = "melvorItA:Harvester"
 }
 declare const enum PageIDs {
     ActiveSkill = "melvorD:ActiveSkill",
@@ -9019,6 +9020,7 @@ declare const enum ModifierIDs {
     agilityItemCostReductionCanReach100 = "melvorD:agilityItemCostReductionCanReach100",
     agilityObstacleItemCost = "melvorD:agilityObstacleItemCost",
     removeDebuffsFromAgility = "melvorD:removeDebuffsFromAgility",
+    harvestingUniqueProductChance = "melvorD:harvestingUniqueProductChance",
     doubleModifiersInAstrologyForMaxedConstellations = "melvorD:doubleModifiersInAstrologyForMaxedConstellations",
     mapRefinementCost = "melvorD:mapRefinementCost",
     travelEventChance = "melvorD:travelEventChance",

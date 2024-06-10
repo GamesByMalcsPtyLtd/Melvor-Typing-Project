@@ -3,6 +3,7 @@ interface RealmData extends IDData {
     media: string;
     unlockRequirements: AnyRequirementData[];
     showIfLocked?: boolean;
+    ignoreCompletion?: boolean;
 }
 declare class Realm extends NamespacedObject {
     get name(): string;
@@ -11,6 +12,7 @@ declare class Realm extends NamespacedObject {
     _name: string;
     unlockRequirements: AnyRequirement[];
     showIfLocked: boolean;
+    ignoreCompletion: boolean;
     modQuery: ModifierQuery;
     constructor(namespace: DataNamespace, data: RealmData, game: Game);
     registerSoftDependencies(data: RealmData, game: Game): void;
