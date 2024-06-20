@@ -641,6 +641,8 @@ declare class CreateMapMenuElement extends HTMLElement implements CustomElement 
     _content: DocumentFragment;
     digSiteSelectToggle: HTMLButtonElement;
     digSiteSelect: DigSiteSelectMenuElement;
+    createPaperTab: HTMLAnchorElement;
+    mapCreateTab: HTMLAnchorElement;
     paperMakingMenu: PaperMakingMenuElement;
     mapUpgradeMenu: MapUpgradeMenuElement;
     mapRefinementMenu: MapRefinementMenuElement;

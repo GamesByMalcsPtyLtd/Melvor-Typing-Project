@@ -18,6 +18,7 @@ interface BaseItemData extends IDData {
     sellsForCurrency?: string;
     isArtefact?: boolean;
     isGenericArtefact?: boolean;
+    isDebug?: boolean;
 }
 interface BaseItemModificationData extends IDData {
     category?: string;
@@ -400,6 +401,7 @@ interface CompostItemData extends BaseItemData {
     buttonStyle: string;
     barStyle: string;
     disableSeedRefund?: boolean;
+    compostAllCost?: IDQuantity;
 }
 interface CompostItemModificationData extends BaseItemModificationData {
     barStyle?: string;
@@ -407,11 +409,13 @@ interface CompostItemModificationData extends BaseItemModificationData {
     compostValue?: number;
     harvestBonus?: number;
     disableSeedRefund?: boolean;
+    compostAllCost?: IDQuantity;
 }
 declare class CompostItem extends Item {
     compostValue: number;
     harvestBonus: number;
     disableSeedRefund: boolean;
+    compostAllCost: CurrencyQuantity;
     buttonStyle: string;
     barStyle: string;
     constructor(namespace: DataNamespace, itemData: CompostItemData, game: Game);

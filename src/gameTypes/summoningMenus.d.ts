@@ -3,7 +3,8 @@ declare class SummoningMarkDiscoveryElement extends HTMLElement implements Custo
     status: HTMLElement;
     name: HTMLSpanElement;
     image: HTMLImageElement;
-    levelRequirement: HTMLHeadingElement;
+    levelRequired: HTMLHeadingElement;
+    abyssalLevelRequired: HTMLHeadingElement;
     discoveredContent: HTMLDivElement;
     progressBar: HTMLDivElement;
     skillImageContainer: HTMLHeadingElement;
@@ -15,7 +16,7 @@ declare class SummoningMarkDiscoveryElement extends HTMLElement implements Custo
     /** Updates the current state based on the mark discovery count + level */
     updateState(mark: SummoningRecipe, summoning: Summoning): void;
     /** Sets the mark to the state of being too high level */
-    setLocked(mark: SummoningRecipe): void;
+    setLocked(mark: SummoningRecipe, summoning: Summoning): void;
     /** Sets the mark to the state of being unlocked via level, but undiscovered */
     setUndiscovered(mark: SummoningRecipe): void;
     /** Sets the mark to the state of being discovered */

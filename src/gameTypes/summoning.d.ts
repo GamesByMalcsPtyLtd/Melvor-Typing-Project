@@ -117,7 +117,8 @@ declare class Summoning extends ArtisanSkill<SummoningRecipe, SummoningSkillData
     onAnyLevelUp(): void;
     getErrorLog(): string;
     getMarkSnapshot(): Map<SummoningRecipe, number>;
-    getNonShardCostReductionModifier(recipe: SummoningRecipe): number;
+    getNonShardCostReduction(recipe: SummoningRecipe, item?: AnyItem): number;
+    modifyNonShardItemCost(item: AnyItem, quantity: number, recipe: SummoningRecipe): number;
     getFlatCostReduction(recipe?: SummoningRecipe, item?: AnyItem): number;
     modifyCurrencyCost(currency: Currency, quantity: number, recipe: SummoningRecipe): number;
     /** Adds the Non shard costs of making a summoning tablet */

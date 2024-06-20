@@ -153,6 +153,7 @@ declare class ShopMenu {
     hideTab(category: ShopCategory): void;
     showCategoryButton(category: ShopCategory): void;
     hideCategoryButton(category: ShopCategory): void;
+    static NON_RAID_CURRENCIES: string[];
     showAllTabsButRaid(): void;
     showAllRaidTabs(): void;
     hideAllTabs(): void;

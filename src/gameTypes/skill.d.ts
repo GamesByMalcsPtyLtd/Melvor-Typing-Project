@@ -489,7 +489,7 @@ declare abstract class Skill<DataType extends BaseSkillData, Events extends Skil
     assignUnlockListeners(): void;
     unassignUnlockListeners(): void;
     autoUnlock(): void;
-    rollForPets(interval: number): void;
+    rollForPets(interval: number, action?: NamedRealmedObject | undefined): void;
     /** Method called when skill is leveled up */
     onLevelUp(oldLevel: number, newLevel: number): void;
     /** Method called when skill is leveled up */
@@ -814,7 +814,7 @@ declare abstract class SkillWithMastery<ActionType extends MasteryAction, DataTy
     /** Opens the mastery pool bonus modal for a given realm */
     openMasteryPoolBonusModalForRealm(realm: Realm): void;
     /** Rolls for all pets that have been registered to the skill */
-    rollForPets(interval: number): void;
+    rollForPets(interval: number, action?: NamedRealmedObject | undefined): void;
     /** Rolls to add a mastery token to action rewards */
     rollForMasteryTokens(rewards: Rewards, realm: Realm): void;
     addProvidedStats(): void;

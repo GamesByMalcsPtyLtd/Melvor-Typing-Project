@@ -31,17 +31,24 @@ declare enum ScopeSourceType {
     Subcategory = "Subcategory"
 }
 /** An object that provides actions and categories for modifier scopes */
-interface IModifierScopeSource {
+interface IModifierScopeSource extends NamespacedObject {
     name: string;
     /** Gets a registry corresponding to the given source type */
     getRegistry(type: ScopeSourceType): NamespaceRegistry<NamedObject> | undefined;
     /** Gets the object data from a package corresponding to the given source type */
     getPkgObjects(pkg: GameDataPackage, type: ScopeSourceType): IDData[] | undefined;
 }
-declare class AttackSpellScopeSource implements IModifierScopeSource {
+declare class AttackSpellScopeSource extends NamespacedObject implements IModifierScopeSource {
     game: Game;
     get name(): string;
-    constructor(game: Game);
+    constructor(nameSpace: DataNamespace, game: Game);
+    getRegistry(type: ScopeSourceType): NamespaceRegistry<NamedObject> | undefined;
+    getPkgObjects(pkg: GameDataPackage, type: ScopeSourceType): IDData[] | undefined;
+}
+declare class CombatAreaScopeSource extends NamespacedObject implements IModifierScopeSource {
+    game: Game;
+    get name(): string;
+    constructor(nameSpace: DataNamespace, game: Game);
     getRegistry(type: ScopeSourceType): NamespaceRegistry<NamedObject> | undefined;
     getPkgObjects(pkg: GameDataPackage, type: ScopeSourceType): IDData[] | undefined;
 }

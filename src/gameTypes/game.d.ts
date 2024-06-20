@@ -7,10 +7,9 @@ declare class Game extends GameEventEmitter<GameEvents> implements Serializable,
     loopInterval: number;
     loopStarted: boolean;
     disableClearOffline: boolean;
-    isUnpausing: boolean;
     previousTickTime: number;
     enableRendering: boolean;
-    maxOfflineTicks: number;
+    readonly MAX_PROCESS_TICKS: number;
     registeredNamespaces: NamespaceMap;
     /** Contains dummy namespaces used for unregistered data that is to be kept/displayed */
     dummyNamespaces: NamespaceMap;
@@ -196,6 +195,8 @@ declare class Game extends GameEventEmitter<GameEvents> implements Serializable,
     ancientRelics: NamespaceRegistry<AncientRelic>;
     ancientRelicsDisplayOrder: NamespacedArray<AnySkill>;
     skillTreesDisplayOrder: NamespacedArray<AnySkill>;
+    /** Registry of all modifier scope sources */
+    modifierScopeSources: NamespaceRegistry<IModifierScopeSource>;
     /** Registry of all modifiers */
     modifierRegistry: ModifierRegistry;
     /** Utility class for managing realm unlocks */
@@ -210,7 +211,6 @@ declare class Game extends GameEventEmitter<GameEvents> implements Serializable,
     /** Quick refereence for player modifiers */
     get modifiers(): PlayerModifierTable;
     get isBirthdayEvent2023Complete(): boolean;
-    readonly attackSpellScopeSource: AttackSpellScopeSource;
     tokenItemStats: StatProvider;
     constructor();
     fetchAndRegisterDataPackage(url: string): Promise<void>;
@@ -327,8 +327,8 @@ declare class Game extends GameEventEmitter<GameEvents> implements Serializable,
     constructDummyObject<T>(id: string, constructor: new (namespace: DataNamespace, localID: string, game: Game) => T): T;
     startMainLoop(): void;
     stopMainLoop(): void;
-    pauseActiveSkill(fromBlur?: boolean): void;
-    unpauseActiveSkill(fromFocus?: boolean): Promise<void>;
+    pauseActiveSkill(): void;
+    unpauseActiveSkill(): void;
     /** Attempts to stop the currently active action, if it belongs to a skill other than the specified one.
      *  Returns true if the active action could not be stopped
      */
@@ -355,21 +355,33 @@ declare class Game extends GameEventEmitter<GameEvents> implements Serializable,
     renderSidebarSkillUnlock(): void;
     /** Renders which skills are active in the sidebar */
     renderActiveSkills(): void;
+    /** Determines the minimum time delta in [ms] that triggers offline mode on a game loop */
+    readonly MIN_OFFLINE_TIME = 60000;
+    /** Determines the maximum time delta in [ms] that offline mode can run for */
+    readonly MAX_OFFLINE_TIME = 86400000;
+    /** Determines the minimum offline time left to process in [ms] before offline mode exits  */
+    readonly OFFLINE_EXIT_TIME = 500;
+    /** Manually tuned constant that allows the garbage collector time to run during offline progress */
+    readonly OFFLINE_GC_RATIO = 0.95;
+    /** Determines if the game is processing online/offline time */
+    _isInOnlineLoop: boolean;
+    _offlineInfo: OfflineModeInfo;
     /** The last time the game loop ran */
     _previousLoopTime: number;
+    resetTickTimestamp(): void;
     loop(): void;
+    enterOfflineLoop(loopTime: number): void;
+    exitOfflineLoop(): void;
+    /** The main loop for when the game is processing online */
+    loopOnline(loopTime: number): void;
+    /** The main loop for when the game is processing offline time */
+    loopOffline(loopTime: number): void;
     getErrorLog(error: unknown, title: string, modError: Modding.ModError): string;
     showBrokenGame(error: unknown, title: string): void;
     clearActiveAction(save?: boolean): void;
     /** Clears an action that was paused or active, if it is in either state */
     clearActionIfActiveOrPaused(action: ActiveAction): void;
-    runOfflineTicks(totalTicks: number, loadingElem?: OfflineLoadingElement): Promise<void>;
-    getOfflineTimeDiff(): {
-        timeDiff: number;
-        originalTimeDiff: number;
-    };
     trackOfflineTelemetry(oldSnapshot: OfflineSnapshot, newSnapshot: OfflineSnapshot, timeDiff: number): void;
-    processOffline(): Promise<void>;
     snapshotOffline(): OfflineSnapshot;
     /** Resets properties used to track offline progress */
     resetOfflineTracking(): void;
@@ -410,7 +422,9 @@ declare class Game extends GameEventEmitter<GameEvents> implements Serializable,
     getSkillUnlockCost(): number;
     /** Processes level cap increases to skills */
     increaseSkillLevelCaps(capIncrease: SkillLevelCapIncrease, reqSet: SkillLevelCapRequirementSet): void;
-    queueNextRandomLevelCapModal(): void;
+    /** Validates that the currently selected random level caps are still valid after a fixed/set increase */
+    validateRandomLevelCapIncreases(): void;
+    queueNextRandomLevelCapModal(noModal?: boolean): void;
     selectRandomLevelCapIncrease(capIncrease: SkillLevelCapIncrease, increase: SkillCapIncrease): void;
     fireLevelCapIncreaseModal(skill: AnySkill): void;
     fireAbyssalLevelCapIncreaseModal(skill: AnySkill): void;
@@ -455,6 +469,14 @@ declare type DummyData = {
     dataNamespace: DataNamespace;
     localID: string;
 };
+interface OfflineModeInfo {
+    action?: ActiveAction;
+    snapshot?: OfflineSnapshot;
+    offlineProgress?: OfflineProgressElement;
+    startTime: number;
+    timeProcessed: number;
+    tickRate: number;
+}
 interface OfflineSnapshot {
     currencies: Map<Currency, number>;
     prayerPoints: number;
@@ -507,11 +529,11 @@ declare class OfflineLoadingElement extends HTMLElement implements CustomElement
     connectedCallback(): void;
     /**
      * Updates the current loading progress
-     * @param totalTicks The total number of ticks being processed
-     * @param ticksLeft The number of ticks left to process
+     * @param timeProcessed The total amount of time in [ms] that has been processed
+     * @param totalTime The amount of time in [ms] left to process
      * @param tps The ticks per second the game is running at
      */
-    updateProgress(totalTicks: number, ticksLeft: number, tps: number): void;
+    updateProgress(timeProcessed: number, totalTime: number, tps: number): void;
     setError(e: unknown, modError: Modding.ModError, log: string): void;
 }
 declare class OfflineProgressElement extends HTMLElement implements CustomElement {

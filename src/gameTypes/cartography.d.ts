@@ -250,6 +250,7 @@ declare class Cartography extends Skill<CartographySkillData, CartographyEvents,
     addHiddenPOIDiscoveryHandler(): void;
     updateHiddenPOIDiscoveryHandler(): void;
     getPercentageIntervalModifier(action: PaperMakingRecipe | ArchaeologyDigSite | undefined): number;
+    _buildPercentageIntervalSources(action?: NamedObject): ModifierSourceBuilder;
     /** Returns the multiplier for all hex travel costs to apply */
     get travelCostMultiplier(): number;
     /** Last travel cost multiplier computed since modifiers changed */
@@ -358,6 +359,7 @@ declare class Cartography extends Skill<CartographySkillData, CartographyEvents,
     mapIngredientNotify(): void;
     /** Callback function for when the create map button is clicked */
     createMapOnClick(): void;
+    queueModalProgressBarRenders(): void;
     /** Callback function for when a dig site is selected in the map creation menu */
     selectDigSiteOnClick(digSite: ArchaeologyDigSite): void;
     /** Callback function for selecting a digsite map */

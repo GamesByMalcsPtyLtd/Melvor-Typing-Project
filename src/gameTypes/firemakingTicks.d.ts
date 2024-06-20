@@ -119,6 +119,7 @@ declare class Firemaking extends CraftingSkill<FiremakingLog, FiremakingSkillDat
     postDataRegistration(): void;
     onLoad(): void;
     onModifierChange(): void;
+    onAnyLevelUp(): void;
     onMasteryLevelUp(action: FiremakingLog, oldLevel: number, newLevel: number): void;
     onEquipmentChange(): void;
     onPageChange(): void;
@@ -153,6 +154,7 @@ declare class Firemaking extends CraftingSkill<FiremakingLog, FiremakingSkillDat
     stopBonfire(): void;
     endBonFire(): void;
     getBonfireInterval(recipe: FiremakingLog): number;
+    getBonfireIntervalSources(recipe: FiremakingLog): HTMLSpanElement[];
     lightBonfire(): void;
     stopOilingMyLog(): void;
     endOilingOfMyLog(): void;
@@ -168,7 +170,9 @@ declare class Firemaking extends CraftingSkill<FiremakingLog, FiremakingSkillDat
     selectLog(recipe: FiremakingLog): void;
     selectOil(oil: FiremakingOilItem): void;
     render(): void;
+    renderRealmVisibility(): void;
     renderBonfireStatus(): void;
+    renderBonfireInfo(): void;
     renderBonfireQuantity(): void;
     renderFireProgress(): void;
     renderBonfireProgress(): void;
@@ -188,9 +192,11 @@ declare class Firemaking extends CraftingSkill<FiremakingLog, FiremakingSkillDat
     getPkgObjects(pkg: GameDataPackage, type: ScopeSourceType): IDData[] | undefined;
 }
 declare class FiremakingRenderQueue extends GatheringSkillRenderQueue<FiremakingLog> {
+    logSelection: boolean;
     selectedLog: boolean;
     bonfireProgress: boolean;
     bonfireStatus: boolean;
+    bonfireInfo: boolean;
     bonfireQty: boolean;
     logQty: boolean;
     logInfo: boolean;

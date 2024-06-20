@@ -1,5 +1,6 @@
 /** Global Game Object */
 declare let game: Game;
+declare let offlineLoading: OfflineLoadingElement;
 declare let skillNav: SkillNav;
 declare let skillProgressDisplay: SkillProgressDisplay;
 declare let combatSkillProgressTable: CombatSkillProgressTableElement;

@@ -10,7 +10,8 @@ declare class RuneMenuElement extends HTMLElement implements CustomElement {
     connectedCallback(): void;
     init(game: Game): void;
     updateCounts(bank: Bank): void;
-    updateHighlights(spellSelection: SpellSelection, useAltRunes: boolean): void;
+    updateHighlights(spellSelection: SpellSelection, attackSelection: AttackSelection[], useAltRunes: boolean): void;
+    updateRealmUnlock(realm: Realm): void;
     selectRealm(realm: Realm): void;
     addBordersForSpell(spell: BaseSpell, useAltRunes: boolean): void;
     removeBorder(item: RuneItem): void;

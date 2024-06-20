@@ -184,9 +184,9 @@ declare class Player extends Character implements IGameEventEmitter<PlayerCombat
     equipCallback(item: EquipmentItem, slot: EquipmentSlot, quantity?: number): void;
     /** Attempts to quick equip the summons in a summoning synergy */
     quickEquipSynergy(synergy: SummoningSynergy): void;
-    checkCompatibleWeaponDamageTypeInEquipmentSet(setID: number, notify?: boolean): boolean;
+    checkSlayerItemEquipRestrictionsOnEquipSetChange(restrictions: CombatEquipmentRestrictions, newEquipment: Equipment): boolean;
     /** Checks if the player can change to the defined equipment set */
-    canChangeToEquipmentSet(setID: number, notify?: boolean): boolean;
+    checkEquipRestrictionsOnEquipSetChange(setID: number): boolean;
     /** Callback function for changing equipment set */
     changeEquipmentSet(setID: number): void;
     changeEquipToSet(setID: number): void;
@@ -197,22 +197,45 @@ declare class Player extends Character implements IGameEventEmitter<PlayerCombat
     updateForEquipmentChange(): void;
     /** Updates and renders the equipment sets */
     updateForEquipSetChange(): void;
-    /** Checks if the monster is immune to the damage type of the item. */
-    isCurrentMonsterImmuneToWeaponDamageType(item: WeaponItem, notify?: boolean): boolean;
-    /** Checks if the monster is immune to the damage type of the item. */
-    isMonsterImmuneToWeaponDamageType(item: WeaponItem, monster: Monster, notify?: boolean): boolean;
-    /** Checks if the monster is immune to the damage type of the item. */
-    isDamageTypeDisallowedInCurrentCombatArea(item: WeaponItem, notify?: boolean): boolean;
-    /** Checks if the monster is immune to the damage type of the item. */
-    isDamageTypeDisallowedInCombatArea(item: WeaponItem, area: AnyCombatArea, notify?: boolean): boolean;
-    /** Checks if the monster is immune to the damage type of the item. */
-    isEquipmentNeededInStronghold(item: EquipmentItem, area: Stronghold, tier: StrongholdTierName, notify?: boolean): boolean;
-    /** Checks if the monster is immune to the damage type of the item. */
-    isEquipmentAllowedInCombatArea(item: EquipmentItem, area: AnyCombatArea, notify?: boolean): boolean;
+    /**
+     * Checks damage type based equipment restrictions when changing damage types. Fires notifications for the first violation
+     * @param restrictions The restrictions to check
+     * @param damageType The new damage type being used
+     * @returns If the new damage type is valid
+     */
+    checkDamageTypeEquipRestrictions(restrictions: CombatEquipmentRestrictions, damageType: DamageType): boolean;
+    /**
+     * Checks slayer item requirements when equipping/unequipping items. Fires notifications if the operation is invalid
+     * @param restrictions The restrictions to check
+     * @param removedItems The items being removed
+     * @param newItem The new item being equipped (if any)
+     * @returns If the slayer item requirements will still be met after changing equipment
+     */
+    checkSlayerItemEquipRestrictions(restrictions: CombatEquipmentRestrictions, removedItems: ItemQuantity<EquipmentItem>[], newItem?: EquipmentItem): boolean;
+    /**
+     * Checks item based combat equipment restrictions when uneuipping items. Fires notifications for the first violation
+     * @param restrictions The restrictions to check
+     * @param removedItems The items being removed
+     * @returns If the unequip operation is valid
+     */
+    checkItemEquipRestrictions(restrictions: CombatEquipmentRestrictions, removedItems: ItemQuantity<EquipmentItem>[]): boolean;
+    /**
+     * Checks if the current restrictions on equipment will be violated when equipping an item. Fires a notification for the first violation.
+     * @param item The item being equipped
+     * @param removedItems The items that will be removed
+     * @returns If the item can be equipped
+     */
+    checkEquipRestrictionsOnEquip(item: EquipmentItem, removedItems: ItemQuantity<EquipmentItem>[]): boolean;
     /** Function for equipping an item */
     equipItem(item: EquipmentItem, set: number, slot?: EquipmentSlot, quantity?: number): boolean;
     /** Returns a callback function for unequipping an item from a slot*/
     unequipCallback(slot: EquipmentSlot): () => void;
+    /**
+     * Checks if the current restrictions on equipment will be violated when unequipping an item. Fires a notification for the first violation.
+     * @param removed The item that is being removed
+     * @returns If the item can be removed
+     */
+    checkEquipRestrictionsOnUnequip(removed: ItemQuantity<EquipmentItem>): boolean;
     /** Function for unequipping an item from a slot */
     unequipItem(set: number, slot: EquipmentSlot): boolean;
     /**
@@ -285,12 +308,6 @@ declare class Player extends Character implements IGameEventEmitter<PlayerCombat
     renderRunesUsed(): void;
     /** Determines in the player can (un)equip an item currently */
     checkIfCantEquip(): boolean;
-    /** Determines in the player can unequip an item currently */
-    checkIfCanUnequipItem(item: EquipmentItem, notify?: boolean): boolean;
-    /** Check for unequipping weapon which defaults to normal damage */
-    checkIfCanUnequipWeapon(item: WeaponItem, notify?: boolean): boolean;
-    /** Check for items that are needed in the stronghold (if player is in one) */
-    checkIfEquipmentNeededInStronghold(item: EquipmentItem, notify?: boolean): boolean;
     computeEquipmentStats(): void;
     /** Calculates the Max HP stat */
     computeMaxHP(): void;
@@ -299,6 +316,12 @@ declare class Player extends Character implements IGameEventEmitter<PlayerCombat
     computeMagicMaxHit(): number;
     computeSummonMaxHit(): void;
     computeAttackType(): void;
+    /**
+     * Gets the damage type that a given set of equipment is using
+     * @param equipment The equipment to check
+     * @returns The damage type of the equipment
+     */
+    getEquipmentDamageType(equipment: Equipment): DamageType;
     computeDamageType(): void;
     setAttackStyle(attackType: AttackType, style: AttackStyle): void;
     computeModifiers(): void;

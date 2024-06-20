@@ -38,7 +38,7 @@ declare class ArtisanMenuElement<ProductItem extends Item = Item> extends HTMLEl
     updateGrants(xp: number, baseXP: number, masteryXP: number, baseMasteryXP: number, poolXP: number, realm: Realm): void;
     updateGrantsSources(skill: AnySkill, action?: NamedObject): void;
     updateAbyssalGrants(xp: number, baseXP: number): void;
-    updateChances(preserveChance: number, preserveSources: HTMLSpanElement[], doublingChance: number, doublingSources: HTMLSpanElement[]): void;
+    updateChances(preserveChance: number, preserveCap: number, preserveSources: HTMLSpanElement[], doublingChance: number, doublingSources: HTMLSpanElement[]): void;
     updateAdditionalPrimaryQuantity(qty: number, modifierSources: HTMLSpanElement[]): void;
     updateCostReduction(reduction: number, modifierSources: HTMLSpanElement[]): void;
     updateInterval(interval: number, modifierSources: HTMLSpanElement[]): void;

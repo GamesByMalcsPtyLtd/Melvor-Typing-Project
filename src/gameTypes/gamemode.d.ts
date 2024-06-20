@@ -265,6 +265,8 @@ declare class SkillLevelCapIncrease extends NamespacedObject implements SoftData
     applyDataModification(data: SkillLevelCapIncreaseModificationData, game: Game): void;
     /** Rolls for a new random selection of level cap increases */
     rollRandomSelection(): void;
+    /** Validates the current random selection ensuring that they still have an impact. Rerolls the selection if invalid */
+    validateRandomSelection(): boolean;
     /** Sets the random selection from an array of skills. Used for save conversion */
     setSelectionFromSkills(skills: AnySkill[]): void;
     encode(writer: SaveWriter): SaveWriter;
@@ -304,6 +306,8 @@ interface LevelCapIncreaseCostData {
     maxCostScaling: number;
     /** Optional. If present, all of these skills must have a level above the new level cap to purchase an increase */
     skillLevelGates?: string[];
+    /** Optional. Sets the base level cap that can be bought  */
+    baseGateLevel?: number;
 }
 declare class LevelCapIncreaseCost {
     increase: number;
@@ -311,6 +315,7 @@ declare class LevelCapIncreaseCost {
     scalingFactor: number;
     maxCostScaling: number;
     skillLevelGates: AnySkill[];
+    baseGateLevel: number;
     constructor(data: LevelCapIncreaseCostData, game: Game);
     /** Returns if the level cap of a skill can be increased via purchase */
     canIncreaseLevelCap(skill: AnySkill): boolean;

@@ -97,7 +97,7 @@ declare class SpecialAttack extends NamespacedObject implements SoftDataDependan
     /** Enabled Attack Types this attack can activate on */
     attackTypes?: Set<AttackType>;
     /** Extra rune consumption for this attack */
-    extraRuneConsumption?: AnyItemQuantity[];
+    extraRuneConsumption?: ItemQuantity<RuneItem>[];
     /** Attack is considered to be dragonbreath */
     isDragonbreath: boolean;
     minAccuracy: number;

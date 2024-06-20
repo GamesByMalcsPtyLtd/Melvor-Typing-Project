@@ -1,5 +1,10 @@
 declare class FiremakingLogMenuElement extends HTMLElement implements CustomElement {
     _content: DocumentFragment;
+    realmSelect: HTMLDivElement;
+    expandButton: HTMLButtonElement;
+    expandDiv: HTMLDivElement;
+    realmContainer: HTMLUListElement;
+    dropdownSelect: HTMLDivElement;
     logSelectButton: HTMLButtonElement;
     logOptionsContainer: HTMLDivElement;
     logQuantity: ItemCurrentIconElement;
@@ -14,6 +19,7 @@ declare class FiremakingLogMenuElement extends HTMLElement implements CustomElem
     burnButton: HTMLButtonElement;
     interval: IntervalIconElement;
     progressBar: ProgressBarElement;
+    realmOptions: Map<Realm, RealmSelectOptionElement>;
     recipeOptions: Map<FiremakingLog, {
         link: HTMLAnchorElement;
         name: HTMLSpanElement;
@@ -22,7 +28,9 @@ declare class FiremakingLogMenuElement extends HTMLElement implements CustomElem
     constructor();
     connectedCallback(): void;
     init(game: Game, firemaking: Firemaking): void;
+    collapseOptions(): void;
     updateOptions(game: Game, firemaking: Firemaking): void;
+    updateRealmUnlock(realm: Realm): void;
     setUnselected(): void;
     setLog(game: Game, firemaking: Firemaking, recipe: FiremakingLog): void;
     updateQuantities(game: Game): void;
@@ -45,9 +53,9 @@ declare class FiremakingBonfireMenuElement extends HTMLElement implements Custom
     constructor();
     connectedCallback(): void;
     init(firemaking: Firemaking): void;
-    updateInfo(firemaking: Firemaking, recipe: FiremakingLog): void;
-    setActive(firemaking: Firemaking): void;
-    setInactive(firemaking: Firemaking, selectedLog: FiremakingLog | undefined): void;
+    updateInfo(firemaking: Firemaking, recipe?: FiremakingLog): void;
+    setActive(): void;
+    setInactive(): void;
     updateItemQuantity(game: Game, activeBonfire: FiremakingLog): void;
     toggleAbyssalState(isAbyssal: boolean): void;
 }

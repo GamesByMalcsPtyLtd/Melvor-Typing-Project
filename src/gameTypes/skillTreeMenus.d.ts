@@ -62,9 +62,9 @@ declare class SkillTreeMenuElement extends HTMLElement implements CustomElement 
     zoomIn: HTMLButtonElement;
     zoomOut: HTMLButtonElement;
     pointsCount: HTMLSpanElement;
-    pointsTotal: HTMLSpanElement;
     dropdownBtn: HTMLButtonElement;
     dropdownItems: HTMLDivElement;
+    dropdownItemMap: Map<AnySkill, HTMLSpanElement>;
     elementScrollDragger: ElementScrollDragger;
     get currentSkillTree(): SkillTree | undefined;
     _currentSkillTree?: SkillTree;
@@ -78,6 +78,7 @@ declare class SkillTreeMenuElement extends HTMLElement implements CustomElement 
     constructor();
     initialize(game: Game): void;
     createDropdownItem(skill: AnySkill): void;
+    updateDropdownItem(skill: AnySkill): void;
     getSkillItem(skill: AnySkill): HTMLImageElement;
     connectedCallback(): void;
     getNodeIcon(node: SkillTreeNode): SkillTreeNodeIconElement | undefined;

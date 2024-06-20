@@ -167,7 +167,6 @@ declare class Farming extends SkillWithMastery<FarmingRecipe, FarmingSkillData, 
     getPlotGrowthChance(plot: FarmingPlot): number;
     getPlotGrowthTime(plot: FarmingPlot): number;
     getHarvestAllCost(category: FarmingCategory): number;
-    getCompostAllCost(category: FarmingCategory): number;
     getPlantAllCost(category: FarmingCategory): number;
     getActionModifierQueryParams(action?: NamedObject): SkillModifierQueryParams;
     /** Temporarily stores the bonus to harvest quantity from compost so it gets included in modifier calculations */
@@ -177,6 +176,7 @@ declare class Farming extends SkillWithMastery<FarmingRecipe, FarmingSkillData, 
     harvestPlot(plot: FarmingPlot): boolean;
     clearDeadPlot(plot: FarmingPlot): void;
     resetPlot(plot: FarmingPlot): void;
+    removeCompostFromPlot(plot: FarmingPlot): void;
     plantPlot(plot: FarmingPlot, recipe: FarmingRecipe, isSelected?: boolean): number;
     plantAllPlots(category: FarmingCategory, forceRecipe?: FarmingRecipe): void;
     onMasteryLevelUp(action: FarmingRecipe, oldLevel: number, newLevel: number): void;

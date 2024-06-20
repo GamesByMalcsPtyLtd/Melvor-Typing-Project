@@ -82,12 +82,9 @@ declare class Equipment implements EncodableObject, Serializable {
     get isWeapon2H(): boolean;
     get equipMenuMedia(): string;
     /** Returns the items that will be removed on equipping */
-    getItemsAddedOnEquip(item: EquipmentItem, slot?: EquipmentSlot): {
-        item: EquipmentItem;
-        quantity: number;
-    }[];
+    getItemsAddedOnEquip(item: EquipmentItem, slot?: EquipmentSlot): ItemQuantity<EquipmentItem>[];
     /** Returns the items that will be removed on unequipping */
-    getItemsAddedOnUnequip(slot: EquipmentSlot): AnyItemQuantity;
+    getItemsAddedOnUnequip(slot: EquipmentSlot): ItemQuantity<EquipmentItem>;
     /** Gets the actually equipped slots to unequip when equipping an item */
     getSlotsToUnequip(itemToEquip: EquipmentItem, slot: EquipmentSlot): EquipmentSlot[];
     /** Gets the root slot of an occupied slot */

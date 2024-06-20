@@ -35,6 +35,7 @@ declare class Smithing extends ArtisanSkill<SmithingRecipe, SmithingSkillData, A
     getSmithedVersionOfOre(ore: AnyItem): AnyItem | undefined;
     getUncappedCostReduction(action?: SmithingRecipe, item?: AnyItem): number;
     getFlatCostReduction(action?: SmithingRecipe, item?: AnyItem): number;
+    modifyItemCost(item: AnyItem, quantity: number, recipe: NamedObject): number;
     getActionModifierQueryParams(action?: NamedObject): SkillModifierQueryParams;
     onMasteryLevelUp(action: SmithingRecipe, oldLevel: number, newLevel: number): void;
     recordCostPreservationStats(costs: Costs): void;

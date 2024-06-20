@@ -92,6 +92,8 @@ declare class SkillTree extends NamespacedObject implements EncodableObject, IGa
     unlockNode(node: SkillTreeNode): void;
     onNodeUnlocked(node: SkillTreeNode): void;
     addPoints(amount: number): void;
+    /** Gets the total amount of points spent in this tree */
+    getTotalPointsSpent(): number;
 }
 declare class DummySkillTree extends SkillTree {
     constructor(namespace: DataNamespace, localID: string, game: Game);

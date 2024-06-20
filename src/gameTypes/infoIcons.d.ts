@@ -69,7 +69,7 @@ declare class IntervalIconElement extends InfoIconElement {
     /** Toggles the alternative media for this icon */
     setMedia(altMedia: boolean): void;
     setInterval(interval: number, modifierSources: HTMLSpanElement[]): void;
-    setCustomInterval(interval: string): void;
+    setCustomInterval(interval: string, modifierSources: HTMLSpanElement[]): void;
 }
 declare class DoublingIconTooltipElement extends HTMLElement implements CustomElement {
     _content: DocumentFragment;
@@ -103,7 +103,7 @@ declare class PreservationIconElement extends InfoIconElement {
     tooltipElem: PreservationIconTooltipElement;
     chance: HTMLElement;
     constructor();
-    setChance(chance: number, sourceSpans: HTMLSpanElement[]): void;
+    setChance(chance: number, cap: number, sourceSpans: HTMLSpanElement[]): void;
 }
 declare class PerfectCookIconTooltipElement extends HTMLElement implements CustomElement {
     _content: DocumentFragment;

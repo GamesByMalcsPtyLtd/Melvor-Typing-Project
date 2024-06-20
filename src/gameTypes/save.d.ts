@@ -152,9 +152,9 @@ declare let inFocus: boolean;
 declare const onloadEvent: (accessCheck?: boolean) => void;
 declare function confirmedAuthenticated(): void;
 declare function checkIfAuthenticated(): Promise<void>;
-declare const INTERFACE_VERSION = 164;
+declare const INTERFACE_VERSION = 183;
 declare function loadGameInterface(accessCheck?: boolean): Promise<void>;
-declare const DATA_VERSION = 467;
+declare const DATA_VERSION = 495;
 declare function changePageCharacterSelection(page: CharacterSelectPage): void;
 /** Future announcement handler that will occur dynamically. For now this is hard coded. */
 declare function updateUIForAnnouncements(): void;
@@ -179,6 +179,8 @@ declare let isCreatingSave: boolean;
 /** Attempts to load the save in the string */
 declare function loadSaveFromString(saveString: string): Promise<void>;
 declare function processSaveLoadError(slotID: number, isCloud: boolean, error: unknown): void;
+declare function showTitleScreenError(error: unknown, title: string): void;
+declare function getTitleScreenErrorLog(error: unknown, title: string, modError: Modding.ModError): string;
 /** Attempts to load the local save in the given save slot */
 declare function loadLocalSave(slotID: number): Promise<void>;
 /** Attempts to load the cloud save in the given save slot */

@@ -348,6 +348,9 @@ declare class CombatArea extends RealmedObject implements SoftDataDependant<Comb
     /** If set, override all monster damage types in the area with this */
     overrideDamageType?: DamageType;
     allowedGamemodes: Set<Gamemode>;
+    modQuery: ModifierQuery;
+    get category(): CombatAreaCategory | undefined;
+    _category?: CombatAreaCategory;
     constructor(namespace: DataNamespace, data: CombatAreaData, game: Game);
     registerSoftDependencies(data: CombatAreaData, game: Game): void;
     applyDataModification(modData: CombatAreaModificationData, game: Game): void;
@@ -356,6 +359,8 @@ declare class CombatArea extends RealmedObject implements SoftDataDependant<Comb
     constructAreaEffect(data: CombatAreaEffectData, game: Game): CombatAreaEffect;
     isRequiredGamemode(gamemode: Gamemode): boolean;
     canEnterWithDamageType(damageType: DamageType): boolean;
+    setCategory(category: CombatAreaCategory): void;
+    removeCategory(): void;
 }
 declare class SlayerArea extends CombatArea {
     areaEffect?: CombatAreaEffect;

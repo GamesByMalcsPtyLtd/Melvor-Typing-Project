@@ -21,7 +21,10 @@ interface PetData extends IDData, IStatObjectData {
     customDescription?: string;
     /** Optional, Language string for custom description */
     langCustomDescription?: string;
+    /** Optional, What realms this pet drop is exclusive to */
+    realms?: string[];
 }
+declare type PetModificationData = IDData & IStatObjectModificationData;
 declare class Pet extends NamespacedObject {
     get name(): string;
     get media(): string;
@@ -39,7 +42,10 @@ declare class Pet extends NamespacedObject {
     _patreonName?: string;
     _customDescription?: string;
     _langCustomDescription?: string;
+    realms: Set<Realm>;
     constructor(namespace: DataNamespace, data: PetData, game: Game);
+    applyDataModification(data: PetModificationData, game: Game): void;
+    isCorrectRealmForPetDrop(realm: Realm): boolean;
 }
 declare class DummyPet extends Pet {
     constructor(namespace: DataNamespace, id: string, game: Game);

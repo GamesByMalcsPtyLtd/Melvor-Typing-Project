@@ -164,7 +164,7 @@ declare type PackagedSave = {
     cd: number[];
 };
 declare const saveFormat2Version = 21;
-declare const currentSaveVersion = SaveVersion.ITAShowSoulPointsSetting;
+declare const currentSaveVersion = SaveVersion.StickyBankTabsSetting;
 declare const enum SaveVersion {
     ModProfiles = 83,
     MasteryModalFilter = 84,
@@ -192,7 +192,8 @@ declare const enum SaveVersion {
     CombatEffectStatGroups = 119,
     CorruptionUnlocks = 120,
     AbyssalWaveTimer = 121,
-    ITAShowSoulPointsSetting = 122
+    ITAShowSoulPointsSetting = 122,
+    StickyBankTabsSetting = 123
 }
 interface AddRemove<T> {
     add: T[];

@@ -189,6 +189,8 @@ interface BooleanSettings {
     enableDoubleClickBury: boolean;
     /** If Soul Points should show next to Prayer instead of PP */
     showSPNextToPrayerSidebar: boolean;
+    /** If Bank tabs should be sticky */
+    enableStickyBankTabs: boolean;
 }
 interface ChoiceSettings {
     /** If special attack modifiers should use neutral colours */
@@ -345,6 +347,7 @@ declare class Settings implements EncodableObject, BooleanSettings, ChoiceSettin
     get enableDoubleClickOpen(): boolean;
     get enableDoubleClickBury(): boolean;
     get showSPNextToPrayerSidebar(): boolean;
+    get enableStickyBankTabs(): boolean;
     /** The set of mastery namespaces that should be hidden in the spend mastery modal */
     hiddenMasteryNamespaces: Set<string>;
     constructor(game: Game);

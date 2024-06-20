@@ -6,6 +6,20 @@ declare type ActiveCombatPassive = {
     /** If the combt passive should be encoded into the save */
     save: boolean;
 };
+/** The current restrictions on the player's equipment in combat */
+interface CombatEquipmentRestrictions {
+    /** Items required due to SlayerItemRequirements */
+    slayer?: {
+        level: number;
+        items: EquipmentItem[];
+    };
+    /** Items required due to the current area the player is in */
+    areaItems?: EquipmentItem[];
+    /** Damage Types that the current area allows */
+    areaDamageTypes?: Set<DamageType>;
+    /** The damage type of the monster the player is currently fighting */
+    monsterDamageType?: DamageType;
+}
 declare type BaseCombatEvents = {
     endOfFight: EndOfFightEvent;
     startOfFight: StartOfFightEvent;
@@ -23,6 +37,8 @@ declare abstract class BaseManager extends NamespacedObject implements Serializa
     abstract enemy: Enemy;
     /** Currently selected combat area. undefined if none is selected. */
     selectedArea?: AnyCombatArea;
+    /** Gets a modifier query for combat area specific modifiers */
+    get areaModQuery(): ModifierQuery;
     /** The Type of combat area the player is currently in */
     get areaType(): CombatAreaType;
     /** The realm of the combat area the player is currently in */
@@ -79,6 +95,8 @@ declare abstract class BaseManager extends NamespacedObject implements Serializa
     getAreaEffectMagnitude(areaEffect: CombatAreaEffect, realm: Realm): number;
     areaEffectMult: number;
     computeAreaEffects(): void;
+    /** Gets the current restrictions to player equipment */
+    getEquipmentRestrictions(): CombatEquipmentRestrictions;
     /** Registers a new stat provider for the player/enemy */
     registerStatProvider(provider: IStatProvider): void;
     /** Performs a full stat recalculation of conditional modifiers, followed by player and enemy stats */
@@ -200,4 +218,6 @@ declare class ManagerRenderQueue {
     corruptionMenus: boolean;
     /** Updates the visibility of resistances based on damage type equipped */
     resistanceMenus: boolean;
+    /** Updates the visibility of realm related combat menus */
+    realmVisibility: Set<Realm>;
 }

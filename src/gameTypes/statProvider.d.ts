@@ -96,7 +96,7 @@ declare class StatObjectSummary {
     modifiers: ModifierTable;
     enemyModifiers: ModifierTable;
     combatEffects: CombatEffectApplicator[];
-    conditionalModifiers: ConditionalModifier[];
+    conditionalModifiers: ConditionalModifierSource[];
     addStatObject(source: ModifierSource, stats: IStatObject, negMult?: number, posMult?: number): void;
     getAllDescriptions(): StatDescription[];
 }

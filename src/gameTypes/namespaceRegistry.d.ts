@@ -146,7 +146,12 @@ declare type InsertOrder = InsertStart | InsertEnd | InsertBefore | InsertAfter;
 declare class NamespacedArray<T extends NamespacedObject> extends Array<T> {
     registery: NamespaceRegistry<T>;
     constructor(registery: NamespaceRegistry<T>, ...items: T[]);
-    registerData(insertions: InsertOrder[]): void;
+    /**
+     * Registers new objects to this array in the order specified
+     * @param insertions The new objects to insert
+     * @returns An array of all new objects inserted
+     */
+    registerData(insertions: InsertOrder[]): T[];
 }
 declare class UnregisteredObjectError extends Error {
     get name(): string;

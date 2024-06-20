@@ -176,10 +176,10 @@ declare function removePyro(): void;
 declare function startPyroInterval(): void;
 /** Helps queue game notifications */
 declare class NotificationQueue {
-    maxNotifiactions: number;
+    maxNotifications: number;
     queue: QueuedNotify[];
     disableQueueLimit: boolean;
-    constructor(maxNotifiactions: number);
+    constructor(maxNotifications: number);
     notify(): void;
     add(notification: QueuedNotify): void;
     clear(): void;
@@ -329,7 +329,7 @@ declare const formatAsOrdinal: (value: number) => string;
 /** Formats a number with a locale specific thousands seperator */
 declare function numberWithCommas(number: number | string, ignoreSetting?: boolean): string;
 /** Formats a number with a postfix */
-declare function formatNumber(number: number, decimals?: number): string;
+declare function formatNumber(number: number, maximumFractionDigits?: number): string;
 /** Formats a percentage with locale sensitivity. Uses the 0-100 range
  * @example formatPercent(5) // 5%
  * @example formatPercent(34.2,2) // 34.20%
@@ -372,7 +372,7 @@ declare function successSpan(content: string): string;
 declare function getTemplateElement(templateID: string): HTMLTemplateElement;
 declare function getTemplateNode(templateID: string): Node;
 declare function getAnyElementFromFragment(fragment: DocumentFragment, elementID: string): HTMLElement;
-declare function getElementFromFragment<T extends keyof HTMLElementTagNameMap>(fragment: DocumentFragment, elementID: string, tagName: T): HTMLElementTagNameMap[T];
+declare function getElementFromFragment<T extends keyof HTMLElementTagNameMap>(fragment: DocumentFragment, elementID: string, tagName: T, preserveID?: boolean): HTMLElementTagNameMap[T];
 /** Formats a number to locale sensitive fixed digits */
 declare function formatFixed(num: number, digits: number): string;
 declare function switchToCategory<T extends HasLevels>(tabs: Map<CategoryLike, RecipeSelectionTabElement<T>>): (categoryToShow: CategoryLike) => void;

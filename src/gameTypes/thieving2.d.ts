@@ -184,10 +184,12 @@ declare class Thieving extends GatheringSkill<ThievingNPC, ThievingSkillData, Th
     getNPCPickpocket(npc: ThievingNPC): number;
     getStealthAgainstNPC(npc: ThievingNPC): number;
     getStealthSources(npc: ThievingNPC): HTMLSpanElement[];
+    getUncappedDoublingChance(action?: NamedObject): number;
+    _buildDoublingSources(action?: NamedObject): ModifierSourceBuilder;
     getPercentageIntervalModifier(action: ThievingNPC): number;
+    _buildPercentageIntervalSources(action?: NamedObject): ModifierSourceBuilder;
     /** Returns the interval an npc in ms */
     getNPCInterval(npc: ThievingNPC): number;
-    getNPCDoublingChance(npc: ThievingNPC): number;
     getNPCCurrencyRange(npc: ThievingNPC, currency: Currency, max: number): {
         min: number;
         max: number;

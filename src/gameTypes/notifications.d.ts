@@ -17,6 +17,16 @@ declare class GenericNotification {
     constructor(type: NotificationType);
     get type(): NotificationType;
 }
+declare class AddCurrencyNotification extends GenericNotification {
+    get currency(): Currency;
+    _currency: Currency;
+    constructor(currency: Currency);
+}
+declare class RemoveCurrencyNotification extends GenericNotification {
+    get currency(): Currency;
+    _currency: Currency;
+    constructor(currency: Currency);
+}
 declare class AddItemNotification extends GenericNotification {
     _item: AnyItem;
     constructor(item: AnyItem);
@@ -67,6 +77,8 @@ declare class NotificationsManager {
     activeNotifications: Map<AnyNotification, NotificationData>;
     activeNotificationElements: Map<AnyNotification, GameNotificationElement>;
     timeoutIds: Map<AnyNotification, number>;
+    addCurrencyNotifications: Map<Currency, AddCurrencyNotification>;
+    removeCurrencyNotifications: Map<Currency, RemoveCurrencyNotification>;
     addItemNotificationClasses: Map<AnyItem, AddItemNotification>;
     removeItemNotificationClasses: Map<AnyItem, RemoveItemNotification>;
     summoningMarkNotificationClasses: Map<SummoningRecipe, SummoningMarkNotification>;
@@ -89,9 +101,11 @@ declare class NotificationsManager {
     createItemNotification(item: AnyItem, quantity: number): void;
     newAddItemNotification(item: AnyItem): AddItemNotification | undefined;
     newRemoveItemNotification(item: AnyItem): RemoveItemNotification | undefined;
+    createCurrencyNotification(currency: Currency, quantity: number): void;
+    getAddCurrencyNotification(currency: Currency): AddCurrencyNotification;
+    getRemoveCurrencyNotification(currency: Currency): RemoveCurrencyNotification;
     createGPNotification(quantity: number): void;
     createSlayerCoinsNotification(quantity: number): void;
-    createCurrencyNotification(currency: Currency, quantity: number): void;
     createSummoningMarkNotification(mark: SummoningRecipe): void;
     createErrorNotification(customID: string, msg: string): void;
     createSuccessNotification(customID: string, msg: string, media: string, quantity?: number): void;

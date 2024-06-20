@@ -115,6 +115,7 @@ interface GameDataModifications {
   modifiers?: ModifierModificationData[];
   skillData?: AnySkillModificationData[];
   skillLevelCapIncreases?: SkillLevelCapIncreaseModificationData[];
+  pets?: PetModificationData[];
 }
 
 interface GameDataNamespaceChange {

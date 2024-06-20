@@ -134,6 +134,7 @@ declare class GrantsBoxElement extends HTMLElement implements CustomElement {
 interface CookingBonusValues {
     preserve: {
         value: number;
+        cap: number;
         sources: HTMLSpanElement[];
     };
     double: {

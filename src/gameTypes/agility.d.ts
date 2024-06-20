@@ -209,6 +209,7 @@ declare class Agility extends GatheringSkill<AgilityObstacle, AgilitySkillData, 
     /** Gets the interval required to complete an obstacle */
     getObstacleInterval(obstacle: AgilityObstacle): number;
     getXPModifier(masteryAction?: AgilityObstacle): number;
+    _buildXPSources(action?: NamedObject | undefined): ModifierSourceBuilder;
     getCurrencyModifier(currency: Currency, obstacle: AgilityObstacle): number;
     getMasteryXPModifier(action: AgilityObstacle): number;
     _buildMasteryXPSources(action?: NamedObject): ModifierSourceBuilder;

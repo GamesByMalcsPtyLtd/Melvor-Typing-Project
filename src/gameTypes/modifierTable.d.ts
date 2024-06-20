@@ -310,9 +310,6 @@ declare class PlayerModifierTable extends CharacterModifierTable {
     readonly combatLootDoublingChance: number;
     readonly damageDealtToBosses: number;
     readonly damageDealtToSlayerTasks: number;
-    readonly damageDealtToSlayerAreaMonsters: number;
-    readonly damageDealtToCombatAreaMonsters: number;
-    readonly damageDealtToDungeonMonsters: number;
     readonly damageDealtToAllMonsters: number;
     readonly autoEatEfficiency: number;
     readonly autoEatThreshold: number;
@@ -381,6 +378,7 @@ declare class PlayerModifierTable extends CharacterModifierTable {
     readonly summoningSynergy_Leprechaun_Devil: number;
     readonly hitpointRegenerationAgainstSlayerTasks: number;
     readonly flatSmithingCoalCost: number;
+    readonly removeSmithingCoalCosts: number;
     readonly meleeStrengthBonus: number;
     readonly rangedStrengthBonus: number;
     readonly magicDamageBonus: number;
@@ -546,7 +544,6 @@ declare class PlayerModifierTable extends CharacterModifierTable {
     readonly doubleHarvestingIntensityChance: number;
     readonly townshipMaxSoulStorage: number;
     readonly starFallChance: number;
-    readonly damageDealtToAbyssalSlayerAreaMonsters: number;
     readonly skillPreservationCap: number;
     readonly flatDrakeNestsFromThievingTreant: number;
     readonly woodcuttingDrakeNestJewelryChance: number;

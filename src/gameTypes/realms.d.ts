@@ -63,6 +63,7 @@ declare class RealmSelectOptionElement extends HTMLElement implements CustomElem
     setCallback(callback: VoidFunction): void;
     setAsSubMenu(): void;
     addSubOption(option: HTMLElement): void;
+    enableSubmenuScrolling(maxHeight: number): void;
     enableSubmenu(): void;
     disableSubmenu(): void;
     addSubmenuFix(): void;

@@ -112,6 +112,7 @@ declare class CombatManager extends BaseManager implements PassiveAction, IGameE
     /** Management class for combat */
     constructor(game: Game, namespace: DataNamespace);
     initialize(): void;
+    getEquipmentRestrictions(): CombatEquipmentRestrictions;
     postDataRegistration(): void;
     passiveTick(): void;
     activeTick(): void;
@@ -126,6 +127,7 @@ declare class CombatManager extends BaseManager implements PassiveAction, IGameE
     renderCompletionCount(): void;
     renderPetStatus(): void;
     renderResistanceMenus(): void;
+    renderRealmVisibility(): void;
     updateResistanceMenuVisibility(damageType: DamageType): void;
     renderCorruptionMenus(): void;
     renderAreaSkillUnlockCounts(): void;
@@ -189,7 +191,14 @@ declare class CombatManager extends BaseManager implements PassiveAction, IGameE
     renderEventAreas(): void;
     checkAreaEntryRequirements(area: AnyCombatArea): boolean;
     checkDamageTypeRequirementsForMonster(monster: Monster, notify?: boolean): boolean;
+    isDamageTypeBlockedFromMonster(damageType: DamageType, monster: Monster): boolean;
     isCurrentDamageTypeDisallowed(area: AnyCombatArea, notify?: boolean): boolean;
+    isDamageTypeBlockedFromArea(damageType: DamageType, area: AnyCombatArea): boolean;
+    notifyIncorrectDamageTypeForMonster(monster: Monster): void;
+    notifyIncorrectDamageTypeForArea(area: AnyCombatArea): void;
+    getCurrentDamageTypeHTML(damageType: DamageType): string;
+    fireDamageTypeSwal(content: string, media: string): void;
+    getCompatibleDamageTypesHTML(compatibleDamageTypes: DamageType[]): string;
     /** Callback function for selecting a monster */
     selectMonster(monster: Monster, area: CombatArea | SlayerArea): void;
     /** Callback function for selecting a dungeon */

@@ -99,6 +99,8 @@ declare class BankTabMenuElement extends HTMLElement implements CustomElement {
     setTabValue(value: SparseNumericMap<Currency>): void;
     setBankValue(value: SparseNumericMap<Currency>): void;
     setValueLabel(label: HTMLElement, value: SparseNumericMap<Currency>): TippyTooltip[];
+    enableStickyBankTabs(): void;
+    disableStickyBankTabs(): void;
 }
 /** Dropdown menu for selecting a tab in the bank */
 declare class BankTabDropdownMenuElement extends HTMLElement implements CustomElement {

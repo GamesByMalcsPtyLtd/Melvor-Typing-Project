@@ -19,6 +19,7 @@ declare class FarmingCategoryOptionsElement extends HTMLElement implements Custo
     constructor();
     connectedCallback(): void;
     setCategory(category: FarmingCategory, game: Game): void;
+    getCurrencyIconHTML(currency: Currency): string;
 }
 declare class FarmingPlotElement extends HTMLElement implements CustomElement {
     _content: DocumentFragment;
@@ -41,6 +42,7 @@ declare class FarmingPlotElement extends HTMLElement implements CustomElement {
     masteryIcon: MasteryXpIconElement;
     masteryPoolIcon: MasteryPoolIconElement;
     compostStatus: HTMLSpanElement;
+    removeCompost: HTMLButtonElement;
     constructor();
     connectedCallback(): void;
     disconnectedCallback(): void;

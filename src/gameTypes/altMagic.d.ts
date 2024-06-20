@@ -1,5 +1,5 @@
 declare type AltMagicConsumption = 'AnyItem' | 'JunkItem' | 'BarIngredientsWithCoal' | 'BarIngredientsWithoutCoal' | 'None' | 'AnySuperiorGem' | 'AnyNormalFood';
-declare type AltMagicProduction = 'GP' | 'Bar' | 'RandomGem' | 'RandomSuperiorGem' | 'PerfectFood' | 'RandomShards' | 'MagicXP';
+declare type AltMagicProduction = 'GP' | 'Bar' | 'RandomGem' | 'RandomSuperiorGem' | 'PerfectFood' | 'RandomShards' | 'MagicXP' | 'AbyssalMagicXP';
 /** Determines which items are consumed by an alt. magic spell */
 declare enum AltMagicConsumptionID {
     AnyItem = -1,
@@ -17,7 +17,8 @@ declare enum AltMagicProductionID {
     RandomSuperiorGem = -4,
     PerfectFood = -5,
     RandomShards = -6,
-    MagicXP = -7
+    MagicXP = -7,
+    AbyssalMagicXP = -8
 }
 interface AltMagicSpecialCostData {
     type: AltMagicConsumption;
@@ -132,6 +133,7 @@ declare class AltMagic extends CraftingSkill<AltMagicSpell, MagicSkillData, Magi
     getPreservationChance(action?: NamedObject): number;
     getPreservationSources(action?: NamedObject): HTMLSpanElement[];
     getXPModifier(masteryAction?: AltMagicSpell): number;
+    _buildXPSources(action?: NamedObject): ModifierSourceBuilder;
     recordCostConsumptionStats(costs: Costs): void;
     /** Left as void as it is not possible to preserve items in alt. magic */
     recordCostPreservationStats(costs: Costs): void;

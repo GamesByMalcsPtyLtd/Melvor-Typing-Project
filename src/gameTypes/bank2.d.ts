@@ -290,7 +290,7 @@ declare class Bank extends GameEventEmitter<BankEvents> implements EncodableObje
     /** Test function. Determines items that are missing from the default sort order per namespace */
     printItemsNotInDefaultSortOrder(): void;
     /** Absolute maximum number of bank tabs allowed by save format */
-    static readonly MAXIMUM_TABS = 256;
+    static readonly MAXIMUM_TABS = 255;
 }
 /** Class for an individual bank item */
 declare class BankItem {
