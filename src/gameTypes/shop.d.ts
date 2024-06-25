@@ -205,12 +205,9 @@ declare class ShopRenderQueue {
 declare type ShopEvents = {
     purchaseMade: ShopPurchaseMadeEvent;
 };
-declare class Shop extends GameEventEmitter<ShopEvents> implements EncodableObject, IStatProvider, IRaidStatProvider {
+declare class Shop extends GameEventEmitter<ShopEvents> implements EncodableObject, IRaidStatProvider {
     game: Game;
-    modifiers: ModifierTable;
-    enemyModifiers: ModifierTable;
-    conditionalModifiers: ConditionalModifierSource[];
-    combatEffects: CombatEffectApplicator[];
+    providedStats: StatProvider;
     raidStats: StatProvider;
     /** Stores the number of times an upgrade has been purchased */
     upgradesPurchased: Map<ShopPurchase, number>;
@@ -248,7 +245,6 @@ declare class Shop extends GameEventEmitter<ShopEvents> implements EncodableObje
     updateBuyQuantity(quantity: number): void;
     encode(writer: SaveWriter): SaveWriter;
     decode(reader: SaveWriter, version: number): void;
-    addStatObject(source: ModifierSource, stats: IStatObject, count: number): void;
     computeProvidedStats(updatePlayers?: boolean): void;
     /** Gets the currency cost for a given purchase quantity */
     getCurrencyCost(cost: AnyShopCost, buyQuantity: number, boughtQuantity: number): number;

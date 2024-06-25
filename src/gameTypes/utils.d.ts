@@ -381,6 +381,13 @@ declare function switchToCategory<T extends HasLevels>(tabs: Map<CategoryLike, R
  * @param delay Time to delay in [ms]
  */
 declare function delayPromise(delay: number): Promise<void>;
+/**
+ * Creates a promise that resolves when the next occurence of a GameEvent is fired from an IGameEventEmitter
+ * @param emitter The object that emits the event
+ * @param key The key of the event to wait for
+ * @returns A promise that resolves when the event next occurs
+ */
+declare function delayUntilGameEvent<Events extends Record<EventType, GameEvent>>(emitter: IGameEventEmitter<Events>, key: keyof Events): Promise<void>;
 /** Tells the browser to download a text file */
 declare function downloadTextFile(fileName: string, fileText: string, fileType?: string): void;
 /** Takes the original array, and returns a soft copy without the elements contained in remove */

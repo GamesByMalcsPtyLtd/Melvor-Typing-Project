@@ -644,7 +644,7 @@ declare abstract class SkillWithMastery<ActionType extends MasteryAction, DataTy
     masteryTokens: Map<Realm, MasteryTokenItem[]>;
     /** Readonly. Returns the percent of the base mastery pool xp the skill an reach */
     get masteryPoolCapPercent(): number;
-    /** The chance to recieve a mastery token for this skill per action */
+    /** The chance to receive a mastery token for this skill per action */
     get masteryTokenChance(): number;
     abstract renderQueue: MasterySkillRenderQueue<ActionType>;
     /** Sorted array of all mastery actions for the skill */

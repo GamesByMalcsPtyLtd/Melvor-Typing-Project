@@ -1,5 +1,7 @@
 /** Events emitted by the Game object */
 declare type GameEvents = {
+    offlineLoopEntered: GameEvent;
+    offlineLoopExited: GameEvent;
     requirementChange: RequirementChangedEvent;
     skillAction: SkillActionEvent;
 };
@@ -327,6 +329,12 @@ declare class Game extends GameEventEmitter<GameEvents> implements Serializable,
     constructDummyObject<T>(id: string, constructor: new (namespace: DataNamespace, localID: string, game: Game) => T): T;
     startMainLoop(): void;
     stopMainLoop(): void;
+    /** If interaction with the game is currently blocked */
+    interactionBlocked: boolean;
+    /** Adds an invisible overlay that blocks interaction with the game, while the main loop is paused. Removed when the game loops once. */
+    blockInteraction(): void;
+    /** Removes the invisible overlay that blocks interaction. Called when the game loops and interaction is blocked */
+    unblockInteraction(): void;
     pauseActiveSkill(): void;
     unpauseActiveSkill(): void;
     /** Attempts to stop the currently active action, if it belongs to a skill other than the specified one.
@@ -369,6 +377,9 @@ declare class Game extends GameEventEmitter<GameEvents> implements Serializable,
     /** The last time the game loop ran */
     _previousLoopTime: number;
     resetTickTimestamp(): void;
+    _forceOfflineLoop: boolean;
+    /** Triggers the game to enter the offline loop on its next loop */
+    triggerOfflineLoop(): void;
     loop(): void;
     enterOfflineLoop(loopTime: number): void;
     exitOfflineLoop(): void;

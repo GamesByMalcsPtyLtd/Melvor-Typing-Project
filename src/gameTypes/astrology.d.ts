@@ -39,7 +39,7 @@ interface AstrologyRecipeData extends BasicSkillRecipeData {
     name: string;
     media: string;
     skillIDs: string[];
-    /** Optional. Specifies the random items that can be recieved from this constellation. Defaults to startdust + golden stardust */
+    /** Optional. Specifies the random items that can be received from this constellation. Defaults to startdust + golden stardust */
     randomItems?: string[];
     /** Optional. Whether this constellation can locate Meteorites. Requires Throne of the Herald. Defaults to true if unset. */
     canLocateMeteorites?: boolean;
@@ -133,7 +133,7 @@ declare class Astrology extends GatheringSkill<AstrologyRecipe, AstrologySkillDa
     isModifierUnlocked(constellation: AstrologyRecipe, type: AstrologyModifierType, modID: number): boolean;
     refundStardust(): void;
     refundStardustAgain(): void;
-    /** Gets the chance to recieve a given random item from a constellation */
+    /** Gets the chance to received a given random item from a constellation */
     getRandomItemChance(item: Item): number;
     /** Gets the quantity of a random item to give from a constellation */
     getRandomItemQuantity(item: Item, action: AstrologyRecipe): number;

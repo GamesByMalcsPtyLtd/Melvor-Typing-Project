@@ -152,9 +152,9 @@ declare let inFocus: boolean;
 declare const onloadEvent: (accessCheck?: boolean) => void;
 declare function confirmedAuthenticated(): void;
 declare function checkIfAuthenticated(): Promise<void>;
-declare const INTERFACE_VERSION = 183;
+declare const INTERFACE_VERSION = 184;
 declare function loadGameInterface(accessCheck?: boolean): Promise<void>;
-declare const DATA_VERSION = 495;
+declare const DATA_VERSION = 497;
 declare function changePageCharacterSelection(page: CharacterSelectPage): void;
 /** Future announcement handler that will occur dynamically. For now this is hard coded. */
 declare function updateUIForAnnouncements(): void;

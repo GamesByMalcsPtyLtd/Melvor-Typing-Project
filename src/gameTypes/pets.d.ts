@@ -9,7 +9,7 @@ interface PetData extends IDData, IStatObjectData {
     langHint?: string;
     /** Optional skill this pet is obtained from */
     skillID?: string;
-    /** If the chance to recieve the pet should scale with the skill's mastery pool progress */
+    /** If the chance to receive the pet should scale with the skill's mastery pool progress */
     scaleChanceWithMasteryPool: boolean;
     /** True if pet does not count towards game completion */
     ignoreCompletion: boolean;

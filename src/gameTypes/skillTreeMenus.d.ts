@@ -48,6 +48,7 @@ declare class SkillTreeRenderQueue {
     requirements: boolean;
     costs: boolean;
     currentPoints: boolean;
+    dropdownPoints: Set<AnySkill>;
 }
 interface SkillTreeMenuEdge {
     from: SkillTreeNode;
@@ -106,6 +107,7 @@ declare class SkillTreeMenuElement extends HTMLElement implements CustomElement 
     renderNodeRequirements(tree: SkillTree): void;
     renderNodeCosts(tree: SkillTree): void;
     renderCurrentPoints(tree: SkillTree): void;
+    renderDropdownPoints(): void;
     static CONFIG: {
         NODE_WIDTH: number;
         NODE_HEIGHT: number;

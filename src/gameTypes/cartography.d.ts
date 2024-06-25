@@ -194,7 +194,7 @@ declare class Cartography extends Skill<CartographySkillData, CartographyEvents,
     /** Currently active potion for this skill */
     get activePotion(): PotionItem | undefined;
     activeDiscoveryModifiers: Set<POIDiscoveryModifiers>;
-    /** If the map creation modal is open and should recieve rendering updates */
+    /** If the map creation modal is open and should receive rendering updates */
     modalOpen: boolean;
     /** If the poi discovery modal is open */
     discoveryModalState: DiscoveryModalState;

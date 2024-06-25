@@ -122,6 +122,7 @@ declare class Thieving extends GatheringSkill<ThievingNPC, ThievingSkillData, Th
     entLeprechaunItem?: AnyItem;
     bearLeprechaunItem?: AnyItem;
     barItems: AnyItem[];
+    abyssalBarItems: AnyItem[];
     easterEgg?: {
         equipped: EquipmentItem;
         positioned: AnyItem;

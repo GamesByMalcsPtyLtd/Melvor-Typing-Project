@@ -34,9 +34,9 @@ interface SlayerTaskCategoryData extends RealmedObjectData {
     extensionCost: IDQuantity[];
     /** Multiplier to the number of monsters given on task extension */
     extensionMultiplier: number;
-    /** The Slayer level required to recieve tasks from this category */
+    /** The Slayer level required to receive tasks from this category */
     level: number;
-    /** Optional. The Abyssal Slayer level required to recieve tasks from this category. Also determines if tasks completed in this category should give abyssal XP */
+    /** Optional. The Abyssal Slayer level required to receive tasks from this category. Also determines if tasks completed in this category should give abyssal XP */
     abyssalLevel?: number;
     /** Defines the currencies awarded upon killing a monster from this category. */
     currencyRewards: {
