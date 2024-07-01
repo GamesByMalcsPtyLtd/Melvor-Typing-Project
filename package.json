@@ -7,8 +7,8 @@
     "name": "Coolrox95"
   },
   "files": [
-    "**/src/gameTypes",
-    "**/src/libraryTypes"
+    "src/gameTypes",
+    "src/libraryTypes"
   ],
   "private": true,
   "devDependencies": {
