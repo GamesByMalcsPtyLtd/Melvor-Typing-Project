@@ -164,7 +164,7 @@ declare type PackagedSave = {
     cd: number[];
 };
 declare const saveFormat2Version = 21;
-declare const currentSaveVersion = SaveVersion.StickyBankTabsSetting;
+declare const currentSaveVersion = SaveVersion.EnemyDamageTypeOverride;
 declare const enum SaveVersion {
     ModProfiles = 83,
     MasteryModalFilter = 84,
@@ -193,7 +193,13 @@ declare const enum SaveVersion {
     CorruptionUnlocks = 120,
     AbyssalWaveTimer = 121,
     ITAShowSoulPointsSetting = 122,
-    StickyBankTabsSetting = 123
+    StickyBankTabsSetting = 123,
+    BarrierSaving = 124,
+    ItANewRealmSelection = 125,
+    ITASkillNavOpacity = 126,
+    ITABankFilterSettings = 127,
+    ITARealmSelectAgility = 128,
+    EnemyDamageTypeOverride = 129
 }
 interface AddRemove<T> {
     add: T[];

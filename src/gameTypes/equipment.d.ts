@@ -194,11 +194,14 @@ declare class EquipmentGridIconElement extends HTMLElement implements CustomElem
     tooltip?: TippyTooltip;
     quickEquip: QuickEquipTooltipElement;
     quickEquipTooltip?: TippyTooltip;
+    quickEquipEnabled: boolean;
     constructor();
     connectedCallback(): void;
     disconnectedCallback(): void;
     setSlot(slot: EquipmentSlot, game: Game): void;
     setEquipped(player: Player, equipped: EquippedItem): void;
+    /** Sets if the quick equip menu is available for this icon */
+    setQuickEquipEnabled(isEnabled: boolean): void;
 }
 declare class EquipmentGridElement extends HTMLElement implements CustomElement {
     _content: DocumentFragment;
@@ -211,6 +214,7 @@ declare class EquipmentGridElement extends HTMLElement implements CustomElement 
     connectedCallback(): void;
     initialize(game: Game): void;
     setEquipment(player: Player): void;
+    setQuickEquipEnabled(isEnabled: boolean): void;
     getSynergyTooltipContent(synergyDescription: string): string;
 }
 declare class EquipmentTooltipElement extends HTMLElement implements CustomElement {

@@ -609,7 +609,7 @@ declare class ModifierSourceBuilder {
     _totalValue: number;
     _spans: HTMLSpanElement[];
     _totalValueSpan: HTMLSpanElement;
-    constructor(modifiers: ModifierTable, percent?: boolean);
+    constructor(modifiers: ModifierTable, percent?: boolean, totalLangString?: string);
     addBaseSource(sourceName: string, value: number, isPositive?: boolean): void;
     addSources(key: string, query?: ModifierQuery, mult?: number): void;
     getSpans(): HTMLSpanElement[];

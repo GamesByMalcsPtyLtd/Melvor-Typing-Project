@@ -15,6 +15,20 @@ interface ItemUpgradeData {
     isDowngrade: boolean;
     quantity?: number;
 }
+interface ItemUpgradeModificationData extends IDData {
+    itemCosts?: {
+        add?: IDQuantity[];
+        remove?: string[];
+    };
+    rootItemIDs?: {
+        add?: string[];
+        remove?: string[];
+    };
+    currencyCosts?: {
+        add?: IDQuantity[];
+        remove?: string[];
+    };
+}
 declare class ItemUpgrade {
     upgradedItem: AnyItem;
     upgradedQuantity: number;
@@ -23,6 +37,7 @@ declare class ItemUpgrade {
     rootItems: AnyItem[];
     isDowngrade: boolean;
     constructor(data: ItemUpgradeData, game: Game);
+    applyDataModification(modData: ItemUpgradeModificationData, game: Game): void;
 }
 declare class BankRenderQueue {
     /** The items in the bank that currently need updating */
@@ -35,6 +50,8 @@ declare class BankRenderQueue {
     bankValue: boolean;
     /** If the space used in the bank requires an update */
     space: boolean;
+    /** Item visibility updates based on filter */
+    bankFilter: boolean;
 }
 declare class ItemFoundEvent extends GameEvent {
     item: AnyItem;
@@ -118,6 +135,7 @@ declare class Bank extends GameEventEmitter<BankEvents> implements EncodableObje
     onEquipmentChange(): void;
     isItemInPosition(item: AnyItem, tab: number, tabPosition: number): boolean;
     registerItemUpgrades(data: ItemUpgradeData[]): void;
+    modifyItemUpgrades(modData: ItemUpgradeModificationData[]): void;
     isItemSelected(item: AnyItem): boolean;
     /** Checks if an item is in the bank */
     hasItem(item: AnyItem): boolean;
@@ -279,8 +297,13 @@ declare class Bank extends GameEventEmitter<BankEvents> implements EncodableObje
     updateSearchArray(): void;
     /** Callback function for when the bank search query changes */
     onBankSearchChange(query: string): void;
+    shouldShowBasedOnFilter(item: AnyItem): boolean;
+    /** Function for when the bank filter changes */
+    onBankFilterChange(): void;
     /** Callback function for selecting a tab icon option */
     setSelectedItemAsTabIcon(tabID: number): void;
+    /** Callback function for selecting a tab icon option */
+    resetTabIcon(tabID: number): void;
     /** Callback function for changing the default sort setting */
     changeDefaultSort(sortSetting: BankSortOrderSetting): void;
     /** Callback function for changing the border setting */

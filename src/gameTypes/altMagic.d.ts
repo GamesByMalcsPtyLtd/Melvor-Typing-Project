@@ -83,6 +83,7 @@ declare class AltMagic extends CraftingSkill<AltMagicSpell, MagicSkillData, Magi
     get isCombat(): boolean;
     readonly _media = Assets.Magic;
     get levelCompletionBreakdown(): LevelCompletionBreakdown[];
+    shouldShowSkillInSidebar(): boolean;
     computeTotalMasteryActions(): void;
     updateTotalUnlockedMasteryActions(): void;
     isMasteryActionUnlocked(action: MasteryAction): boolean;

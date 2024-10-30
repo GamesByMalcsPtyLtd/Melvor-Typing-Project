@@ -609,12 +609,15 @@ declare const enum AttackIDs {
     TouchOfBlight = "melvorItA:TouchOfBlight",
     WrathOfTheRealm = "melvorItA:WrathOfTheRealm",
     ManifestationOfTheAbyss = "melvorItA:ManifestationOfTheAbyss",
+    ManifestationOfTheAbyss2 = "melvorItA:ManifestationOfTheAbyss2",
     AbyssalBarrage = "melvorItA:AbyssalBarrage",
     AbyssalToss = "melvorItA:AbyssalToss",
     SilenceOfTheVoid = "melvorItA:SilenceOfTheVoid",
+    SilenceOfTheVoid2 = "melvorItA:SilenceOfTheVoid2",
     VoidburstBeam = "melvorItA:VoidburstBeam",
     KingsRage = "melvorItA:KingsRage",
     CommandOfTheKing = "melvorItA:CommandOfTheKing",
+    CommandOfTheKing2 = "melvorItA:CommandOfTheKing2",
     SmogHunterPlayer = "melvorItA:SmogHunterPlayer",
     BlightedSlashesPlayer = "melvorItA:BlightedSlashesPlayer",
     ToxicBlastPlayer = "melvorItA:ToxicBlastPlayer",
@@ -862,6 +865,7 @@ declare const enum CombatPassiveIDs {
     Voidtouch = "melvorItA:Voidtouch",
     VoidGazer = "melvorItA:VoidGazer",
     AbyssalMight = "melvorItA:AbyssalMight",
+    AbyssalMight2 = "melvorItA:AbyssalMight2",
     VoidBody = "melvorItA:VoidBody",
     Sovereignty = "melvorItA:Sovereignty",
     TaintedI = "melvorItA:TaintedI",
@@ -4621,6 +4625,7 @@ declare const enum ItemIDs {
     Eternity_Staff = "melvorItA:Eternity_Staff",
     Eternity_Bow_Uncharged = "melvorItA:Eternity_Bow_Uncharged",
     Eternity_Bow = "melvorItA:Eternity_Bow",
+    Unknown_Chest = "melvorItA:Unknown_Chest",
     ABYSSAL_DEBUG_STICK = "melvorItA:ABYSSAL_DEBUG_STICK"
 }
 declare const enum MonsterIDs {
@@ -7654,7 +7659,8 @@ declare const enum SummoningCategoryIDs {
     TabletsFamiliars = "melvorD:TabletsFamiliars",
     Synergies = "melvorD:Synergies",
     AbyssalMarks = "melvorItA:AbyssalMarks",
-    AbyssalTabletsFamiliars = "melvorItA:AbyssalTabletsFamiliars"
+    AbyssalTabletsFamiliars = "melvorItA:AbyssalTabletsFamiliars",
+    SynergiesItA = "melvorItA:Synergies"
 }
 declare const enum AstrologyRecipeIDs {
     Deedree = "melvorF:Deedree",
@@ -8501,6 +8507,7 @@ declare const enum CombatEffectIDs {
     Corruption20 = "melvorItA:Corruption20",
     Corruption21 = "melvorItA:Corruption21",
     Corruption22 = "melvorItA:Corruption22",
+    AbyssalSpell = "melvorItA:AbyssalSpell",
     AbyssalBlast = "melvorItA:AbyssalBlast",
     AbyssalWave = "melvorItA:AbyssalWave",
     AbyssalSurge = "melvorItA:AbyssalSurge",

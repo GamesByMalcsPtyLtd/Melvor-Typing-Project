@@ -220,6 +220,8 @@ declare class EquipmentItem extends Item implements SoftDataDependant<EquipmentI
     get hasDescription(): boolean;
     get description(): string;
     get modifiedDescription(): string;
+    get modifiesSkillXP(): boolean;
+    get modifiesAbyssalXP(): boolean;
     constructor(namespace: DataNamespace, data: BaseEquipmentItemData, game: Game);
     registerSoftDependencies(data: EquipmentItemData, game: Game): void;
     applyDataModification(modData: BaseEquipmentItemModificationData, game: Game): void;

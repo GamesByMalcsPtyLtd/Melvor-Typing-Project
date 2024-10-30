@@ -1,5 +1,5 @@
 /** Data for constructing a TownshipBiome object */
-interface TownshipBiomeData extends IDData {
+interface TownshipBiomeData extends RealmedObjectData {
     /** The display name of the biome */
     name: string;
     /** URI of the biomes image */
@@ -19,7 +19,7 @@ declare const enum TownshipConvertType {
     ToTownship = 0,
     FromTownship = 1
 }
-declare class TownshipBiome extends NamespacedObject implements SoftDataDependant<TownshipBiomeData> {
+declare class TownshipBiome extends RealmedObject implements SoftDataDependant<TownshipBiomeData> {
     get name(): string;
     get media(): string;
     get englishName(): string;
@@ -87,7 +87,7 @@ declare class TownshipBuildingProvides {
     resourceCount(resource: TownshipResource): number;
 }
 /** Data for constructing a TownshipBuilding object */
-interface TownshipBuildingData extends IDData, IStatObjectData {
+interface TownshipBuildingData extends RealmedObjectData, IStatObjectData {
     /** The display name of the building */
     name: string;
     /** URI of the buildings image */
@@ -110,7 +110,7 @@ interface TownshipBuildingData extends IDData, IStatObjectData {
     abyssalTier?: number;
     requirements?: AnyRequirementData[];
 }
-declare class TownshipBuilding extends NamespacedObject implements SoftDataDependant<TownshipBuildingData> {
+declare class TownshipBuilding extends RealmedObject implements SoftDataDependant<TownshipBuildingData> {
     get name(): string;
     get media(): string;
     get englishName(): string;
@@ -472,6 +472,7 @@ declare class Township extends Skill<TownshipSkillData, TownshipEvents, Township
     get solarEclipseSeasonEnabled(): boolean;
     get lemonSeasonEnabled(): boolean;
     get eternalDarknessSeasonEnabled(): boolean;
+    shouldShowSkillInSidebar(): boolean;
     getModifiedArmourWeaponryValueForAbyssalWave(): number;
     getTotalArmourWeaponry(): number;
     /** Callback function for the Repair All in this Biome button */

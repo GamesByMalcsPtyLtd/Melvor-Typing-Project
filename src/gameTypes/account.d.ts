@@ -1,4 +1,4 @@
-declare const gameVersion = "v1.3";
+declare const gameVersion = "v1.3.1";
 declare const previousGameVersion = "v1.3";
 declare const characterSelectAnnouncementVersion = 4;
 /** Locks/Unlocks Base Game skills based on full version entitlement */

@@ -33,6 +33,8 @@ declare class Fletching extends ArtisanSkill<FletchingRecipe, FletchingSkillData
     registerData(namespace: DataNamespace, data: FletchingSkillData): void;
     modifyData(data: FletchingModificationData): void;
     postDataRegistration(): void;
+    resetToDefaultSelectedRecipeBasedOnRealm(): void;
+    updateRealmSelection(): void;
     getRecipeAutoSubcategory(recipe: FletchingRecipe): SkillSubcategory | undefined;
     getActionModifierQueryParams(action?: NamedObject): SkillModifierQueryParams;
     getRecipeCosts(recipe: FletchingRecipe): Costs;

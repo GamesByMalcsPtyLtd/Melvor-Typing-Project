@@ -128,6 +128,7 @@ declare class CombatManager extends BaseManager implements PassiveAction, IGameE
     renderPetStatus(): void;
     renderResistanceMenus(): void;
     renderRealmVisibility(): void;
+    renderCategoryVisibilityByRealm(): void;
     updateResistanceMenuVisibility(damageType: DamageType): void;
     renderCorruptionMenus(): void;
     renderAreaSkillUnlockCounts(): void;

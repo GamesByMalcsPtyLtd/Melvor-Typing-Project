@@ -30,8 +30,8 @@ declare class ArchaeologyDigSiteContainerElement extends HTMLElement implements 
     mapArtefactValue: HTMLDivElement;
     toolContainer: HTMLDivElement;
     toolInfoContainer: HTMLDivElement;
-    toolName: HTMLSpanElement;
     chanceToFind: HTMLDivElement;
+    artefactChances: Map<ArchaeologyTool, HTMLDivElement>;
     excavateBtn: HTMLButtonElement;
     showArtefactsBtn: HTMLButtonElement;
     masteryDisplay: MasteryDisplayElement;
@@ -68,7 +68,7 @@ declare class ArchaeologyDigSiteContainerElement extends HTMLElement implements 
     removeOutlineSelectedTool(tool: ArchaeologyTool): void;
     showNoMapSelected(): void;
     setActiveTools(digSite: ArchaeologyDigSite, archaeology: Archaeology): void;
-    setChanceToFindArtefacts(digSite: ArchaeologyDigSite, archaeology: Archaeology): void;
+    updateArtefactChances(digSite: ArchaeologyDigSite, archaeology: Archaeology): void;
     setDefaultTool(): void;
     removeActiveMap(): void;
     getProgressBar(): ProgressBarElement;

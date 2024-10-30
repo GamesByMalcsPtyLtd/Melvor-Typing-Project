@@ -694,8 +694,6 @@ declare class PaperMakingMenuElement extends HTMLElement implements CustomElemen
     connectedCallback(): void;
     /** Initializes the menu, assigning callbacks and generating recipe select */
     init(cartography: Cartography, game: Game): void;
-    /** Adjust UI based on language and device */
-    setLangOverrides(): void;
     /** Sets the currently selected recipe */
     setSelectedRecipe(cartography: Cartography, recipe: PaperMakingRecipe, game: Game): void;
     unsetRecipe(): void;

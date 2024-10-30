@@ -29,6 +29,8 @@ declare class Crafting extends ArtisanSkill<CraftingRecipe, CraftingSkillData, A
     registerData(namespace: DataNamespace, data: CraftingSkillData): void;
     modifyData(data: CraftingModificationData): void;
     postDataRegistration(): void;
+    resetToDefaultSelectedRecipeBasedOnRealm(): void;
+    updateRealmSelection(): void;
     getRecipeAutoSubcategory(recipe: CraftingRecipe): SkillSubcategory | undefined;
     getFlatCostReduction(action?: CraftingRecipe, item?: AnyItem): number;
     getActionModifierQueryParams(action?: NamedObject): SkillModifierQueryParams;

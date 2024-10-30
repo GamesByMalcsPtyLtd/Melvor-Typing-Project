@@ -20,6 +20,9 @@ declare class Game extends GameEventEmitter<GameEvents> implements Serializable,
     normalCombatTriangleSet: CombatTriangleSet;
     /** Default Realm Selection. Preinitialized for use as default variable. */
     defaultRealm: Realm;
+    /** Current global Realm Selection. */
+    currentRealm: Realm;
+    realmSidebarSelect?: RealmSidebarSelect;
     /** Default Damage Type (Normal). Preinitialized for convenience. */
     normalDamage: DamageType;
     /** Standard Normal Attack. Preinitialized for use as default variable. */
@@ -141,6 +144,9 @@ declare class Game extends GameEventEmitter<GameEvents> implements Serializable,
         clueHuntStep6: boolean;
         birthdayEventProgress: boolean;
         realmVisibility: boolean;
+        realmSidebarVisibility: Set<Realm>;
+        sidebarSkillOpacity: boolean;
+        sidebarClass: boolean;
     };
     realms: NamespaceRegistry<Realm>;
     damageTypes: NamespaceRegistry<DamageType>;
@@ -352,7 +358,13 @@ declare class Game extends GameEventEmitter<GameEvents> implements Serializable,
     runTicks(ticksToRun: number): void;
     tick(): void;
     queueRequirementRenders(): void;
+    toggleAbyssalRealm(): void;
+    selectRealm(realm: Realm): void;
     render(): void;
+    renderSidebarClass(): void;
+    renderSidebarSkillOpacity(): void;
+    renderRealmVisibility(): void;
+    renderRealmSidebarVisibility(): void;
     checkUniqueBirthdayEventCompletions(): void;
     updateBirthdayEventProgress(): void;
     renderBirthdayEventProgress(): void;
@@ -382,7 +394,7 @@ declare class Game extends GameEventEmitter<GameEvents> implements Serializable,
     triggerOfflineLoop(): void;
     loop(): void;
     enterOfflineLoop(loopTime: number): void;
-    exitOfflineLoop(): void;
+    exitOfflineLoop(loopTime: number): void;
     /** The main loop for when the game is processing online */
     loopOnline(loopTime: number): void;
     /** The main loop for when the game is processing offline time */

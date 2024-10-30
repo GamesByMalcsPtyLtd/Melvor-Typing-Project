@@ -66,6 +66,7 @@ declare class Corruption extends CombatSkill<CorruptionSkillData, CorruptionModi
     onUnlock(): void;
     encode(writer: SaveWriter): SaveWriter;
     decode(reader: SaveWriter, version: number): void;
+    shouldShowSkillInSidebar(): boolean;
 }
 /** Menu for browsing corruptions */
 declare class CorruptionMenuElement extends HTMLElement implements CustomElement {

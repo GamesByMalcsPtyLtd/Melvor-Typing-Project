@@ -31,7 +31,7 @@ declare abstract class BaseSpell extends NamespacedObject implements SoftDataDep
     registerSoftDependencies(data: BaseSpellData, game: Game): void;
     applyDataModification(data: BaseSpellModificationData, game: Game): void;
 }
-interface AttackSpellbookData extends IDData {
+interface AttackSpellbookData extends RealmedObjectData {
     /** Display name of the spellbook */
     name: string;
     /** Optional. Language string ID to use for the name property */
@@ -51,7 +51,7 @@ interface AttackSpellbookData extends IDData {
     /** Optional. Limit spell usage to these damage types. Unset allows for all damage types. */
     allowedDamageTypeIDs?: string[];
 }
-declare class AttackSpellbook extends NamespacedObject {
+declare class AttackSpellbook extends RealmedObject {
     get name(): string;
     get media(): string;
     allowCurses: boolean;

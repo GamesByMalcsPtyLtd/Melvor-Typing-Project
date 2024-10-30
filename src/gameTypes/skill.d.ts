@@ -269,10 +269,12 @@ declare abstract class Skill<DataType extends BaseSkillData, Events extends Skil
     getItemForRegistration(id: string): AnyItem;
     /** Gets the realm options that should show for this skill in a RealmSelectMenuElement */
     getRealmOptions(): Realm[];
+    shouldShowSkillInSidebar(): boolean;
     /** Callback function for when the current realm for this skill is changed */
     selectRealm(realm: Realm): void;
     /** Queues rendering changes for this skill when the current realm changes */
     onRealmChange(): void;
+    updateSkillHeaderRealm(): void;
     /** Initializes menus for this skill */
     initMenus(): void;
     onLoad(): void;

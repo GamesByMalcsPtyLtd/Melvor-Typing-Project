@@ -89,6 +89,7 @@ declare class BankTabMenuElement extends HTMLElement implements CustomElement {
     /** Updates the bank search based on a search result */
     updateForSearchResult(foundItems: Set<AnyItem>, foundTabs: Set<number>, hideTabs: boolean): void;
     updateTabsForSearch(foundTabs: Set<number>, hideTabs: boolean): void;
+    updateForFilterResult(foundItems: Set<AnyItem>): void;
     /** Makes all bank items visible */
     showAllItems(): void;
     /** Sets the specified tabs image to the media string provided */
@@ -302,6 +303,7 @@ declare class BankItemSettingsMenuElement extends HTMLElement implements CustomE
     _content: DocumentFragment;
     selectedItemContainer: HTMLDivElement;
     selectTabIconDropdown: BankTabDropdownMenuElement;
+    resetTabIcon: HTMLAnchorElement;
     minibarSettingsContainer: HTMLDivElement;
     minibarSettingsToggles: HTMLDivElement;
     unlockAllButton: HTMLButtonElement;

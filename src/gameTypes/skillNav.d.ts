@@ -64,6 +64,7 @@ declare class SkillNav {
     shouldShowStandardLevels(skill: AnySkill): boolean;
     shouldShowAbyssalLevels(skill: AnySkill): boolean;
     getLevelVisibility(skill: AnySkill): SkillSidebarLevelVisibility;
+    updateOpacity(skill: AnySkill, visible: boolean): void;
 }
 declare type SkillSidebarLevelVisibility = {
     standard: boolean;
@@ -92,6 +93,9 @@ declare class SkillHeaderElement extends HTMLElement implements CustomElement {
     levelCapButton: LevelCapPurchaseButtonElement;
     abyssalLevelCapButton: LevelCapPurchaseButtonElement;
     skillTreeButton: SkillTreeButtonElement;
+    realmNameDiv: HTMLDivElement;
+    realmName: HTMLHeadingElement;
+    currentHeaderClass: string;
     constructor();
     connectedCallback(): void;
     setSkill(skill: AnySkill): void;
@@ -105,6 +109,10 @@ declare class SkillHeaderElement extends HTMLElement implements CustomElement {
     updateAbyssalLevelVisibility(skill: AnySkill): void;
     appendUpper(...nodes: Node[]): void;
     appendLower(...nodes: Node[]): void;
+    updateRealmClass(className: string): void;
+    setRealmVisibility(visible: boolean): void;
+    setRealmText(text: string): void;
+    setRealmClass(realm: Realm): void;
 }
 declare class CombatSkillProgressTableRow {
     row: HTMLTableRowElement;

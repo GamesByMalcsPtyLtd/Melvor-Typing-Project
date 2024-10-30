@@ -1,7 +1,7 @@
 declare const DEBUGENABLED = false;
 declare const releaseDate = 1637258400000;
 declare const DEBUG_REPORTER: string[];
-declare const gameTitle = "Melvor Idle :: v1.3";
+declare const gameTitle = "Melvor Idle :: v1.3.1";
 declare let currentTitleNewsID: string[];
 declare let playFabEventQueue: {
     eventName: string;
@@ -24,10 +24,17 @@ declare let offlineProgressCache: string;
 /** Update everything on screen when loading the game */
 declare function updateWindow(): Promise<void>;
 /**
+ * Shows the broken game modal
+ * @param title The title of the error to report
+ * @param errorLog The error log that can be copied
+ * @param brokenMods Optional. Array of mod information from stack trace analysis
+ */
+declare function showGameErrorModal(title: string, errorLog: string, brokenMods?: Modding.ModBasic[]): void;
+/**
  * Handles errors when loading the game. Shows the error modal and removes the loader.
  * @param e Exception from the try catch block
  */
-declare function showGameLoadError(e: unknown): void;
+declare function handleGameLoadingError(title: string, e: unknown): void;
 /** Loads the lore book modal text */
 declare function loadLore(): void;
 /** Removes old variables from localstorage, and fixes invalid bank tabs */
@@ -45,7 +52,7 @@ declare function isAndroid(): boolean;
 /**
  * @deprecated Use nativeManager.isMobile
  */
-declare function isMobile(): true | typeof isAndroid;
+declare function isMobile(): boolean;
 /**
  * @deprecated Use nativeManager.isSteam
  */

@@ -28,7 +28,7 @@ declare class QuantityIconsElement extends HTMLElement implements CustomElement 
      * @param costs The costs to display
      * @param allowQuickBuy If the Item icons should allow quick buying from the shop
      */
-    setIconsForCosts(costs: Costs, allowQuickBuy?: boolean): void;
+    setIconsForCosts(costs: Costs, allowQuickBuy?: boolean, altMedia?: boolean): void;
     setIconsForFixedCosts(costs: FixedCosts, allowQuickBuy?: boolean): void;
     /**
      * Creates and appends Item and Currency icons for an artisan skill recipe
@@ -125,7 +125,7 @@ declare class GrantsBoxElement extends HTMLElement implements CustomElement {
     constructor();
     connectedCallback(): void;
     setUnselected(): void;
-    setSelected(): void;
+    setSelected(showAbyssalXp?: boolean): void;
     updateGrants(xp: number, baseXP: number, masteryXP: number, baseMasteryXP: number, poolXP: number, realm: Realm): void;
     updateAbyssalGrants(xp: number, baseXP: number): void;
     hideMastery(): void;

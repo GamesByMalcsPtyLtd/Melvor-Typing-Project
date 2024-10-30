@@ -191,6 +191,27 @@ interface BooleanSettings {
     showSPNextToPrayerSidebar: boolean;
     /** If Bank tabs should be sticky */
     enableStickyBankTabs: boolean;
+    /** Determines if the game should use the legacy realm selection (per skill) instead of the new global selection */
+    useLegacyRealmSelection: boolean;
+    /** Sets opacity on Skill's nav if there is no content in that Skill for the current realm */
+    showOpacityForSkillNavs: boolean;
+    /**
+     * BANK FILTERS (Using settings because its easier)
+     */
+    bankFilterShowAll: boolean;
+    bankFilterShowDemo: boolean;
+    bankFilterShowFull: boolean;
+    bankFilterShowTotH: boolean;
+    bankFilterShowAoD: boolean;
+    bankFilterShowItA: boolean;
+    bankFilterShowDamageReduction: boolean;
+    bankFilterShowAbyssalResistance: boolean;
+    bankFilterShowNormalDamage: boolean;
+    bankFilterShowAbyssalDamage: boolean;
+    bankFilterShowSkillXP: boolean;
+    bankFilterShowAbyssalXP: boolean;
+    /** Whether to always show realm selection for Agility, regardless of the value of useLegacyRealmSelection */
+    alwaysShowRealmSelectAgility: boolean;
 }
 interface ChoiceSettings {
     /** If special attack modifiers should use neutral colours */
@@ -348,6 +369,21 @@ declare class Settings implements EncodableObject, BooleanSettings, ChoiceSettin
     get enableDoubleClickBury(): boolean;
     get showSPNextToPrayerSidebar(): boolean;
     get enableStickyBankTabs(): boolean;
+    get useLegacyRealmSelection(): boolean;
+    get showOpacityForSkillNavs(): boolean;
+    get bankFilterShowAll(): boolean;
+    get bankFilterShowDemo(): boolean;
+    get bankFilterShowFull(): boolean;
+    get bankFilterShowTotH(): boolean;
+    get bankFilterShowAoD(): boolean;
+    get bankFilterShowItA(): boolean;
+    get bankFilterShowDamageReduction(): boolean;
+    get bankFilterShowAbyssalResistance(): boolean;
+    get bankFilterShowNormalDamage(): boolean;
+    get bankFilterShowAbyssalDamage(): boolean;
+    get bankFilterShowSkillXP(): boolean;
+    get bankFilterShowAbyssalXP(): boolean;
+    get alwaysShowRealmSelectAgility(): boolean;
     /** The set of mastery namespaces that should be hidden in the spend mastery modal */
     hiddenMasteryNamespaces: Set<string>;
     constructor(game: Game);

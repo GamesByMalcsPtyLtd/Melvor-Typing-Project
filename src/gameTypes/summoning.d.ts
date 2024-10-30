@@ -113,6 +113,8 @@ declare class Summoning extends ArtisanSkill<SummoningRecipe, SummoningSkillData
     modifyData(data: SummoningModificationData): void;
     postDataRegistration(): void;
     addXPForTabletConsumption(tablet: EquipmentItem, interval: number): void;
+    resetToDefaultSelectedRecipeBasedOnRealm(): void;
+    updateRealmSelection(): void;
     getRecipeFromProduct(product: AnyItem): SummoningRecipe | undefined;
     onAnyLevelUp(): void;
     getErrorLog(): string;

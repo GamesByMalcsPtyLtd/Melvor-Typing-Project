@@ -38,8 +38,13 @@ declare class Runecrafting extends ArtisanSkill<RunecraftingRecipe, Runecrafting
     postDataRegistration(): void;
     /** Determines if a recipe makes combo runes that use water runes as an ingredient */
     doesRecipeMakeWaterComboRunes(recipe: RunecraftingRecipe): boolean;
+    resetToDefaultSelectedRecipeBasedOnRealm(): void;
+    updateRealmSelection(): void;
     getRecipeAutoSubcategory(recipe: RunecraftingRecipe): SkillSubcategory | undefined;
     getUncappedCostReduction(recipe?: RunecraftingRecipe, item?: AnyItem): number;
+    _buildRuneItemCostReductionSources(action?: NamedObject): ModifierSourceBuilder;
+    getRuneItemCostReductionSources(action?: NamedObject): HTMLSpanElement[];
+    getCostReductionSources(action?: NamedObject): HTMLSpanElement[];
     getActionModifierQueryParams(action?: NamedObject): SkillModifierQueryParams;
     onMasteryLevelUp(action: RunecraftingRecipe, oldLevel: number, newLevel: number): void;
     checkMasteryLevelBonusFilter(action: RunecraftingRecipe, filter: string): boolean;

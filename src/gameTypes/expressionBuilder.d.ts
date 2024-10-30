@@ -72,7 +72,7 @@ interface IExprTester {
     validateWithType(exprString: string | number, type: ExprPrimaryType): ExprTestResult;
 }
 declare const expressions: {
-    updateModifiers: (modifiers: Modifier[]) => void;
+    updateModifiers: (namespace: DataNamespace, modifiers: Modifier[]) => void;
     getCharacterNumberTranspiler: () => IExprTranspiler<(character: Character) => number>;
     getCombatEffectNumberTranspiler: (effect: CombatEffect) => IExprTranspiler<CombatEffectNumberFunc>;
     getInitialParamNumberTranspiler: (paramNames: string[]) => IExprTranspiler<(initialParams: Record<string, number>) => number>;

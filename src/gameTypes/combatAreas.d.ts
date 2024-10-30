@@ -55,6 +55,7 @@ declare class CombatAreaMenu {
     removeTutorialHighlight(): void;
     updateAreaBackgroundColours(): void;
     updateAreaWarnings(): void;
+    updateMonsterValues(): void;
 }
 declare class CombatAreaMenuElement extends HTMLElement implements CustomElement {
     _content: DocumentFragment;
@@ -94,6 +95,7 @@ declare class CombatAreaMenuElement extends HTMLElement implements CustomElement
     isEventActive: boolean;
     isOpen: boolean;
     strongholdSelect?: StrongholdSelectElement;
+    monsterSelectElements: Map<AnyCombatArea, MonsterSelectTableElement>;
     constructor();
     connectedCallback(): void;
     setArea(area: AnyCombatArea): void;
@@ -114,6 +116,7 @@ declare class CombatAreaMenuElement extends HTMLElement implements CustomElement
     createReqImage(media: string): HTMLImageElement;
     createReqSpan(text: string): HTMLSpanElement;
     setOpenOptions(area: AnyCombatArea): void;
+    updateOpenOptions(area: AnyCombatArea): void;
     setMonsterCount(numMonsters: string, lastMonster: Monster): void;
     setDungeonInfo(dungeon: Dungeon): void;
     setStrongholdInfo(stronghold: Stronghold): void;
@@ -133,10 +136,13 @@ declare class CombatAreaMenuElement extends HTMLElement implements CustomElement
 declare class MonsterSelectTableElement extends HTMLElement implements CustomElement {
     _content: DocumentFragment;
     tableBody: HTMLTableSectionElement;
+    monsterHPSpan: Map<Monster, HTMLSpanElement>;
+    monsterBarrierSpan: Map<Monster, HTMLSpanElement>;
     constructor();
     connectedCallback(): void;
     setArea(area: AnyCombatArea): void;
     createRow(monster: Monster, area: AnyCombatArea): void;
+    updateMonsterValuesAfterLoad(monster: Monster): void;
     static attackTypeMedia: {
         melee: string;
         ranged: Assets;
@@ -205,7 +211,12 @@ declare class CombatAreaMenuManager {
     init(game: Game, categoryMenu: CategoryMenuElement): void;
     closeOpen(): void;
     toggleCategory(category: CombatAreaCategory): void;
+    toggleCategoryVisibilityByRealm(realm: Realm): void;
     openCategory(category: CombatAreaCategory): void;
+    showMenuRealmHeader(): void;
+    hideMenuRealmHeader(): void;
+    updateMenuHeaderText(text: string): void;
+    updateMenuHeaderClass(realm: Realm): void;
 }
 declare type AreaDifficulty = {
     name: string;

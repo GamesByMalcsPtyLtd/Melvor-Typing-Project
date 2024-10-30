@@ -113,6 +113,9 @@ declare class CategoryMenuElement extends HTMLElement implements CustomElement {
     expandText: HTMLSpanElement;
     expandDiv: HTMLDivElement;
     optionsContainer: HTMLUListElement;
+    headerDiv: HTMLDivElement;
+    headerName: HTMLHeadingElement;
+    currentHeaderClass: string;
     options: Map<CategoryLike, CategoryMenuOptionElement>;
     constructor();
     connectedCallback(): void;
@@ -121,6 +124,11 @@ declare class CategoryMenuElement extends HTMLElement implements CustomElement {
     unhighlightOption(option: CategoryLike): void;
     onExpandButtonClick(): void;
     collapseOptions(): void;
+    setHeaderClass(className: string): void;
+    setHeaderVisibility(visible: boolean): void;
+    setHeaderText(text: string): void;
+    hideCategory(category: CategoryLike): void;
+    showCategory(category: CategoryLike): void;
 }
 declare class RealmedCategoryMenuElement extends HTMLElement implements CustomElement {
     _content: DocumentFragment;
@@ -128,11 +136,17 @@ declare class RealmedCategoryMenuElement extends HTMLElement implements CustomEl
     expandText: HTMLSpanElement;
     expandDiv: HTMLDivElement;
     mainContainer: HTMLUListElement;
+    realmNameDiv: HTMLDivElement;
+    realmName: HTMLHeadingElement;
     realmOptions: Map<Realm, RealmSelectOptionElement>;
     categoryOptions: Map<SkillCategory, CategoryMenuOptionElement>;
+    currentRealm: Realm;
+    realmNameClass: string;
     constructor();
     connectedCallback(): void;
+    setCurrentRealm(realm: Realm): void;
     addOptions<T extends SkillCategory>(categories: T[], expandText: string, callbackFn: (category: T) => void): void;
+    setRealmNameColour(realm: Realm): void;
     updateRealmUnlock(realm: Realm): void;
     highlightOption(option: SkillCategory): void;
     unhighlightOption(option: SkillCategory): void;

@@ -1,4 +1,4 @@
-interface PrayerData extends IDData, IStatObjectData {
+interface PrayerData extends RealmedObjectData, IStatObjectData {
     level: number;
     name: string;
     media: string;
@@ -16,7 +16,7 @@ interface PrayerData extends IDData, IStatObjectData {
     /** Optional. The IDs of the DamageTypes this prayer is allowed to be used with. */
     allowedDamageTypeIDs?: string[];
 }
-declare class ActivePrayer extends NamespacedObject {
+declare class ActivePrayer extends RealmedObject {
     level: number;
     _abyssalLevel?: number;
     get abyssalLevel(): number;

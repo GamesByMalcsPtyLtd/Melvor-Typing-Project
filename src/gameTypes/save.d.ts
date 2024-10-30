@@ -152,9 +152,12 @@ declare let inFocus: boolean;
 declare const onloadEvent: (accessCheck?: boolean) => void;
 declare function confirmedAuthenticated(): void;
 declare function checkIfAuthenticated(): Promise<void>;
-declare const INTERFACE_VERSION = 184;
-declare function loadGameInterface(accessCheck?: boolean): Promise<void>;
-declare const DATA_VERSION = 497;
+declare const INTERFACE_VERSION = 207;
+declare function assertInterfaceVersion(): void;
+/** Sets the save loading message with setTimeout to allow the UI to refresh */
+declare function setSaveLoadingMessageAsync(slotID: number, message: string): Promise<void>;
+declare function loadGameInterface(slotID: number): Promise<void>;
+declare const DATA_VERSION = 517;
 declare function changePageCharacterSelection(page: CharacterSelectPage): void;
 /** Future announcement handler that will occur dynamically. For now this is hard coded. */
 declare function updateUIForAnnouncements(): void;
@@ -169,15 +172,14 @@ declare function updateLocalSaveHeaders(): Promise<void>;
 declare function updateCloudSaveHeaders(): Promise<void>;
 declare const enum SaveLoadErrorMessage {
     InvalidVersion = "Invalid save version.",
-    CorruptSave = "Corrupt Save.",
-    InterfaceLoadFailed = "Interface failed to load."
+    CorruptSave = "Corrupt Save."
 }
 /** If the game is currently trying to load a save file */
 declare let isLoadingSave: boolean;
 /** If the game is currently creating a new save file */
 declare let isCreatingSave: boolean;
 /** Attempts to load the save in the string */
-declare function loadSaveFromString(saveString: string): Promise<void>;
+declare function loadSaveFromString(saveString: string, slotID: number): Promise<void>;
 declare function processSaveLoadError(slotID: number, isCloud: boolean, error: unknown): void;
 declare function showTitleScreenError(error: unknown, title: string): void;
 declare function getTitleScreenErrorLog(error: unknown, title: string, modError: Modding.ModError): string;

@@ -9,6 +9,7 @@ declare class Attack extends CombatSkill {
     renderQueue: SkillRenderQueue;
     postDataRegistration(): void;
     constructor(namespace: DataNamespace, game: Game);
+    shouldShowSkillInSidebar(): boolean;
 }
 declare class Strength extends CombatSkill {
     readonly _media = Assets.Strength;
@@ -16,6 +17,7 @@ declare class Strength extends CombatSkill {
     renderQueue: SkillRenderQueue;
     postDataRegistration(): void;
     constructor(namespace: DataNamespace, game: Game);
+    shouldShowSkillInSidebar(): boolean;
 }
 declare class Defence extends CombatSkill {
     readonly _media = Assets.Defence;
@@ -23,6 +25,7 @@ declare class Defence extends CombatSkill {
     renderQueue: SkillRenderQueue;
     constructor(namespace: DataNamespace, game: Game);
     postDataRegistration(): void;
+    shouldShowSkillInSidebar(): boolean;
 }
 declare class Hitpoints extends CombatSkill {
     readonly _media = Assets.Hitpoints;
@@ -34,6 +37,7 @@ declare class Hitpoints extends CombatSkill {
     get startingLevel(): number;
     onLevelUp(oldLevel: number, newLevel: number): void;
     onAbyssalLevelUp(oldLevel: number, newLevel: number): void;
+    shouldShowSkillInSidebar(): boolean;
 }
 declare class Ranged extends CombatSkill {
     readonly _media = Assets.Ranged;
@@ -41,6 +45,7 @@ declare class Ranged extends CombatSkill {
     renderQueue: SkillRenderQueue;
     constructor(namespace: DataNamespace, game: Game);
     postDataRegistration(): void;
+    shouldShowSkillInSidebar(): boolean;
 }
 declare class PrayerRenderQueue extends SkillRenderQueue {
     prayerMenu: boolean;
@@ -55,6 +60,7 @@ declare class Prayer extends CombatSkill {
     render(): void;
     renderPrayerMenu(): void;
     onAnyLevelUp(): void;
+    shouldShowSkillInSidebar(): boolean;
 }
 declare class Slayer extends CombatSkill {
     readonly _media = Assets.Slayer;
@@ -62,4 +68,5 @@ declare class Slayer extends CombatSkill {
     renderQueue: SkillRenderQueue;
     constructor(namespace: DataNamespace, game: Game);
     postDataRegistration(): void;
+    shouldShowSkillInSidebar(): boolean;
 }

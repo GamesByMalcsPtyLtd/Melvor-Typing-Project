@@ -27,6 +27,7 @@ declare class XpIconTooltipElement extends HTMLElement implements CustomElement 
 declare class XpIconElement extends InfoIconElement {
     _content: DocumentFragment;
     container: HTMLDivElement;
+    image: HTMLImageElement;
     tooltipElem: XpIconTooltipElement;
     xp: HTMLElement;
     constructor();
@@ -36,6 +37,7 @@ declare class XpIconElement extends InfoIconElement {
 declare class AbyssalXpIconElement extends InfoIconElement {
     _content: DocumentFragment;
     container: HTMLDivElement;
+    image: HTMLImageElement;
     tooltipElem: XpIconTooltipElement;
     xp: HTMLElement;
     constructor();
@@ -83,6 +85,7 @@ declare class DoublingIconTooltipElement extends HTMLElement implements CustomEl
 declare class DoublingIconElement extends InfoIconElement {
     _content: DocumentFragment;
     container: HTMLDivElement;
+    image: HTMLImageElement;
     tooltipElem: DoublingIconTooltipElement;
     chance: HTMLElement;
     constructor();
@@ -100,6 +103,7 @@ declare class PreservationIconTooltipElement extends HTMLElement implements Cust
 declare class PreservationIconElement extends InfoIconElement {
     _content: DocumentFragment;
     container: HTMLDivElement;
+    image: HTMLImageElement;
     tooltipElem: PreservationIconTooltipElement;
     chance: HTMLElement;
     constructor();
@@ -117,6 +121,7 @@ declare class PerfectCookIconTooltipElement extends HTMLElement implements Custo
 declare class PerfectCookIconElement extends InfoIconElement {
     _content: DocumentFragment;
     container: HTMLDivElement;
+    image: HTMLImageElement;
     tooltipElem: PerfectCookIconTooltipElement;
     chance: HTMLElement;
     constructor();
@@ -134,6 +139,7 @@ declare class CookingSuccessIconTooltipElement extends HTMLElement implements Cu
 declare class CookingSuccessIconElement extends InfoIconElement {
     _content: DocumentFragment;
     container: HTMLDivElement;
+    image: HTMLImageElement;
     tooltipElem: CookingSuccessIconTooltipElement;
     chance: HTMLElement;
     constructor();
@@ -149,6 +155,7 @@ declare class AdditionalPrimaryQuantityIconTooltipElement extends HTMLElement im
 declare class AdditionalPrimaryQuantityIconElement extends InfoIconElement {
     _content: DocumentFragment;
     container: HTMLDivElement;
+    image: HTMLImageElement;
     tooltipElem: AdditionalPrimaryQuantityIconTooltipElement;
     quantity: HTMLElement;
     constructor();
@@ -166,6 +173,7 @@ declare class CostReductionIconTooltipElement extends HTMLElement implements Cus
 declare class CostReductionIconElement extends InfoIconElement {
     _content: DocumentFragment;
     container: HTMLDivElement;
+    image: HTMLImageElement;
     tooltipElem: CostReductionIconTooltipElement;
     percent: HTMLElement;
     constructor();
@@ -174,6 +182,7 @@ declare class CostReductionIconElement extends InfoIconElement {
 declare class MasteryXpIconElement extends InfoIconElement {
     _content: DocumentFragment;
     container: HTMLDivElement;
+    image: HTMLImageElement;
     tooltipElem: XpIconTooltipElement;
     xp: HTMLElement;
     constructor();
@@ -190,6 +199,7 @@ declare class MasteryPoolIconTooltipElement extends HTMLElement implements Custo
 declare class MasteryPoolIconElement extends InfoIconElement {
     _content: DocumentFragment;
     container: HTMLDivElement;
+    image: HTMLImageElement;
     tooltipElem: MasteryPoolIconTooltipElement;
     xp: HTMLElement;
     realmIconMelvor: HTMLImageElement;
@@ -215,6 +225,7 @@ declare class StealthIconTooltipElement extends HTMLElement implements CustomEle
 declare class StealthIconElement extends InfoIconElement {
     _content: DocumentFragment;
     container: HTMLDivElement;
+    image: HTMLImageElement;
     tooltipElem: StealthIconTooltipElement;
     stealth: HTMLElement;
     constructor();
@@ -239,6 +250,7 @@ declare class MeteoriteChanceIconTooltipElement extends HTMLElement implements C
 declare class MeteoriteChanceIconElement extends InfoIconElement {
     _content: DocumentFragment;
     container: HTMLDivElement;
+    image: HTMLImageElement;
     tooltipElem: MeteoriteChanceIconTooltipElement;
     chance: HTMLElement;
     constructor();
@@ -247,6 +259,7 @@ declare class MeteoriteChanceIconElement extends InfoIconElement {
 declare class StarfallChanceIconElement extends InfoIconElement {
     _content: DocumentFragment;
     container: HTMLDivElement;
+    image: HTMLImageElement;
     tooltipElem: HTMLDivElement;
     chance: HTMLElement;
     constructor();

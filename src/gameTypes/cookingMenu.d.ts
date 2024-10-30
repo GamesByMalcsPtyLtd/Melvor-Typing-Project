@@ -24,6 +24,8 @@ declare class CookingMenuElement extends HTMLElement implements CustomElement {
     progressBar: ProgressBarElement;
     intervalTooltipEl: IntervalIconTooltipElement;
     intervalTooltip?: TippyTooltip;
+    passiveIntervalTooptipEl: IntervalIconTooltipElement;
+    passiveIntervalTooltip?: TippyTooltip;
     constructor();
     connectedCallback(): void;
     disconnectedCallback(): void;
@@ -47,15 +49,14 @@ declare class CookingRecipeSelectionElement extends HTMLElement implements Custo
     masteryPercent: HTMLElement;
     productName: HTMLSpanElement;
     selectButton: HTMLButtonElement;
-    iconContainer: HTMLDivElement;
     cookingXP: HTMLSpanElement;
     healingAmount: HTMLSpanElement;
     intervalIcon: IntervalIconElement;
+    costIcons: QuantityIconsElement;
     foodModifiersCont: HTMLDivElement;
     foodModifiers: HTMLDivElement;
     perfectFoodModifiersCont: HTMLDivElement;
     perfectFoodModifiers: HTMLDivElement;
-    quantityIcons: ItemQuantityIconElement[];
     constructor();
     connectedCallback(): void;
     setRecipe(recipe: CookingRecipe, cooking: Cooking, game: Game): void;

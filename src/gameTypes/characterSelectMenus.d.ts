@@ -43,6 +43,7 @@ declare class SaveSlotDisplayElement extends HTMLElement implements CustomElemen
     emptySlotText: HTMLHeadingElement;
     existingCloudWarning: HTMLHeadingElement;
     saveLoadingSpinner: HTMLButtonElement;
+    saveLoadingMessage: HTMLSpanElement;
     characterDisplay: CharacterDisplayElement;
     constructor();
     connectedCallback(): void;
@@ -58,6 +59,7 @@ declare class SaveSlotDisplayElement extends HTMLElement implements CustomElemen
     setLocalSave(slotID: number, localInfo: SaveGameHeader, cloudInfo?: SaveGameHeader): void;
     setSaveLoading(): void;
     setDisabled(): void;
+    setLoadingMessage(message: string): void;
 }
 declare class GamemodeSelectionElement extends HTMLElement implements CustomElement {
     _content: DocumentFragment;

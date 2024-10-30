@@ -93,6 +93,7 @@ declare class Cooking extends CraftingSkill<CookingRecipe, CookingSkillData, Coo
     getRecipeMasteryModifiedInterval(recipe: CookingRecipe): number;
     /** Gets the interval for performing a normal cook with a recipe */
     getRecipeCookingInterval(recipe: CookingRecipe): number;
+    getPassiveIntervalSources(recipe: CookingRecipe): HTMLSpanElement[];
     /** Gets the interval for performing a passive cook with a recipe */
     getRecipePassiveCookingInterval(recipe: CookingRecipe): number;
     getRecipeSuccessChance(recipe: CookingRecipe): number;

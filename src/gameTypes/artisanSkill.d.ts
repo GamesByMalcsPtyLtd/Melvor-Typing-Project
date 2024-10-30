@@ -18,6 +18,7 @@ declare abstract class ArtisanSkill<RecipeClass extends ArtisanSkillRecipe, Data
     abstract readonly activeRecipe: RecipeClass;
     /** ID of currently selected recipe */
     selectedRecipe?: RecipeClass;
+    selectedRecipeInRealm: Map<Realm, RecipeClass>;
     get actionInterval(): number;
     get actionLevel(): number;
     get actionAbyssalLevel(): number;
@@ -26,6 +27,8 @@ declare abstract class ArtisanSkill<RecipeClass extends ArtisanSkillRecipe, Data
     createButtonOnClick(): void;
     /** Callback function for when a recipe is selected */
     selectRecipeOnClick(recipe: RecipeClass): void;
+    resetToDefaultSelectedRecipeBasedOnRealm(): void;
+    abstract updateRealmSelection(): void;
     onLoad(): void;
     onAncientRelicUnlock(): void;
     queueBankQuantityRender(item: AnyItem): void;
@@ -34,6 +37,7 @@ declare abstract class ArtisanSkill<RecipeClass extends ArtisanSkillRecipe, Data
     onAnyLevelUp(): void;
     getErrorLog(): string;
     render(): void;
+    renderRealmedCategorySelection(): void;
     renderRealmVisibility(): void;
     /** Gets the costs for a recipe for this skill */
     getRecipeCosts(recipe: RecipeClass): Costs;
@@ -60,6 +64,7 @@ declare class ArtisanSkillRenderQueue<ActionType extends ArtisanSkillRecipe> ext
     selectedRecipe: boolean;
     /** Updates the recipe selection tabs */
     selectionTabs: boolean;
+    realmedCategorySelection: boolean;
 }
 interface ArtisanSkillRecipeData extends BasicSkillRecipeData {
     itemCosts: IDQuantity[];

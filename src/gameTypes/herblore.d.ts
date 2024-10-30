@@ -47,6 +47,8 @@ declare class Herblore extends ArtisanSkill<HerbloreRecipe, HerbloreSkillData, P
     /** Returns the recipe for a given potion. If none exists, returns undefined instead. */
     getRecipeForPotion(potion: PotionItem): HerbloreRecipe | undefined;
     getPotionTier(recipe: HerbloreRecipe): number;
+    resetToDefaultSelectedRecipeBasedOnRealm(): void;
+    updateRealmSelection(): void;
     onMasteryLevelUp(action: HerbloreRecipe, oldLevel: number, newLevel: number): void;
     recordCostPreservationStats(costs: Costs): void;
     recordCostConsumptionStats(costs: Costs): void;

@@ -32,6 +32,8 @@ declare class Smithing extends ArtisanSkill<SmithingRecipe, SmithingSkillData, A
     registerData(namespace: DataNamespace, data: SmithingSkillData): void;
     modifyData(data: SmithingModificationData): void;
     postDataRegistration(): void;
+    resetToDefaultSelectedRecipeBasedOnRealm(): void;
+    updateRealmSelection(): void;
     getSmithedVersionOfOre(ore: AnyItem): AnyItem | undefined;
     getUncappedCostReduction(action?: SmithingRecipe, item?: AnyItem): number;
     getFlatCostReduction(action?: SmithingRecipe, item?: AnyItem): number;

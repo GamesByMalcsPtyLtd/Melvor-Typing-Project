@@ -532,6 +532,7 @@ interface CraftingActionEventMatcherOptions extends SkillActionEventMatcherOptio
     type: 'CraftingAction';
     actionIDs?: string[];
     categoryIDs?: string[];
+    subcategoryIDs?: string[];
     /** Optional. If present, the item being crafted must match being a consumable item or not */
     isConsumable?: boolean;
 }
@@ -541,6 +542,8 @@ declare class CraftingActionEventMatcher extends SkillActionEventMatcher<Craftin
     actions?: Set<CraftingRecipe>;
     /** If present, the category of the recipe must match a member */
     categories?: Set<SkillCategory>;
+    /** If present, the subcategory of the recipe must match a member */
+    subcategories?: Set<SkillSubcategory>;
     /** If present, the product of the recipe must match being a consumble item or not */
     isConsumable?: boolean;
     constructor(options: CraftingActionEventMatcherOptions, game: Game);

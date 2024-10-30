@@ -585,3 +585,14 @@ interface SteamPurchaseResult {
 declare function generateMonsterStatsCSV(): void;
 declare function generateEquipmentStatsCSV(): void;
 declare function generateLangModifierCustomDescriptionForItem(item: EquipmentItem): void;
+interface UIElementShift {
+    element: string;
+    destination: string;
+}
+declare let isOnMobileLayout: boolean;
+declare const MOBILE_UI_ELEMENT_SHIFTS: UIElementShift[];
+declare const DESKTOP_UI_ELEMENT_SHIFTS: UIElementShift[];
+declare function shiftUIElement(shift: UIElementShift): void;
+declare function shiftToMobileLayout(): void;
+declare function shiftToDesktopLayout(): void;
+declare function onMobileScreenWidthChange(event: MediaQueryListEvent): void;

@@ -220,4 +220,6 @@ declare class ManagerRenderQueue {
     resistanceMenus: boolean;
     /** Updates the visibility of realm related combat menus */
     realmVisibility: Set<Realm>;
+    /** Updates the category visibility based on realm*/
+    categoryVisibilityByRealm: Set<Realm>;
 }

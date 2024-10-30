@@ -221,21 +221,23 @@ declare class Player extends Character implements IGameEventEmitter<PlayerCombat
     checkItemEquipRestrictions(restrictions: CombatEquipmentRestrictions, removedItems: ItemQuantity<EquipmentItem>[]): boolean;
     /**
      * Checks if the current restrictions on equipment will be violated when equipping an item. Fires a notification for the first violation.
+     * @param set The equipment set that is being equipped to
      * @param item The item being equipped
      * @param removedItems The items that will be removed
      * @returns If the item can be equipped
      */
-    checkEquipRestrictionsOnEquip(item: EquipmentItem, removedItems: ItemQuantity<EquipmentItem>[]): boolean;
+    checkEquipRestrictionsOnEquip(set: number, item: EquipmentItem, removedItems: ItemQuantity<EquipmentItem>[]): boolean;
     /** Function for equipping an item */
     equipItem(item: EquipmentItem, set: number, slot?: EquipmentSlot, quantity?: number): boolean;
     /** Returns a callback function for unequipping an item from a slot*/
     unequipCallback(slot: EquipmentSlot): () => void;
     /**
      * Checks if the current restrictions on equipment will be violated when unequipping an item. Fires a notification for the first violation.
+     * @param set The equipment set the item is being unequipped from
      * @param removed The item that is being removed
      * @returns If the item can be removed
      */
-    checkEquipRestrictionsOnUnequip(removed: ItemQuantity<EquipmentItem>): boolean;
+    checkEquipRestrictionsOnUnequip(set: number, removed: ItemQuantity<EquipmentItem>): boolean;
     /** Function for unequipping an item from a slot */
     unequipItem(set: number, slot: EquipmentSlot): boolean;
     /**

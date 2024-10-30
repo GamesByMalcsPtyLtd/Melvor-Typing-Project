@@ -4,6 +4,8 @@ interface RealmData extends IDData {
     unlockRequirements: AnyRequirementData[];
     showIfLocked?: boolean;
     ignoreCompletion?: boolean;
+    sidebarClass?: string;
+    realmClass?: string;
 }
 declare class Realm extends NamespacedObject {
     get name(): string;
@@ -14,6 +16,8 @@ declare class Realm extends NamespacedObject {
     showIfLocked: boolean;
     ignoreCompletion: boolean;
     modQuery: ModifierQuery;
+    sidebarClass?: string;
+    realmClass: string;
     constructor(namespace: DataNamespace, data: RealmData, game: Game);
     registerSoftDependencies(data: RealmData, game: Game): void;
     get isUnlocked(): boolean;
@@ -21,12 +25,16 @@ declare class Realm extends NamespacedObject {
 declare class RealmManager {
     game: Game;
     readonly unlockUnlisteners: Map<Realm, VoidFunction[]>;
+    currentSidebarRealm?: Realm;
     constructor(game: Game);
     onLoad(): void;
     assignUnlockListeners(): void;
     onRealmRequirementMet(realm: Realm): void;
     queueRealmUnlockedModal(realm: Realm): void;
     queueRealmUnlockRenders(realm: Realm): void;
+    showRealmUnlockRequirementsModal(realm: Realm): void;
+    setSidebarTheme(realm: Realm): void;
+    removeSidebarTheme(): void;
 }
 interface RealmedObjectData extends IDData {
     /** Optional. The ID of the realm the object belongs to. Defaults to melvorD:Melvor */
@@ -74,6 +82,7 @@ declare class RealmSelectMenuElement extends HTMLElement implements CustomElemen
     expanded: HTMLDivElement;
     realmContainer: HTMLUListElement;
     realmOptions: Map<Realm, RealmSelectOptionElement>;
+    realmSidebarOptions: Map<Realm, RealmSidebarSelect>;
     constructor();
     connectedCallback(): void;
     /** Populates the menu */
@@ -90,4 +99,20 @@ declare class RealmTabSelectElement extends HTMLElement implements CustomElement
     connectedCallback(): void;
     setOptions(realms: Realm[], callback: (realm: Realm) => void): void;
     updateRealmUnlock(realm: Realm): void;
+}
+declare class RealmSidebarSelect {
+    realmSidebarOptions: Map<Realm, RealmSidebarSelectOption>;
+    constructor();
+    updateRealmVisibility(realm: Realm): void;
+}
+declare class RealmSidebarSelectOption {
+    realm: Realm;
+    sidebarEl: SidebarSubitemWrapper;
+    constructor(realm: Realm);
+    setLocked(): void;
+    setUnlocked(): void;
+    showRealmSidebarOption(): void;
+    hideRealmSidebarOption(): void;
+    setSidebarOptionAsLocked(): void;
+    setSidebarOptionAsUnlocked(): void;
 }

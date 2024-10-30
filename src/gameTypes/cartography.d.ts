@@ -158,6 +158,7 @@ declare class Cartography extends Skill<CartographySkillData, CartographyEvents,
     getHexQueuePosition(hex: Hex): number;
     /** Returns true if the hex is currently being autosurveyed */
     isAutoSurveyingHex(hex: Hex): boolean;
+    shouldShowSkillInSidebar(): boolean;
     /** Hex that is currently being automatically surveyed */
     autoSurveyHex?: Hex;
     /** Returns the hex that is currently being surveyed */

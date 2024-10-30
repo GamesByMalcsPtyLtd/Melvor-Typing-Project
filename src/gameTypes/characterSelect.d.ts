@@ -24,6 +24,7 @@ declare function showLocalSaveSelection(): void;
 declare function showCloudSaveSelection(): void;
 /** Shows the save selection as loading a save in a given slot */
 declare function showSaveSelectionLoading(slotLoading: number): void;
+declare function setSaveLoadingMessage(slotID: number, message: string): void;
 declare function showSaveLoadingError(slotID: number, message: string, isCloud: boolean): void;
 /** Changes the type of saves being displayed. */
 declare function toggleSaveSelectionView(newView?: SaveViewType | -1): void;

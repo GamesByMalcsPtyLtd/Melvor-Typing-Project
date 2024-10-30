@@ -88,6 +88,7 @@ declare class SkillTree extends NamespacedObject implements EncodableObject, IGa
     onLoad(): void;
     getNodeCosts(node: SkillTreeNode): Costs;
     canAffordNode(node: SkillTreeNode): boolean;
+    canAffordAnyNode(): boolean;
     onNodeIconClick(node: SkillTreeNode): Promise<void>;
     unlockNode(node: SkillTreeNode): void;
     onNodeUnlocked(node: SkillTreeNode): void;

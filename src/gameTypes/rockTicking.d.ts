@@ -136,6 +136,7 @@ declare class Mining extends GatheringSkill<MiningRock, MiningSkillData, MiningE
     passiveTick(): void;
     getErrorLog(): string;
     onPageChange(): void;
+    onMasteryLevelUp(action: MiningRock, oldLevel: number, newLevel: number): void;
     onModifierChange(): void;
     onEquipmentChange(): void;
     onAnyLevelUp(): void;

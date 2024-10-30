@@ -109,8 +109,6 @@ declare class ArchaeologyRenderQueue extends GatheringSkillRenderQueue<Archaeolo
     digSiteVisibility: boolean;
     /** Updates Museum artefacts completion */
     museumArtefacts: Set<AnyItem>;
-    /** Updates Museum artefacts completion */
-    toolSelection: Set<ArchaeologyTool>;
     /** Updates Grants Rates for Dig Sites */
     digSiteRates: boolean;
 }

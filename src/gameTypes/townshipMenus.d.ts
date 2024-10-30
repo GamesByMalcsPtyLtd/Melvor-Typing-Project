@@ -35,7 +35,6 @@ declare class TownshipTownBiomeSelectElement extends HTMLElement implements Cust
     setBiome(biome: TownshipBiome, township: Township): void;
     highlight(biome: TownshipBiome | undefined): void;
     unhighlight(biome: TownshipBiome | undefined): void;
-    setAsMobileLayout(biome: TownshipBiome | undefined): void;
     updateProgress(biome: TownshipBiome, township: Township): void;
     applyReqFormatting(req: HTMLElement, isMet: boolean): void;
     updateRequirements(biome: TownshipBiome, township: Township): void;
@@ -131,7 +130,7 @@ declare class BuildingInTownElement extends HTMLElement implements CustomElement
     hideUpgradesToContainer(): void;
     showBuildRequirements(): void;
     hideBuildRequirements(): void;
-    createTotalElement(media: string, total: number): string;
+    createTotalElement(media: string, total: number, showPercent?: boolean): string;
     updateBuildingTotals(building: TownshipBuilding, township: Township): void;
     updateResourceTotals(building: TownshipBuilding, township: Township): void;
     updateStatsTotals(building: TownshipBuilding): void;
