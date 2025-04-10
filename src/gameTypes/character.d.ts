@@ -79,7 +79,7 @@ declare abstract class Character implements EncodableObject, Serializable, INoWi
     firstMiss: boolean;
     /** The amount of Barrier remaining */
     barrier: number;
-    /** The amount of Barrier remaining */
+    /** The percent of max hitpoints that the maximum barrier should be */
     maxBarrierPercent: number;
     barrierTurns: number;
     hasBarrier: boolean;

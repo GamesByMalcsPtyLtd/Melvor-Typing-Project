@@ -596,3 +596,4 @@ declare function shiftUIElement(shift: UIElementShift): void;
 declare function shiftToMobileLayout(): void;
 declare function shiftToDesktopLayout(): void;
 declare function onMobileScreenWidthChange(event: MediaQueryListEvent): void;
+declare function updateStickyElements(offset: number): void;

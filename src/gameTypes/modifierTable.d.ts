@@ -172,7 +172,6 @@ declare class CharacterModifierTable extends ModifierTable {
     readonly meleeProtection: number;
     readonly rangedProtection: number;
     readonly magicProtection: number;
-    readonly sleepImmunity: number;
     readonly rebirthChance: number;
     readonly summoningMaxHit: number;
     readonly otherStyleImmunity: number;

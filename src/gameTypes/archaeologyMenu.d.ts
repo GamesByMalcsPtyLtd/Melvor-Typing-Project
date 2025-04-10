@@ -102,6 +102,7 @@ declare class ArchaeologyMuseumItemElement extends HTMLElement implements Custom
     connectedCallback(): void;
     disconnectedCallback(): void;
     updateItem(item: AnyItem, game: Game): void;
+    updateInBank(item: AnyItem, game: Game, museum: ArchaeologyMuseum): void;
     showInBank(): void;
     hideInBank(): void;
     getItemTooltipHTML(item: AnyItem, game: Game): string;
@@ -112,4 +113,30 @@ declare enum WeightBadgeClass {
     RARE = "font-size-xs badge badge-danger ml-2",
     VERYRARE = "font-size-xs badge badge-primary ml-2",
     LEGENDARY = "font-size-xs badge badge-secondary ml-2"
+}
+declare class ArchaeologyMuseumElement extends HTMLElement implements CustomElement {
+    _content: DocumentFragment;
+    donationCount: HTMLElement;
+    nextRewardCount: HTMLElement;
+    donateGenericButton: HTMLButtonElement;
+    tokenGainCount: HTMLSpanElement;
+    tokensInBankCount: HTMLSpanElement;
+    artefactContainers: ArtefactObject<HTMLDivElement>;
+    artefacts: Map<AnyItem, ArchaeologyMuseumItemElement>;
+    constructor();
+    connectedCallback(): void;
+    init(archaeology: Archaeology): void;
+    loadArtefacts(archaeology: Archaeology): void;
+    createArtefactsForDigSite(archaeology: Archaeology, digSite: ArchaeologyDigSite, size: ArtefactType): void;
+    createMuseumItem(item: AnyItem, container: HTMLDivElement, museum: ArchaeologyMuseum): void;
+    /** Updates the information shown for donating generic artefacts */
+    updateGenericDonationInfo(museum: ArchaeologyMuseum): void;
+    updateMuseumTokenCount(game: Game, museum: ArchaeologyMuseum): void;
+    /**
+     * Updates the donation count, and items until next reward
+     * @param museum The museum to render
+     */
+    updateDonationProgress(museum: ArchaeologyMuseum): void;
+    updateAllArtefacts(game: Game, museum: ArchaeologyMuseum): void;
+    updateArtefact(item: AnyItem, game: Game, museum: ArchaeologyMuseum): void;
 }

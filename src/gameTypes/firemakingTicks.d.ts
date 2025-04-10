@@ -155,7 +155,12 @@ declare class Firemaking extends CraftingSkill<FiremakingLog, FiremakingSkillDat
     endBonFire(): void;
     getBonfireInterval(recipe: FiremakingLog): number;
     getBonfireIntervalSources(recipe: FiremakingLog): HTMLSpanElement[];
-    lightBonfire(): void;
+    /**
+     * Attempts to light a bonfire for the given recipe
+     * @param recipe The recipe to light a bonfire for. If unspecified, uses the currently selected logs
+     * @returns True if the bonfire was successfully lit
+     */
+    lightBonfire(recipe?: FiremakingLog): boolean;
     stopOilingMyLog(): void;
     endOilingOfMyLog(): void;
     onOilingOfLogsStatusChange(): void;

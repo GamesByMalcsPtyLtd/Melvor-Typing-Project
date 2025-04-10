@@ -101,7 +101,7 @@ declare class SpendMasteryMenuElement extends HTMLElement implements CustomEleme
     setSkill(skill: SkillWithMastery<MasteryAction, MasterySkillData>, realm: Realm, game: Game): void;
     unsetSkill(): void;
     updateRealmUnlock(realm: Realm): void;
-    createRealmOptions(skill: SkillWithMastery<MasteryAction, MasterySkillData>, game: Game): void;
+    createRealmOptions(skill: SkillWithMastery<MasteryAction, MasterySkillData>, realm: Realm, game: Game): void;
     showMasteriesForRealm(skill: SkillWithMastery<MasteryAction, MasterySkillData>, realm: Realm, game: Game): void;
     shouldHideMastery(skill: SkillWithMastery<MasteryAction, MasterySkillData>, action: MasteryAction): boolean;
     updateAllActions(): void;

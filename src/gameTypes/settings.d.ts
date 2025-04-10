@@ -212,6 +212,8 @@ interface BooleanSettings {
     bankFilterShowAbyssalXP: boolean;
     /** Whether to always show realm selection for Agility, regardless of the value of useLegacyRealmSelection */
     alwaysShowRealmSelectAgility: boolean;
+    /** Whether to allow swiping left/right on mobile to open/close the sidebar */
+    enableSwipeSidebar: boolean;
 }
 interface ChoiceSettings {
     /** If special attack modifiers should use neutral colours */
@@ -384,6 +386,7 @@ declare class Settings implements EncodableObject, BooleanSettings, ChoiceSettin
     get bankFilterShowSkillXP(): boolean;
     get bankFilterShowAbyssalXP(): boolean;
     get alwaysShowRealmSelectAgility(): boolean;
+    get enableSwipeSidebar(): boolean;
     /** The set of mastery namespaces that should be hidden in the spend mastery modal */
     hiddenMasteryNamespaces: Set<string>;
     constructor(game: Game);

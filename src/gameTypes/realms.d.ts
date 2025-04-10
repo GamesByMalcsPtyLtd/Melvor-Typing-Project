@@ -67,6 +67,8 @@ declare class RealmSelectOptionElement extends HTMLElement implements CustomElem
     setRealm(realm: Realm): void;
     setLocked(): void;
     setUnlocked(): void;
+    setSelected(): void;
+    setUnselected(): void;
     currentCallback?: VoidFunction;
     setCallback(callback: VoidFunction): void;
     setAsSubMenu(): void;
@@ -95,10 +97,14 @@ declare class RealmTabSelectElement extends HTMLElement implements CustomElement
     optionsContainer: HTMLUListElement;
     options: RealmSelectOptionElement[];
     optionsMap: Map<Realm, RealmSelectOptionElement>;
+    selectedOption?: RealmSelectOptionElement;
     constructor();
     connectedCallback(): void;
-    setOptions(realms: Realm[], callback: (realm: Realm) => void): void;
+    setOptions(realms: Realm[], callback: (realm: Realm) => void, highlightSelected?: boolean): void;
     updateRealmUnlock(realm: Realm): void;
+    setSelectedRealm(realm: Realm): void;
+    selectOption(option: RealmSelectOptionElement): void;
+    unselectOption(): void;
 }
 declare class RealmSidebarSelect {
     realmSidebarOptions: Map<Realm, RealmSidebarSelectOption>;

@@ -511,6 +511,8 @@ interface OfflineSnapshot {
     loot: Map<AnyItem, number>;
     monsterKills: Map<Monster, number>;
     dungeonCompletion: Map<Dungeon, number>;
+    strongholdCompletion: Map<Stronghold, number>;
+    abyssDepthCompletion: Map<AbyssDepth, number>;
     taskCompletions: Map<SlayerTaskCategory, number>;
     summoningMarks: Map<SummoningRecipe, number>;
     itemCharges: Map<AnyItem, number>;
@@ -566,4 +568,11 @@ declare class OfflineProgressElement extends HTMLElement implements CustomElemen
     constructor();
     connectedCallback(): void;
     setMessages(game: Game, oldSnapshot: OfflineSnapshot, newSnapshot: OfflineSnapshot, timeDiff: number, offlineAction?: ActiveAction): void;
+    /**
+     * Gets a map of the difference between counts in two snapshot maps
+     * @param oldCount The count map for the old snapshot
+     * @param newCount The count map for the new snapshot
+     * @returns The difference between the two maps (Only includes diffs > 0)
+     */
+    getCountDiff<T>(oldCount: Map<T, number>, newCount: Map<T, number>): Map<T, number>;
 }

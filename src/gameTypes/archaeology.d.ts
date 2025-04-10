@@ -1,3 +1,4 @@
+/// <reference types="sweetalert2" />
 interface ArtefactObject<T> {
     tiny: T;
     small: T;
@@ -107,8 +108,6 @@ declare class ArchaeologyRenderQueue extends GatheringSkillRenderQueue<Archaeolo
     mapSelection: Set<ArchaeologyDigSite>;
     /** Updates the visibility of dig sites */
     digSiteVisibility: boolean;
-    /** Updates Museum artefacts completion */
-    museumArtefacts: Set<AnyItem>;
     /** Updates Grants Rates for Dig Sites */
     digSiteRates: boolean;
 }
@@ -152,14 +151,12 @@ declare class ArchaeologyMuseumReward extends NamespacedObject {
     constructor(namepsace: DataNamespace, data: ArchaeologyMuseumRewardData, game: Game);
 }
 declare class ArchaeologyItemDonatedEvent extends GameEvent {
-    item: AnyItem;
     oldCount: number;
     newCount: number;
-    constructor(item: AnyItem, oldCount: number, newCount: number);
+    constructor(oldCount: number, newCount: number);
 }
 declare type ArchaeologyEvents = {
     action: ArchaeologyActionEvent;
-    itemDonated: ArchaeologyItemDonatedEvent;
 } & SkillWithMasteryEvents;
 interface ArtefactTypeLocation {
     size: ArtefactType;
@@ -176,17 +173,10 @@ declare class Archaeology extends GatheringSkill<ArchaeologyDigSite, Archaeology
     currentDigSite?: ArchaeologyDigSite;
     renderQueue: ArchaeologyRenderQueue;
     lastActiveDigSiteProgressBar?: ArchaeologyDigSite;
-    digSiteContainer: Map<ArchaeologyDigSite, ArchaeologyDigSiteContainerElement>;
     artefactTypeTools: Map<ArtefactType, ArchaeologyTool>;
-    museumRewards: NamespaceRegistry<ArchaeologyMuseumReward>;
     artefactLocationCache: Map<AnyItem, ArtefactTypeLocation>;
     /** Chance for bone drops when finding no artefacts (%) */
     chanceForBones: number;
-    /** Array of mastery bonuses this map gives. Sorted in order of lowest number of mastered hexes to highest number. */
-    sortedMuseumRewards: ArchaeologyMuseumReward[];
-    /** Total number of museum rewards that have been unlocked */
-    unlockedMuseumRewards: number;
-    itemsDonatedToMuseum: Set<AnyItem>;
     hiddenDigSites: Set<ArchaeologyDigSite>;
     get masteryAction(): ArchaeologyDigSite;
     get actionLevel(): number;
@@ -199,7 +189,6 @@ declare class Archaeology extends GatheringSkill<ArchaeologyDigSite, Archaeology
     postDataRegistration(): void;
     onAnyLevelUp(): void;
     render(): void;
-    renderMuseumArtefacts(): void;
     renderProgressBar(): void;
     renderMapCharges(): void;
     renderSelectedMap(): void;
@@ -213,6 +202,10 @@ declare class Archaeology extends GatheringSkill<ArchaeologyDigSite, Archaeology
     resetActionState(): void;
     onLoad(): void;
     postLoad(): void;
+    onPageChange(): void;
+    /** Queues renders when the museum becomes visible */
+    onMuseumVisible(): void;
+    queueBankQuantityRender(item: AnyItem): void;
     onModifierChange(): void;
     onAncientRelicUnlock(): void;
     museumRewardSource: ModifierSource;
@@ -249,25 +242,9 @@ declare class Archaeology extends GatheringSkill<ArchaeologyDigSite, Archaeology
     setToolAsInactive(digSite: ArchaeologyDigSite, tool: ArchaeologyTool): void;
     setAllDigSites(): void;
     showArtefactsForDigSite(digSite: ArchaeologyDigSite): void;
-    updateItem(item: AnyItem): void;
-    itemAlreadyDonatedToMuseum(item: AnyItem): boolean;
-    itemsUntilNextMuseumReward(): number;
-    donateItemToMuseum(item: AnyItem): void;
-    /**
-     * Awards a museum reward to the player. Does not recompute provided stats.
-     * @param bonus The bonus to give
-     */
-    awardMuseumReward(reward: ArchaeologyMuseumReward): void;
-    /**
-     * Queues a modal for unlocking a new museum bonus
-     * @param bonus The bonus unlocked
-     */
-    queueMuseumRewardModal(reward: ArchaeologyMuseumReward): void;
-    createItemCurrencyNodes(costs: ItemCurrencyLike): HTMLSpanElement[];
     cacheArtefactTypeAndLocation(item: AnyItem, digSite: ArchaeologyDigSite, type: ArtefactType): void;
     getArtefactTypeAndLocation(item: AnyItem): ArtefactTypeLocation;
     getArtefactTypeAndLocationFromCache(item: AnyItem): ArtefactTypeLocation;
-    cleanupDonatedMuseumArtefacts(): void;
     getObtainableItems(): Set<AnyItem>;
     getRegistry(type: ScopeSourceType): NamespaceRegistry<NamedObject> | undefined;
     getPkgObjects(pkg: GameDataPackage, type: ScopeSourceType): IDData[] | undefined;
@@ -278,6 +255,8 @@ declare const enum ArchaeologyPage {
 }
 declare class ArchaeologyUI {
     archaeology: Archaeology;
+    /** If the museum is currently visible */
+    get isMuseumVisible(): boolean;
     currentPage: ArchaeologyPage;
     defaultElements: {
         containers: {
@@ -288,40 +267,93 @@ declare class ArchaeologyUI {
             digSites: HTMLLinkElement;
             museum: HTMLLinkElement;
         };
-        museum: {
-            artefactsDonated: HTMLLIElement;
-            nextReward: HTMLLIElement;
-            content: HTMLDivElement;
-            museumTokensInBank: HTMLSpanElement;
-            museumTokensGained: HTMLSpanElement;
-            donateBtn: HTMLButtonElement;
-        };
+        museum: ArchaeologyMuseumElement;
     };
     constructor(archaeology: Archaeology);
     loadArchaeologyUI(): void;
     getPageButton(page: ArchaeologyPage): HTMLLinkElement;
     updatePageHighlight(oldPage: ArchaeologyPage, newPage: ArchaeologyPage): void;
     showPage(pageID: ArchaeologyPage): void;
-    createMenuEvents(): void;
-    loadMuseum(): void;
-    updateUI(): void;
 }
-declare class ArchaeologyMuseum {
-    artefacts: Map<AnyItem, ArchaeologyMuseumItemElement>;
-    museumTokenItem?: AnyItem;
-    genericArtefactCache: Set<AnyItem>;
-    constructor();
-    cacheMuseumData(): void;
-    getMuseumTokenGainInfo(): {
+declare class ArchaeologyMuseumRenderQueue {
+    /** Updates the progress towards rewards */
+    donationProgress: boolean;
+    /** Updates the information for generic donations */
+    genericDonationInfo: boolean;
+    /** Updates the amount of museum tokens in the bank */
+    museumTokenCount: boolean;
+    /** Updates all artefacts */
+    allArtefacts: boolean;
+    /** Updates Museum artefacts completion */
+    artefacts: Set<AnyItem>;
+}
+declare type ArchaeologyMuseumEvents = {
+    itemDonated: ArchaeologyItemDonatedEvent;
+};
+declare class ArchaeologyMuseum extends GameEventEmitter<ArchaeologyMuseumEvents> implements EncodableObject {
+    game: Game;
+    archaeology: Archaeology;
+    get tokenItem(): AnyItem;
+    _tokenItem: AnyItem;
+    genericArtefacts: AnyItem[];
+    rewards: NamespaceRegistry<ArchaeologyMuseumReward>;
+    /** The rewards for donating items to the museum, sorted by lowest to highest number of items required */
+    sortedRewards: ArchaeologyMuseumReward[];
+    /** Save state property. The artefact items which have been donated to the museum */
+    donatedItems: Set<AnyItem>;
+    readonly renderQueue: ArchaeologyMuseumRenderQueue;
+    /** Gets the total number of different items that have been donated to the museum */
+    get donationCount(): number;
+    constructor(game: Game, archaeology: Archaeology);
+    registerRewards(namespace: DataNamespace, data: ArchaeologyMuseumRewardData[]): void;
+    postDataRegistration(): void;
+    onLoad(): void;
+    render(): void;
+    renderDonationProgress(): void;
+    renderGenericDonation(): void;
+    renderMuseumTokeCount(): void;
+    renderAllArtefacts(): void;
+    renderArtefacts(): void;
+    /** Removes non-artefact items from the donatedItems set */
+    cleanupDonatedMuseumArtefacts(): void;
+    /** Checks if the given item has been donated to the museum */
+    isItemDonated(item: AnyItem): boolean;
+    /** Gets the number of artefacts that must be donated until the next reward is unlocked */
+    getItemsUntilNextReward(): number;
+    /** Callback function for when an individual item is selected to be donated */
+    donateItem(item: AnyItem): void;
+    /** Awards any unawarded rewards to the player */
+    giveUnawardedRewards(): void;
+    /**
+     * Awards a museum reward to the player. Does not recompute provided stats.
+     * @param bonus The bonus to give
+     */
+    giveReward(reward: ArchaeologyMuseumReward): void;
+    /**
+     * Queues a modal for unlocking a new museum bonus
+     * @param bonus The bonus unlocked
+     */
+    queueRewardModal(reward: ArchaeologyMuseumReward): void;
+    createItemCurrencyNodes(costs: ItemCurrencyLike): HTMLSpanElement[];
+    /**
+     * Iterates over each generic artefact in the bank that will be donated
+     * @param callbackfn
+     */
+    forEachGenericArtefactInBank(callbackfn: (item: AnyItem, donateQuantity: number) => void): void;
+    /**
+     * Gets information about the "Donate Generic Artefacts" action
+     * @returns The number of Museum Tokens gained, The total currency value of all donated items, and the total count of items donated
+     */
+    getDonateGenericInfo(): {
         tokenGain: number;
         currencyValue: SparseNumericMap<Currency>;
         itemCount: number;
     };
-    loadMuseumArtefacts(archaeology: Archaeology, game: Game): void;
-    createMuseumItem(item: AnyItem, el: HTMLDivElement): void;
-    updateMuseumProgress(): void;
-    updateMuseumItem(item: AnyItem, game: Game): void;
-    cacheGenericArtefacts(): void;
-    onDonateClick(): void;
+    /** Callback function for when the "Donate Generic Artefacts" button is pressed */
+    onDonateGenericClick(): Promise<void>;
+    fireConfirmDonateGenericModal(): Promise<import("sweetalert2").SweetAlertResult<any> | undefined>;
+    /** Executes the donation of all generic artefacts in the bank */
     donateAllGenericArtefacts(): void;
+    encode(writer: SaveWriter): SaveWriter;
+    decode(reader: SaveWriter, version: number): void;
 }
