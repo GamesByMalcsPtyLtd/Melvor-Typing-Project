@@ -26,6 +26,8 @@ declare const setSaveGUID: () => void;
 declare let sidebarSwipeTimer: number;
 /** Flags whether swipe events should be blocked */
 declare let disableSwipeEvents: boolean;
+/** Flags whether swipe events should be blocked due to a modal being open */
+declare let disableModalSwipe: boolean;
 declare let disableSidebarSwipe: boolean;
 declare function disableSidebarSwipeTimer(): void;
 declare function updateKeys(): void;
@@ -152,12 +154,12 @@ declare let inFocus: boolean;
 declare const onloadEvent: (accessCheck?: boolean) => void;
 declare function confirmedAuthenticated(): void;
 declare function checkIfAuthenticated(): Promise<void>;
-declare const INTERFACE_VERSION = 211;
+declare const INTERFACE_VERSION = 212;
 declare function assertInterfaceVersion(): void;
 /** Sets the save loading message with setTimeout to allow the UI to refresh */
 declare function setSaveLoadingMessageAsync(slotID: number, message: string): Promise<void>;
 declare function loadGameInterface(slotID: number): Promise<void>;
-declare const DATA_VERSION = 525;
+declare const DATA_VERSION = 527;
 declare function changePageCharacterSelection(page: CharacterSelectPage): void;
 /** Future announcement handler that will occur dynamically. For now this is hard coded. */
 declare function updateUIForAnnouncements(): void;

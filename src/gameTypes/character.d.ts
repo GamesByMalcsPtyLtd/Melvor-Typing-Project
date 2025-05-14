@@ -160,6 +160,8 @@ declare abstract class Character implements EncodableObject, Serializable, INoWi
     computeMagicMaxHit(): number;
     /** Calculates base evasion stats */
     computeEvasion(): void;
+    /** Calculates the average and max evasion stats */
+    computeAverageEvasion(): void;
     getMeleeDefenceBonus(): number;
     getRangedDefenceBonus(): number;
     getMagicDefenceBonus(): number;
@@ -515,7 +517,9 @@ declare class CharacterCombatStats {
     set accuracy(value: number);
     get evasion(): Evasion<number>;
     get averageEvasion(): number;
+    set averageEvasion(value: number);
     get maxEvasion(): number;
+    set maxEvasion(value: number);
     get maxHit(): number;
     set maxHit(value: number);
     get minHit(): number;

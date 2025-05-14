@@ -76,6 +76,8 @@ declare class Statistics implements SkillObject<StatTracker>, Serializable, Enco
     renderMutatedStats(): void;
     /** Converts the currency stats prior to the currenct rework */
     convertCurrencyStats(): void;
+    /** Converts the old way of tracking token item claim count into the statistic */
+    convertTimesClaimedStats(): void;
 }
 declare enum GeneralStats {
     /** @deprecated Use CurrencyStats.TotalEarned instead */
@@ -475,7 +477,9 @@ declare enum ItemStats {
     /** Stat for bones */
     TimesBuried = 18,
     /** Stat for soul items */
-    TimesReleased = 19
+    TimesReleased = 19,
+    /** The number of times a TokenItem has been claimed in the bank */
+    TimesClaimed = 20
 }
 declare enum StatCategories {
     General = 0,

@@ -164,7 +164,7 @@ declare type PackagedSave = {
     cd: number[];
 };
 declare const saveFormat2Version = 21;
-declare const currentSaveVersion = SaveVersion.SwipeSidebarSetting;
+declare const currentSaveVersion = SaveVersion.ItemClaimCount;
 declare const enum SaveVersion {
     ModProfiles = 83,
     MasteryModalFilter = 84,
@@ -200,7 +200,8 @@ declare const enum SaveVersion {
     ITABankFilterSettings = 127,
     ITARealmSelectAgility = 128,
     EnemyDamageTypeOverride = 129,
-    SwipeSidebarSetting = 130
+    SwipeSidebarSetting = 130,
+    ItemClaimCount = 131
 }
 interface AddRemove<T> {
     add: T[];
