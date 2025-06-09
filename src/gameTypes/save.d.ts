@@ -159,7 +159,7 @@ declare function assertInterfaceVersion(): void;
 /** Sets the save loading message with setTimeout to allow the UI to refresh */
 declare function setSaveLoadingMessageAsync(slotID: number, message: string): Promise<void>;
 declare function loadGameInterface(slotID: number): Promise<void>;
-declare const DATA_VERSION = 527;
+declare const DATA_VERSION = 528;
 declare function changePageCharacterSelection(page: CharacterSelectPage): void;
 /** Future announcement handler that will occur dynamically. For now this is hard coded. */
 declare function updateUIForAnnouncements(): void;
